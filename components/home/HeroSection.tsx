@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { createAudit } from '@/actions/auditActions';
 import { toast } from 'sonner';
 import WorldMap from '../ui/world-map';
+import AnalysisLoader from '../audit/AnalysisLoader';
 
 export default function HeroSection({ user }: { user: any }) {
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
