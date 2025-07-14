@@ -18,7 +18,7 @@ import { IoArrowBackOutline } from "react-icons/io5";
 import { Separator } from "../ui/separator";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ContentActions } from "./content-actions";
+import { ContentActions } from "./ContentActions";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -90,6 +90,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         )
     }
     const [isDownloading, setIsDownloading] = useState(false);
+    const currentDate = new Date().toISOString().split("T")[0]; 
 
     const handleDownloadPdf = async () => {
         setIsDownloading(true);
@@ -100,7 +101,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         try {
             toast.info("Preparing your PDF report...");
             const { generateSimplePdfFromMarkdown } = await import('@/lib/generatePdf');
-            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `website-audit-${audit.id}.pdf`);
+            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `${audit.url}-humanbrandai-${currentDate}.pdf`);
         } catch (error) {
             console.error("PDF generation failed:", error);
             toast.error("Failed to generate PDF report.");
@@ -187,7 +188,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                             <div className="flex justify-end">
                                 <ContentActions
                                     content={audit.auditGenratedContent}
-                                    auditID={audit?.id}
+                                    auditURL={audit.url}
                                 />
                             </div>
                         </div>

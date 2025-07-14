@@ -21,8 +21,8 @@ const UserMenu = ({ user }: { user: any }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-                <Avatar className=" hover:cursor-pointer">
-                    <AvatarImage src={user.image && user.image} alt="Profile image" />
+                <Avatar className=" hover:cursor-pointer rounded-full">
+                    <AvatarImage src={user.image && user.image} className=" rounded-full" alt="Profile image" />
                     <AvatarFallback>{user.name?.slice(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>

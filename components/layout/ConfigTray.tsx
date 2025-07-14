@@ -11,7 +11,7 @@ const ConfigTray = async () => {
     const user = await getCurrentUser();
 
     return (
-        <div className="flex items-center bg-background/50 backdrop-blur border p-1 rounded-full">
+        <div className="flex items-center gap-1 bg-background/50 backdrop-blur border p-1 rounded-full">
             <Button className="rounded-full border border-transparent hover:border-border hover:border" variant="ghost" size="sm" asChild>
                 <Link href="/">Home</Link>
             </Button>
