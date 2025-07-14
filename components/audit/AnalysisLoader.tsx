@@ -58,7 +58,7 @@ export default function AnalysisLoader() {
             {/* --- CSS Animations Definition --- */}
             <style jsx global>{`
         @keyframes drawLine {
-          from { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+          from { stroke-dasharray: 10000; stroke-dashoffset: 1000; }
           to { stroke-dasharray: 1000; stroke-dashoffset: 0; }
         }
         .animated-line {
