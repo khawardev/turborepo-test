@@ -15,30 +15,23 @@ export default function HeroSection({ user }: { user: any }) {
     const router = useRouter();
 
     const handleUrlSubmit = async (url: string) => {
-        setIsLoading(true);
-
         if (!user) {
             setSubmittedUrl(url);
             setAuthModalOpen(true);
             setIsLoading(false);
         } else {
-            // defer to let UI update before starting heavy task
-            setTimeout(() => {
-                startAudit(url);
-            }, 100);
+            startAudit(url);
         }
     };
 
     const startAudit = async (url: string) => {
         try {
             toast.info('Starting your free audit... Please wait.');
-
             const result = await createAudit(url);
-
             if (result.error) {
                 toast.error(result.error);
             } else if (result.auditId) {
-                toast.success('Analysis started! Redirecting to results...');
+                toast.success('Analysis finsihed! Redirecting to results...');
                 router.push(`/audit/${result.auditId}`);
             }
         } catch (error) {
@@ -53,9 +46,7 @@ export default function HeroSection({ user }: { user: any }) {
 
         if (submittedUrl) {
             setIsLoading(true);
-            setTimeout(() => {
-                startAudit(submittedUrl);
-            }, 100);
+            startAudit(submittedUrl);
         }
     };
 
@@ -75,7 +66,7 @@ export default function HeroSection({ user }: { user: any }) {
                     />
                 </div>
                 <div className="relative z-10">
-                    <UrlSubmissionForm isLoading={isLoading} onSubmit={handleUrlSubmit} />
+                    <UrlSubmissionForm setIsLoading={setIsLoading} isLoading={isLoading} onSubmit={handleUrlSubmit} />
                 </div>
             </div>
 

@@ -18,12 +18,14 @@ interface FormValues {
 
 interface UrlSubmissionFormProps {
     onSubmit: (url: string) => void;
+    setIsLoading: (url: boolean) => void;
     isLoading: boolean;
 }
 
 export default function UrlSubmissionForm({
     onSubmit,
-    isLoading
+    isLoading,
+    setIsLoading
 }: UrlSubmissionFormProps) {
     const form = useForm<FormValues>({
         defaultValues: { url: '' },
@@ -31,6 +33,7 @@ export default function UrlSubmissionForm({
     });
 
     const handleFormSubmit = async (data: FormValues) => {
+        setIsLoading(true)
         onSubmit(data.url);
     };
 
