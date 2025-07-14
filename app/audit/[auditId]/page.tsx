@@ -3,8 +3,9 @@ import { getCurrentUser } from "@/actions/userActions";
 import AuditResults from "@/components/audit/AuditResults";
 import { notFound } from "next/navigation";
 
-export default async function AuditPage({ params }: { params: { auditId: string } }) {
-    const { auditId } = await params;
+const page = async ({ params }: any) => {
+    const resolvedParams = await params;
+    const auditId = resolvedParams?.auditId; 
     const auditData = await getAuditById(auditId);
     const userData = await getCurrentUser();
 
@@ -13,4 +14,6 @@ export default async function AuditPage({ params }: { params: { auditId: string 
     }
 
     return <AuditResults audit={auditData} user={userData} />;
-}
+};
+
+export default page;

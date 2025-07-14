@@ -11,7 +11,7 @@ import { Copy, Download, Stars } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast } from "sonner";
 
-export function ContentActions({ content }: any) {
+export function ContentActions({ content, auditID }: any) {
     const handleCopy = () => {
         navigator.clipboard.writeText(content);
         toast.success("Content copied to clipboard!");
@@ -22,7 +22,7 @@ export function ContentActions({ content }: any) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "AIAG_generatedContent.txt";
+        a.download = `website-audit-${auditID}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
-import { AlertTriangle, CheckCircle2,  Loader2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
 import {
     Activity,
@@ -99,7 +99,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         }
         try {
             toast.info("Preparing your PDF report...");
-            const { generateSimplePdfFromMarkdown }  = await import('@/lib/generatePdf');
+            const { generateSimplePdfFromMarkdown } = await import('@/lib/generatePdf');
             generateSimplePdfFromMarkdown(audit.auditGenratedContent, `website-audit-${audit.id}.pdf`);
         } catch (error) {
             console.error("PDF generation failed:", error);
@@ -138,22 +138,22 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <ScoreWidget
                     title="Performance"
-                    score={audit.results.performanceScore}
+                    score={audit.results?.performanceScore}
                     icon={<Activity className="w-5 h-5" />}
                 />
                 <ScoreWidget
                     title="Accessibility"
-                    score={audit.results.accessibilityScore}
+                    score={audit.results?.accessibilityScore}
                     icon={<Accessibility className="w-5 h-5" />}
                 />
                 <ScoreWidget
                     title="Best Practices"
-                    score={audit.results.bestPracticesScore}
+                    score={audit.results?.bestPracticesScore}
                     icon={<ShieldCheck className="w-5 h-5" />}
                 />
                 <ScoreWidget
                     title="SEO"
-                    score={audit.results.seoScore}
+                    score={audit.results?.seoScore}
                     icon={<SearchCheck className="w-5 h-5" />}
                 />
             </div>
@@ -186,7 +186,8 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                             <h1 className="text-xl tracking-tight font-semibold font-heading">Website Audit Report Content</h1>
                             <div className="flex justify-end">
                                 <ContentActions
-                                    content={audit.crawledContent}
+                                    content={audit.auditGenratedContent}
+                                    auditID={audit?.id}
                                 />
                             </div>
                         </div>

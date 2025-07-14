@@ -1,7 +1,13 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -13,23 +19,27 @@ interface FormValues {
 interface UrlSubmissionFormProps {
     onSubmit: (url: string) => void;
     isLoading: boolean;
-    setIsLoading: (value: boolean) => void;
 }
 
-export default function UrlSubmissionForm({ onSubmit, isLoading, setIsLoading }: UrlSubmissionFormProps) {
+export default function UrlSubmissionForm({
+    onSubmit,
+    isLoading
+}: UrlSubmissionFormProps) {
     const form = useForm<FormValues>({
-        defaultValues: { url: "" },
-        mode: 'onChange',
+        defaultValues: { url: '' },
+        mode: 'onChange'
     });
 
-    const handleFormSubmit = async (data: any) => {
-        setIsLoading(true)
+    const handleFormSubmit = async (data: FormValues) => {
         onSubmit(data.url);
     };
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit((handleFormSubmit))} className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto">
+            <form
+                onSubmit={form.handleSubmit(handleFormSubmit)}
+                className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto"
+            >
                 <FormField
                     control={form.control}
                     name="url"
@@ -55,9 +65,14 @@ export default function UrlSubmissionForm({ onSubmit, isLoading, setIsLoading }:
                         </FormItem>
                     )}
                 />
-                <Button type="submit" size="lg" className="w-full rounded-full font-semibold sm:w-auto" disabled={isLoading}>
-                    {isLoading && <Loader2 className="animate-spin" />}
-                    Start  Audit
+                <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full rounded-full font-semibold sm:w-auto"
+                    disabled={isLoading}
+                >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Start Audit
                 </Button>
             </form>
         </Form>

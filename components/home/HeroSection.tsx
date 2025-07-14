@@ -15,37 +15,54 @@ export default function HeroSection({ user }: { user: any }) {
     const router = useRouter();
 
     const handleUrlSubmit = async (url: string) => {
+        setIsLoading(true);
+
         if (!user) {
             setSubmittedUrl(url);
             setAuthModalOpen(true);
+            setIsLoading(false);
         } else {
-            await startAudit(url);
+            // defer to let UI update before starting heavy task
+            setTimeout(() => {
+                startAudit(url);
+            }, 100);
         }
     };
 
     const startAudit = async (url: string) => {
-        toast.info("Starting your free audit... Please wait.");
-        const result = await createAudit(url);
-        if (result.error) {
-            toast.error(result.error);
+        try {
+            toast.info('Starting your free audit... Please wait.');
+
+            const result = await createAudit(url);
+
+            if (result.error) {
+                toast.error(result.error);
+            } else if (result.auditId) {
+                toast.success('Analysis started! Redirecting to results...');
+                router.push(`/audit/${result.auditId}`);
+            }
+        } catch (error) {
+            toast.error('Something went wrong while starting audit.');
+        } finally {
             setIsLoading(false);
-        } else if (result.auditId) {
-            toast.success("Analysis started! Redirecting to results...");
-            router.push(`/audit/${result.auditId}`);
         }
     };
 
     const handleAuthSuccess = () => {
         setAuthModalOpen(false);
+
         if (submittedUrl) {
-            startAudit(submittedUrl);
+            setIsLoading(true);
+            setTimeout(() => {
+                startAudit(submittedUrl);
+            }, 100);
         }
     };
 
     return (
         <>
             <div className="relative">
-                <div className="absolute inset-x-0 md:-top-40 top-20 overflow-hidden  z-0 opacity-30 dark:opacity-60 pointer-events-none">
+                <div className="absolute inset-x-0 md:-top-40 top-20 overflow-hidden z-0 opacity-30 dark:opacity-60 pointer-events-none">
                     <WorldMap
                         dots={[
                             { start: { lat: 64.2, lng: -149.4 }, end: { lat: 34.0, lng: -118.2 } },
@@ -53,12 +70,12 @@ export default function HeroSection({ user }: { user: any }) {
                             { start: { lat: -15.7, lng: -47.8 }, end: { lat: 38.7, lng: -9.1 } },
                             { start: { lat: 51.5, lng: -0.1 }, end: { lat: 28.6, lng: 77.2 } },
                             { start: { lat: 28.6, lng: 77.2 }, end: { lat: 43.1, lng: 131.9 } },
-                            { start: { lat: 28.6, lng: 77.2 }, end: { lat: -1.2, lng: 36.8 } },
+                            { start: { lat: 28.6, lng: 77.2 }, end: { lat: -1.2, lng: 36.8 } }
                         ]}
                     />
                 </div>
                 <div className="relative z-10">
-                    <UrlSubmissionForm setIsLoading={setIsLoading} onSubmit={handleUrlSubmit} isLoading={isLoading} />
+                    <UrlSubmissionForm isLoading={isLoading} onSubmit={handleUrlSubmit} />
                 </div>
             </div>
 
