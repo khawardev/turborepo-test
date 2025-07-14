@@ -15,6 +15,7 @@ export default function HeroSection({ user }: { user: any }) {
     const router = useRouter();
 
     const handleUrlSubmit = async (url: string) => {
+        setIsLoading(true);
         if (!user) {
             setSubmittedUrl(url);
             setAuthModalOpen(true);
@@ -24,7 +25,6 @@ export default function HeroSection({ user }: { user: any }) {
     };
 
     const startAudit = async (url: string) => {
-        setIsLoading(true);
         toast.info("Starting your free audit... Please wait.");
         const result = await createAudit(url);
         if (result.error) {

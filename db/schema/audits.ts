@@ -9,6 +9,8 @@ export const audit = audit_schema.table('audit', {
     url: text('url').notNull(),
     status: text('status', { enum: ['pending', 'completed', 'failed'] }).notNull().default('pending'),
     results: jsonb('results'),
+    crawledContent: text('crawledContent'),
+    auditGenratedContent: text('auditGenratedContent'),
     createdAt: timestamp('createdAt').notNull().defaultNow(),
     updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });

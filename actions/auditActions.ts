@@ -6,6 +6,10 @@ import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { user as userSchema } from "@/db/schema/users";
 import { audit as auditSchema } from "@/db/schema/audits";
+import { crawlWebsite } from "./crawl";
+import { generateNewContent } from "./generateContent";
+import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
+import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
 
 export async function createAudit(url: string) {
     const session = await getSession();
@@ -35,19 +39,39 @@ export async function createAudit(url: string) {
         return { error: "Failed to create audit record." };
     }
 
-    // Simulate audit process
     await new Promise(resolve => setTimeout(resolve, 4000));
 
-    // Simulate a failure for a specific URL for testing WAA-TC-3.4
     if (url.includes("fail-test.com")) {
         await db.update(auditSchema)
             .set({ status: 'failed', updatedAt: new Date() })
             .where(eq(auditSchema.id, newAudit.id));
         revalidatePath(`/audit/${newAudit.id}`);
-        return { auditId: newAudit.id }; // Credit not consumed on failure
+        return { auditId: newAudit.id }; 
+    }
+    const crawlResult = await crawlWebsite(url);
+    if (crawlResult.error) {
+        throw new Error(crawlResult.error);
     }
 
-    // On success, update audit and decrement user credits
+    console.log(crawlResult.content, `<-> crawlResult <->`);
+
+    const prompt = INITIAL_AUDIT_PROMPT({
+        website_url: url,
+        crawledContent: crawlResult.content,
+    });
+    const generatedResult = await generateNewContent(prompt)
+
+console.log(generatedResult, `<-> generatedResult <->`);
+
+
+    
+    const cleanedMarkdown = cleanAndFlattenBulletsGoogle(generatedResult.generatedText)
+
+
+    console.log(generatedResult, `<-> generatedResult <->`);
+
+
+
     const mockResults = {
         seoScore: Math.floor(Math.random() * (95 - 70 + 1) + 70),
         performanceScore: Math.floor(Math.random() * (98 - 65 + 1) + 65),
@@ -58,7 +82,7 @@ export async function createAudit(url: string) {
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
-                .set({ status: 'completed', results: mockResults, updatedAt: new Date() })
+                .set({ status: 'completed', results: mockResults, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown,  updatedAt: new Date() })
                 .where(eq(auditSchema.id, newAudit.id));
 
             await tx.update(userSchema)
@@ -67,7 +91,7 @@ export async function createAudit(url: string) {
         });
 
         revalidatePath(`/audit/${newAudit.id}`);
-        revalidatePath('/'); // To update header credit count
+        revalidatePath('/'); 
         return { auditId: newAudit.id };
 
     } catch (error) {

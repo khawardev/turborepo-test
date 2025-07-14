@@ -25,7 +25,7 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
         >
-          <div className="fixed bottom-6 w-full sm:w-auto sm:right-6 z-50">
+          <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50">
             <ConfigTray />
           </div>
 

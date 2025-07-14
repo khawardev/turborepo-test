@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LogOutIcon } from 'lucide-react'
 import { signOut } from '@/lib/auth/auth-client'
+import { useRouter } from "next/navigation"
 
 const UserMenu = ({ user }: { user: any }) => {
+    const router = useRouter()
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
@@ -36,7 +38,7 @@ const UserMenu = ({ user }: { user: any }) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={async () => {
                     await signOut();
-                    window.location.href = "/";
+                    router.refresh();
                 }}>
                     <LogOutIcon size={16} className="opacity-60 " />
                     <span>Logout</span>

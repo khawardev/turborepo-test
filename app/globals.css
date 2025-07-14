@@ -1,3 +1,4 @@
+@import url("./markdown.css");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -42,6 +43,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
+
 :root {
   --radius: 0.65rem;
   --background: oklch(0.22 0.03 180);
@@ -128,5 +130,9 @@
 
   .font-Inter {
     font-family: 'Inter', sans-serif !important;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

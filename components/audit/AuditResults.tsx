@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
 import { AlertTriangle, FileDown, CheckCircle2, CircleSlash } from "lucide-react";
-import { MdFileDownload, MdOutlineDownloading } from "react-icons/md";
+import { MdFileDownload, MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
 import {
     Activity,
     Accessibility,
@@ -17,6 +17,9 @@ interface AuditResultsProps {
 }
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Separator } from "../ui/separator";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { ContentActions } from "./content-actions";
 
 const ScoreWidget = ({
     title,
@@ -83,16 +86,12 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
     return (
         <div className="container flex flex-col space-y-6 max-w-4xl mx-auto py-12 px-4">
-            
-            <Link href={'/audit'}>
-                <Button className="rounded-full" variant="outline">
-                    <IoArrowBackOutline /> back
-                </Button>
-            </Link>
-            
+            <Button className="rounded-full" variant="outline" asChild>
+                <Link href="/audit"><IoArrowBackOutline /> back</Link>
+            </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl   tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
+                    <h1 className="text-3xl tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
                     <p className="text-muted-foreground break-all">{audit.url}</p>
                 </div>
                 <Button size={'sm'} >
@@ -124,8 +123,6 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                 />
             </div>
 
-
-        
             {hasCredits && (
                 <Alert className="mb-8 border-lime-green/50 text-lime-green">
                     <CheckCircle2 className="h-4 w-4 text-lime-green" />
@@ -138,13 +135,35 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
             {!hasCredits && user?.auditCredits !== appConfig.audits.freeTierLimit && (
                 <Alert variant="destructive" className="mb-8">
-                    <CircleSlash className="h-4 w-4" />
+                    <MdOutlineRemoveCircleOutline className="h-4 w-4" />
                     <AlertTitle className="font-semibold">Usage Limit Reached</AlertTitle>
                     <AlertDescription>
-                        You have used all your free reports. Upgrade to generate more.
+                        You have used all your free reports.
                     </AlertDescription>
                 </Alert>
             )}
+
+            {
+                audit.crawledContent &&
+                <section>
+                    <div>
+                        <div className={"flex md:items-center items-end justify-between mb-4"}>
+                            <h1 className="text-xl tracking-tight font-semibold font-heading">Website Audit Report Content</h1>
+                            <div className="flex justify-end">
+                                <ContentActions
+                                    content={audit.crawledContent}
+                                />
+                            </div>
+                        </div>
+                        <Separator className="mb-4" />
+                    </div>
+                    <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{audit.auditGenratedContent}</ReactMarkdown>
+                    </div>
+                </section>
+            }
         </div>
+
+
     );
 }

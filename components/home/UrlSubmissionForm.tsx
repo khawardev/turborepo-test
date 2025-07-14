@@ -21,7 +21,7 @@ export default function UrlSubmissionForm({ onSubmit, isLoading }: UrlSubmission
         mode: 'onChange',
     });
 
-    const handleFormSubmit = (data: FormValues) => {
+    const handleFormSubmit = async (data: any) => {
         onSubmit(data.url);
     };
 
@@ -42,9 +42,10 @@ export default function UrlSubmissionForm({ onSubmit, isLoading }: UrlSubmission
                         <FormItem className="w-full">
                             <FormControl>
                                 <Input
+                                    disabled={isLoading}
                                     type="url"
                                     placeholder="https://www.yourwebsite.com"
-                                    className="h-10 text-center sm:text-left"
+                                    className="h-10 text-center rounded-full sm:text-left"
                                     {...field}
                                 />
                             </FormControl>
@@ -52,9 +53,9 @@ export default function UrlSubmissionForm({ onSubmit, isLoading }: UrlSubmission
                         </FormItem>
                     )}
                 />
-                <Button type="submit" size="lg" className="w-full font-semibold sm:w-auto" disabled={isLoading}>
+                <Button type="submit" size="lg" className="w-full rounded-full font-semibold sm:w-auto" disabled={isLoading}>
                     {isLoading && <Loader2 className="animate-spin" />}
-                    Start Free Audit
+                    Start  Audit
                 </Button>
             </form>
         </Form>

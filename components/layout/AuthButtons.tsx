@@ -13,7 +13,7 @@ export default function AuthButtons() {
     };
     return (
         <>
-            <Button onClick={() => setAuthModalOpen(true)} className=" rounded-full" variant="outline">
+            <Button onClick={() => setAuthModalOpen(true)} className="bg-input/50 rounded-full" variant="outline">
                 Sign In
             </Button>
             <AuthModal
