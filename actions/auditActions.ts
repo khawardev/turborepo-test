@@ -50,27 +50,16 @@ export async function createAudit(url: string) {
     }
     const crawlResult = await crawlWebsite(url);
     if (crawlResult.error) {
-        throw new Error(crawlResult.error);
+        console.error("Analysis failed:", crawlResult.error);
+        return { error: "An error occurred during analysis. Please try again." };
     }
-
-    console.log(crawlResult.content, `<-> crawlResult <->`);
 
     const prompt = INITIAL_AUDIT_PROMPT({
         website_url: url,
         crawledContent: crawlResult.content,
     });
     const generatedResult = await generateNewContent(prompt)
-
-console.log(generatedResult, `<-> generatedResult <->`);
-
-
-    
     const cleanedMarkdown = cleanAndFlattenBulletsGoogle(generatedResult.generatedText)
-
-
-    console.log(generatedResult, `<-> generatedResult <->`);
-
-
 
     const mockResults = {
         seoScore: Math.floor(Math.random() * (95 - 70 + 1) + 70),

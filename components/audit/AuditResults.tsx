@@ -1,9 +1,11 @@
+'use client'
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
-import { AlertTriangle, FileDown, CheckCircle2, CircleSlash } from "lucide-react";
-import { MdFileDownload, MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
+import { AlertTriangle, CheckCircle2,  Loader2 } from "lucide-react";
+import { MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
 import {
     Activity,
     Accessibility,
@@ -11,15 +13,19 @@ import {
     SearchCheck,
 } from "lucide-react";
 import Link from "next/link";
-interface AuditResultsProps {
-    audit: any;
-    user: any;
-}
+
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Separator } from "../ui/separator";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ContentActions } from "./content-actions";
+import { toast } from "sonner";
+import { useState } from "react";
+
+interface AuditResultsProps {
+    audit: any;
+    user: any;
+}
 
 const ScoreWidget = ({
     title,
@@ -83,19 +89,48 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
             </div>
         )
     }
+    const [isDownloading, setIsDownloading] = useState(false);
 
+    const handleDownloadPdf = async () => {
+        setIsDownloading(true);
+        if (!audit?.auditGenratedContent) {
+            toast.error("No report content available to download.");
+            return;
+        }
+        try {
+            toast.info("Preparing your PDF report...");
+            const { generateSimplePdfFromMarkdown }  = await import('@/lib/generatePdf');
+            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `website-audit-${audit.id}.pdf`);
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            toast.error("Failed to generate PDF report.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
     return (
         <div className="container flex flex-col space-y-6 max-w-4xl mx-auto py-12 px-4">
-            <Button className="rounded-full" variant="outline" asChild>
-                <Link href="/audit"><IoArrowBackOutline /> back</Link>
+            <Button className="w-fit rounded-full" variant="outline" asChild>
+                <Link href="/audit">
+                    <IoArrowBackOutline /> back
+                </Link>
             </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
                     <p className="text-muted-foreground break-all">{audit.url}</p>
                 </div>
-                <Button size={'sm'} >
-                    Save Report <MdOutlineDownloading />
+                <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>
+                    {isDownloading ? (
+                        <>
+                            <Loader2 className="animate-spin" />
+                            Generating...
+                        </>
+                    ) : (
+                        <>
+                            Save Report <MdOutlineDownloading />
+                        </>
+                    )}
                 </Button>
             </div>
             <Separator className="mb-8" />
@@ -157,7 +192,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                         </div>
                         <Separator className="mb-4" />
                     </div>
-                    <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
+                    <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{audit.auditGenratedContent}</ReactMarkdown>
                     </div>
                 </section>

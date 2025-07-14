@@ -13,21 +13,23 @@ interface FormValues {
 interface UrlSubmissionFormProps {
     onSubmit: (url: string) => void;
     isLoading: boolean;
+    setIsLoading: (value: boolean) => void;
 }
 
-export default function UrlSubmissionForm({ onSubmit, isLoading }: UrlSubmissionFormProps) {
+export default function UrlSubmissionForm({ onSubmit, isLoading, setIsLoading }: UrlSubmissionFormProps) {
     const form = useForm<FormValues>({
         defaultValues: { url: "" },
         mode: 'onChange',
     });
 
     const handleFormSubmit = async (data: any) => {
+        setIsLoading(true)
         onSubmit(data.url);
     };
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto">
+            <form onSubmit={form.handleSubmit((handleFormSubmit))} className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto">
                 <FormField
                     control={form.control}
                     name="url"

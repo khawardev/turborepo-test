@@ -24,7 +24,7 @@ export async function crawlWebsite(url:any) {
             .join('\n\n---\n\n');
 
         if (!combinedContent) {
-            return { error: 'Crawling did not return any usable content.' };
+            return { error: 'Not able to get the usable audit contet' };
         }
 
         return { content: combinedContent };

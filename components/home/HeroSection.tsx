@@ -15,7 +15,6 @@ export default function HeroSection({ user }: { user: any }) {
     const router = useRouter();
 
     const handleUrlSubmit = async (url: string) => {
-        setIsLoading(true);
         if (!user) {
             setSubmittedUrl(url);
             setAuthModalOpen(true);
@@ -59,7 +58,7 @@ export default function HeroSection({ user }: { user: any }) {
                     />
                 </div>
                 <div className="relative z-10">
-                    <UrlSubmissionForm onSubmit={handleUrlSubmit} isLoading={isLoading} />
+                    <UrlSubmissionForm setIsLoading={setIsLoading} onSubmit={handleUrlSubmit} isLoading={isLoading} />
                 </div>
             </div>
 

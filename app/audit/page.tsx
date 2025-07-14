@@ -25,8 +25,8 @@ export default async function AuditsListPage() {
             <Separator className="mb-8" />
             {audits.length === 0 ? (
                 <div className="text-center py-16 border-2 border-dashed rounded-lg">
-                    <h2 className="text-xl font-bold tracking-tight">No Audits Found</h2>
-                    <p className="text-muted-foreground mb-4">You haven't generated any audits yet.</p>
+                    <h2 className="font-semibold text-medium">No Audits Found</h2>
+                    <p className="text-muted-foreground mt-1 mb-4">You haven't generated any audits yet.</p>
                     <Button  size={'sm'} asChild>
                         <Link href="/">Start your First Audit</Link>
                     </Button>

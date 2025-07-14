@@ -14,7 +14,7 @@ export async function generateNewContent(
         // } else {
         //     model = google("gemini-2.5-pro-preview-05-06");
         // }
-        model = google("gemini-2.5-pro-preview-05-06");
+        model = google("gemini-2.5-pro");
         const result = await generateText({
             model,
             temperature: 0.7,
