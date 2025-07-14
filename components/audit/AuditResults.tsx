@@ -62,7 +62,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
     if (audit.status === 'failed') {
         return (
-            <div className="container max-w-4xl mx-auto py-12 px-4">
+            <div className="container max-w-4xl mx-auto py-30 px-4">
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Analysis Failed</AlertTitle>
@@ -76,7 +76,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
     if (hasReachedLimit && audit.status !== 'completed') {
         return (
-            <div className="container max-w-4xl mx-auto py-12 px-4 text-center">
+            <div className="container max-w-4xl mx-auto py-30 px-4 text-center">
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-2xl">You've Used All Your Free Audits!</CardTitle>
@@ -110,7 +110,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         }
     };
     return (
-        <div className="container flex flex-col space-y-6 max-w-4xl mx-auto py-12 px-4">
+        <div className="container flex flex-col space-y-6 max-w-4xl mx-auto py-30 px-4">
             <Button className="w-fit rounded-full" variant="outline" asChild>
                 <Link href="/audit">
                     <IoArrowBackOutline /> back
