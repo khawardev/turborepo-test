@@ -15,5 +15,9 @@ chown -R ubuntu:ubuntu "$APP_DIR"
 npm install
 npm run build
 
-# Restart PM2 app
-pm2 start ecosystem.config.js
+# Restart or start PM2 app
+if pm2 list | grep -q "Audit"; then
+  pm2 restart Audit
+else
+  pm2 start ecosystem.config.js
+fi
