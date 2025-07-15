@@ -3,7 +3,6 @@
 APP_DIR="/opt/app/"
 cd "$APP_DIR" || exit 1
 
-git pull || exit 1
 npm install || exit 1
 npm run build || exit 1
 
