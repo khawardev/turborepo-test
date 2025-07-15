@@ -1,11 +1,15 @@
 #!/bin/bash
+set -e
 
-APP_DIR="/opt/app/"
-cd "$APP_DIR" || exit 1
+APP_DIR="/opt/app"
+cd "$APP_DIR"
 
-npm install || exit 1
-npm run build || exit 1
+# Ensure proper ownership
+chown -R ubuntu:ubuntu "$APP_DIR"
 
-pm2 restart Audit || exit 1
+# Install and build
+npm install
+npm run build
 
-exit 0
+# Restart PM2 app
+pm2 restart Audit
