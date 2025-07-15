@@ -4,12 +4,16 @@ set -e
 APP_DIR="/opt/app"
 cd "$APP_DIR"
 
-# Ensure proper ownership
+# Ensure logs directory exists and set permissions
+mkdir -p logs
+chmod -R 755 logs
+
+# Set ownership
 chown -R ubuntu:ubuntu "$APP_DIR"
 
-# Install and build
+# Install dependencies and build
 npm install
 npm run build
 
 # Restart PM2 app
-pm2 restart Audit
+pm2 start ecosystem.config.js
