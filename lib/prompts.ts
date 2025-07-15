@@ -98,8 +98,6 @@ Use newlines (a literal \\n) for multiple items in a cell.
 | High-Impact Tests | A/B Ideas | 1)…\\n2)…\\n3)… |
 
 ––– OUTPUT FORMAT & TONE –––––––––––––––––––––––––––––––––––––––––––
-
-  ## Website Health Audit Report
   
   Prepared for: 
   Prepared by: 
