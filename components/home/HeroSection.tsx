@@ -27,7 +27,7 @@ export default function HeroSection({ user }: { user: any }) {
 
     const startAudit = async (url: string) => {
         try {
-            toast.info('Starting your free audit... Please wait.');
+            toast.info('Starting your free audit, Please wait.');
             const result = await createAudit(url);
             if (result.error) {
                 toast.error(result.error);
@@ -53,8 +53,8 @@ export default function HeroSection({ user }: { user: any }) {
 
     return (
         <>
-            <div className="relative">
-                <div className="absolute inset-x-0 md:-top-40 top-20 overflow-hidden z-0 opacity-30 dark:opacity-60 pointer-events-none">
+            <div className="relative ">
+                <div className="absolute inset-x-0 w-full md:scale-110 md:-top-30 top-20 overflow-hidden z-0 opacity-30 dark:opacity-60 pointer-events-none">
                     <WorldMap
                         dots={[
                             { start: { lat: 64.2, lng: -149.4 }, end: { lat: 34.0, lng: -118.2 } },

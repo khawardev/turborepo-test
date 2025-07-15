@@ -212,25 +212,34 @@
 }
 
 .markdown-body table {
+  display: block;
   width: 100%;
+  overflow-x: auto;
   border-collapse: collapse;
   margin-bottom: 2rem;
   border-radius: var(--radius);
-  overflow: hidden;
+  border: 1px solid var(--border);
 }
 
 .markdown-body table th,
 .markdown-body table td {
-  border: 1px solid var(--border);
-  padding: 0.75rem;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
   text-align: left;
   font-size: 16px;
+  vertical-align: top;
+}
+
+.markdown-body table tr:last-child td {
+  border-bottom: none;
 }
 
 .markdown-body table th {
   background-color: var(--accent);
   color: var(--accent-foreground);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .markdown-body br {

@@ -15,9 +15,9 @@ export default async function AuditsListPage() {
     const { audits } = userWithAudits;
 
     return (
-        <div className="container max-w-5xl mx-auto py-30 px-4">
+        <div className="container max-w-5xl mx-auto md:py-30 py-28 px-4">
             <div className="mb-6">
-                <h1 className="text-3xl  tracking-tight font-bold font-heading">My Websites <span className=" text-primary">Audits</span></h1>
+                <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">My Websites <span className=" text-primary">Audits</span></h1>
                 <p className="text-muted-foreground">
                     View and access all your previously generated websites audits.
                 </p>

@@ -23,8 +23,22 @@ const ConfigTrayClient = ({ user, appConfig }: Props) => {
         pathname === url ? "bg-input/50 border border-input" : "";
 
     return (
-        <section className="flex items-center w-[90%] justify-between gap-2">
-            <Image src={'https://i.postimg.cc/5ythqc3x/HB-Green-Halflogo-name-mark-side-green-1.png'} width={42} height={42} alt="logo" />
+        <section className="flex items-center max-w-5xl w-full px-4 justify-between gap-1">
+            <div>
+                <Link href="/" className="block relative">
+                    <img
+                        src="https://i.postimg.cc/c1jwNRnH/HB-logo-name-mark-side-green-1.png"
+                        alt="Full Logo"
+                        className="hidden md:block w-[150px] h-auto"
+                    />
+                    <img
+                        src="https://i.postimg.cc/5ythqc3x/HB-Green-Halflogo-name-mark-side-green-1.png"
+                        alt="Half Logo"
+                        className="block md:hidden w-[45px] h-auto"
+                    />
+                </Link>
+            </div>
+
             <div className="flex items-center gap-1 bg-background/50 backdrop-blur border p-1 rounded-full">
                 <Button
                     className={`rounded-full border border-transparent hover:border-border hover:border ${isActive("/")}`}

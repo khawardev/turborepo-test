@@ -62,13 +62,10 @@ export default function WorldMap({ dots = [] }: MapProps) {
         .pulsing-circle {
           animation: pulse 3s infinite;
         }
-        .marching-path {
-          stroke-dasharray: 4 2;
-          animation: march 1.5s linear infinite;
-        }
+        
       `}</style>
 
-      <div className="w-full aspect-[2/1] relative text-accent">
+      <div className="w-full  relative text-accent">
         <img
           src={`data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`}
           className="h-full w-full [mask-image:linear-gradient(to_bottom,transparent,white_10%,white_90%,transparent)] pointer-events-none select-none"
@@ -81,15 +78,7 @@ export default function WorldMap({ dots = [] }: MapProps) {
           viewBox="0 0 800 400"
           className="w-full h-full absolute inset-0 pointer-events-none select-none text-primary"
         >
-          <defs>
-            <linearGradient id="path-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
-              <stop offset="25%" stopColor="currentColor" stopOpacity="1" />
-              <stop offset="75%" stopColor="currentColor" stopOpacity="1" />
-              <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-
+        
           {animatedDots.map((dot, i) => (
             <g key={`group-${i}`}>
               {/* Animated Path using CSS */}

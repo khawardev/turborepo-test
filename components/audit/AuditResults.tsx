@@ -62,7 +62,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
     if (audit.status === 'failed') {
         return (
-            <div className="container max-w-4xl mx-auto py-30 px-4">
+            <div className="container max-w-4xl mx-auto md:py-30 py-28 px-4">
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Analysis Failed</AlertTitle>
@@ -76,7 +76,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
 
     if (hasReachedLimit && audit.status !== 'completed') {
         return (
-            <div className="container max-w-4xl mx-auto py-30 px-4 text-center">
+            <div className="container max-w-4xl mx-auto md:py-30 py-28 px-4 text-center">
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-2xl">You've Used All Your Free Audits!</CardTitle>
@@ -110,7 +110,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         }
     };
     return (
-        <div className="container flex flex-col space-y-6 max-w-4xl mx-auto py-30 px-4">
+        <div className="container flex flex-col space-y-6 max-w-4xl mx-auto md:py-30 py-28 px-4">
             <Button className="w-fit rounded-full" variant="outline" asChild>
                 <Link href="/audit">
                     <IoArrowBackOutline /> back
@@ -118,7 +118,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
             </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
+                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
                     <p className="text-muted-foreground break-all">{audit.url}</p>
                 </div>
                 <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>

@@ -51,7 +51,7 @@ export async function createAudit(url: string) {
     const crawlResult = await crawlWebsite(url);
     if (crawlResult.error) {
         console.error("Analysis failed:", crawlResult.error);
-        return { error: "An error occurred during analysis. Please try again." };
+        return { error: crawlResult.error };
     }
 
     const prompt = INITIAL_AUDIT_PROMPT({
@@ -89,7 +89,7 @@ export async function createAudit(url: string) {
             .set({ status: 'failed', updatedAt: new Date() })
             .where(eq(auditSchema.id, newAudit.id));
         revalidatePath(`/audit/${newAudit.id}`);
-        return { error: "An error occurred during analysis. Please try again." };
+        return { error: "An error occurred , Please try again." };
     }
 }
 

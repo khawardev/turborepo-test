@@ -58,9 +58,9 @@ Evaluate each element for Coherence, Effectiveness, Fidelity, Connection, and Su
 Close this section with a one-line “What this means for you:”.
 
 ### STEP 3 – Brand Effectiveness Scorecard
-Ensure each "1-Sentence Business Impact" cell contains a full sentence. Use (High), (Medium), (Low) for the Icon column based on the Overall score.
+Ensure each "1-Sentence Business Impact" cell contains a full sentence. Use (High), (Medium), (Low) for the Impact column based on the Overall score.
 
-| Element | Clarity | Consistency | Differentiation | Audience Connection | Believability / Proof | Overall | Icon | 1-Sentence Business Impact |
+| Element | Clarity | Consistency | Differentiation | Audience Connection | Believability / Proof | Overall | Impact | 1-Sentence Business Impact |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
 | Core Purpose (Why) | | | | | | | | |
 | Mission (What) | | | | | | | | |
@@ -99,16 +99,17 @@ Use newlines (a literal \\n) for multiple items in a cell.
 
 ––– OUTPUT FORMAT & TONE –––––––––––––––––––––––––––––––––––––––––––
 
-  Website Health Audit: 
+  ## Website Health Audit Report
+  
   Prepared for: 
   Prepared by: 
   Date: ${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
 
-• [Heading] Introduction: ≤ 60 words.
-• [Heading] Executive Summary: ≤ 180 words.
+• ## Introduction: ≤ 60 words.
+• ## Executive Summary: ≤ 180 words.
 • Sections 1–5 as above, strictly following the formatting rules.
 • Style: professional, clear, and structured.
-• Closing: "If an always-on brand governance layer sounds useful, we'd love to explore at HumanbrandAI Brand OS with you."
+• Closing: "If an always-on brand governance layer sounds useful, we'd love to explore the HumanbrandAI Brand OS with you."
 • Please while makng the proper document keeping the headings and each and every detail based on the standards.
 
 END OF PROMPT

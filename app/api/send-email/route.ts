@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       </p>
 
       <p style="font-size: 13px; color: #6b7280; line-height: 16px; margin: 0; font-family: 'Inter', sans-serif;">
-        Best regards,<br />John
+        Best regards,<br />Riz
         
       </p>
 
