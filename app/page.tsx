@@ -7,7 +7,7 @@ export default async function Home() {
   return (
     <div className="container mx-auto max-w-4xl px-4 flex flex-col justify-center text-center h-[95vh]">
       <h1 className="font-heading z-50 text-4xl font-bold tracking-tight sm:text-6xl text-lime-green">
-        Get Clarity... Start your free <span className="text-primary">website</span> Health Audit.
+        Get Clarity. Start your free <span className="text-primary">website</span> Health Audit.
       </h1>
       <div className="mt-10">
         <HeroSection user={user} />

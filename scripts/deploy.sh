@@ -4,6 +4,9 @@ set -e
 APP_DIR="/opt/app"
 cd "$APP_DIR"
 
+# Kill process using port 3000
+sudo fuser -k 3000/tcp || true
+
 # Ensure logs directory exists and set permissions
 mkdir -p logs
 chmod -R 755 logs
