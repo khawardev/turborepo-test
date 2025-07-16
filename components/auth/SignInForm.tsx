@@ -27,11 +27,15 @@ export default function SignInForm({ onSuccess }: { onSuccess: () => void }) {
                 toast.success("Signed in successfully!");
                 onSuccess();
             },
-            onError: (err:any) => {
+            onError: (err: any) => {
+                console.log(err, `<-> err <->`);
+                
                 if (err.status === 403) {
                     toast.error("Please verify your email before signing in.");
                 } else {
-                    toast.error(err.message || "Invalid credentials, Please try again.");
+
+
+                    toast.error(err?.error?.message);
                 }
             }
         });

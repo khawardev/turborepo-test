@@ -4,14 +4,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
-import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, CheckSquare, FileText, Loader2, Quote, Target, TrendingUp, Users, Volume2 } from "lucide-react";
 import { MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
-import {
-    Activity,
-    Accessibility,
-    ShieldCheck,
-    SearchCheck,
-} from "lucide-react";
 import Link from "next/link";
 
 import { IoArrowBackOutline } from "react-icons/io5";
@@ -21,6 +15,11 @@ import remarkGfm from "remark-gfm";
 import { ContentActions } from "./ContentActions";
 import { toast } from "sonner";
 import { useState } from "react";
+import { FaRegCircleCheck } from "react-icons/fa6";
+import { GrDocumentPerformance } from "react-icons/gr";
+import { HiOutlineUsers } from "react-icons/hi2";
+import { IoShieldCheckmarkOutline } from "react-icons/io5";
+import { PiQuotes } from "react-icons/pi";
 
 interface AuditResultsProps {
     audit: any;
@@ -37,8 +36,8 @@ const ScoreWidget = ({
     icon: React.ReactNode;
 }) => {
     const getScoreColor = () => {
-        if (score >= 90) return "text-primary";
-        if (score >= 50) return "text-lime-green";
+        if (score >= 80) return "text-primary";
+        if (score >= 40) return "text-lime-green";
         return "text-red-500";
     };
 
@@ -50,7 +49,7 @@ const ScoreWidget = ({
             </CardHeader>
             <CardContent>
                 <div className={`text-2xl font-bold ${getScoreColor()}`}>{score}</div>
-                <p className="text-xs text-muted-foreground">out of 100</p>
+                <p className="text-xs text-muted-foreground/60">out of 100</p>
             </CardContent>
         </Card>
     );
@@ -59,6 +58,42 @@ const ScoreWidget = ({
 export default function AuditResults({ audit, user }: AuditResultsProps) {
     const hasCredits = user?.auditCredits > 0;
     const hasReachedLimit = user?.auditCredits <= 0 && user?.auditCredits !== appConfig.audits.freeTierLimit;
+
+    const matricsData = {
+        Matrics: [
+            {
+                title: "Brand Score",
+                score: audit.results?.overallBrandScore ?? 0,
+                icon: <TrendingUp className="size-5" />,
+            },
+            {
+                title: "Core Purpose",
+                score: audit.results?.corePurpose ?? 0,
+                icon: <Target className="size-4" />,
+            },
+            {
+                title: "Lexical Distinctiveness",
+                score: audit.results?.lexicalDistinctiveness ?? 0,
+                icon: <PiQuotes className="size-5" />,
+            },
+            {
+                title: "Portfolio Clarity",
+                score: audit.results?.portfolioClarity ?? 0,
+                icon: <FaRegCircleCheck className="size-4" />,
+            },
+            {
+                title: "Consistency",
+                score: audit.results?.consistency ?? 0,
+                icon: <IoShieldCheckmarkOutline className="size-5" />,
+            },
+            {
+                title: "Audience Connection",
+                score: audit.results?.audienceConnection ?? 0,
+                icon: <HiOutlineUsers className="size-5" />,
+            },
+        ],
+        executiveSummary: audit.results?.executiveSummary ?? "",
+    };
 
     if (audit.status === 'failed') {
         return (
@@ -90,7 +125,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         )
     }
     const [isDownloading, setIsDownloading] = useState(false);
-    const currentDate = new Date().toISOString().split("T")[0]; 
+    const currentDate = new Date().toISOString().split("T")[0];
 
     const handleDownloadPdf = async () => {
         setIsDownloading(true);
@@ -135,30 +170,24 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                 </Button>
             </div>
             <Separator className="mb-8" />
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <ScoreWidget
-                    title="Performance"
-                    score={audit.results?.performanceScore}
-                    icon={<Activity className="w-5 h-5" />}
-                />
-                <ScoreWidget
-                    title="Accessibility"
-                    score={audit.results?.accessibilityScore}
-                    icon={<Accessibility className="w-5 h-5" />}
-                />
-                <ScoreWidget
-                    title="Best Practices"
-                    score={audit.results?.bestPracticesScore}
-                    icon={<ShieldCheck className="w-5 h-5" />}
-                />
-                <ScoreWidget
-                    title="SEO"
-                    score={audit.results?.seoScore}
-                    icon={<SearchCheck className="w-5 h-5" />}
-                />
+            <Card className="bg-muted/30">
+                <CardHeader>
+                    <CardTitle>Executive Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="text-muted-foreground">
+                    {matricsData.executiveSummary}
+                </CardContent>
+            </Card>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {matricsData.Matrics.map(({ title, score, icon }) => (
+                    <ScoreWidget
+                        key={title}
+                        title={title}
+                        score={score}
+                        icon={icon}
+                    />
+                ))}
             </div>
-
             {hasCredits && (
                 <Alert className="mb-8 border-lime-green/50 text-lime-green">
                     <CheckCircle2 className="h-4 w-4 text-lime-green" />

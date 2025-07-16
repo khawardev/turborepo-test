@@ -1,5 +1,5 @@
 export const siteConfig = {
-    name: "Website Audit App",
+    name: "Website Audit | Humanbrand AI",
     url: "http://localhost:3000",
     description: "Get a free, comprehensive audit of your website's performance, SEO, and more.",
 };

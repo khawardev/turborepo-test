@@ -18,6 +18,9 @@ GOALS
 3.  **USE NEWLINES, NOT <br>:** For multi-line content within table cells (like in the Action Framework), use a literal newline character ('\\n'), not the '<br>' HTML tag.
 4.  **NO HORIZONTAL RULES:** Do NOT include separators like '---' or '***' between sections. Rely on headings for structure.
 
+
+- SCRAPED_CONTENT contains the text content of a specific page and its source URL. Analyze the entire corpus, paying close attention to consistency (or lack thereof) across different pages.
+
 USER INPUTS (Provided by the application)
 - WEBSITE_URL = ${params.website_url}
 - SCRAPED_CONTENT = ${params.crawledContent}
@@ -26,16 +29,16 @@ TASK
 Perform the audit according to the strict formatting rules above.
 
 ### STEP 1 – Core Brand Signal Extraction
-Analyse SCRAPED_CONTENT. Copy verbatim statements. When creating the table below, write each cell as a full paragraph.
+Analyse the entire SCRAPED_CONTENT. Copy verbatim statements. When creating the table below, write each cell as a full paragraph. For the 'Source' column, provide the specific page URL from which the extract was taken.
 
 | Brand Signal | Verbatim Extract (Client) | Source (Client) |
 | :--- | :--- | :--- |
-| Tagline / Hook | | [WEBSITE URL found in crawledContent] |
-| Purpose / “Why” | | [WEBSITE URL found in crawledContent] |
-| Mission / “What” | | [WEBSITE URL found in crawledContent] |
-| Company Descriptor | | [WEBSITE URL found in crawledContent] |
-| Narrative Theme | | [WEBSITE URL found in crawledContent] |
-| Tone-of-Voice Signals | | [WEBSITE URL found in crawledContent] |
+| Tagline / Hook | | [WEBSITE URL found in SCRAPED_CONTENT] |
+| Purpose / “Why” | | [WEBSITE URL found in SCRAPED_CONTENT] |
+| Mission / “What” | | [WEBSITE URL found in SCRAPED_CONTENT] |
+| Company Descriptor | | [WEBSITE URL found in SCRAPED_CONTENT] |
+| Narrative Theme | | [WEBSITE URL found in SCRAPED_CONTENT] |
+| Tone-of-Voice Signals | | [WEBSITE URL found in SCRAPED_CONTENT] |
 
 ### STEP 1B – Brand Lexicon Extraction
 List >= 15 high-frequency or proprietary terms/phrases.
@@ -100,7 +103,7 @@ Use newlines (a literal \\n) for multiple items in a cell.
 ––– OUTPUT FORMAT & TONE –––––––––––––––––––––––––––––––––––––––––––
   
   Prepared for: 
-  Prepared by: 
+  Prepared by: Website Audit | Humanbrand AI
   Date: ${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
 
 • ## Introduction: ≤ 60 words.
@@ -111,4 +114,37 @@ Use newlines (a literal \\n) for multiple items in a cell.
 • Please while makng the proper document keeping the headings and each and every detail based on the standards.
 
 END OF PROMPT
+`;
+
+
+
+
+
+export const METRICS_EXTRACTION_PROMPT = (params: {
+  generatedText: string;
+}) => `
+You are a data extraction assistant. Your job is to analyze the given brand audit content and return a clean JSON with specific scoring metrics and the executive summary.
+
+STRICT RULES:
+- Return only valid raw JSON (without markdown, code blocks, or backticks).
+- No explanation, no commentary, no markdown — just pure JSON.
+- If a score is not found, return null for that field.
+- Round all scores to 1 decimal place if necessary.
+
+FROM THE INPUT TEXT BELOW, EXTRACT THE FOLLOWING FIELDS INTO A JSON OBJECT:
+
+{
+  "overallBrandScore": number (1–100),
+  "corePurpose": number (1–100),
+  "lexicalDistinctiveness": number (1–100),
+  "portfolioClarity": number (1–100),
+  "consistency": number (1–100),
+  "audienceConnection": number (1–100),
+  "executiveSummary": string (≤ 110 words)
+}
+
+INPUT TEXT:
+"""
+${params.generatedText}
+"""
 `;

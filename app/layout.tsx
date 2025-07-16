@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter?.className} relative antialiased`}>
+      <body className={`${inter?.className} relative antialiased`} cz-shortcut-listen="true">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

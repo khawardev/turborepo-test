@@ -26,11 +26,13 @@ export default function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
         await signUp.email(data, {
             onSuccess: () => {
                 toast.success("Account created successfully");
-                toast.success("Check your email to verify.");
+                setTimeout(() => {
+                    toast.success("Check your email to verify.");
+                }, 3000);
                 onSuccess();
             },
             onError: (err: any) => {
-                toast.error(err.message || "An error occurred, Please try again.");
+                toast.error(err?.error?.message);
             }
         });
         setIsLoading(false);

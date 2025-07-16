@@ -8,7 +8,7 @@ import { user as userSchema } from "@/db/schema/users";
 import { audit as auditSchema } from "@/db/schema/audits";
 import { crawlWebsite } from "./crawl";
 import { generateNewContent } from "./generateContent";
-import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
+import { INITIAL_AUDIT_PROMPT, METRICS_EXTRACTION_PROMPT } from "@/lib/prompts";
 import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
 
 export async function createAudit(url: string) {
@@ -46,7 +46,7 @@ export async function createAudit(url: string) {
             .set({ status: 'failed', updatedAt: new Date() })
             .where(eq(auditSchema.id, newAudit.id));
         revalidatePath(`/audit/${newAudit.id}`);
-        return { auditId: newAudit.id }; 
+        return { auditId: newAudit.id };
     }
     const crawlResult = await crawlWebsite(url);
     if (crawlResult.error) {
@@ -61,17 +61,25 @@ export async function createAudit(url: string) {
     const generatedResult = await generateNewContent(prompt)
     const cleanedMarkdown = cleanAndFlattenBulletsGoogle(generatedResult.generatedText)
 
-    const mockResults = {
-        seoScore: Math.floor(Math.random() * (95 - 70 + 1) + 70),
-        performanceScore: Math.floor(Math.random() * (98 - 65 + 1) + 65),
-        accessibilityScore: Math.floor(Math.random() * (92 - 75 + 1) + 75),
-        bestPracticesScore: Math.floor(Math.random() * (99 - 80 + 1) + 80),
-    };
+
+
+    const matricsExtractionPrompt = METRICS_EXTRACTION_PROMPT({
+        generatedText: generatedResult.generatedText,
+    });
+
+    const metricsResult = await generateNewContent(matricsExtractionPrompt);
+    let rawOutput = metricsResult.generatedText.trim();
+
+    if (rawOutput.startsWith('```')) {
+        rawOutput = rawOutput.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
+    }
+
+    const extractedMetricsJson = JSON.parse(rawOutput);
 
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
-                .set({ status: 'completed', results: mockResults, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown,  updatedAt: new Date() })
+                .set({ status: 'completed', results: extractedMetricsJson, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown, updatedAt: new Date() })
                 .where(eq(auditSchema.id, newAudit.id));
 
             await tx.update(userSchema)
@@ -80,7 +88,7 @@ export async function createAudit(url: string) {
         });
 
         revalidatePath(`/audit/${newAudit.id}`);
-        revalidatePath('/'); 
+        revalidatePath('/');
         return { auditId: newAudit.id };
 
     } catch (error) {
