@@ -7,8 +7,8 @@ cd "$APP_DIR"
 
 # Ensure logs directory exists and set permissions
 mkdir -p logs
-chmod -R 755 logs
-chown -R ubuntu:ubuntu "$APP_DIR"
+sudo chmod -R 755 logs
+sudo chown -R ubuntu:ubuntu "$APP_DIR"
 
 # Kill process using port 3000
 sudo fuser -k 3000/tcp || true
