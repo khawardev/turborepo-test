@@ -145,49 +145,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         }
     };
     return (
-        <div className="container flex flex-col space-y-6 max-w-4xl mx-auto md:py-30 py-28 px-4">
-            <Button className="w-fit rounded-full" variant="outline" asChild>
-                <Link href="/audit">
-                    <IoArrowBackOutline /> back
-                </Link>
-            </Button>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
-                    <p className="text-muted-foreground break-all">{audit.url}</p>
-                </div>
-                <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>
-                    {isDownloading ? (
-                        <>
-                            <Loader2 className="animate-spin" />
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            Save Report <MdOutlineDownloading />
-                        </>
-                    )}
-                </Button>
-            </div>
-            <Separator className="mb-8" />
-            <Card className="bg-muted/30">
-                <CardHeader>
-                    <CardTitle>Executive Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="text-muted-foreground">
-                    {matricsData.executiveSummary}
-                </CardContent>
-            </Card>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {matricsData.Matrics.map(({ title, score, icon }) => (
-                    <ScoreWidget
-                        key={title}
-                        title={title}
-                        score={score}
-                        icon={icon}
-                    />
-                ))}
-            </div>
+        <div className="container flex flex-col space-y-6 max-w-5xl mx-auto md:py-30 py-28 px-4">
             {hasCredits && (
                 <Alert className="mb-8 border-lime-green/50 text-lime-green">
                     <CheckCircle2 className="h-4 w-4 text-lime-green" />
@@ -207,13 +165,56 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                     </AlertDescription>
                 </Alert>
             )}
+           
+            <Button className="w-fit rounded-full" variant="outline" asChild>
+                <Link href="/audit">
+                    <IoArrowBackOutline /> back
+                </Link>
+            </Button>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
+                    <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
+                </div>
+                <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>
+                    {isDownloading ? (
+                        <>
+                            <Loader2 className="animate-spin" />
+                            Generating...
+                        </>
+                    ) : (
+                        <>
+                            Save Report <MdOutlineDownloading />
+                        </>
+                    )}
+                </Button>
+            </div>
+            {/* <Card className="bg-muted/30">
+                <CardHeader>
+                    <CardTitle>Executive Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="text-muted-foreground">
+                    {matricsData.executiveSummary}
+                </CardContent>
+            </Card>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {matricsData.Matrics.map(({ title, score, icon }) => (
+                    <ScoreWidget
+                        key={title}
+                        title={title}
+                        score={score}
+                        icon={icon}
+                    />
+                ))}
+            </div> */}
+          
 
             {
                 audit.crawledContent &&
                 <section>
                     <div>
-                        <div className={"flex md:items-center items-end justify-between mb-4"}>
-                            <h1 className="text-xl tracking-tight font-semibold font-heading">Website Audit Report Content</h1>
+                        <div className={"flex md:items-center items-end justify-end mb-4"}>
+                            <h1 className="text-xl tracking-tight font-semibold font-heading hidden">Website Audit Report Content</h1>
                             <div className="flex justify-end">
                                 <ContentActions
                                     content={audit.auditGenratedContent}

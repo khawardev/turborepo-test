@@ -110,7 +110,6 @@ Use newlines (a literal \\n) for multiple items in a cell.
 • ## Executive Summary: ≤ 180 words.
 • Sections 1–5 as above, strictly following the formatting rules.
 • Style: professional, clear, and structured.
-• Closing: "If an always-on brand governance layer sounds useful, we'd love to explore the HumanbrandAI Brand OS with you."
 • Please while makng the proper document keeping the headings and each and every detail based on the standards.
 
 END OF PROMPT

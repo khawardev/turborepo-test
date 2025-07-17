@@ -63,23 +63,23 @@ export async function createAudit(url: string) {
 
 
 
-    const matricsExtractionPrompt = METRICS_EXTRACTION_PROMPT({
-        generatedText: generatedResult.generatedText,
-    });
+    // const matricsExtractionPrompt = METRICS_EXTRACTION_PROMPT({
+    //     generatedText: generatedResult.generatedText,
+    // });
 
-    const metricsResult = await generateNewContent(matricsExtractionPrompt);
-    let rawOutput = metricsResult.generatedText.trim();
+    // const metricsResult = await generateNewContent(matricsExtractionPrompt);
+    // let rawOutput = metricsResult.generatedText.trim();
 
-    if (rawOutput.startsWith('```')) {
-        rawOutput = rawOutput.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
-    }
+    // if (rawOutput.startsWith('```')) {
+    //     rawOutput = rawOutput.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
+    // }
 
-    const extractedMetricsJson = JSON.parse(rawOutput);
+    // const extractedMetricsJson = JSON.parse(rawOutput);
 
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
-                .set({ status: 'completed', results: extractedMetricsJson, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown, updatedAt: new Date() })
+                .set({ status: 'completed', results: null, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown, updatedAt: new Date() })
                 .where(eq(auditSchema.id, newAudit.id));
 
             await tx.update(userSchema)

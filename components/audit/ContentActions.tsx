@@ -14,7 +14,7 @@ import { toast } from "sonner";
 export function ContentActions({ content, auditURL }: any) {
     const handleCopy = () => {
         navigator.clipboard.writeText(content);
-        toast.success("Content copied to clipboard!");
+        toast.success("Content copied to clipboard");
     };
     const currentDate = new Date().toISOString().split("T")[0];
 
