@@ -2,12 +2,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { marked } from 'marked';
 
-const HEADING_COLOR = '#111827';  // Slightly darker than #1F2937 (gray-900)
-const TEXT_COLOR = '#111827';     // Same as above for consistency
-const BORDER_COLOR = '#9CA3AF';   // Darker than #D1D5DB (gray-400 → gray-500)
+const HEADING_COLOR = '#111827';
+const TEXT_COLOR = '#111827';
+const BORDER_COLOR = '#9CA3AF';
 
-
-export function generateSimplePdfFromMarkdown(markdownContent: any, fileName: any) {
+export function generateSimplePdfFromMarkdown(markdownContent: string, fileName: string) {
     const doc = new jsPDF({
         orientation: 'p',
         unit: 'mm',
@@ -19,21 +18,18 @@ export function generateSimplePdfFromMarkdown(markdownContent: any, fileName: an
     const contentWidth = doc.internal.pageSize.getWidth() - margin * 2;
     let yPosition = margin;
 
-    const addPageIfNeeded = (spaceNeeded: any) => {
+    const addPageIfNeeded = (spaceNeeded: number) => {
         if (yPosition + spaceNeeded > pageHeight - margin) {
             doc.addPage();
             yPosition = margin;
         }
     };
 
-    // --- Core Text Cleaning Function ---
-    // This removes ** and * from text to prevent them from appearing in the PDF.
-    const cleanText = (text: any) => {
+    const cleanText = (text: any): string => {
         if (typeof text !== 'string') return '';
-        return text.replace(/\*\*| \*/g, ''); // Removes ** and *
+        return text.replace(/\*\*|\*/g, '').trim();
     };
 
-    // Pre-process the entire document to remove horizontal rules ('---' or '***')
     const preProcessedContent = markdownContent.replace(/(\n---\n|\n\*\*\*\n)/g, '\n');
     const tokens = marked.lexer(preProcessedContent);
 
@@ -45,7 +41,6 @@ export function generateSimplePdfFromMarkdown(markdownContent: any, fileName: an
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(20 - token.depth * 2);
                 doc.setTextColor(HEADING_COLOR);
-                // Use maxWidth to ensure even long headings wrap correctly
                 doc.text(cleanText(token.text), margin, yPosition, { maxWidth: contentWidth });
                 yPosition += 10;
                 break;
@@ -75,22 +70,37 @@ export function generateSimplePdfFromMarkdown(markdownContent: any, fileName: an
 
             case 'table':
                 const head = [token.header.map((h: any) => cleanText(h.text))];
-                const body = token.rows.map((row: any) => row.map((cell: any) => cleanText(cell.text)));
+                const body = token.rows.map((row: any[]) => row.map((cell: any) => cleanText(cell.text)));
+
+                const columnStylesConfig: any = {};
+                const sourceColumnWidth = 55;
+
+                token.header.forEach((headerCell: any, index: any) => {
+                    const headerText = cleanText(headerCell.text).toLowerCase();
+                    if (headerText.includes('source')) {
+                        columnStylesConfig[index] = { cellWidth: sourceColumnWidth };
+                    } else {
+                        columnStylesConfig[index] = { cellWidth: 'auto' };
+                    }
+                });
 
                 autoTable(doc, {
                     head: head,
                     body: body,
                     startY: yPosition,
-                    theme: 'grid', // This provides visible borders
+                    theme: 'grid',
+                    tableWidth: contentWidth,
+                    columnStyles: columnStylesConfig,
                     styles: {
                         fontSize: 8,
                         textColor: TEXT_COLOR,
-                        cellPadding: 2, // Compact padding
+                        cellPadding: 2,
                         lineWidth: 0.1,
                         lineColor: BORDER_COLOR,
+                        overflow: 'linebreak',
                     },
                     headStyles: {
-                        fillColor: '#F3F4F6', // A very light grey for the header
+                        fillColor: '#F3F4F6',
                         textColor: TEXT_COLOR,
                         fontStyle: 'bold',
                     },
@@ -99,13 +109,12 @@ export function generateSimplePdfFromMarkdown(markdownContent: any, fileName: an
                 yPosition = (doc as any).lastAutoTable.finalY + 10;
                 break;
 
-            // These cases are now intentionally ignored to remove them from the PDF
             case 'hr':
             case 'space':
                 break;
 
             default:
-                if (token.text) {
+                if ('text' in token && token.text) {
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(10);
                     doc.setTextColor(TEXT_COLOR);

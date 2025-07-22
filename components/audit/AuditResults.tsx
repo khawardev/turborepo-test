@@ -136,7 +136,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
         try {
             toast.info("Preparing your PDF report...");
             const { generateSimplePdfFromMarkdown } = await import('@/lib/generatePdf');
-            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `${audit.url}-humanbrandai-${currentDate}.pdf`);
+            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `${audit.url}_humanbrandai_${currentDate}.pdf`);
         } catch (error) {
             console.error("PDF generation failed:", error);
             toast.error("Failed to generate PDF report.");
@@ -173,7 +173,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
             </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary"> Health Audit </span>  is ready</h1>
+                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary">Brand Health Audit </span>  is ready</h1>
                     <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
                 </div>
                 <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>

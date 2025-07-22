@@ -23,7 +23,7 @@ export function ContentActions({ content, auditURL }: any) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${auditURL}-humanbrandai-${currentDate}.txt`;
+        a.download = `${auditURL}_humanbrandai_${currentDate}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

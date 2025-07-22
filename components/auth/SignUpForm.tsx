@@ -28,7 +28,7 @@ export default function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                 toast.success("Account created successfully");
                 setTimeout(() => {
                     toast.success("Check your email to verify.");
-                }, 3000);
+                }, 2000);
                 onSuccess();
             },
             onError: (err: any) => {

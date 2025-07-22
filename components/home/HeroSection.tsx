@@ -1,19 +1,57 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import UrlSubmissionForm from './UrlSubmissionForm';
 import AuthModal from '../auth/AuthModal';
 import { useRouter } from 'next/navigation';
 import { createAudit } from '@/actions/auditActions';
 import { toast } from 'sonner';
 import WorldMap from '../ui/world-map';
-import AnalysisLoader from '../audit/AnalysisLoader';
+import AuditProgress from '../layout/AuditProgress';
 
 export default function HeroSection({ user }: { user: any }) {
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [submittedUrl, setSubmittedUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [progress, setProgress] = useState(0);
+    const [progressTitle, setProgressTitle] = useState('');
     const router = useRouter();
+
+
+    const stopProgress = () => {
+        if (progressIntervalRef.current) {
+            clearTimeout(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+        }
+    };
+
+    const runProgressSimulation = () => {
+        const stages = [
+            { title: 'Initializing Audit...', progress: 10, duration: 20000 },
+            { title: 'Analysing Website...', progress: 40, duration: 20000 },
+            { title: 'Analyzing Content with AI...', progress: 80, duration: 20000 },
+            { title: 'Finalizing Report...', progress: 95, duration: 3000 },
+        ];
+
+        let stageIndex = 0;
+
+        const nextStage = () => {
+            if (stageIndex >= stages.length) {
+                stopProgress();
+                return;
+            }
+
+            const stage = stages[stageIndex];
+            setProgress(stage.progress);
+            setProgressTitle(stage.title);
+
+            stageIndex++;
+            progressIntervalRef.current = setTimeout(nextStage, stage.duration);
+        };
+
+        nextStage();
+    };
 
     const handleUrlSubmit = async (url: string) => {
         if (!user) {
@@ -26,16 +64,22 @@ export default function HeroSection({ user }: { user: any }) {
     };
 
     const startAudit = async (url: string) => {
+        runProgressSimulation();
         try {
-            toast.info('Starting your free audit, Please wait.');
+            toast.info('Starting your free audit, this take a moment.');
             const result = await createAudit(url);
+            stopProgress();
+
             if (result.error) {
                 toast.error(result.error);
             } else if (result.auditId) {
+                setProgress(100);
+                setProgressTitle('Analysis Finished!');
                 toast.success('Analysis finsihed! Redirecting to results...');
                 router.push(`/audit/${result.auditId}`);
             }
         } catch (error) {
+            stopProgress();
             toast.error('Something went wrong while starting audit.');
         } finally {
             setIsLoading(false);
@@ -52,8 +96,8 @@ export default function HeroSection({ user }: { user: any }) {
     };
 
     return (
-        <>
-            <div className="relative ">
+        <main className=' flex flex-col justify-between space-y-4'>
+            <div className="relative">
                 <div className="absolute inset-x-0 w-full md:scale-110 md:-top-30 top-20 overflow-hidden z-0 opacity-30 dark:opacity-60 pointer-events-none">
                     <WorldMap
                         dots={[
@@ -66,16 +110,18 @@ export default function HeroSection({ user }: { user: any }) {
                         ]}
                     />
                 </div>
+                <div className="absolute md:-bottom-50 -bottom-40 w-full z-50">
+                    {isLoading && <AuditProgress progress={progress} progressTitle={progressTitle} />}
+                </div>
                 <div className="relative z-10">
                     <UrlSubmissionForm setIsLoading={setIsLoading} isLoading={isLoading} onSubmit={handleUrlSubmit} />
                 </div>
             </div>
-
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onOpenChange={setAuthModalOpen}
                 onAuthSuccess={handleAuthSuccess}
             />
-        </>
+        </main>
     );
 }

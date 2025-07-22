@@ -61,21 +61,6 @@ export async function createAudit(url: string) {
     const generatedResult = await generateNewContent(prompt)
     const cleanedMarkdown = cleanAndFlattenBulletsGoogle(generatedResult.generatedText)
 
-
-
-    // const matricsExtractionPrompt = METRICS_EXTRACTION_PROMPT({
-    //     generatedText: generatedResult.generatedText,
-    // });
-
-    // const metricsResult = await generateNewContent(matricsExtractionPrompt);
-    // let rawOutput = metricsResult.generatedText.trim();
-
-    // if (rawOutput.startsWith('```')) {
-    //     rawOutput = rawOutput.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
-    // }
-
-    // const extractedMetricsJson = JSON.parse(rawOutput);
-
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
