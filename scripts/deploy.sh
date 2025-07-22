@@ -1,7 +1,4 @@
 #!/bin/bash
-set -e
-exec > /opt/app/logs/deploy.log 2>&1
-
 APP_DIR="/opt/app"
 cd "$APP_DIR"
 
