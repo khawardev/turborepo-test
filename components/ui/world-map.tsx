@@ -91,9 +91,7 @@ export default function WorldMap({ dots = [] }: MapProps) {
                 style={{ animationDelay: dot.animationDelay }}
               />
 
-              {/* Static start point */}
               <circle cx={dot.startPoint.x} cy={dot.startPoint.y} r="2" fill="currentColor" />
-              {/* Pulsing start point using CSS */}
               <circle
                 cx={dot.startPoint.x}
                 cy={dot.startPoint.y}

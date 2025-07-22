@@ -1,11 +1,11 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react"; 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import UserMenu from "./UserMenu";
 import AuthButtons from "./AuthButtons";
-import Image from "next/image";
 
 type Props = {
     user: any;
@@ -18,12 +18,48 @@ type Props = {
 
 const ConfigTrayClient = ({ user, appConfig }: Props) => {
     const pathname = usePathname();
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (scrollTimeout.current) {
+                clearTimeout(scrollTimeout.current);
+            }
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+            scrollTimeout.current = setTimeout(() => {
+                setIsVisible(true);
+            }, 200); 
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            if (scrollTimeout.current) {
+                clearTimeout(scrollTimeout.current);
+            }
+        };
+    }, [lastScrollY]);
 
     const isActive = (url: string) =>
         pathname === url ? "bg-input/50 border border-input" : "";
 
     return (
-        <section className="flex items-center max-w-5xl w-full px-4 justify-between gap-1">
+        <section
+            className={`
+                fixed top-4 left-1/2 -translate-x-1/2 z-50 
+                flex items-center max-w-5xl w-full px-4 justify-between gap-1 
+                transition-transform duration-300 ease-in-out
+                ${isVisible ? "translate-y-0" : "-translate-y-[150%]"}
+            `}
+        >
             <div>
                 <Link href="/" className="block relative">
                     <img
