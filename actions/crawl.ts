@@ -11,8 +11,8 @@ export async function crawlWebsite(url:any) {
         const spider = new Spider({ apiKey: process.env.SPIDER_API_KEY! });
 
         const crawlParams:any = {
-            limit: 1,
-            depth: 1,
+            limit: 10,
+            depth: 3,
             return_format: 'markdown',
         };
 
@@ -24,7 +24,7 @@ export async function crawlWebsite(url:any) {
             .join('\n\n---\n\n');
 
         if (!combinedContent) {
-            return { error: 'Not able to get the usable content from the website' };
+            return { error: 'Not able to get content from the website, try again!' };
         }
 
         return { content: combinedContent };
