@@ -26,8 +26,8 @@ WorkingDirectory=$APP_DIR
 Restart=always
 User=ubuntu
 Environment=NODE_ENV=production
-StandardOutput=append:/opt/app/logs/audit.log
-StandardError=append:/opt/app/logs/audit-error.log
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
