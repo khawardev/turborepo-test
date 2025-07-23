@@ -17,7 +17,7 @@ export async function crawlWebsite(url:any) {
         };
 
         const crawlResults:any = await spider.crawlUrl(url, crawlParams);
-
+       
         const combinedContent = crawlResults
             .filter((result:any) => result.status === 200 && result.content)
             .map((result: any) => `## URL: ${result.url}\n\n${result.content}`)
@@ -26,9 +26,14 @@ export async function crawlWebsite(url:any) {
         if (!combinedContent) {
             return { error: 'Not able to get content from the website, try again!' };
         }
+        console.error("Spider crawl combinedContent:", combinedContent);
 
         return { content: combinedContent };
     } catch (error: any) {
-        return { error: error.message || 'Crawling failed.' };
+        console.error("Spider crawl failed:", error);
+        return {
+            error: error.message || 'Crawling failed.',
+            details: error.cause || null
+        };
     }
 }

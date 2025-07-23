@@ -8,7 +8,7 @@ const BORDER_COLOR = '#9CA3AF';
 
 export function generateSimplePdfFromMarkdown(markdownContent: string, fileName: string) {
     const doc = new jsPDF({
-        orientation: 'p',
+        orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
     });
