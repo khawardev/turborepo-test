@@ -14,18 +14,39 @@ export async function crawlWebsite(url: any) {
         const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY! });
         const crawlResponse: any = await app.crawlUrl(url, {
             limit: 10,
-            maxDepth:3,
+            maxDepth: 3,
             scrapeOptions: {
                 formats: ['markdown'],
             }
-        })
+        });
 
-        if (!crawlResponse.success) {
-            throw new Error(`Failed to crawl: ${crawlResponse.error}`)
+        if (!crawlResponse.success || !crawlResponse.data) {
+            const errorMessage = crawlResponse.error || "Crawl failed with no data returned.";
+            throw new Error(errorMessage);
         }
-     
-        logger.info("Crawl successful, content combined.", {  url});
-        return { content: crawlResponse?.data[0].markdown };
+
+        const allPagesDataString = crawlResponse.data.map((page: any) => {
+            let pageContent = `\n\n--- Page Data Start ---\n\n`;
+            pageContent += `Markdown Content for page: ${page.metadata?.sourceURL || 'N/A'}\n\n`;
+            pageContent += `${page.markdown || 'No markdown content.'}\n\n`;
+            pageContent += `Metadata for page: ${page.metadata?.sourceURL || 'N/A'}\n\n`;
+            if (page.metadata) {
+                for (const key in page.metadata) {
+                    if (Object.prototype.hasOwnProperty.call(page.metadata, key)) {
+                        const value = page.metadata[key];
+                        pageContent += `${key}: ${JSON.stringify(value)}\n`;
+                    }
+                }
+            } else {
+                pageContent += 'No metadata available for this page.\n';
+            }
+
+            pageContent += `\n--- Page Data End ---\n`;
+            return pageContent;
+        }).join('');
+
+        logger.info("Crawl successful, all page content combined.", { url });
+        return { content: allPagesDataString };
 
     } catch (error: any) {
         logger.error("Spider crawl API call failed.", { functionName, url, errorMessage: error.message, errorDetails: error });
