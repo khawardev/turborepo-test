@@ -31,11 +31,11 @@ USER INPUTS (Provided by the application)
 TASK
 First, determine the client's Brand Name from the SCRAPED\_CONTENT (e.g., from page titles, headers, or frequent usage; cross-check with domain if possible). Then, infer the Business Model (e.g., B2B if patterns reference "partners/businesses/solutions"; B2C/D2C if "customers/you/experiences/direct channels"). Use this throughout for tailored analysis. If BUSINESS\_MODEL provided, override inference. Generate the full Preview Brand Health Audit by following the structure and instructions below precisely, in numbered sequence. Complete each section fully before proceeding. For any element not found, note "Not explicitly stated; inferred from \[brief context with instance count\]" or "Absent from first 10 pages; deeper analysis may reveal more" and adjust scores accordingly.  
 
-\#\#\# \[Inferred Brand Name\]\- Preview Website Brand Health Audit(\[Inferred / Provided Business Model\])    
+\#\#\# \[Inferred Brand Name\]\ - Preview Website Brand Health Audit (\[Inferred / Provided Business Model\])    
 Prepared by Humanbrand AI
 
 \#\#\# 0\. Corpus Analysis & Linguistic Baseline    
-Process the first 10 pages of SCRAPED\_CONTENT as a unified experience.Quantify patterns to establish the foundation, noting business model indicators(e.g., audience terms) and separating human - readable(body text) vs.machine - readable(meta / schema) elements.  
+Process the first 10 pages of \[Inferred Brand Name\] as a unified experience. Quantify patterns to establish the foundation, noting business model indicators(e.g., audience terms) and separating human - readable(body text) vs.machine - readable(meta / schema) elements.  
 
 Content Analyzed:
 \- Total Pages: \[10 or fewer if limited\]
@@ -80,7 +80,8 @@ Write a professional summary(150 - 200 words) that captures the core findings fr
 
 \#\#\# 3\. Human View: Core Brand Narrative    
 In this section, Humanbrand AI synthesizes the foundational messaging components of the \[Inferred Brand Name\] brand as interpreted from emergent patterns in human - readable content(body text, headlines) of the first 10 pages, tailored to \[Business Model\](e.g., B2B: expertise - focused; B2C / D2C: benefit / emotion - driven).    
-Analyze the SCRAPED\_CONTENT to find verbatim statements from recurring patterns.For the 'Source' column, provide the specific URL.  
+
+[Task] : Analyze the SCRAPED\_CONTENT to find verbatim statements from recurring patterns.For the 'Source' column, provide the specific URL.  
 
 | Brand Signal | Verbatim Extract(website) | Source(website) | Pattern Evidence |    
 | : --- | : --- | : --- | : --- |    
@@ -198,7 +199,7 @@ The Critical Insight: \[One - sentence summary of untapped potential, e.g., B2B 
 
 Note: This preview from Humanbrand AI highlights opportunities from initial pages.For a full - site audit with advanced pattern synthesis, verbal identity, AI perception analysis, and social monitoring via our Brand OS, contact Humanbrand AI for deeper assessments.  
 
-Humanbrand AI \- Brand clarity today.On - brand content forever.
+Humanbrand AI \- Brand clarity today. On - brand content forever.
 `;
 
 
