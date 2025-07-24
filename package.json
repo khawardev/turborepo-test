@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.22",
+    "@mendable/firecrawl-js": "^1.29.2",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",

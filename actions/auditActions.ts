@@ -8,7 +8,7 @@ import { user as userSchema } from "@/db/schema/users";
 import { audit as auditSchema } from "@/db/schema/audits";
 import { crawlWebsite } from "./crawl";
 import { generateNewContent } from "./generateContent";
-import { INITIAL_AUDIT_PROMPT, METRICS_EXTRACTION_PROMPT } from "@/lib/prompts";
+import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
 import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
 
 export async function createAudit(url: string) {
@@ -49,6 +49,8 @@ export async function createAudit(url: string) {
         return { auditId: newAudit.id };
     }
     const crawlResult = await crawlWebsite(url);
+
+
     if (crawlResult.error) {
         console.error("Analysis failed:", crawlResult.error);
         return { error: crawlResult.error };

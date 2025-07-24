@@ -1,38 +1,36 @@
-'use server';
-import { Spider } from "@spider-cloud/spider-client";
+import FirecrawlApp from '@mendable/firecrawl-js';
+import { logger } from "@/lib/utils";
 
-export async function crawlWebsite(url:any) {
+export async function crawlWebsite(url: any) {
+    const functionName = "crawlWebsite";
+    logger.info("Crawl initiated.", { url });
 
     if (!url || typeof url !== 'string') {
-        return { error: 'Invalid URL provided.' };
+        logger.warn("Invalid URL provided for crawling.", { functionName, urlProvided: url });
+        return { error: 'A valid URL must be provided.' };
     }
 
     try {
-        const spider = new Spider({ apiKey: process.env.SPIDER_API_KEY! });
-
-        const crawlParams:any = {
+        const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY! });
+        const crawlResponse: any = await app.crawlUrl(url, {
             limit: 10,
-            depth: 3,
-            return_format: 'markdown',
-        };
+            maxDepth:3,
+            scrapeOptions: {
+                formats: ['markdown'],
+            }
+        })
 
-        const crawlResults:any = await spider.crawlUrl(url, crawlParams);
-       
-        const combinedContent = crawlResults
-            .filter((result:any) => result.status === 200 && result.content)
-            .map((result: any) => `## URL: ${result.url}\n\n${result.content}`)
-            .join('\n\n---\n\n');
-
-        if (!combinedContent) {
-            return { error: 'Not able to get content from the website, try again!' };
+        if (!crawlResponse.success) {
+            throw new Error(`Failed to crawl: ${crawlResponse.error}`)
         }
-        console.error("Spider crawl combinedContent:", combinedContent);
+     
+        logger.info("Crawl successful, content combined.", {  url});
+        return { content: crawlResponse?.data[0].markdown };
 
-        return { content: combinedContent };
     } catch (error: any) {
-        console.error("Spider crawl failed:", error);
+        logger.error("Spider crawl API call failed.", { functionName, url, errorMessage: error.message, errorDetails: error });
         return {
-            error: error.message || 'Crawling failed.',
+            error: error.message || 'An unknown error occurred during the website crawl.',
             details: error.cause || null
         };
     }

@@ -95,6 +95,8 @@ export default function HeroSection({ user }: { user: any }) {
         }
     };
 
+
+    
     return (
         <main className=' flex flex-col justify-between space-y-4'>
             <div className="relative">
