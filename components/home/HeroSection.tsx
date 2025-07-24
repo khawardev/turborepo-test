@@ -66,7 +66,7 @@ export default function HeroSection({ user }: { user: any }) {
     const startAudit = async (url: string) => {
         runProgressSimulation();
         try {
-            toast.info('Starting your free audit, this take a moment.');
+            toast.info('Starting your free audit, this take a moment..');
             const result = await createAudit(url);
             stopProgress();
 
