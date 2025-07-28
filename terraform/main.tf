@@ -86,6 +86,11 @@ variable "spider_api_key" {
   type        = string
 }
 
+variable "firecrawl_api_key" {
+  description = "Firecrawl API key"
+  type        = string
+}
+
 variable "google_generative_ai_api_key" {
   description = "Google Generative AI API key"
   type        = string
@@ -188,6 +193,7 @@ locals {
     email_pass                   = var.email_pass
     spider_api_key               = var.spider_api_key
     google_generative_ai_api_key = var.google_generative_ai_api_key
+    firecrawl_api_key = var.firecrawl_api_key
   })) : base64encode(<<-EOF
     #!/bin/bash
     echo "No user_data.sh found"
