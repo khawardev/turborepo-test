@@ -67,3 +67,6 @@ override.tf.json
 
 # Ignore .terraform.lock.hcl if using dynamic providers
 .terraform.lock.hcl
+test_crawl.js
+test_crawl.ts
+temp/

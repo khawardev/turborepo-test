@@ -35,6 +35,8 @@ EMAIL_USER="${email_user}"
 EMAIL_PASS="${email_pass}"
 SPIDER_API_KEY="${spider_api_key}"
 GOOGLE_GENERATIVE_AI_API_KEY="${google_generative_ai_api_key}"
+FIRECRAWL_API_KEY="${firecrawl_api_key}"
+
 EOF
 
 # Build
