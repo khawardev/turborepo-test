@@ -6,10 +6,10 @@ import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { user as userSchema } from "@/db/schema/users";
 import { audit as auditSchema } from "@/db/schema/audits";
-import { crawlWebsite } from "./crawl";
 import { generateNewContent } from "./generateContent";
 import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
 import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
+import { crawlWebsite } from "./spider-crawl";
 
 export async function createAudit(url: string) {
     const session = await getSession();
