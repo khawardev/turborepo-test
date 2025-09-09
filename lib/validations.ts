@@ -15,3 +15,24 @@ export const todoSchema = z.object({
     title: z.string().min(1, "Title is required"),
     completed: z.boolean().default(false),
 });
+
+const competitorSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  url: z.string().url("Invalid URL"),
+  facebook_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  linkedin_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  x_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  youtube_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  instagram_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+});
+
+export const brandSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  url: z.string().url("Invalid URL"),
+  facebook_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  linkedin_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  x_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  youtube_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  instagram_url: z.string().url("Invalid URL").optional().or(z.literal("")),
+  competitors: z.array(competitorSchema).optional(),
+});

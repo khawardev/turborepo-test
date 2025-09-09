@@ -9,11 +9,24 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background border-b">
-      <ContainerNoPy className="h-16 flex items-center justify-between">
+      <ContainerNoPy className="h-16 flex items-center justify-between px-4">
         <h1 className="text-xl tracking-tight font-bold">
           <Link href={"/"}>BrandOS</Link>
         </h1>
         <div className="flex items-center gap-4">
+          <div className="flex items-center">
+            <Button variant={'ghost'} size={'sm'} asChild>
+              <Link href="/me/brands">
+                <span>Brands</span>
+              </Link>
+            </Button>
+            <Button variant={'ghost'} size={'sm'} asChild>
+              <Link href="/me">
+                <span>Profile</span>
+              </Link>
+            </Button>
+          </div>
+          <span className=" text-muted-foreground/30">|</span>
           {user ? (
             <UserNav user={user} />
           ) : (

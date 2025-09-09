@@ -16,7 +16,7 @@ export function LogoutButton() {
     <Button
       onClick={handleLogout}
       variant="destructive"
-      className="px-8 py-3 text-lg font-semibold"
+      className="px-5 font-semibold"
     >
       Logout
     </Button>

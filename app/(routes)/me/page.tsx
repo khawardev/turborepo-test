@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/server/actions/userActions";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Separator } from "@/components/ui/separator";
-import { ContainerLg, ContainerSm, ContainerXs } from "@/components/shared/containers";
+import {  ContainerXs } from "@/components/shared/containers";
 
 export default async function MePage() {
   const user = await getCurrentUser();
@@ -12,11 +12,11 @@ export default async function MePage() {
   }
 
   return (
-    <ContainerXs className=" flex items-center justify-center md:min-h-[80vh]">
-      <div className="w-full max-w-xl space-y-6">
-        <div className="space-y-2 ">
-          <h1 className="text-xl tracking-tight font-bold">Your Profile</h1>
-          <p className="text-muted-foreground">
+    <ContainerXs>
+      <div className="w-full space-y-6">
+        <div>
+          <h3 className="text-lg  font-medium">Your Profile</h3>
+          <p className="text-sm text-muted-foreground">
             Here is the information associated with your account.
           </p>
         </div>

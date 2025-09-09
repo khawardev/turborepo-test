@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { logout } from "@/server/actions/authActions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, Building } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,12 +58,6 @@ export function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/me">
-            <TiUserOutline className="h-4 w-4" />
-            <span>Profile</span>
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="h-4 w-4" />
           <span>Log out</span>
