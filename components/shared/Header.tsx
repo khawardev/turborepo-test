@@ -14,18 +14,21 @@ export async function Header() {
           <Link href={"/"}>BrandOS</Link>
         </h1>
         <div className="flex items-center gap-4">
-          <div className="flex items-center">
-            <Button variant={'ghost'} size={'sm'} asChild>
-              <Link href="/me/brands">
-                <span>Brands</span>
-              </Link>
-            </Button>
-            <Button variant={'ghost'} size={'sm'} asChild>
-              <Link href="/me">
-                <span>Profile</span>
-              </Link>
-            </Button>
-          </div>
+          {user &&
+            <div className="flex items-center">
+              <Button variant={'ghost'} size={'sm'} asChild>
+                <Link href="/me/brands">
+                  <span>Brands</span>
+                </Link>
+              </Button>
+              <Button variant={'ghost'} size={'sm'} asChild>
+                <Link href="/me">
+                  <span>Profile</span>
+                </Link>
+              </Button>
+            </div>
+          }
+
           <span className=" text-muted-foreground/30">|</span>
           {user ? (
             <UserNav user={user} />
