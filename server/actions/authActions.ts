@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { loginSchema, registerSchema } from "@/lib/validations";
 import { User } from "@/types";
 
-const API_URL = "http://54.221.221.0:8000";
+const API_URL = process.env.API_URL;
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {

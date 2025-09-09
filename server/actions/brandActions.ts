@@ -7,7 +7,7 @@ import { brandSchema } from "@/lib/validations";
 import { getCurrentUser } from "./authActions";
 import { Brand, Competitor } from "@/types";
 
-const API_URL = "http://54.221.221.0:8000";
+const API_URL = process.env.API_URL;
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
   const user = await getCurrentUser();
