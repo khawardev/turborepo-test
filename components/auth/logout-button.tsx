@@ -15,8 +15,7 @@ export function LogoutButton() {
   return (
     <Button
       onClick={handleLogout}
-      variant="destructive"
-      className="px-5 font-semibold"
+      className="px-7"
     >
       Logout
     </Button>
