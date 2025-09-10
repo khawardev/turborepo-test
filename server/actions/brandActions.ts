@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { brandSchema } from "@/lib/validations";
 import { getCurrentUser } from "./authActions";
 import { Brand, Competitor } from "@/types";
+import { crawlWebsite } from "./scrapeActions";
 
 const API_URL = process.env.API_URL;
 
@@ -46,6 +47,9 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
       };
     }
 
+    // Initiate crawl for the brand's website
+    crawlWebsite(brandResult.url, brandResult.brand_id);
+
     // If there are competitors, add them
     if (competitors && competitors.length > 0) {
       const competitorsRes = await fetch(`${API_URL}/brands/competitors/`, {
@@ -67,9 +71,16 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
         return {
           success: false,
           error:
-            competitorsResult.detail || "Brand created, but failed to add competitors",
+            competitorsResult.detail ||
+            "Brand created, but failed to add competitors",
         };
       }
+      const competitorsResult = await competitorsRes.json();
+
+      // Initiate crawl for each competitor's website
+      competitorsResult.forEach((competitor: Competitor) => {
+        crawlWebsite(competitor.url, brandResult.brand_id, competitor.competitor_id);
+      });
     }
 
     revalidatePath("/me/brands");
@@ -137,4 +148,30 @@ export async function getCompetitors(brand_id: string): Promise<Competitor[]> {
     } catch (error) {
         return [];
     }
+}
+
+export async function getBrandById(brand_id: string, client_id: string): Promise<Brand | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/brands/?client_id=${client_id}&brand_id=${brand_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const brands = await res.json();
+    return brands[0] || null;
+  } catch (error) {
+    return null;
+  }
 }

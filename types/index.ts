@@ -25,4 +25,13 @@ export type Competitor = {
   x_url?: string;
   youtube_url?: string;
   instagram_url?: string;
+  competitor_id?: string;
+};
+
+export type CrawledContent = {
+  content: string;
+  SK: string;
+  entity_type: string;
+  PK: string;
+  url: string;
 };

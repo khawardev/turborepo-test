@@ -89,7 +89,9 @@ export default function BrandItem({ brand }: BrandItemProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>{brand.name}</CardTitle>
+          <Link href={`/me/brands/${brand.brand_id}`}>
+            <CardTitle className="hover:underline">{brand.name}</CardTitle>
+          </Link>
           <CardDescription>
             <Link href={brand.url} target="_blank" rel="noreferrer" className="hover:underline">
               {brand.url}

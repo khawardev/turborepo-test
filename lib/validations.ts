@@ -36,3 +36,10 @@ export const brandSchema = z.object({
   instagram_url: z.string().url("Invalid URL").optional().or(z.literal("")),
   competitors: z.array(competitorSchema).optional(),
 });
+
+export const crawlWebsiteSchema = z.object({
+  url: z.string().url(),
+  brand_id: z.string(),
+  client_id: z.string(),
+  competitor_id: z.string().optional(),
+});

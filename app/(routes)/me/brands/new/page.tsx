@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addBrand } from "@/server/actions/brandActions";
+import { initiateScraping } from "@/server/actions/scrapeActions";
 import { ContainerXs } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
 import { Plus } from "lucide-react";
@@ -60,14 +61,25 @@ export default function AddBrandPage() {
   async function onSubmit(data: BrandFormValues) {
     setIsLoading(true);
     const result = await addBrand(data);
-    setIsLoading(false);
 
     if (result.success) {
-      toast.success("Brand created successfully!");
+      toast.success("Brand created successfully! Now scraping websites...");
+      const scrapingResult = await initiateScraping(
+        result.data,
+        data.competitors || [],
+      );
+
+      if (scrapingResult.status === "success") {
+        toast.success(scrapingResult.message);
+      } else {
+        toast.error(scrapingResult.message);
+      }
+
       router.push("/me/brands");
     } else {
       toast.error(result.error || "Failed to create brand.");
     }
+    setIsLoading(false);
   }
 
   return (
