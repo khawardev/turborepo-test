@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/server/actions/userActions";
-import { UserNav } from "../header/UserNav";
-import { ContainerNoPy } from "./containers";
+import { UserNav } from "./UserNav";
+import { ContainerNoPy } from "../shared/containers";
 
 export async function Header() {
   const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function Header() {
           {user &&
             <div className="flex items-center">
               <Button variant={'ghost'} size={'sm'} asChild>
-                <Link href="/me/brands">
+                <Link href="/brands">
                   <span>Brands</span>
                 </Link>
               </Button>

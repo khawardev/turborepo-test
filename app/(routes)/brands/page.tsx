@@ -2,10 +2,10 @@ import { getBrands } from "@/server/actions/brandActions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Brand } from "@/types";
-import BrandItem from "@/components/brands/BrandItem";
 import { ContainerXs } from "@/components/shared/containers";
 import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
+import BrandItem from "@/components/brands/BrandItem";
 
 export default async function BrandsPage() {
   const brands: Brand[] = await getBrands();

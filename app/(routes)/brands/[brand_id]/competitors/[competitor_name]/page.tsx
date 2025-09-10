@@ -82,7 +82,7 @@ export default async function CompetitorDashboardPage({
                       <ReactMarkdown
                         components={{
                           img: ({ node, ...props }) => (
-                            <MarkdownImage src={props.src} alt={props.alt} />
+                            <MarkdownImage src={props.src as string} alt={props.alt} />
                           ),
                         }}
                       >

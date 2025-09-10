@@ -150,7 +150,12 @@ export async function getCompetitors(brand_id: string): Promise<Competitor[]> {
     }
 }
 
-export async function getBrandById(brand_id: string, client_id: string): Promise<Brand | null> {
+export async function getBrandById(brand_id: string, client_id: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return null;
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
   if (!token) {
@@ -158,12 +163,15 @@ export async function getBrandById(brand_id: string, client_id: string): Promise
   }
 
   try {
-    const res = await fetch(`${API_URL}/brands/?client_id=${client_id}&brand_id=${brand_id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetch(
+      `${API_URL}/brands/?client_id=${client_id}&brand_id=${brand_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+    );
 
     if (!res.ok) {
       return null;

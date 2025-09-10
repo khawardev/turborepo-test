@@ -89,9 +89,11 @@ export default function BrandItem({ brand }: BrandItemProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <Link href={`/me/brands/${brand.brand_id}`}>
-            <CardTitle className="hover:underline">{brand.name}</CardTitle>
-          </Link>
+          <CardTitle>
+            <Link href={`/brands/${brand.brand_id}`} className="hover:underline">
+              {brand.name}
+            </Link>
+          </CardTitle>
           <CardDescription>
             <Link href={brand.url} target="_blank" rel="noreferrer" className="hover:underline">
               {brand.url}
@@ -137,11 +139,11 @@ export default function BrandItem({ brand }: BrandItemProps) {
                           </Link>
                         </TableCell>
                         <TableCell className="flex flex-wrap gap-1">
-                            {competitor.facebook_url && <Badge variant="outline"><Link href={competitor.facebook_url} target="_blank">Facebook</Link></Badge>}
-                            {competitor.instagram_url && <Badge variant="outline"><Link href={competitor.instagram_url} target="_blank">Instagram</Link></Badge>}
-                            {competitor.linkedin_url && <Badge variant="outline"><Link href={competitor.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
-                            {competitor.x_url && <Badge variant="outline"><Link href={competitor.x_url} target="_blank">X</Link></Badge>}
-                            {competitor.youtube_url && <Badge variant="outline"><Link href={competitor.youtube_url} target="_blank">YouTube</Link></Badge>}
+                          {competitor.facebook_url && <Badge variant="outline"><Link href={competitor.facebook_url} target="_blank">Facebook</Link></Badge>}
+                          {competitor.instagram_url && <Badge variant="outline"><Link href={competitor.instagram_url} target="_blank">Instagram</Link></Badge>}
+                          {competitor.linkedin_url && <Badge variant="outline"><Link href={competitor.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
+                          {competitor.x_url && <Badge variant="outline"><Link href={competitor.x_url} target="_blank">X</Link></Badge>}
+                          {competitor.youtube_url && <Badge variant="outline"><Link href={competitor.youtube_url} target="_blank">YouTube</Link></Badge>}
                         </TableCell>
                       </TableRow>
                     ))}

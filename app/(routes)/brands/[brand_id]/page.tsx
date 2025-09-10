@@ -42,9 +42,9 @@ export default async function BrandDashboardPage({
     user.client_id,
   );
 
-  const websiteUrls =
+  const websiteUrls: any[] =
     crawledContent.status === "success"
-      ? [...new Set(crawledContent.data.map((item: any) => item.url))]
+      ? [...new Set(crawledContent.data.map((item: any) => String(item.url)))]
       : [];
 
   return (
@@ -80,7 +80,7 @@ export default async function BrandDashboardPage({
                             components={{
                               img: ({ node, ...props }) => (
                                 <MarkdownImage
-                                  src={props.src}
+                                  src={props.src as string}
                                   alt={props.alt}
                                 />
                               ),
@@ -98,7 +98,7 @@ export default async function BrandDashboardPage({
             <Card>
               <CardHeader>
                 <CardTitle>Scraped Website Content</CardTitle>
-              </CardHeader>
+                </CardHeader>
               <CardContent>
                 <p>No website content scraped yet.</p>
               </CardContent>
