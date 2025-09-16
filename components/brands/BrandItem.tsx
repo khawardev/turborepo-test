@@ -111,6 +111,11 @@ export default function BrandItem({ brand }: BrandItemProps) {
           </CardDescription>
         </div>
         <div className="flex items-center space-x-2">
+          <Button asChild variant='outline' >
+            <Link href={`/brands/${brand.brand_id}`} >
+              view
+            </Link>
+          </Button>
           <Button variant="outline" size="icon" onClick={toggleOpen} aria-expanded={isOpen}>
             {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
