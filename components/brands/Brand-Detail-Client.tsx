@@ -77,11 +77,9 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
                         ))}
                     </CardContent>
                 </Card>
+                <CardTitle>Competitors</CardTitle>
                 {crawlData.competitors.length > 0 && (
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Competitors</CardTitle>
-                        </CardHeader>
                         <CardContent>
                             {crawlData.competitors.map((compData) => (
                                 <div key={compData.competitor_id}>
