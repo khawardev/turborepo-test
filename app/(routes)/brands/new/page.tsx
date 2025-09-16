@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,10 +25,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addBrand } from "@/server/actions/brandActions";
-import { initiateScraping } from "@/server/actions/scrapeActions";
 import { ContainerXs } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
-import { Plus } from "lucide-react";
+import { Delete, Plus, Trash2 } from "lucide-react";
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 
@@ -60,26 +59,10 @@ export default function AddBrandPage() {
 
   async function onSubmit(data: BrandFormValues) {
     setIsLoading(true);
-    const result = await addBrand(data);
-
-    if (result.success) {
-      toast.success("Brand created successfully! Now scraping websites...");
-      const scrapingResult = await initiateScraping(
-        result.data,
-        data.competitors || [],
-      );
-
-      if (scrapingResult.status === "success") {
-        toast.success(scrapingResult.message);
-      } else {
-        toast.error(scrapingResult.message);
-      }
-
-      router.push("/me/brands");
-    } else {
-      toast.error(result.error || "Failed to create brand.");
-    }
+    await addBrand(data);
     setIsLoading(false);
+    router.push("/brands");
+    toast.success('Brand has been added successfully')
   }
 
   return (
@@ -243,11 +226,11 @@ export default function AddBrandPage() {
                   <Button
                     type="button"
                     variant="destructive"
-                    size="sm"
+                    size="icon"
                     onClick={() => remove(index)}
                     className="absolute -top-2 -right-2"
                   >
-                    Remove
+                    <Trash2/>
                   </Button>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField

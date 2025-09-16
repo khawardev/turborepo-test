@@ -15,7 +15,6 @@ export function LogoutButton() {
   return (
     <Button
       onClick={handleLogout}
-      className="px-7"
     >
       Logout
     </Button>

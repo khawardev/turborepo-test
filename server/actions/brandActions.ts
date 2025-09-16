@@ -1,185 +1,112 @@
 "use server";
 
 import { z } from "zod";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { brandSchema } from "@/lib/validations";
-import { getCurrentUser } from "./authActions";
 import { Brand, Competitor } from "@/types";
-import { crawlWebsite } from "./scrapeActions";
-
-const API_URL = process.env.API_URL;
+import { scrapeWebsite } from "./scrapeActions";
+import { api } from "@/lib/hooks/getBrandsApi";
+import { getAuth } from "./authActions";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const auth = await getAuth();
+  if (!auth.success || !auth.user) {
     return { success: false, error: "Unauthorized" };
   }
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  if (!token) {
-    return { success: false, error: "Unauthorized" };
-  }
-
+  const { user } = auth;
   const { competitors, ...brandData } = values;
 
   try {
-    // Create the brand
-    const brandRes = await fetch(`${API_URL}/brands/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        ...brandData,
-        client_id: user.client_id,
-      }),
+    const brandResult = await api.createBrand({
+      client_id: user.client_id,
+      ...brandData,
     });
 
-    const brandResult = await brandRes.json();
+    scrapeWebsite({
+      url: brandResult.url,
+      brand_id: brandResult.brand_id,
+    });
 
-    if (!brandRes.ok) {
-      return {
-        success: false,
-        error: brandResult.detail || "Failed to create brand",
-      };
-    }
-
-    // Initiate crawl for the brand's website
-    crawlWebsite(brandResult.url, brandResult.brand_id);
-
-    // If there are competitors, add them
     if (competitors && competitors.length > 0) {
-      const competitorsRes = await fetch(`${API_URL}/brands/competitors/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          brand_id: brandResult.brand_id,
-          client_id: user.client_id,
-          competitors: competitors,
-        }),
-      });
-
-      if (!competitorsRes.ok) {
-        const competitorsResult = await competitorsRes.json();
-        // Optionally, you might want to delete the created brand here if competitors fail
-        return {
-          success: false,
-          error:
-            competitorsResult.detail ||
-            "Brand created, but failed to add competitors",
-        };
-      }
-      const competitorsResult = await competitorsRes.json();
-
-      // Initiate crawl for each competitor's website
-      competitorsResult.forEach((competitor: Competitor) => {
-        crawlWebsite(competitor.url, brandResult.brand_id, competitor.competitor_id);
-      });
+      await addCompetitors(brandResult.brand_id, competitors);
     }
 
-    revalidatePath("/me/brands");
+    revalidatePath("/brands");
     return { success: true, data: brandResult };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Something went wrong" };
+  }
+}
+
+export async function addCompetitors(brandId: string, competitors: any[]) {
+  const auth = await getAuth();
+  if (!auth.success || !auth.user) {
+    console.error("Unauthorized attempt to add competitors.");
+    return;
+  }
+  const { user } = auth;
+  try {
+    const competitorsResult = await api.createCompetitors({
+      brand_id: brandId,
+      client_id: user.client_id,
+      competitors,
+    });
+
+    competitorsResult.forEach((competitor: Competitor) => {
+      scrapeWebsite({
+        url: competitor.url,
+        brand_id: brandId,
+        competitor_id: competitor.competitor_id,
+      });
+    });
   } catch (error) {
-    return { success: false, error: "Something went wrong" };
+    console.error("Failed to add competitors:", error);
   }
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return [];
-  }
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  if (!token) {
+  const auth = await getAuth();
+  if (!auth.success || !auth.user) {
     return [];
   }
 
   try {
-    const res = await fetch(`${API_URL}/brands/?client_id=${user.client_id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      return [];
-    }
-
-    return res.json();
+    const brands = await api.getBrands(auth.user.client_id);
+    return brands;
   } catch (error) {
+    console.error("Failed to fetch brands:", error);
     return [];
   }
 }
 
-export async function getCompetitors(brand_id: string): Promise<Competitor[]> {
-    const user = await getCurrentUser();
-    if (!user) {
-        return [];
-    }
+export async function getCompetitors(brand_id: string): Promise<{ brand_id: string; competitors: Competitor[] }> {
+  const auth = await getAuth();
+  const emptyResult = { brand_id: brand_id, competitors: [] };
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
-    if (!token) {
-        return [];
-    }
-
-    try {
-        const res = await fetch(`${API_URL}/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            cache: "no-store",
-        });
-
-        if (!res.ok) {
-            return [];
-        }
-
-        return res.json();
-    } catch (error) {
-        return [];
-    }
-}
-
-export async function getBrandById(brand_id: string, client_id: string) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return null;
+  if (!auth.success || !auth.user) {
+    return emptyResult;
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  if (!token) {
+  try {
+    const result = await api.getCompetitors(auth.user.client_id, brand_id);
+    return result;
+  } catch (error) {
+    console.error(`Failed to fetch competitors for brand ${brand_id}:`, error);
+    return emptyResult;
+  }
+}
+
+export async function getBrandById(brand_id: string): Promise<Brand | null> {
+  const auth = await getAuth();
+  if (!auth.success || !auth.user) {
     return null;
   }
 
   try {
-    const res = await fetch(
-      `${API_URL}/brands/?client_id=${client_id}&brand_id=${brand_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      },
-    );
-
-    if (!res.ok) {
-      return null;
-    }
-
-    const brands = await res.json();
+    const brands = await api.getBrands(auth.user.client_id, brand_id);
     return brands[0] || null;
   } catch (error) {
+    console.error(`Failed to fetch brand ${brand_id}:`, error);
     return null;
   }
 }

@@ -35,3 +35,22 @@ export type CrawledContent = {
   PK: string;
   url: string;
 };
+
+
+
+export interface ScrapedContent {
+  url: string;
+  content: string;
+}
+
+export interface CompetitorScrapedData {
+  competitor_id: string;
+  contents: ScrapedContent[];
+}
+
+export interface BulkCrawlData {
+  client_id: string;
+  brand_id: string;
+  contents: ScrapedContent[];
+  competitors: CompetitorScrapedData[];
+}

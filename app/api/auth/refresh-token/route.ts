@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-const API_URL = process.env.API_URL;
+import { authApi } from '@/lib/hooks/getAuthApi';
 
 export async function POST(req: NextRequest) {
   const refreshToken = req.cookies.get('refresh_token')?.value;
@@ -9,29 +9,34 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${API_URL}/refresh-token?refresh_token=${refreshToken}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${req.cookies.get('access_token')?.value}`
-      }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return NextResponse.json({ message: data.detail || 'Failed to refresh token' }, { status: response.status });
-    }
-
+    const data = await authApi.refreshToken(refreshToken);
     const { access_token, refresh_token: new_refresh_token } = data;
 
-    const res = NextResponse.json({ message: 'Token refreshed' });
-    res.cookies.set('access_token', access_token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/' });
+    const res = NextResponse.json({ message: 'Token refreshed successfully' });
+
+    res.cookies.set('access_token', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/'
+    });
+
     if (new_refresh_token) {
-      res.cookies.set('refresh_token', new_refresh_token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/' });
+      res.cookies.set('refresh_token', new_refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/'
+      });
     }
 
     return res;
-  } catch (error) {
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.detail || 'Failed to refresh token';
+
+    const res = NextResponse.json({ message }, { status });
+    res.cookies.delete('access_token');
+    res.cookies.delete('refresh_token');
+
+    return res;
   }
 }
