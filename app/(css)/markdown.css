@@ -205,9 +205,8 @@
   width: 100%;
   height: auto;
   display: block;
-  /* padding: 120px; */
-  border: 1px solid #dfdfdf;
-  box-shadow: 0 4px 6px #ececec;
+  /* border: 1px solid #dfdfdf; */
+  /* box-shadow: 0 4px 6px #ececec; */
   margin-bottom: 50px;
   margin-top: 50px;
 }

@@ -71,9 +71,7 @@ export const api = {
     },
 
     getCompetitors: (clientId: string, brandId: string) => {
-        const url = new URL(`${API_URL}/brands/competitors/`);
-        url.searchParams.append("client_id", clientId);
-        url.searchParams.append("brand_id", brandId);
+        const url = new URL(`${API_URL}/brands/competitors/?client_id=${clientId}&brand_id=${brandId}`);
         return request(url.pathname + url.search, "GET");
     },
 
@@ -84,9 +82,12 @@ export const api = {
     crawlWebsite: (data: CrawlWebsitePayload) => request("/website-crawl-spidercrawl", "POST", data),
 
     getBulkCrawlContent: (clientId: string, brandId: string) => {
-        const url = new URL(`${API_URL}/bulk-website-crawl-content`);
-        url.searchParams.append("client_id", clientId);
-        url.searchParams.append("brand_id", brandId);
+        const url = new URL(`${API_URL}/bulk-website-crawl-content/?client_id=${clientId}&brand_id=${brandId}`);
         return request(url.pathname + url.search, "GET");
+    },
+
+    deleteBrand: (clientId: string, brandId: string) => {
+        const url = new URL(`${API_URL}/brands/?client_id=${clientId}&brand_id=${brandId}`);
+        return request(url.pathname + url.search, "DELETE");
     },
 };

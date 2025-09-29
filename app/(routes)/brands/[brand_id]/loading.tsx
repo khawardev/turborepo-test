@@ -1,10 +1,10 @@
-import { ContainerSm } from "@/components/shared/containers";
+import { ContainerMd  } from "@/components/shared/containers";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BrandDetailLoading() {
   return (
-    <ContainerSm>
+    <ContainerMd>
       <Skeleton className="h-6 w-1/3 mb-4" />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <aside className="md:col-span-1">
@@ -45,6 +45,6 @@ export default function BrandDetailLoading() {
           </Card>
         </main>
       </div>
-    </ContainerSm>
+    </ContainerMd>
   );
 }

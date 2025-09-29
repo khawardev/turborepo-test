@@ -3,42 +3,43 @@ import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/server/actions/userActions";
 import { UserNav } from "./UserNav";
 import { ContainerNoPy } from "../shared/containers";
+import { FullLogo } from "../shared/logo";
+import { ThemeSwitcher } from "../ui/theme-switcher";
+import { BrandOSConfig } from "@/config/routes";
 
 export async function Header() {
   const user = await getCurrentUser();
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background border-b">
-      <ContainerNoPy className="h-16 flex items-center justify-between px-4">
-        <h1 className="text-xl tracking-tight font-bold">
-          <Link href={"/"}>BrandOS</Link>
-        </h1>
-        <div className="flex items-center gap-4">
-          {user &&
-            <div className="flex items-center">
-              <Button variant={'ghost'} size={'sm'} asChild>
-                <Link href="/brands">
-                  <span>Brands</span>
-                </Link>
+    <header className="z-30 absolute top-5 w-full ">
+      <div className="flex h-14 items-center mx-auto max-w-6xl justify-between gap-3  px-3">
+        <Link href={'/'}><FullLogo /></Link>
+        <ul className="flex flex-1 items-center justify-end gap-2">
+          <li className="lg:pr-4 md:not-sr-only sr-only">
+            {user &&
+              BrandOSConfig.mainNav.map((item: any, index: any) => (
+                <Button variant={'ghost'} size={'sm'} key={index}>
+                  <Link
+                    href={item.href}
+                    className="text-muted-foreground hover:text-accent-foreground block duration-150">
+                    <span>{item.title}</span>
+                  </Link>
+                </Button>
+              ))
+            }
+          </li>
+          <div className="md:border-l pl-4 flex items-center gap-2">
+            {!user &&
+              <Button asChild>
+                <Link href="/login">Login</Link>
               </Button>
-              <Button variant={'ghost'} size={'sm'} asChild>
-                <Link href="/me">
-                  <span>Profile</span>
-                </Link>
-              </Button>
-            </div>
-          }
+            }
+            {user && <UserNav user={user} />}
+            <ThemeSwitcher />
+          </div>
 
-          <span className=" text-muted-foreground/30">|</span>
-          {user ? (
-            <UserNav user={user} />
-          ) : (
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
-        </div>
-      </ContainerNoPy>
+        </ul>
+      </div>
     </header>
   );
 }

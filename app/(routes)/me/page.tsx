@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/server/actions/userActions";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Separator } from "@/components/ui/separator";
-import {  ContainerXs } from "@/components/shared/containers";
+import {ContainerMd} from "@/components/shared/containers";
 
 export default async function MePage() {
   const user = await getCurrentUser();
@@ -12,7 +12,7 @@ export default async function MePage() {
   }
 
   return (
-    <ContainerXs>
+    <ContainerMd>
       <div className="w-full space-y-6">
         <div>
           <h3 className="text-lg  font-medium">Your Profile</h3>
@@ -45,6 +45,6 @@ export default async function MePage() {
           <LogoutButton />
         </div>
       </div>
-    </ContainerXs>
+    </ContainerMd>
   );
 }

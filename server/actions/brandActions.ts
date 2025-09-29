@@ -22,10 +22,10 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
       ...brandData,
     });
 
-    scrapeWebsite({
-      url: brandResult.url,
-      brand_id: brandResult.brand_id,
-    });
+    // scrapeWebsite({
+    //   url: brandResult.url,
+    //   brand_id: brandResult.brand_id,
+    // });
 
     if (competitors && competitors.length > 0) {
       await addCompetitors(brandResult.brand_id, competitors);
@@ -52,13 +52,13 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
       competitors,
     });
 
-    competitorsResult.forEach((competitor: Competitor) => {
-      scrapeWebsite({
-        url: competitor.url,
-        brand_id: brandId,
-        competitor_id: competitor.competitor_id,
-      });
-    });
+    // competitorsResult.forEach((competitor: Competitor) => {
+    //   scrapeWebsite({
+    //     url: competitor.url,
+    //     brand_id: brandId,
+    //     competitor_id: competitor.competitor_id,
+    //   });
+    // });
   } catch (error) {
     console.error("Failed to add competitors:", error);
   }
@@ -108,5 +108,22 @@ export async function getBrandById(brand_id: string): Promise<Brand | null> {
   } catch (error) {
     console.error(`Failed to fetch brand ${brand_id}:`, error);
     return null;
+  }
+}
+
+export async function deleteBrand(brand_id: string) {
+  const auth = await getAuth();
+  if (!auth.success || !auth.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    await api.deleteBrand(auth.user.client_id, brand_id);
+
+    revalidatePath("/brands");
+    return { success: true };
+  } catch (error: any) {
+    console.error(`Failed to delete brand ${brand_id}:`, error);
+    return { success: false, error: error.message || "Something went wrong" };
   }
 }

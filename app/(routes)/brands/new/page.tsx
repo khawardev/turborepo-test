@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,9 +25,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addBrand } from "@/server/actions/brandActions";
-import { ContainerXs } from "@/components/shared/containers";
+import { ContainerMd, ContainerXs } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
 import { Delete, Plus, Trash2 } from "lucide-react";
+import { MdDeleteOutline } from "react-icons/md";
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 
@@ -66,7 +67,7 @@ export default function AddBrandPage() {
   }
 
   return (
-    <ContainerXs>
+    <ContainerMd>
       <div>
         <h3 className="text-lg  font-medium">Onboarding</h3>
         <p className="text-sm text-muted-foreground">
@@ -203,7 +204,7 @@ export default function AddBrandPage() {
             </div>
             <Button
               type="button"
-              variant="outline"
+              variant='outline'
               onClick={() =>
                 append({
                   name: "",
@@ -219,143 +220,148 @@ export default function AddBrandPage() {
               <Plus /> Competitor
             </Button>
           </section>
-          <Card className="border-none p-0">
-            <CardContent className="space-y-8 p-0">
-              {fields.map((field, index) => (
-                <div key={field.id} className="p-4 border rounded-lg space-y-4 relative">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => remove(index)}
-                    className="absolute -top-2 -right-2"
-                  >
-                    <Trash2/>
-                  </Button>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Competitor Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Vercel" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Website URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="https://vercel.com"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.facebook_url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Facebook URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="https://facebook.com/vercel"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+          {fields.length > 0 &&
+            <div >
+              <div className="flex flex-col space-y-8" >
+                {fields.map((field, index) => (
+                  <div key={field.id} className=" flex flex-row-reverse gap-6  space-y-4 relative ">
+                    <div className=" w-full gap-6 flex  flex-col">
+                      <span className="absolute flex justify-end flex-row w-full -z-10 text-[220px] font-bold text-muted-foreground opacity-5 -top-6 -left-2 select-none">
+                        C{index + 1}
+                      </span>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Competitor Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Vercel" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Website URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://vercel.com"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.facebook_url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Facebook URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://facebook.com/vercel"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.instagram_url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Instagram URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://instagram.com/vercel"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.linkedin_url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>LinkedIn URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://linkedin.com/company/vercel"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.x_url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>X (Twitter) URL</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://x.com/vercel" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`competitors.${index}.youtube_url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>YouTube URL</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://youtube.com/c/vercel"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant={'destructive'}
+                      onClick={() => remove(index)}
+                      className="w-[100px] h-[225px] rounded-xl  [&_svg:not([class*='size-'])]:size-6 [&_svg:not([class*='size-'])]:opacity-50 "
+                    >
+                      <MdDeleteOutline />
+                    </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.instagram_url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Instagram URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="https://instagram.com/vercel"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.linkedin_url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>LinkedIn URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="https://linkedin.com/company/vercel"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.x_url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>X (Twitter) URL</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://x.com/vercel" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name={`competitors.${index}.youtube_url`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>YouTube URL</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="https://youtube.com/c/vercel"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
 
-            </CardContent>
-          </Card>
-
+              </div>
+            </div>
+          }
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Spinner />}
             Save Brand
           </Button>
         </form>
       </Form>
-    </ContainerXs>
+    </ContainerMd>
   );
 }

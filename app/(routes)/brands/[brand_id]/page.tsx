@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getBrandById, getCompetitors } from "@/server/actions/brandActions";
 import { getBulkWebsiteCrawlContent } from "@/server/actions/scrapeActions";
 import BrandDetailClient from "@/components/brands/Brand-Detail-Client";
-import {  ContainerSm } from "@/components/shared/containers";
+import {  ContainerMd } from "@/components/shared/containers";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 interface BrandDetailPageProps {
@@ -25,7 +25,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
   }
 
   return (
-    <ContainerSm>
+    <ContainerMd>
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -41,6 +41,6 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
         competitors={competitorsResponse.competitors}
         crawlData={crawlDataResult.data}
       />
-    </ContainerSm>
+    </ContainerMd>
   );
 }

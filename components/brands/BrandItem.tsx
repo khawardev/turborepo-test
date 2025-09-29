@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Brand, Competitor } from "@/types";
-import { getCompetitors } from "@/server/actions/brandActions";
+import { useTransition } from "react";
 import {
   Card,
   CardContent,
@@ -19,14 +17,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Link as LinkIcon } from "lucide-react";
+import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../ui/badge";
+import { scrapeBrandAndCompetitors } from "@/server/actions/scrapeActions";
+import { ButtonSpinner, Spinner } from "../shared/spinner";
+import { toast } from "sonner";
+import { deleteBrand } from "@/server/actions/brandActions";
+import { useRouter } from "next/navigation";
+import { MdDeleteOutline } from "react-icons/md";
 
-interface BrandItemProps {
-  brand: Brand;
-}
+
 
 function BrandItemSkeleton() {
   return (
@@ -66,71 +68,74 @@ function BrandItemSkeleton() {
   );
 }
 
-export default function BrandItem({ brand }: BrandItemProps) {
-  const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const fetchCompetitors = async () => {
-    setIsLoading(true);
-    try {
-      const result = await getCompetitors(brand.brand_id);
-      setCompetitors(result.competitors);
-    } catch (error) {
-      console.error("Failed to fetch competitors", error);
-    } finally {
-      setIsLoading(false);
-    }
+export default function BrandItem({ brand, competitors, crawlData, index }: any) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const scrapeBrand = () => {
+    startTransition(async () => {
+      await scrapeBrandAndCompetitors(brand, competitors);
+      router.refresh();
+      toast.success('Brand Scrapped Successfully')
+    });
   };
+  const confirmDelete = () => {
+    toast(`Delete ${brand.name}?`, {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Confirm",
+        onClick: () => {
+          startTransition(async () => {
+            await deleteBrand(brand.brand_id)
+            router.refresh()
+            toast.success("Brand Deleted Successfully")
+          })
+        },
+      },
+    })
+  }
 
-  const toggleOpen = () => {
-    const nextIsOpen = !isOpen;
-    setIsOpen(nextIsOpen);
-    if (nextIsOpen && competitors.length === 0) {
-      fetchCompetitors();
-    }
-  };
-
-  
-  console.log(`${brand.brand_id} & ${brand.name}`, `<-> brand.brand_id and name <->`);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>
-            <Link href={`/brands/${brand.brand_id}`} className="hover:underline">
+    <div className="flex gap-4">
+      <Card className="w-full relative">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>
               {brand.name}
-            </Link>
-          </CardTitle>
-          <CardDescription>
-            <Link href={brand.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
-              {brand.url}
-              <LinkIcon className="size-3" />
-            </Link>
-          </CardDescription>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button asChild variant='outline' >
-            <Link href={`/brands/${brand.brand_id}`} >
-              view
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" onClick={toggleOpen} aria-expanded={isOpen}>
-            {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </div>
-      </CardHeader>
-      {isOpen && (
-        <CardContent>
-          {isLoading ? (
+            </CardTitle>
+            <CardDescription>
+              <Link href={brand.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
+                {brand.url}
+                <LinkIcon className="size-3" />
+              </Link>
+            </CardDescription>
+          </div>
+          <div className="flex items-center space-x-2">
+            {crawlData ?
+              <Button variant={'outline'} asChild  >
+                <Link href={`/brands/${brand.brand_id}`} >
+                  Show
+                </Link>
+              </Button> :
+              <Button disabled={isPending} onClick={scrapeBrand} >
+                {isPending ? (
+                  <ButtonSpinner>Scraping</ButtonSpinner>
+                ) : (
+                  "Scrape"
+                )}
+              </Button>
+            }
+          </div>
+        </CardHeader>
+        <CardContent >
+          {isPending ? (
             <BrandItemSkeleton />
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               <div>
                 <h4 className="text-md font-medium mb-2">Social Links</h4>
                 <div className="flex flex-wrap gap-2">
-                  {brand.facebook_url && <Badge asChild  variant='secondary'><Link href={brand.facebook_url} target="_blank">Facebook</Link></Badge>}
+                  {brand.facebook_url && <Badge asChild variant='secondary'><Link href={brand.facebook_url} target="_blank">Facebook</Link></Badge>}
                   {brand.instagram_url && <Badge asChild variant="secondary" ><Link href={brand.instagram_url} target="_blank">Instagram</Link></Badge>}
                   {brand.linkedin_url && <Badge asChild variant="secondary" ><Link href={brand.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
                   {brand.x_url && <Badge asChild variant="secondary" ><Link href={brand.x_url} target="_blank">X</Link></Badge>}
@@ -150,68 +155,63 @@ export default function BrandItem({ brand }: BrandItemProps) {
                           <TableHead>Socials</TableHead>
                         </TableRow>
                       </TableHeader>
-                        <TableBody>
-                          {competitors.map((competitor) => {
-                            console.log(
-                              `${competitor.competitor_id} & ${competitor.name}`,
-                              "<-> competitor_id and name <->"
-                            );
-
-                            return (
-                              <TableRow key={competitor.competitor_id}>
-                                <TableCell className="font-medium">{competitor.name}</TableCell>
-                                <TableCell>
-                                  <Link
-                                    href={competitor.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-1 hover:underline"
-                                  >
-                                    {competitor.url}
-                                    <LinkIcon className="size-3" />
-                                  </Link>
-                                </TableCell>
-                                <TableCell className="flex flex-wrap gap-1">
-                                  {competitor.facebook_url && (
-                                    <Badge asChild variant="secondary">
-                                      <Link href={competitor.facebook_url} target="_blank">
-                                        Facebook
-                                      </Link>
-                                    </Badge>
-                                  )}
-                                  {competitor.instagram_url && (
-                                    <Badge asChild variant="secondary">
-                                      <Link href={competitor.instagram_url} target="_blank">
-                                        Instagram
-                                      </Link>
-                                    </Badge>
-                                  )}
-                                  {competitor.linkedin_url && (
-                                    <Badge asChild variant="secondary">
-                                      <Link href={competitor.linkedin_url} target="_blank">
-                                        LinkedIn
-                                      </Link>
-                                    </Badge>
-                                  )}
-                                  {competitor.x_url && (
-                                    <Badge asChild variant="secondary">
-                                      <Link href={competitor.x_url} target="_blank">
-                                        X
-                                      </Link>
-                                    </Badge>
-                                  )}
-                                  {competitor.youtube_url && (
-                                    <Badge asChild variant="secondary">
-                                      <Link href={competitor.youtube_url} target="_blank">
-                                        YouTube
-                                      </Link>
-                                    </Badge>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
+                      <TableBody>
+                        {competitors.map((competitor: any) => {
+                          return (
+                            <TableRow key={competitor.competitor_id}>
+                              <TableCell className="font-medium">{competitor.name}</TableCell>
+                              <TableCell>
+                                <Link
+                                  href={competitor.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center gap-1 hover:underline"
+                                >
+                                  {competitor.url}
+                                  <LinkIcon className="size-3" />
+                                </Link>
+                              </TableCell>
+                              <TableCell className="flex flex-wrap gap-1">
+                                {competitor.facebook_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.facebook_url} target="_blank">
+                                      Facebook
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.instagram_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.instagram_url} target="_blank">
+                                      Instagram
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.linkedin_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.linkedin_url} target="_blank">
+                                      LinkedIn
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.x_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.x_url} target="_blank">
+                                      X
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.youtube_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.youtube_url} target="_blank">
+                                      YouTube
+                                    </Link>
+                                  </Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
                     </Table>
                   </div>
                 ) : (
@@ -220,10 +220,26 @@ export default function BrandItem({ brand }: BrandItemProps) {
                   </div>
                 )}
               </div>
+
+              <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold text-muted-foreground opacity-5  select-none">
+                B{index + 1}
+              </span>
             </div>
           )}
         </CardContent>
-      )}
-    </Card>
+      </Card>
+      <Button
+        type="button"
+        variant={'destructive'}
+        onClick={confirmDelete}
+        className="w-[100px] h-[310px] rounded-xl  [&_svg:not([class*='size-'])]:size-6 [&_svg:not([class*='size-'])]:opacity-50 "
+      >
+        {isPending ? (
+          <Spinner />
+        ) : (
+          <MdDeleteOutline />
+        )}
+      </Button>
+    </div>
   );
 }

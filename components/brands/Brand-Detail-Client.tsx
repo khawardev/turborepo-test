@@ -118,7 +118,17 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
                             <Separator />
                             <CardContent className="pt-6">
                                 <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{selectedContent.content}</ReactMarkdown>
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                            img: ({ node, ...props }) => {
+                                                if (!props.src) return null
+                                                return <img {...props} alt={props.alt || ""} />
+                                            },
+                                        }}
+                                    >
+                                        {selectedContent.content}
+                                    </ReactMarkdown>
                                 </div>
                             </CardContent>
                         </>

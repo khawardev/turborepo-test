@@ -2,6 +2,7 @@
 
 import { api } from "@/lib/hooks/getBrandsApi";
 import { getAuth } from "./authActions";
+import { revalidatePath } from "next/cache";
 
 
 type ScrapeWebsiteParams = {
@@ -9,6 +10,38 @@ type ScrapeWebsiteParams = {
   brand_id: string;
   competitor_id?: string;
 };
+
+
+export async function scrapeBrandAndCompetitors(
+  brand: any,
+  competitors: any[]
+) {
+  try {
+    await Promise.all([
+      scrapeWebsite({
+        url: brand.url,
+        brand_id: brand.brand_id,
+      }),
+
+      ...competitors.map((competitor) =>
+        scrapeWebsite({
+          url: competitor.url,
+          brand_id: brand.brand_id,
+          competitor_id: competitor.competitor_id,
+        })
+      ),
+    ]);
+    revalidatePath('/brands')
+    return { success: true };
+  } catch (error) {
+    console.error(
+      `Scraping failed for brand ${brand.brand_id} and competitors:`,
+      error
+    );
+    return { success: false, error: "Scraping failed" };
+  }
+}
+
 
 export async function scrapeWebsite(params: ScrapeWebsiteParams) {
   const auth = await getAuth();

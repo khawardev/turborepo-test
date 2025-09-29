@@ -4,6 +4,7 @@ import "@/app/(css)/globals.css";
 
 import { Toaster } from "sonner";
 import { Header } from "@/components/header/Header";
+import { ThemeProvider } from "next-themes";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -27,10 +28,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter?.className} relative  antialiased`} suppressHydrationWarning={true}>
-        <Header />
-        <Toaster />
-        {children}
+      <body className={`${inter?.className}  relative  antialiased`} suppressHydrationWarning={true}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+        >
+          <Header />
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

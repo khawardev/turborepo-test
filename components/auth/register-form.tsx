@@ -52,12 +52,13 @@ export function RegisterForm({
         className={cn("flex flex-col gap-6", className)}
         {...props}
       >
-        <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-bold">Create an account</h1>
-          <p className="text-muted-foreground text-sm text-balance">
+        <div className="flex flex-col gap-5">
+          <h1 className="text-4xl leading-8 font-bold">Create <br /> your account</h1>
+          <p className="text-muted-foreground text-balance">
             Enter your details below to create an account
           </p>
         </div>
+
         <div className="grid gap-4">
           <FormField
             control={form.control}

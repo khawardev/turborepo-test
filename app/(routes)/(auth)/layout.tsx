@@ -1,26 +1,29 @@
-import { ContainerSm } from "@/components/shared/containers";
-import Image from "next/image";
+
+import PrismaticBurst from "@/components/ui/react-bits/PrismaticBurst";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
-    <ContainerSm className="flex flex-row container mx-auto justify-between h-[90vh]">
-      
-      <div className=" flex flex-col  w-full justify-center">
-        {children}
-      </div>
-      <div className="bg-muted hidden lg:block rounded-3xl ">
-        <Image
-          src="https://img.freepik.com/free-vector/pale-green-gradient-tones-background_23-2148381991.jpg?semt=ais_hybrid&w=740&q=80"
-          alt="Image"
-          width="2920"
-          height="2920"
-          className="h-full w-full rounded-3xl"
+    <div className="h-screen relative flex items-center justify-center">
+        <PrismaticBurst
+          animationType="rotate3d"
+          intensity={3}
+          speed={0.5}
+          distort={1.0}
+          paused={false}
+          offset={{ x: 0, y: 0 }}
+          hoverDampness={0.25}
+          rayCount={14}
+          mixBlendMode="lighten"
+          colors={['#71EA01', '#000000', '#71EA01']}
         />
+        <div className="z-10 absolute  w-full flex items-center justify-center">
+          {children}
       </div>
-    </ContainerSm>
+    </div>
   );
 }
