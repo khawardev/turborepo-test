@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Link as LinkIcon } from "lucide-react";
+import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../ui/badge";
@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { deleteBrand } from "@/server/actions/brandActions";
 import { useRouter } from "next/navigation";
 import { MdDeleteOutline } from "react-icons/md";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
 
@@ -94,6 +95,7 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
     })
   }
 
+console.log(brand.brand_id, `<-> brand.brand_id <->`);
 
   return (
     <div className="flex gap-4">
@@ -124,7 +126,24 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                   "Scrape"
                 )}
               </Button>
+              
             }
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" >
+                  Actions<ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardHeader>
         <CardContent >
@@ -143,6 +162,7 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                 </div>
               </div>
 
+                
               <div>
                 <h4 className="text-md font-medium mb-2">Competitors</h4>
                 {competitors.length > 0 ? (
@@ -156,7 +176,8 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {competitors.map((competitor: any) => {
+                          {competitors.map((competitor: any) => {
+                          console.log(competitor.competitor_id, `<-> competitor.competitor_id <->`);
                           return (
                             <TableRow key={competitor.competitor_id}>
                               <TableCell className="font-medium">{competitor.name}</TableCell>
@@ -228,18 +249,7 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
           )}
         </CardContent>
       </Card>
-      <Button
-        type="button"
-        variant={'destructive'}
-        onClick={confirmDelete}
-        className="w-[100px] h-[310px] rounded-xl  [&_svg:not([class*='size-'])]:size-6 [&_svg:not([class*='size-'])]:opacity-50 "
-      >
-        {isPending ? (
-          <Spinner />
-        ) : (
-          <MdDeleteOutline />
-        )}
-      </Button>
+      
     </div>
   );
 }

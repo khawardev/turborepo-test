@@ -19,9 +19,7 @@ export async function Header() {
             {user &&
               BrandOSConfig.mainNav.map((item: any, index: any) => (
                 <Button variant={'ghost'} size={'sm'} key={index}>
-                  <Link
-                    href={item.href}
-                    className="text-muted-foreground hover:text-accent-foreground block duration-150">
+                  <Link href={item.href}>
                     <span>{item.title}</span>
                   </Link>
                 </Button>

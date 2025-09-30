@@ -11,7 +11,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
         "bg-input/20 border-input/90 flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs",
         "transition-colors duration-100 ease-in-out",
-        "shadow-xs bg-linear-to-t hover:to-muted to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 duration-200",
+        "shadow-xs dark:bg-border/20  bg-accent  duration-200",
         "outline-none focus:border-primary/40 focus:ring-primary/40", 
         "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",

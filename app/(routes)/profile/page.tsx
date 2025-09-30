@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Separator } from "@/components/ui/separator";
 import {ContainerMd} from "@/components/shared/containers";
+import LightRaysWrapper from "@/components/LightRaysWrapper";
 
 export default async function MePage() {
   const user = await getCurrentUser();
@@ -12,6 +13,7 @@ export default async function MePage() {
   }
 
   return (
+    <LightRaysWrapper className="h-screen">
     <ContainerMd>
       <div className="w-full space-y-6">
         <div>
@@ -45,6 +47,7 @@ export default async function MePage() {
           <LogoutButton />
         </div>
       </div>
-    </ContainerMd>
+      </ContainerMd>
+    </LightRaysWrapper>
   );
 }
