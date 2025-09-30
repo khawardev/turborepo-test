@@ -52,8 +52,8 @@ export function RegisterForm({
         className={cn("flex flex-col gap-6", className)}
         {...props}
       >
-        <div className="flex flex-col gap-5">
-          <h1 className="text-4xl leading-8 font-bold">Create <br /> your account</h1>
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl leading-8 font-bold">Sign up</h1>
           <p className="text-muted-foreground text-balance">
             Enter your details below to create an account
           </p>
