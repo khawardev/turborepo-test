@@ -1,11 +1,15 @@
 import { Spinner } from '@/components/shared/spinner'
 import React from 'react'
+import LightRaysWrapper from '../LightRaysWrapper'
 
 const Loading = () => {
     return (
-        <div className='flex justify-center items-center min-h-[85vh]'>
-            <Spinner />
-        </div>
+        <LightRaysWrapper className="h-screen">
+            <div className='flex gap-2 text-muted-foreground text-sm justify-center items-center min-h-screen'>
+                <Spinner  /> loading...
+            </div>
+        </LightRaysWrapper>
+
     )
 }
 

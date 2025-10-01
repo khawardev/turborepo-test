@@ -12,7 +12,7 @@ export const ButtonSpinner = ({children}: {children: ReactNode}) => {
 
 export const Spinner = () => {
   return (
-    <Icons.loading className="text-muted-foreground size-4 animate-spin" />
+    <Icons.loading className="text-muted-foreground size-3 animate-spin" />
   )
 }
 
