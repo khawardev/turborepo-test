@@ -242,7 +242,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                 )}
               </div>
 
-              <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold text-muted-foreground opacity-5  select-none">
+                <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
                 B{index + 1}
               </span>
             </div>

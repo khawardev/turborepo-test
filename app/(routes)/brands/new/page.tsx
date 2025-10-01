@@ -228,7 +228,7 @@ export default function AddBrandPage() {
                   {fields.map((field, index) => (
                     <div key={field.id} className=" flex flex-row-reverse gap-6  space-y-4 relative ">
                       <div className=" w-full gap-6 flex  flex-col">
-                        <span className="absolute flex justify-end flex-row w-full -z-10 text-[220px] font-bold text-muted-foreground opacity-5 -top-6 -left-2 select-none">
+                        <span className="absolute flex justify-end flex-row w-full -z-10 text-[220px] font-bold text-primary/5  -top-6 -left-2 select-none">
                           C{index + 1}
                         </span>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
