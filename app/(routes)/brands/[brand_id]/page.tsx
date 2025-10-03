@@ -12,7 +12,7 @@ interface BrandDetailPageProps {
 }
 
 export default async function BrandDetailPage({ params }: BrandDetailPageProps) {
-  const { brand_id } = await params; 
+  const { brand_id } =  params; 
 
   const [brand, competitorsResponse, crawlDataResult] = await Promise.all([
     getBrandById(brand_id),

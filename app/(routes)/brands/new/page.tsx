@@ -68,7 +68,6 @@ export default function AddBrandPage() {
   }
 
   return (
-    <LightRaysWrapper className="h-screen">
       <ContainerMd>
         <div>
           <h3 className="text-lg  font-medium">Onboarding</h3>
@@ -366,6 +365,5 @@ export default function AddBrandPage() {
           </form>
         </Form>
       </ContainerMd>
-    </LightRaysWrapper>
   );
 }

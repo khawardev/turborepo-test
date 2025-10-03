@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/server/actions/userActions";
 import { UserNav } from "./UserNav";
-import { ContainerNoPy } from "../shared/containers";
 import { FullLogo } from "../shared/logo";
 import { ThemeSwitcher } from "../ui/theme-switcher";
 import { BrandOSConfig } from "@/config/routes";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function Header() {
   const user = await getCurrentUser();

@@ -1,22 +1,5 @@
-const API_URL = process.env.API_URL;
+import { authRequest } from "../../server/api/authRequest";
 
-async function authRequest(endpoint: string, method: "GET" | "POST", options: RequestInit = {}) {
-    const res = await fetch(`${API_URL}${endpoint}`, {
-        method,
-        headers: {
-            "Content-Type": "application/json",
-            ...options.headers,
-        },
-        body: options.body,
-        cache: "no-store",
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-        throw { status: res.status, detail: data.detail || "API request failed" };
-    }
-    return data;
-}
 
 export const authApi = {
     login: async (credentials: any) => {
@@ -39,8 +22,5 @@ export const authApi = {
         return data;
     },
 
-    refreshToken: async (refreshToken: string) => {
-        const data = await authRequest(`/refresh-token?refresh_token=${refreshToken}`, "POST", {});
-        return data;
-    },
+  
 };

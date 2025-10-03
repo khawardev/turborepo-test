@@ -1,19 +1,14 @@
-import { getBrands, getCompetitors } from "@/server/actions/brandActions";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Brand } from "@/types";
 import { ContainerMd } from "@/components/shared/containers";
-import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import BrandItem from "@/components/brands/BrandItem";
-import { getBulkWebsiteCrawlContent } from "@/server/actions/scrapeActions";
-import { TiWarningOutline } from "react-icons/ti";
 import LightRaysWrapper from "@/components/LightRaysWrapper";
+import BrandList from "@/components/brands/BrandList";
+import BrandsLoading from "./loading";
 
-export default async function BrandsPage() {
-  const brands: Brand[] = await getBrands();
+export default function BrandsPage() {
   return (
-    <LightRaysWrapper className="h-screen">
       <ContainerMd>
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -29,33 +24,10 @@ export default async function BrandsPage() {
             </Link>
           </Button>
         </div>
-
-        {brands.length === 0 ? (
-          <Card className="flex flex-col gap-3 items-center justify-center text-center h-64 border-dashed border-2">
-            <h3 className=" text-5xl opacity-15"><TiWarningOutline /></h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              Get started by adding your first brand.
-            </p>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {brands.map(async (brand, index) => {
-              const competitor = await getCompetitors(brand.brand_id)
-              const crawlData = await getBulkWebsiteCrawlContent(brand.brand_id)
-              return (
-                <BrandItem
-                  key={brand.brand_id}
-                  index={index}
-                  crawlData={crawlData.data.contents.length > 0}
-                  brand={brand}
-                  competitors={competitor.competitors}
-                />
-              )
-            })}
-          </div>
-        )}
+        <Suspense fallback={<BrandsLoading />}>
+          <BrandList />
+        </Suspense>
       </ContainerMd>
-    </LightRaysWrapper>
   );
 }
 

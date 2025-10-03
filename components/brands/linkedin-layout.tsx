@@ -1,80 +1,66 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+"use client"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import linkedinData from "@/data/dummy/social-media/linkedin.json";
-import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText } from "lucide-react";
-import Image from "next/image";
+import linkedinData from "@/data/ayaz_socials/linkedin.json";
+import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText, Link as LinkIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Textarea } from "../ui/textarea";
+import Link from "next/link";
+import { useState } from "react";
 
 interface LinkedInLayoutProps {
     onGenerateReport: () => void;
+    ownerName: string;
+    isBrand: boolean;
 }
 
-export default function LinkedInLayout({ onGenerateReport }: LinkedInLayoutProps) {
-    const { profile, posts } = linkedinData;
+export default function LinkedInLayout({ onGenerateReport, ownerName, isBrand }: LinkedInLayoutProps) {
+    const { brand, competitors } = linkedinData;
+    const entity = isBrand ? brand : competitors.find((c: any) => c.name === ownerName);
+
+    if (!entity || !entity.posts || entity.posts.length === 0 || entity.posts.some((p: any) => p.warning_code === 'no_posts')) {
+        return (
+            <Card>
+                <CardContent className="p-4">
+                    <p>No LinkedIn data available for {ownerName}.</p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const posts = entity.posts.filter((p: any) => !p.warning_code);
+    const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+
+    const toggleComments = (postId: string) => {
+        setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
+    };
 
     return (
-        <Card>
-            <div className="relative h-32 md:h-48">
-                <Image src={profile.banner} layout="fill" objectFit="cover" alt="Banner" className="rounded-t-lg" />
-            </div>
-            <div className="p-4">
-                <Avatar className="w-24 h-24 md:w-32 md:h-32 -mt-12 md:-mt-16 border-4 border-background">
-                    <AvatarImage src={profile.avatar} />
-                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+        <div>
+            <div className="pb-4">
                 <div className="mt-4 flex justify-between items-start">
-                    <div>
-                        <h2 className="text-2xl font-bold">{profile.name}</h2>
-                        <p className="text-muted-foreground">{profile.tagline}</p>
-                        <p className="text-sm text-muted-foreground mt-2">{profile.followers} followers</p>
-                    </div>
-                    <Button onClick={onGenerateReport}><FileText className="w-4 h-4 mr-2" />Generate Report</Button>
-                </div>
-                <div className="mt-4 flex items-center space-x-2">
-                    <Button>Follow</Button>
-                    <Button variant="outline">View Website</Button>
+                    <h2 className="text-2xl font-bold">{entity.name}</h2>
+                    <Button onClick={onGenerateReport}><FileText className="mr-2 h-4 w-4" />Generate Report</Button>
                 </div>
             </div>
             <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-                <div className="md:col-span-1 space-y-4">
-                    <Card>
-                        <CardContent className="pt-6">
-                            <h3 className="font-semibold">About</h3>
-                            <p className="text-sm mt-2">{profile.about}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className="md:col-span-2 space-y-4">
-                    <Card>
-                        <CardContent className="pt-6">
-                            <div className="flex space-x-4">
-                                <Avatar>
-                                    <AvatarImage src={profile.avatar} />
-                                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <Textarea placeholder="Start a post" className="flex-grow" />
-                            </div>
-                            <div className="flex justify-end mt-2">
-                                <Button>Post</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    {posts.map((post) => (
-                        <Card key={post.id}>
-                            <CardContent className="pt-6">
+            <div className="pt-4">
+                <div className="space-y-4">
+                    {posts.map((post: any) => (
+                        <Card key={post.linkedin_post_id}>
+                            <CardContent className="p-4">
                                 <div className="flex justify-between">
                                     <div className="flex items-center space-x-4">
                                         <Avatar>
-                                            <AvatarImage src={post.avatar} />
-                                            <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
+                                            <AvatarFallback>{entity.name.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-semibold">{post.author}</p>
-                                            <p className="text-sm text-muted-foreground">{post.timestamp}</p>
+                                            <p className="font-semibold">{entity.name}</p>
+                                            <Link href={post.url} target="_blank" rel="noreferrer" className="text-sm text-muted-foreground hover:underline inline-flex items-center gap-1">
+                                                {new Date(post.date_posted).toLocaleDateString()}
+                                                <LinkIcon className="size-3" />
+                                            </Link>
                                         </div>
                                     </div>
                                     <DropdownMenu>
@@ -82,29 +68,43 @@ export default function LinkedInLayout({ onGenerateReport }: LinkedInLayoutProps
                                             <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
-                                <p className="mt-4 text-sm">{post.content}</p>
+                                <p className="mt-4 text-sm">{post.post_text}</p>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                    {post.hashtags?.map((tag: any) => <span key={tag} className="text-xs text-blue-500 hover:underline cursor-pointer">#{tag}</span>)}
+                                </div>
                                 <div className="flex items-center space-x-2 mt-4 text-muted-foreground text-xs">
                                     <ThumbsUp className="w-3 h-3" />
-                                    <span>{post.likes}</span>
+                                    <span>{post.num_likes}</span>
                                     <span>·</span>
-                                    <span>{post.comments} comments</span>
+                                    <button onClick={() => toggleComments(post.linkedin_post_id)} className="hover:underline">
+                                        {post.num_comments} comments
+                                    </button>
                                 </div>
                                 <Separator className="my-2" />
                                 <div className="grid grid-cols-3 gap-1 text-center font-semibold text-muted-foreground text-sm">
-                                    <Button variant="ghost" className="w-full"><ThumbsUp className="w-5 h-5 mr-2" /> Like</Button>
-                                    <Button variant="ghost" className="w-full"><MessageSquare className="w-5 h-5 mr-2" /> Comment</Button>
-                                    <Button variant="ghost" className="w-full"><Share2 className="w-5 h-5 mr-2" /> Share</Button>
+                                    <Button variant="ghost" className="w-full"><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
+                                    <Button variant="ghost" className="w-full" onClick={() => toggleComments(post.linkedin_post_id)}><MessageSquare className="mr-2 h-4 w-4" /> Comment</Button>
+                                    <Button variant="ghost" className="w-full"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
                                 </div>
+                                {showComments[post.linkedin_post_id] && (
+                                    <div className="mt-4 space-y-3">
+                                        {post.comments?.map((comment: any, index: any) => (
+                                            <div key={index} className="text-xs bg-muted p-2 rounded-lg">
+                                                {comment}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     ))}
                 </div>
             </div>
-        </Card>
+        </div>
     );
 }

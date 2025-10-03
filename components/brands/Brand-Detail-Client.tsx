@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { LinkIcon, FileText } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 import TwitterLayout from "./twitter-layout";
 import FacebookLayout from "./facebook-layout";
 import InstagramLayout from "./instagram-layout";
@@ -78,8 +78,7 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
 
     const getPagePath = (url: string) => {
         try {
-            const path = new URL(url).pathname;
-            return path;
+            return new URL(url).pathname;
         } catch (e) {
             return url;
         }
@@ -87,7 +86,12 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
 
     const renderSocialLayout = () => {
         if (!selectedSocial) return null;
-        const layoutProps = { onGenerateReport: handleGenerateReport };
+        const isBrand = selectedSocial.ownerName === brand.name;
+        const layoutProps = {
+            onGenerateReport: handleGenerateReport,
+            ownerName: selectedSocial.ownerName,
+            isBrand: isBrand
+        };
         switch (selectedSocial.platform) {
             case "Twitter":
                 return <TwitterLayout {...layoutProps} />;
@@ -181,7 +185,7 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
             </aside>
             <main className="md:col-span-3">
                 {currentView === "website" && (
-                    <Card>
+                    <Card >
                         {selectedContent ? (
                             <>
                                 <CardHeader>
@@ -194,7 +198,7 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
                                     </CardDescription>
                                 </CardHeader>
                                 <Separator />
-                                <CardContent className="pt-6">
+                                <CardContent >
                                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}

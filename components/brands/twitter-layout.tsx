@@ -20,7 +20,7 @@ export default function TwitterLayout({ onGenerateReport }: TwitterLayoutProps) 
             <div className="relative h-48 md:h-64">
                 <Image src={profile.banner} layout="fill" objectFit="cover" alt="Banner" />
             </div>
-            <div className="p-4">
+            <div >
                 <div className="flex justify-between items-start">
                     <Avatar className="w-24 h-24 md:w-32 md:h-32 -mt-12 md:-mt-16 border-4 border-background">
                         <AvatarImage src={profile.avatar} />
@@ -28,7 +28,7 @@ export default function TwitterLayout({ onGenerateReport }: TwitterLayoutProps) 
                     </Avatar>
                     <div className="flex items-center space-x-2">
                         <Button variant="outline">Follow</Button>
-                        <Button onClick={onGenerateReport}><FileText className="w-4 h-4 mr-2" />Generate Report</Button>
+                        <Button onClick={onGenerateReport}><FileText  />Generate Report</Button>
                     </div>
                 </div>
                 <div className="mt-4">
@@ -87,8 +87,8 @@ export default function TwitterLayout({ onGenerateReport }: TwitterLayoutProps) 
                                             <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit  />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2  />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>

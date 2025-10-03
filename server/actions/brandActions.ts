@@ -4,28 +4,23 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { brandSchema } from "@/lib/validations";
 import { Brand, Competitor } from "@/types";
-import { scrapeWebsite } from "./scrapeActions";
-import { api } from "@/lib/hooks/getBrandsApi";
-import { getAuth } from "./authActions";
+import { brandRequest } from "@/server/api/brandRequest";
+import { getCurrentUser } from "./authActions";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     return { success: false, error: "Unauthorized" };
   }
-  const { user } = auth;
   const { competitors, ...brandData } = values;
 
   try {
-    const brandResult = await api.createBrand({
-      client_id: user.client_id,
-      ...brandData,
+    const brandResult = await brandRequest("/brands/", "POST", {
+      body: JSON.stringify({
+        client_id: user.client_id,
+        ...brandData,
+      }),
     });
-
-    // scrapeWebsite({
-    //   url: brandResult.url,
-    //   brand_id: brandResult.brand_id,
-    // });
 
     if (competitors && competitors.length > 0) {
       await addCompetitors(brandResult.brand_id, competitors);
@@ -39,39 +34,33 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
 }
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     console.error("Unauthorized attempt to add competitors.");
     return;
   }
-  const { user } = auth;
   try {
-    const competitorsResult = await api.createCompetitors({
-      brand_id: brandId,
-      client_id: user.client_id,
-      competitors,
+    await brandRequest("/brands/competitors/", "POST", {
+      body: JSON.stringify({
+        brand_id: brandId,
+        client_id: user.client_id,
+        competitors,
+      }),
     });
-
-    // competitorsResult.forEach((competitor: Competitor) => {
-    //   scrapeWebsite({
-    //     url: competitor.url,
-    //     brand_id: brandId,
-    //     competitor_id: competitor.competitor_id,
-    //   });
-    // });
   } catch (error) {
     console.error("Failed to add competitors:", error);
   }
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
-    return [];
-  }
+  const user = await getCurrentUser();
+  if (!user) return [];
 
   try {
-    const brands = await api.getBrands(auth.user.client_id);
+    const brands = await brandRequest(
+      `/brands/?client_id=${user.client_id}`,
+      "GET"
+    );
     return brands;
   } catch (error) {
     console.error("Failed to fetch brands:", error);
@@ -79,16 +68,19 @@ export async function getBrands(): Promise<Brand[]> {
   }
 }
 
-export async function getCompetitors(brand_id: string): Promise<{ brand_id: string; competitors: Competitor[] }> {
-  const auth = await getAuth();
-  const emptyResult = { brand_id: brand_id, competitors: [] };
+export async function getCompetitors(
+  brand_id: string
+): Promise<{ brand_id: string; competitors: Competitor[] }> {
+  const user = await getCurrentUser();
+  const emptyResult = { brand_id, competitors: [] };
 
-  if (!auth.success || !auth.user) {
-    return emptyResult;
-  }
+  if (!user) return emptyResult;
 
   try {
-    const result = await api.getCompetitors(auth.user.client_id, brand_id);
+    const result = await brandRequest(
+      `/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`,
+      "GET"
+    );
     return result;
   } catch (error) {
     console.error(`Failed to fetch competitors for brand ${brand_id}:`, error);
@@ -96,14 +88,16 @@ export async function getCompetitors(brand_id: string): Promise<{ brand_id: stri
   }
 }
 
-export async function getBrandById(brand_id: string): Promise<Brand | null> {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
-    return null;
-  }
+export async function getBrandById(
+  brand_id: string
+): Promise<Brand | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
 
   try {
-    const brands = await api.getBrands(auth.user.client_id, brand_id);
+    const brands = await brandRequest(
+      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"
+    );
     return brands[0] || null;
   } catch (error) {
     console.error(`Failed to fetch brand ${brand_id}:`, error);
@@ -112,13 +106,16 @@ export async function getBrandById(brand_id: string): Promise<Brand | null> {
 }
 
 export async function deleteBrand(brand_id: string) {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    await api.deleteBrand(auth.user.client_id, brand_id);
+    await brandRequest(
+      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
+      "DELETE"
+    );
 
     revalidatePath("/brands");
     return { success: true };

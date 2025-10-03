@@ -5,7 +5,7 @@ import "@/app/(css)/globals.css";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header/Header";
 import { ThemeProvider } from "next-themes";
-
+import LightRaysWrapper from "@/components/LightRaysWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,20 +23,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter?.className}  relative  antialiased`} suppressHydrationWarning={true}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-        >
-          <Header />
-          {children}
-          <Toaster />
+      <body className={`${inter.className} relative antialiased`} suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <LightRaysWrapper>
+            <Header />
+            {children}
+            <Toaster />
+          </LightRaysWrapper>
         </ThemeProvider>
       </body>
     </html>

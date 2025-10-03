@@ -1,19 +1,44 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import facebookData from "@/data/dummy/social-media/facebook.json";
+import facebookData from "@/data/ayaz_socials/facebook.json";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Textarea } from "../ui/textarea";
+import { formatDistanceToNow } from 'date-fns';
 
 interface FacebookLayoutProps {
     onGenerateReport: () => void;
+    ownerName: string;
+    isBrand: boolean;
 }
 
-export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps) {
-    const { profile, posts } = facebookData;
+export default function FacebookLayout({ onGenerateReport, ownerName, isBrand }: FacebookLayoutProps) {
+    const entity = isBrand ? facebookData.brand : facebookData.competitors.find(c => c.name === ownerName);
+
+    if (!entity || !entity.posts || entity.posts.length === 0) {
+        return (
+            <Card>
+                <CardContent className="p-4">
+                    <p>No Facebook data available for {ownerName}.</p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const { name, posts } = entity;
+
+    const profile = {
+        name: name,
+        avatar: "/placeholder.svg",
+        banner: "/placeholder.svg",
+        category: "Company",
+        likes: "N/A",
+        followers: "N/A",
+        about: `Official Facebook page for ${name}.`
+    };
 
     return (
         <Card>
@@ -31,9 +56,9 @@ export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps
                         <p className="text-sm text-muted-foreground">{profile.followers} followers · {profile.likes} likes</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button><ThumbsUp className="w-4 h-4 mr-2" /> Like</Button>
+                        <Button><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
                         <Button variant="secondary">Follow</Button>
-                        <Button onClick={onGenerateReport}><FileText className="w-4 h-4 mr-2" />Generate Report</Button>
+                        <Button onClick={onGenerateReport}><FileText className="mr-2 h-4 w-4" />Generate Report</Button>
                     </div>
                 </div>
             </div>
@@ -41,7 +66,7 @@ export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
                 <div className="md:col-span-1 space-y-4">
                     <Card>
-                        <CardContent className="pt-6">
+                        <CardContent className="p-4">
                             <h3 className="font-semibold">About</h3>
                             <p className="text-sm mt-2">{profile.about}</p>
                         </CardContent>
@@ -49,7 +74,7 @@ export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps
                 </div>
                 <div className="md:col-span-2 space-y-4">
                     <Card>
-                        <CardContent className="pt-6">
+                        <CardContent className="p-4">
                             <div className="flex space-x-4">
                                 <Avatar>
                                     <AvatarImage src={profile.avatar} />
@@ -63,17 +88,17 @@ export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps
                         </CardContent>
                     </Card>
                     {posts.map((post) => (
-                        <Card key={post.id}>
-                            <CardContent className="pt-6">
+                        <Card key={post.post_id}>
+                            <CardContent className="p-4">
                                 <div className="flex justify-between">
                                     <div className="flex items-center space-x-4">
                                         <Avatar>
-                                            <AvatarImage src={post.avatar} />
-                                            <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
+                                            <AvatarImage src={profile.avatar} />
+                                            <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-semibold">{post.author}</p>
-                                            <p className="text-sm text-muted-foreground">{post.timestamp}</p>
+                                            <p className="font-semibold">{profile.name}</p>
+                                            <p className="text-sm text-muted-foreground">{formatDistanceToNow(new Date(post.date_posted), { addSuffix: true })}</p>
                                         </div>
                                     </div>
                                     <DropdownMenu>
@@ -81,27 +106,32 @@ export default function FacebookLayout({ onGenerateReport }: FacebookLayoutProps
                                             <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
                                 <p className="mt-4">{post.content}</p>
+                                {post.hashtags && post.hashtags.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {post.hashtags.map(tag => <span key={tag} className="text-sm text-blue-500">#{tag}</span>)}
+                                    </div>
+                                )}
                                 <div className="flex justify-between items-center mt-4 text-muted-foreground text-sm">
                                     <div className="flex items-center space-x-1">
                                         <ThumbsUp className="w-4 h-4" />
                                         <span>{post.likes}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <span>{post.comments} comments</span>
-                                        <span>{post.shares} shares</span>
+                                        <span>{post.num_comments} comments</span>
+                                        <span>{post.num_shares} shares</span>
                                     </div>
                                 </div>
                                 <Separator className="my-2" />
                                 <div className="grid grid-cols-3 gap-1 text-center font-semibold text-muted-foreground">
-                                    <Button variant="ghost" className="w-full"><ThumbsUp className="w-5 h-5 mr-2" /> Like</Button>
-                                    <Button variant="ghost" className="w-full"><MessageSquare className="w-5 h-5 mr-2" /> Comment</Button>
-                                    <Button variant="ghost" className="w-full"><Share2 className="w-5 h-5 mr-2" /> Share</Button>
+                                    <Button variant="ghost" className="w-full"><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
+                                    <Button variant="ghost" className="w-full"><MessageSquare className="mr-2 h-4 w-4" /> Comment</Button>
+                                    <Button variant="ghost" className="w-full"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
                                 </div>
                             </CardContent>
                         </Card>

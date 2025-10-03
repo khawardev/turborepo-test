@@ -1,16 +1,14 @@
 "use server";
 
-import { api } from "@/lib/hooks/getBrandsApi";
-import { getAuth } from "./authActions";
 import { revalidatePath } from "next/cache";
-
+import { brandRequest } from "@/server/api/brandRequest";
+import { getCurrentUser } from "./authActions";
 
 type ScrapeWebsiteParams = {
   url: string;
   brand_id: string;
   competitor_id?: string;
 };
-
 
 export async function scrapeBrandAndCompetitors(
   brand: any,
@@ -22,7 +20,6 @@ export async function scrapeBrandAndCompetitors(
         url: brand.url,
         brand_id: brand.brand_id,
       }),
-
       ...competitors.map((competitor) =>
         scrapeWebsite({
           url: competitor.url,
@@ -31,7 +28,8 @@ export async function scrapeBrandAndCompetitors(
         })
       ),
     ]);
-    revalidatePath('/brands')
+
+    revalidatePath("/brands");
     return { success: true };
   } catch (error) {
     console.error(
@@ -42,10 +40,9 @@ export async function scrapeBrandAndCompetitors(
   }
 }
 
-
 export async function scrapeWebsite(params: ScrapeWebsiteParams) {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     console.error("Unauthorized attempt to scrape website.");
     return { success: false, error: "Unauthorized" };
   }
@@ -57,11 +54,13 @@ export async function scrapeWebsite(params: ScrapeWebsiteParams) {
       limit: 1,
       url,
       brand_id,
-      client_id: auth.user.client_id,
+      client_id: user.client_id,
       ...(competitor_id && { competitor_id }),
     };
 
-    const result = await api.crawlWebsite(payload);
+    const result = await brandRequest("/website-crawl-spidercrawl", "POST", {
+      body: JSON.stringify(payload),
+    });
     return { success: true, data: result };
   } catch (error: any) {
     console.error(`Failed to scrape website for URL ${url}:`, error);
@@ -70,14 +69,17 @@ export async function scrapeWebsite(params: ScrapeWebsiteParams) {
 }
 
 export async function getBulkWebsiteCrawlContent(brand_id: string) {
-  const auth = await getAuth();
-  if (!auth.success || !auth.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     console.error("Unauthorized attempt to get crawl content.");
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    const result = await api.getBulkCrawlContent(auth.user.client_id, brand_id);
+    const result = await brandRequest(
+      `/bulk-website-crawl-content/?client_id=${user.client_id}&brand_id=${brand_id}`,
+      "GET"
+    );
     return { success: true, data: result };
   } catch (error: any) {
     console.error(`Failed to get bulk crawl content for brand ${brand_id}:`, error);

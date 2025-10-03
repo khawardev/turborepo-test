@@ -26,7 +26,7 @@ export default function InstagramLayout({ onGenerateReport }: InstagramLayoutPro
                             <h2 className="text-2xl">{profile.username}</h2>
                             <Button variant="secondary">Follow</Button>
                             <Button variant="ghost" size="icon"><PlusSquare /></Button>
-                            <Button onClick={onGenerateReport} size="sm"><FileText className="w-4 h-4 mr-2" />Report</Button>
+                            <Button onClick={onGenerateReport} size="sm"><FileText  />Report</Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
                                     <MoreHorizontal className="w-5 h-5" />
@@ -62,8 +62,8 @@ export default function InstagramLayout({ onGenerateReport }: InstagramLayoutPro
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit  />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2  />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
