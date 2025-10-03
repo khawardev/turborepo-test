@@ -4,7 +4,7 @@ import "@/app/(css)/globals.css";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header/Header";
 import { ThemeProvider } from "next-themes";
-import LightRaysWrapper from "@/components/LightRaysWrapper";
+import LightRaysWrapper from "@/components/ui/react-bits/LightRaysWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 

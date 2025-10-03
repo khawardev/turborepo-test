@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getBrandById, getCompetitors } from "@/server/actions/brandActions";
 import { getBulkWebsiteCrawlContent } from "@/server/actions/scrapeActions";
-import BrandDetailClient from "@/components/brands/Brand-Detail-Client";
+import BrandDetailClient from "@/components/brands/view_brand/Brand-Detail-Client";
 import {  ContainerMd } from "@/components/shared/containers";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 

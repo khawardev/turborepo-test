@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import instagramData from "@/data/dummy/social-media/instagram.json";
 import { Heart, MessageCircle, Send, MoreHorizontal, Bookmark, Edit, Trash2, PlusSquare, FileText } from "lucide-react";
 import Image from "next/image";
-import { Button } from "../ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
 
 interface InstagramLayoutProps {
     onGenerateReport: () => void;

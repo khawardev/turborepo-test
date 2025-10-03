@@ -1,6 +1,6 @@
 import { getBrands, getCompetitors } from "@/server/actions/brandActions";
 import { Brand, Competitor } from "@/types";
-import BrandItem from "@/components/brands/BrandItem";
+import BrandItem from "@/components/brands/list_brand/BrandItem";
 import { Card } from "@/components/ui/card";
 
 async function BrandList() {
@@ -16,9 +16,7 @@ async function BrandList() {
     );
   }
 
-  const competitorsPromises = brands.map((brand) =>
-    getCompetitors(brand.brand_id)
-  );
+  const competitorsPromises = brands.map((brand) => getCompetitors(brand.brand_id));
   const competitorsResults = await Promise.all(competitorsPromises);
 
   const competitorsMap = competitorsResults.reduce((acc, result) => {
