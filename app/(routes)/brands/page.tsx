@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ContainerMd } from "@/components/shared/containers";
 import { Plus } from "lucide-react";
-import LightRaysWrapper from "@/components/LightRaysWrapper";
 import BrandList from "@/components/brands/BrandList";
 import BrandsLoading from "./loading";
 

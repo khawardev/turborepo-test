@@ -27,9 +27,7 @@ import {
 import { addBrand } from "@/server/actions/brandActions";
 import { ContainerMd, ContainerXs } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
-import { Delete, Plus, Trash2 } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
-import LightRaysWrapper from "@/components/LightRaysWrapper";
+import { Plus} from "lucide-react";
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 

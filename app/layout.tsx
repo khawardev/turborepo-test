@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "@/app/(css)/globals.css";
-
 import { Toaster } from "sonner";
 import { Header } from "@/components/header/Header";
 import { ThemeProvider } from "next-themes";

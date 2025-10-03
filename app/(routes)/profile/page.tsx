@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { ContainerMd } from "@/components/shared/containers";
-import LightRaysWrapper from "@/components/LightRaysWrapper";
 import { getCurrentUser } from "@/server/actions/authActions";
 import ProfileLoading from "./loading";
 import { Suspense } from "react";

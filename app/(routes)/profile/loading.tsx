@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { ContainerMd } from "@/components/shared/containers";
-import LightRaysWrapper from "@/components/LightRaysWrapper";
 
 export default function ProfileLoading() {
   return (
@@ -12,7 +11,7 @@ export default function ProfileLoading() {
             <Skeleton className="h-7 w-32" />
             <Skeleton className="h-4 w-64 mt-2" />
           </div>
-          <Card className="p-5 ">
+          <Card className="p-5 space-y-1 ">
             <div className="flex justify-between">
               <Skeleton className="h-5 w-16" />
               <Skeleton className="h-5 w-40" />
