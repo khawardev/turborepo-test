@@ -18,6 +18,7 @@ import { TreeSidebar } from '@/components/ui/sidebar-list';
 import { getCurrentUser } from '@/server/actions/authActions';
 import { UserNav } from '@/components/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+import LightRaysWrapper from '@/components/ui/react-bits/LightRaysWrapper';
 
 const DashboardLayout = async ({ children }: any) => {
     const user: any = await getCurrentUser();
@@ -26,7 +27,8 @@ const DashboardLayout = async ({ children }: any) => {
     }
 
     return (
-        <SidebarProvider  >
+        <LightRaysWrapper>
+        <SidebarProvider>
             <TreeSidebar />
             <SidebarInset className='bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300'  >
                 <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
@@ -52,15 +54,17 @@ const DashboardLayout = async ({ children }: any) => {
                         <div className="h-320 absolute left-0 top-0 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
                         <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
                     </div>  */}
-
                     {children ? children :
-                        <DashboardInnerLayout>
-                            <BrandPerceptionDashboard />
-                        </DashboardInnerLayout>
+                       
+                            <DashboardInnerLayout>
+                                <BrandPerceptionDashboard />
+                            </DashboardInnerLayout>
+                       
                     }
                 </div>
             </SidebarInset>
         </SidebarProvider>
+ </LightRaysWrapper >
     )
 }
 export default DashboardLayout;

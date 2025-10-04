@@ -16,8 +16,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "BrandOS",
-  description: "BrandOS is a brand management platform.",
+  title: "Brand OS",
+  description: "Brand OS is a brand management platform.",
 };
 
 export default function RootLayout({

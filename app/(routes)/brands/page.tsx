@@ -8,25 +8,23 @@ import BrandsLoading from "./loading";
 
 export default function BrandsPage() {
   return (
-      <ContainerMd>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-lg font-medium">Brands</h3>
-            <p className="text-sm text-muted-foreground">
-              View and manage your brands and competitors.
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/brands/new">
-              <Plus />
-              Brand
-            </Link>
-          </Button>
+    <ContainerMd>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h3 className="text-lg font-medium">Brands</h3>
+          <p className="text-sm text-muted-foreground">
+            View and manage your brands and competitors.
+          </p>
         </div>
-        <Suspense fallback={<BrandsLoading />}>
-          <BrandList />
-        </Suspense>
-      </ContainerMd>
+        <Button asChild>
+          <Link href="/brands/new">
+            <Plus />
+            Brand
+          </Link>
+        </Button>
+      </div>
+      <BrandList />
+    </ContainerMd>
   );
 }
 

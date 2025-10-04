@@ -4,6 +4,7 @@ import BrandDashboard from '@/components/dashboard/BrandDashboard'
 import { redirect } from 'next/navigation'
 import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
 import { getCurrentUser } from '@/server/actions/authActions'
+import LightRaysWrapper from '@/components/ui/react-bits/LightRaysWrapper'
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
     const { brand } = await params
@@ -15,12 +16,13 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
     if (!brandData) {
         return <div>Brand not found</div>
     }
-    
+
     return (
         <DashboardLayout>
             <DashboardInnerLayout>
                 <BrandDashboard data={brandData} />
             </DashboardInnerLayout>
         </DashboardLayout>
+
     )
 }
