@@ -2,12 +2,12 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import linkedinData from "@/data/ayaz_socials/linkedin";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText, Link as LinkIcon } from "lucide-react";
 import { Button } from "../../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
 import Link from "next/link";
 import { useState } from "react";
+import { linkedinData } from "@/data/ayaz_socials/linkedin";
 
 interface LinkedInLayoutProps {
     onGenerateReport: () => void;

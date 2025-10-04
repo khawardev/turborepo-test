@@ -1,13 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import facebookData from "@/data/ayaz_socials/facebook";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
 import { Textarea } from "../../ui/textarea";
 import { formatDistanceToNow } from 'date-fns';
+import { facebookData } from "@/data/ayaz_socials/facebook";
 
 interface FacebookLayoutProps {
     onGenerateReport: () => void;
