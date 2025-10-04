@@ -1,4 +1,4 @@
-import { authRequest } from "../../server/api/authRequest";
+import { authRequest } from "../server/api/authRequest";
 
 
 export const authApi = {

@@ -1,4 +1,4 @@
-import { brandRequest } from "../../server/api/brandRequest";
+import { brandRequest } from "../server/api/brandRequest";
 const API_URL = process.env.API_URL;
 
 export const api = {

@@ -1,0 +1,57 @@
+[
+    {
+        "created_at": "2025-10-03T15:11:35.711590",
+        "entity_type": "BATCH_WEBSITE",
+        "brand_id": "18302825-9a8a-4fc1-80b0-726d7d70ff49",
+        "client_id": "763d503f-9d24-42c4-b6d5-0fa2beba5da9",
+        "scraped_pages": 10,
+        "errors": [],
+        "status": "Completed",
+        "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#BATCH_WEBSITE#4b1c7172-62dc-444d-9c8e-68d95ba857bc",
+        "batch_id": "4b1c7172-62dc-444d-9c8e-68d95ba857bc",
+        "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9",
+        "name": "magna_scrape",
+        "result_keys": [
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#WEBSITE_CRAWL#629f544f-d20a-44f7-837d-b43faff18edb",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#WEBSITE_CRAWL#0a57b258-dbfa-4328-bbb9-43c55168cf75",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#WEBSITE_CRAWL#b17b7904-8a49-4613-963b-697c14fba5c0",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#WEBSITE_CRAWL#8810f3ff-1ca4-4966-966e-7f9debcaaea0",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#WEBSITE_CRAWL#f5367133-4d40-4d18-9c21-7320124473e6",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#COMPETITOR#32906bac-70db-4192-bc5f-9720ec7972e3#WEBSITE_CRAWL#38c69e54-ec85-4681-8e16-90f51560d7d9",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#COMPETITOR#32906bac-70db-4192-bc5f-9720ec7972e3#WEBSITE_CRAWL#e2549fa9-8b79-4166-a7aa-e9e64ce72f2e",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#COMPETITOR#32906bac-70db-4192-bc5f-9720ec7972e3#WEBSITE_CRAWL#e88a6168-3270-4062-9197-b804f5dadf4b",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#COMPETITOR#32906bac-70db-4192-bc5f-9720ec7972e3#WEBSITE_CRAWL#d3da7cfb-e2b1-4359-9250-4a3d9a4b91d2",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            },
+            {
+                "SK": "BRAND#18302825-9a8a-4fc1-80b0-726d7d70ff49#COMPETITOR#32906bac-70db-4192-bc5f-9720ec7972e3#WEBSITE_CRAWL#00546b7e-ed95-4379-aa48-272e6a64ec08",
+                "PK": "CLIENT#763d503f-9d24-42c4-b6d5-0fa2beba5da9"
+            }
+        ]
+    }
+]

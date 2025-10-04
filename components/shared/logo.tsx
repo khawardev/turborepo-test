@@ -2,7 +2,7 @@
 import React from 'react'
 export const FullLogo = () => {
     return (
-        <div className="flex items-center justify-center" suppressHydrationWarning={true}>
+        <div className="flex items-center " suppressHydrationWarning={true}>
             <span className="inline dark:hidden">
                 <img
                     src="https://i.postimg.cc/nzx83C4D/HB-logo.png"

@@ -5,8 +5,13 @@ import { FullLogo } from "../shared/logo";
 import { ThemeSwitcher } from "../ui/theme-switcher";
 import { BrandOSConfig } from "@/config/routes";
 import { getCurrentUser } from "@/server/actions/authActions";
+import { headers } from "next/headers";
 
 export async function Header() {
+  const header = await headers()
+  const pathname = header.get("x-pathname") || "";
+  if (pathname.startsWith("/dashboard")) return null;
+
   const user = await getCurrentUser();
 
   return (
