@@ -1,4 +1,4 @@
-[
+export const SynthesizedReport = [
     {
         "synthesizor_id": "1d4bb2b0-fba7-4896-8860-94f054ca4076",
         "extraction_report_ids": [

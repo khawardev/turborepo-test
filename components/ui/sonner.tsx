@@ -9,7 +9,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="toaster group  bg-accent text-muted-foreground font-Inter font-medium"
+      className="toaster group  bg-muted text-muted-foreground font-Inter font-medium"
       style={
         {
           "--normal-bg": "var(--accent)",

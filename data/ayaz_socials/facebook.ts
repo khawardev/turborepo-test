@@ -1,4 +1,4 @@
-{
+export const facebookData = {
     "batch_id": "ebcecc49-7b57-4cce-8c39-cca521786601",
     "start_date": "09-01-2025",
     "end_date": "10-01-2025",

@@ -9,12 +9,8 @@ export const BrandOSConfig: any = {
             href: "/brands",
         },
         {
-            title: "Reports",
-            href: "/reports",
-        },
-        {
-            title: "Social Analytics",
-            href: "/social-analytics",
+            title: "Dashboard",
+            href: "/dashboard",
         },
     ],
 };

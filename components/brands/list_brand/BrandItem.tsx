@@ -113,7 +113,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            {crawlData ?
+            {/* {crawlData ?
               <Button variant={'outline'} asChild  >
                 <Link href={`/brands/${brand.brand_id}`} >
                   Show
@@ -127,7 +127,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                 )}
               </Button>
               
-            }
+            } */}
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

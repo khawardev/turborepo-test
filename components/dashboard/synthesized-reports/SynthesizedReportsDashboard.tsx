@@ -1,0 +1,86 @@
+'use client'
+
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Copy, DownloadCloud } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { toast } from "sonner";
+export default function SynthesizedReportsDashboard({ data }: any) {
+    const [copied, setCopied] = useState(false);
+
+    if (!data || data.length === 0) {
+        return (
+            <div className="mt-4 p-6 border rounded-lg h-[70vh] flex items-center justify-center">
+                <p className="text-muted-foreground">No synthesized reports available.</p>
+            </div>
+        );
+    }
+
+    const content = data[0].data || "No content available for this report.";
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(content);
+            toast.success('Content Copied to Clipboard')
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            setCopied(false);
+            try {
+                toast.success('Content Copied to Clipboard')
+                const textarea = document.createElement("textarea");
+                textarea.value = content;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch {
+                // fallback failed — silently fail
+            }
+        }
+    };
+
+    const handleDownload = () => {
+        const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${data[0].title || "synthesized-report"}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <div className="relative">
+            <div className="flex items-center justify-between gap-2 mb-4">
+                <h2 className="text-xl tracking-tight font-bold">Synthesized Report</h2>
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleDownload} variant="outline" aria-label="Download report">
+                        <DownloadCloud />
+                        Download
+                    </Button>
+                    <Button onClick={handleCopy} variant="outline" aria-label="Copy report">
+                        <Copy />
+                        {copied ? "Copied!" : "Copy"}
+                    </Button>
+                </div>
+            </div>
+
+            <ScrollArea className="h-[74vh] w-full bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10  text-card-foreground rounded-lg p-6">
+                <div className="prose prose-neutral max-w-none markdown-body space-y-5 dark:prose-invert">
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                    >
+                        {content || 'No content available'}
+                    </ReactMarkdown>
+                </div>
+            </ScrollArea>
+        </div>
+    );
+}

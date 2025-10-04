@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "@/app/(css)/globals.css";
 import { Toaster } from "sonner";
-import { Header } from "@/components/header/Header";
 import { ThemeProvider } from "next-themes";
 import LightRaysWrapper from "@/components/ui/react-bits/LightRaysWrapper";
+import HeaderServer from "@/components/header/HeaderServer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className={`${inter.className} relative antialiased`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
-            <Header />
+            <HeaderServer />
             {children}
             <Toaster />
           </LightRaysWrapper>

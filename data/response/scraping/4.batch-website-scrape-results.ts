@@ -1,4 +1,4 @@
-{
+export const websiteScrapedData = {
     "batch_id": "4b1c7172-62dc-444d-9c8e-68d95ba857bc",
     "status": "Completed",
     "scraped_at": "2025-10-03T15:11:35.711590",

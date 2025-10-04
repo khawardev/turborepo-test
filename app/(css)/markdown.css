@@ -2,10 +2,15 @@
 @import "tailwindcss";
 
 
+.markdown-body {
+  color: var(--foreground);
+}
+
 .markdown-body h1 a,
 .markdown-body h2 a,
 .markdown-body h3 a,
 .markdown-body p a {
+  color: var(--primary);
   text-decoration: underline;
   transition: color 0.3s;
 }
@@ -201,12 +206,10 @@
 }
 
 .markdown-body p img {
-  border-radius: 1.4rem;
+  border-radius: .8rem;
   width: 100%;
   height: auto;
   display: block;
-  /* border: 1px solid #dfdfdf; */
-  /* box-shadow: 0 4px 6px #ececec; */
   margin-bottom: 50px;
   margin-top: 50px;
 }
@@ -218,22 +221,33 @@
 }
 
 .markdown-body table {
+  display: block;
   width: 100%;
+  overflow-x: auto;
   border-collapse: collapse;
   margin-bottom: 2rem;
-  font-size: 0.9em;
+  border-radius: 8px;
+  border: 1px solid var(--border);
 }
 
 .markdown-body table th,
 .markdown-body table td {
-  border: 1px solid #dee2e6;
-  padding: 0.75rem;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem;
   text-align: left;
+  vertical-align: top;
+}
+
+.markdown-body table tr:last-child td {
+  border-bottom: none;
 }
 
 .markdown-body table th {
-  background-color: #f8f9fa;
+  background-color: var(--accent);
+  color: var(--accent-foreground);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .markdown-body br {

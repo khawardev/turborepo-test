@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import facebookData from "@/data/ayaz_socials/facebook.json";
+import facebookData from "@/data/ayaz_socials/facebook";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../../ui/button";
@@ -56,9 +56,9 @@ export default function FacebookLayout({ onGenerateReport, ownerName, isBrand }:
                         <p className="text-sm text-muted-foreground">{profile.followers} followers · {profile.likes} likes</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
+                        <Button><ThumbsUp  /> Like</Button>
                         <Button variant="secondary">Follow</Button>
-                        <Button onClick={onGenerateReport}><FileText className="mr-2 h-4 w-4" />Generate Report</Button>
+                        <Button onClick={onGenerateReport}><FileText  />Generate Report</Button>
                     </div>
                 </div>
             </div>
@@ -106,8 +106,8 @@ export default function FacebookLayout({ onGenerateReport, ownerName, isBrand }:
                                             <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit  />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2  />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
@@ -129,9 +129,9 @@ export default function FacebookLayout({ onGenerateReport, ownerName, isBrand }:
                                 </div>
                                 <Separator className="my-2" />
                                 <div className="grid grid-cols-3 gap-1 text-center font-semibold text-muted-foreground">
-                                    <Button variant="ghost" className="w-full"><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
-                                    <Button variant="ghost" className="w-full"><MessageSquare className="mr-2 h-4 w-4" /> Comment</Button>
-                                    <Button variant="ghost" className="w-full"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+                                    <Button variant="ghost" className="w-full"><ThumbsUp  /> Like</Button>
+                                    <Button variant="ghost" className="w-full"><MessageSquare  /> Comment</Button>
+                                    <Button variant="ghost" className="w-full"><Share2  /> Share</Button>
                                 </div>
                             </CardContent>
                         </Card>

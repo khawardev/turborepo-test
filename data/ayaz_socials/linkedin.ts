@@ -1,4 +1,4 @@
-{
+export const linkedinData = {
     "batch_id": "96384931-e58a-462f-a38a-0388a09cc0c9",
     "start_date": "09-20-2025",
     "end_date": "10-01-2025",

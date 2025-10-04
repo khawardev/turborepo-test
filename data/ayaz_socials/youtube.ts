@@ -1,4 +1,4 @@
-{
+export const youtubeData = {
     "batch_id": "ce37d6ca-6f89-4d68-acf2-69672d88f13a",
     "name": "Youtube Batch",
     "start_date": "09-15-2025",

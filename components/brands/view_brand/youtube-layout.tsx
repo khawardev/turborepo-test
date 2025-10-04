@@ -1,6 +1,6 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card";
-import youtubeData from "@/data/ayaz_socials/youtube.json";
+import youtubeData from "@/data/ayaz_socials/youtube";
 import { Avatar, AvatarFallback } from "../../ui/avatar";
 import { Button } from "../../ui/button";
 import { MoreVertical, Edit, Trash2, FileText, Link as LinkIcon } from "lucide-react";
@@ -46,7 +46,7 @@ export default function YouTubeLayout({ onGenerateReport, ownerName, isBrand }: 
                         <h2 className="text-2xl font-bold">{ownerName}</h2>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button onClick={onGenerateReport}><FileText className="mr-2 h-4 w-4" />Generate Report</Button>
+                        <Button onClick={onGenerateReport}><FileText  />Generate Report</Button>
                     </div>
                 </div>
                 <div className="mt-8">
@@ -76,8 +76,8 @@ export default function YouTubeLayout({ onGenerateReport, ownerName, isBrand }: 
                                             <MoreVertical className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit  />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2  />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>

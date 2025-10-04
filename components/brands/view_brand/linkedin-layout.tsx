@@ -2,7 +2,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import linkedinData from "@/data/ayaz_socials/linkedin.json";
+import linkedinData from "@/data/ayaz_socials/linkedin";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText, Link as LinkIcon } from "lucide-react";
 import { Button } from "../../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
@@ -41,7 +41,7 @@ export default function LinkedInLayout({ onGenerateReport, ownerName, isBrand }:
             <div className="pb-4">
                 <div className="mt-4 flex justify-between items-start">
                     <h2 className="text-2xl font-bold">{entity.name}</h2>
-                    <Button onClick={onGenerateReport}><FileText className="mr-2 h-4 w-4" />Generate Report</Button>
+                    <Button onClick={onGenerateReport}><FileText  />Generate Report</Button>
                 </div>
             </div>
             <Separator />
@@ -68,8 +68,8 @@ export default function LinkedInLayout({ onGenerateReport, ownerName, isBrand }:
                                             <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
+                                            <DropdownMenuItem><Edit  />Edit</DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500"><Trash2  />Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
@@ -87,9 +87,9 @@ export default function LinkedInLayout({ onGenerateReport, ownerName, isBrand }:
                                 </div>
                                 <Separator className="my-2" />
                                 <div className="grid grid-cols-3 gap-1 text-center font-semibold text-muted-foreground text-sm">
-                                    <Button variant="ghost" className="w-full"><ThumbsUp className="mr-2 h-4 w-4" /> Like</Button>
-                                    <Button variant="ghost" className="w-full" onClick={() => toggleComments(post.linkedin_post_id)}><MessageSquare className="mr-2 h-4 w-4" /> Comment</Button>
-                                    <Button variant="ghost" className="w-full"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+                                    <Button variant="ghost" className="w-full"><ThumbsUp  /> Like</Button>
+                                    <Button variant="ghost" className="w-full" onClick={() => toggleComments(post.linkedin_post_id)}><MessageSquare  /> Comment</Button>
+                                    <Button variant="ghost" className="w-full"><Share2  /> Share</Button>
                                 </div>
                                 {showComments[post.linkedin_post_id] && (
                                     <div className="mt-4 space-y-3">

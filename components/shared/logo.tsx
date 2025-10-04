@@ -1,8 +1,10 @@
 'use client'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 export const FullLogo = () => {
+    const router = useRouter()
     return (
-        <div className="flex items-center " suppressHydrationWarning={true}>
+        <button onClick={() => (router.push('/'))}  className="flex items-center " suppressHydrationWarning={true}>
             <span className="inline dark:hidden">
                 <img
                     src="https://i.postimg.cc/nzx83C4D/HB-logo.png"
@@ -32,6 +34,6 @@ export const FullLogo = () => {
                     className="cursor-pointer hidden lg:block"
                 />
             </span>
-        </div>
+        </button>
     )
 }
