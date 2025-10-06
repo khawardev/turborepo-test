@@ -34,6 +34,8 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
     revalidatePath("/brands");
     return { success: true, data: brandResult };
   } catch (error: any) {
+    console.log(error, `<-> error <->`);
+    
     return { success: false, error: error.message || "Something went wrong" };
   }
 }
@@ -48,7 +50,7 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
   }
   const user = await getCurrentUser();
 
-  
+
   try {
     await brandRequest("/brands/competitors/", "POST", {
       body: JSON.stringify({
@@ -67,7 +69,7 @@ export async function getBrands(): Promise<Brand[]> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
-  if (!accessToken)  return [];
+  if (!accessToken) return [];
   const user = await getCurrentUser();
   try {
     const brands = await brandRequest(
@@ -88,7 +90,7 @@ export async function getCompetitors(
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
-  if (!accessToken)  return emptyResult;
+  if (!accessToken) return emptyResult;
   const user = await getCurrentUser();
 
   try {
@@ -96,6 +98,7 @@ export async function getCompetitors(
       `/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`,
       "GET"
     );
+
     return result;
   } catch (error) {
     console.error(`Failed to fetch competitors for brand ${brand_id}:`, error);

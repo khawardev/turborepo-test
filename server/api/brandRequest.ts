@@ -3,12 +3,22 @@
 import { cookies } from "next/headers";
 const API_URL = process.env.API_URL;
 
-
-export async function brandRequest(endpoint: string, method: "GET" | "POST" | "PUT" | "DELETE", body?: any) {
+export async function brandRequest(
+    endpoint: string,
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    body?: any
+) {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
-    if (!token) {
-        throw new Error("Unauthorized");
+    if (!token) throw new Error("Unauthorized");
+
+    let normalizedBody;
+    if (body) {
+        if (typeof body === "string") normalizedBody = body;
+        else if (typeof body === "object" && body.body) {normalizedBody =typeof body.body === "string" ? body.body : JSON.stringify(body.body);
+        } else {
+            normalizedBody = JSON.stringify(body);
+        }
     }
 
     const res = await fetch(`${API_URL}${endpoint}`, {
@@ -17,13 +27,19 @@ export async function brandRequest(endpoint: string, method: "GET" | "POST" | "P
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        ...(body ? { body: JSON.stringify(body) } : {}),
+        ...(normalizedBody ? { body: normalizedBody } : {}),
         cache: "no-store",
     });
 
     const data = await res.json();
+
     if (!res.ok) {
-        throw new Error(data.detail || "API request failed");
+        const message =
+            typeof data === "string"
+                ? data
+                : data.detail || data.message || JSON.stringify(data);
+        throw new Error(message);
     }
+
     return data;
 }

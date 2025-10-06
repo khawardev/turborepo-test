@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 
 async function BrandList() {
   const brands: Brand[] = await getBrands();
+console.log(brands, `<-> brands <->`);
 
   if (brands.length === 0) {
     return (

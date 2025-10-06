@@ -28,8 +28,6 @@ import { deleteBrand } from "@/server/actions/brandActions";
 import { useRouter } from "next/navigation";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-
-
 function BrandItemSkeleton() {
   return (
     <div className="space-y-6">
@@ -71,6 +69,7 @@ function BrandItemSkeleton() {
 export default function BrandItem({ brand, competitors, crawlData, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
   const scrapeBrand = () => {
     startTransition(async () => {
       await scrapeBrandAndCompetitors(brand, competitors);
@@ -78,6 +77,7 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
       toast.success('Brand Scrapped Successfully')
     });
   };
+
   const confirmDelete = () => {
     toast(`Delete ${brand.name}?`, {
       description: "This action cannot be undone.",
@@ -92,7 +92,6 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
     })
   }
 
-  console.log(brand.brand_id, `<-> brand.brand_id <->`);
 
   return (
     <div className="flex gap-4">
@@ -124,7 +123,6 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                 )}
               </Button>
             }
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" >
@@ -157,7 +155,6 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                   {brand.youtube_url && <Badge asChild variant="secondary" ><Link href={brand.youtube_url} target="_blank">YouTube</Link></Badge>}
                 </div>
               </div>
-
 
               <div>
                 <h4 className="text-md font-medium mb-2">Competitors</h4>
