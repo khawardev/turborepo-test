@@ -7,13 +7,13 @@ export const SidebarHrefTree = {
             items: [
                 {
                     seprator: <BreadcrumbSeparator />,
-                    title: "Brand Perception Audit",
-                    url: "/dashboard",
+                    title: "Magna",
+                    url: "/dashboard/magna",
                 },
                 {
                     seprator: <BreadcrumbSeparator />,
-                    title: "Magna",
-                    url: "/dashboard/magna",
+                    title: "Brand Perception Audit",
+                    url: "/dashboard",
                 },
             ],
         },

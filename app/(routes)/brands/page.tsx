@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ContainerMd } from "@/components/shared/containers";

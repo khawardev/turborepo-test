@@ -22,11 +22,10 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
 import { scrapeBrandAndCompetitors } from "@/server/actions/scrapeActions";
-import { ButtonSpinner, Spinner } from "../../shared/spinner";
+import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
 import { deleteBrand } from "@/server/actions/brandActions";
 import { useRouter } from "next/navigation";
-import { MdDeleteOutline } from "react-icons/md";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
@@ -84,18 +83,16 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
       description: "This action cannot be undone.",
       action: {
         label: "Confirm",
-        onClick: () => {
-          startTransition(async () => {
-            await deleteBrand(brand.brand_id)
-            router.refresh()
-            toast.success("Brand Deleted Successfully")
-          })
+        onClick: async () => {
+          await deleteBrand(brand.brand_id)
+          router.refresh()
+          toast.success("Brand Deleted Successfully")
         },
       },
     })
   }
 
-console.log(brand.brand_id, `<-> brand.brand_id <->`);
+  console.log(brand.brand_id, `<-> brand.brand_id <->`);
 
   return (
     <div className="flex gap-4">
@@ -113,7 +110,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            {/* {crawlData ?
+            {crawlData ?
               <Button variant={'outline'} asChild  >
                 <Link href={`/brands/${brand.brand_id}`} >
                   Show
@@ -126,9 +123,8 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                   "Scrape"
                 )}
               </Button>
-              
-            } */}
-            
+            }
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" >
@@ -162,7 +158,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                 </div>
               </div>
 
-                
+
               <div>
                 <h4 className="text-md font-medium mb-2">Competitors</h4>
                 {competitors.length > 0 ? (
@@ -176,7 +172,7 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {competitors.map((competitor: any) => {
+                        {competitors.map((competitor: any) => {
                           console.log(competitor.competitor_id, `<-> competitor.competitor_id <->`);
                           return (
                             <TableRow key={competitor.competitor_id}>
@@ -242,14 +238,14 @@ console.log(brand.brand_id, `<-> brand.brand_id <->`);
                 )}
               </div>
 
-                <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
+              <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
                 B{index + 1}
               </span>
             </div>
           )}
         </CardContent>
       </Card>
-      
+
     </div>
   );
 }
