@@ -7,6 +7,7 @@ import { Copy, DownloadCloud } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
+import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
 export default function SynthesizedReportsDashboard({ data }: any) {
     const [copied, setCopied] = useState(false);
 
@@ -72,12 +73,12 @@ export default function SynthesizedReportsDashboard({ data }: any) {
                 </div>
             </div>
 
-            <ScrollArea className="h-[74vh] w-full bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10  text-card-foreground rounded-lg p-6">
+            <ScrollArea className="h-[74vh] flex gap-2 w-full bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10  text-card-foreground rounded-lg p-6">
                 <div className="prose prose-neutral max-w-none markdown-body space-y-5 dark:prose-invert">
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                     >
-                        {content || 'No content available'}
+                        {cleanAndFlattenBulletsGoogle(content)}
                     </ReactMarkdown>
                 </div>
             </ScrollArea>

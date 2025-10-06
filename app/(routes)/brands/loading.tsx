@@ -13,7 +13,7 @@ import {
 export default function BrandsLoading() {
   return (
     <ContainerMd>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center ">
         <div className="space-y-8 w-full">
           <div className="flex justify-between items-center">
             <div >

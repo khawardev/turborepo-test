@@ -10,6 +10,7 @@ import Link from 'next/link';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
+import { cleanAndFlattenBulletsGoogle } from '@/lib/cleanMarkdown';
 export default function WebsiteDataView({ data }: any) {
     const [selectedPage, setSelectedPage] = useState(data?.brand?.pages?.[0]);
     const [isCopied, setIsCopied] = useState(false);
@@ -97,7 +98,7 @@ export default function WebsiteDataView({ data }: any) {
                                 },
                             }}
                         >
-                            {selectedPage?.content || 'No content available'}
+                            {cleanAndFlattenBulletsGoogle(selectedPage?.content)}
                         </ReactMarkdown>
                     </div>
                 </ScrollArea>

@@ -4,12 +4,11 @@ import Link from "next/link";
 import { ContainerMd } from "@/components/shared/containers";
 import { Plus } from "lucide-react";
 import BrandList from "@/components/brands/list_brand/BrandList";
-import BrandsLoading from "./loading";
 
 export default function BrandsPage() {
   return (
     <ContainerMd>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center ">
         <div>
           <h3 className="text-lg font-medium">Brands</h3>
           <p className="text-sm text-muted-foreground">

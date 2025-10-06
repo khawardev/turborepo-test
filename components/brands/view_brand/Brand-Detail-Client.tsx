@@ -15,6 +15,7 @@ import InstagramLayout from "./instagram-layout";
 import LinkedInLayout from "./linkedin-layout";
 import YouTubeLayout from "./youtube-layout";
 import ReportLayout from "./report-layout";
+import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
 
 interface BrandDetailClientProps {
     brand: Brand;
@@ -40,7 +41,6 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
     const [selectedContent, setSelectedContent] = useState<SelectedContentState | null>(null);
     const [selectedSocial, setSelectedSocial] = useState<SelectedSocialState | null>(null);
     const [currentView, setCurrentView] = useState<"website" | "social" | "report">("website");
-
     useEffect(() => {
         if (crawlData?.contents?.length > 0) {
             const firstContent = crawlData.contents[0];
@@ -209,7 +209,7 @@ export default function BrandDetailClient({ brand, competitors, crawlData }: Bra
                                                 },
                                             }}
                                         >
-                                            {selectedContent.content}
+                                            {cleanAndFlattenBulletsGoogle(selectedContent.content)}
                                         </ReactMarkdown>
                                     </div>
                                 </CardContent>
