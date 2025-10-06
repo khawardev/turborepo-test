@@ -2,10 +2,12 @@ import { getBrands, getCompetitors } from "@/server/actions/brandActions";
 import { Brand, Competitor } from "@/types";
 import BrandItem from "@/components/brands/list_brand/BrandItem";
 import { Card } from "@/components/ui/card";
+import { getBatchId } from "@/server/actions/scrapeActions";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 async function BrandList() {
   const brands: Brand[] = await getBrands();
-console.log(brands, `<-> brands <->`);
+  const user = await getCurrentUser()
 
   if (brands.length === 0) {
     return (
@@ -25,20 +27,25 @@ console.log(brands, `<-> brands <->`);
     return acc;
   }, {} as Record<string, Competitor[]>);
 
+
+  const brandsWithBatch = await Promise.all(
+    brands.map(async (brand, index) => {
+      const competitors = competitorsMap[brand.brand_id] || [];
+      const batch_id = await getBatchId(user.client_id, brand.brand_id);
+      return (
+        <BrandItem
+          key={brand.brand_id}
+          index={index}
+          isScrapped={batch_id ? true : false}
+          brand={brand}
+          competitors={competitors}
+        />
+      );
+    })
+  );
   return (
     <div className="space-y-4">
-      {brands.map((brand, index) => {
-        const competitors = competitorsMap[brand.brand_id] || [];
-        return (
-          <BrandItem
-            key={brand.brand_id}
-            index={index}
-            crawlData={false}
-            brand={brand}
-            competitors={competitors}
-          />
-        );
-      })}
+      {brandsWithBatch}
     </div>
   );
 }

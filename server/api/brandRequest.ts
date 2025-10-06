@@ -3,6 +3,8 @@
 import { cookies } from "next/headers";
 const API_URL = process.env.API_URL;
 
+
+
 export async function brandRequest(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
@@ -12,34 +14,31 @@ export async function brandRequest(
     const token = cookieStore.get("access_token")?.value;
     if (!token) throw new Error("Unauthorized");
 
-    let normalizedBody;
-    if (body) {
-        if (typeof body === "string") normalizedBody = body;
-        else if (typeof body === "object" && body.body) {normalizedBody =typeof body.body === "string" ? body.body : JSON.stringify(body.body);
-        } else {
-            normalizedBody = JSON.stringify(body);
-        }
-    }
-
     const res = await fetch(`${API_URL}${endpoint}`, {
         method,
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        ...(normalizedBody ? { body: normalizedBody } : {}),
+        body: prepareRequestBody(body),
         cache: "no-store",
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
 
     if (!res.ok) {
-        const message =
-            typeof data === "string"
-                ? data
-                : data.detail || data.message || JSON.stringify(data);
+        const message = data?.detail || data?.message || "Request failed";
         throw new Error(message);
     }
 
     return data;
+}
+
+function prepareRequestBody(body?: any) {
+    if (!body) return undefined;
+    if (typeof body === "string") return body;
+    if (typeof body === "object" && body.body)
+        return typeof body.body === "string" ? body.body : JSON.stringify(body.body);
+    return JSON.stringify(body);
 }

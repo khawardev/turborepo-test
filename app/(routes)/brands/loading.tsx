@@ -14,7 +14,7 @@ export default function BrandsLoading() {
   return (
     <ContainerMd>
       <div className="flex justify-between items-center ">
-        <div className="space-y-8 w-full">
+        <div className="space-y-4 w-full">
           <div className="flex justify-between items-center">
             <div >
               <Skeleton className="h-7 w-32" />

@@ -1,7 +1,6 @@
 'use client'
 
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useTheme } from "next-themes";
 import { Activity, Award, Globe, Heart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,10 +9,6 @@ import KpiCard from "../charts-and-cards/KpiCard";
 import CustomLegend from "../../shared/Legend";
 
 export default function OverviewTab({ data }: any) {
-    const { theme } = useTheme();
-    console.log(data, `<-> data <->`);
-    
-
     const { platforms, colors } = data;
     const { PLATFORM_COLORS } = colors;
     const platformKeys = Object.keys(platforms);

@@ -34,8 +34,6 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
     revalidatePath("/brands");
     return { success: true, data: brandResult };
   } catch (error: any) {
-    console.log(error, `<-> error <->`);
-    
     return { success: false, error: error.message || "Something went wrong" };
   }
 }
@@ -127,24 +125,60 @@ export async function getBrandById(
 }
 
 export async function deleteBrand(brand_id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
 
+  if (!accessToken) {
+    return { success: false, message: "Unauthorized", data: null };
+  }
+
+  const user = await getCurrentUser();
+
+  try {
+
+    const getClientDetail = await getClientDetails();
+    console.log(getClientDetail, `<-> getClientDetail <->`);
+
+    // const brandDelete = await brandRequest(
+    //   `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
+    //   "DELETE"
+    // );
+
+    // revalidatePath("/brands");
+    // return {
+    //   success: true,
+    //   message: brandDelete?.message || "Brand deleted successfully",
+    //   data: brandDelete,
+    // };
+  } catch (error: any) {
+    console.error(`Failed to delete brand ${brand_id}:`, error);
+    return {
+      success: false,
+      message: "Failed to delete brand. Please try again.",
+      console: error?.message,
+      data: null,
+    };
+  }
+}
+
+export async function getClientDetails() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
   if (!accessToken) {
+    console.error("Unauthorized attempt to get client details.");
     return { success: false, error: "Unauthorized" };
   }
   const user = await getCurrentUser();
-  try {
-    await brandRequest(
-      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
-      "DELETE"
-    );
+  if (!user) {
+    return { success: false, error: "User not found" };
+  }
 
-    revalidatePath("/brands");
-    return { success: true };
+  try {
+    const result = await brandRequest(`/clients/${user.client_id}/details`, "GET");
+    return { success: true, data: result };
   } catch (error: any) {
-    console.error(`Failed to delete brand ${brand_id}:`, error);
-    return { success: false, error: error.message || "Something went wrong" };
+    console.error(`Failed to get client details for client ${user.client_id}:`, error);
+    return { success: false, error: error.message || "Failed to fetch client details" };
   }
 }

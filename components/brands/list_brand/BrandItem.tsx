@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
-import { scrapeBrandAndCompetitors } from "@/server/actions/scrapeActions";
+import { getBatchWebsiteTaskStatus, scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
 import { deleteBrand } from "@/server/actions/brandActions";
@@ -66,15 +66,19 @@ function BrandItemSkeleton() {
   );
 }
 
-export default function BrandItem({ brand, competitors, crawlData, index }: any) {
+export default function BrandItem({ brand, competitors, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const scrapeBrand = () => {
     startTransition(async () => {
-      await scrapeBrandAndCompetitors(brand, competitors);
-      router.refresh();
-      toast.success('Brand Scrapped Successfully')
+      const result = await scrapeBatchWebsite(brand);
+      if (result.success) {
+        router.refresh();
+        toast.success("Scraping completed successfully!");
+      } else {
+        toast.error("Scraping failed.");
+      }
     });
   };
 
@@ -84,14 +88,19 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
       action: {
         label: "Confirm",
         onClick: async () => {
-          await deleteBrand(brand.brand_id)
-          router.refresh()
-          toast.success("Brand Deleted Successfully")
+          const result = await deleteBrand(brand.brand_id);
+
+          // if (result.success) {
+          //   router.refresh();
+          //   toast.success(result.message);
+          // } else {
+          //   console.log(result.console, `<-> result.console <->`);
+          //   toast.error(result.message);
+          // }
         },
       },
-    })
-  }
-
+    });
+  };
 
   return (
     <div className="flex gap-4">
@@ -109,15 +118,17 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            {crawlData ?
+            {isScrapped ?
               <Button variant={'outline'} asChild  >
                 <Link href={`/brands/${brand.brand_id}`} >
-                  Show
+                  {brand.name} dashboard
                 </Link>
               </Button> :
               <Button disabled={isPending} onClick={scrapeBrand} >
                 {isPending ? (
-                  <ButtonSpinner>Scraping</ButtonSpinner>
+                  <ButtonSpinner>
+                    Scraping
+                  </ButtonSpinner>
                 ) : (
                   "Scrape"
                 )}
@@ -170,7 +181,6 @@ export default function BrandItem({ brand, competitors, crawlData, index }: any)
                       </TableHeader>
                       <TableBody>
                         {competitors.map((competitor: any) => {
-                          console.log(competitor.competitor_id, `<-> competitor.competitor_id <->`);
                           return (
                             <TableRow key={competitor.competitor_id}>
                               <TableCell className="font-medium">{competitor.name}</TableCell>

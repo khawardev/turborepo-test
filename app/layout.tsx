@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "@/app/(css)/globals.css";
-import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import LightRaysWrapper from "@/components/ui/react-bits/LightRaysWrapper";
 import HeaderServer from "@/components/header/HeaderServer";
-
+import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
