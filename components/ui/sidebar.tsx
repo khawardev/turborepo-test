@@ -140,7 +140,8 @@ function SidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
+            "group/sidebar-wrapper  flex min-h-svh w-full",
+            // "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
             className
           )}
           {...props}
@@ -188,7 +189,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-background/40  backdrop-blur-sm text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="bg-background/60  backdrop-blur-sm text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -245,7 +246,8 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          className=" group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          // className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -310,7 +312,9 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
+        // "bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
+        // "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300/10 shadow-zinc-950/10  text-card-foreground  ring-border dark:ring-offset-background ring-offset-background/10 ring-1 ring-offset-2  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}

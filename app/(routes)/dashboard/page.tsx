@@ -27,10 +27,10 @@ const DashboardLayout = async ({ children }: any) => {
 
 
     return (
-        <LightRaysWrapper>
             <SidebarProvider>
                 <TreeSidebar />
-                <SidebarInset className='bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300'  >
+                {/* <SidebarInset className='bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300'  > */}
+                <SidebarInset  >
                     <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
                         <div className="flex items-center gap-2">
                             <SidebarTrigger className="-ml-1" />
@@ -62,7 +62,6 @@ const DashboardLayout = async ({ children }: any) => {
                     </div>
                 </SidebarInset>
             </SidebarProvider>
-        </LightRaysWrapper >
     )
 }
 export default DashboardLayout;
