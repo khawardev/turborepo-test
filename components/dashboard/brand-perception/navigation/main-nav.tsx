@@ -38,7 +38,7 @@ export default function MainNav({
                             placeholder="Search across all brand data..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 h-7 rounded-full w-full"
+                            className="pl-10 h-7.5 w-full"
                         />
                     </div>
                 </div>
@@ -46,7 +46,7 @@ export default function MainNav({
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <Button
                         size="sm"
-                        className="rounded-full h-7 w-full sm:w-auto"
+                        className="h-7 w-full sm:w-auto"
                         onClick={toggleAllSections}
                         variant="outline"
                     >
@@ -63,7 +63,7 @@ export default function MainNav({
 
                     <Button
                         size="sm"
-                        className="rounded-full h-7 w-full sm:w-auto"
+                        className="h-7 w-full sm:w-auto"
                         onClick={handleExport}
                     >
                         Export Data

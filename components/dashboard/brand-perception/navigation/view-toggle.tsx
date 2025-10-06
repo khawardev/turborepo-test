@@ -14,7 +14,7 @@ export default function ViewToggle({ currentView, setCurrentView }: ViewTogglePr
             value={currentView}
             onValueChange={(value) => setCurrentView(value as ViewType)}
         >
-            <TabsList className="rounded-full ">
+            <TabsList >
                 <TabsTrigger
                     value="platforms"
                 >

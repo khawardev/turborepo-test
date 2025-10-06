@@ -26,7 +26,6 @@ export default function BrandPerceptionDashboard() {
 
     return (
         <div className="flex flex-col space-y-6">
-
             <DashboardHeader title={'Magna International'} subtitle={'Outside-In Brand Perception Audit Dashboard'} />
             <MainNav
                 currentView={currentView}
@@ -41,7 +40,6 @@ export default function BrandPerceptionDashboard() {
                 currentFilter={currentFilter}
                 setCurrentFilter={setCurrentFilter}
             />
-
             <main >
                 {currentView === "platforms" ? (
                     <PlatformsView

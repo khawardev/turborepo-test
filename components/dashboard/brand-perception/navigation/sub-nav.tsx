@@ -22,7 +22,7 @@ export default function SubNav({ currentFilter, setCurrentFilter }: SubNavProps)
             value={currentFilter}
             onValueChange={(value) => setCurrentFilter(value as FilterType)}
         >
-            <TabsList className="rounded-full ">
+            <TabsList >
                 {filters.map((filter) => (
                     <TabsTrigger
                         key={filter.value}
