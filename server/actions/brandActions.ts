@@ -6,12 +6,17 @@ import { brandSchema } from "@/lib/validations";
 import { Brand, Competitor } from "@/types";
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "./authActions";
+import { cookies } from "next/headers";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
     return { success: false, error: "Unauthorized" };
   }
+
+  const user = await getCurrentUser();
   const { competitors, ...brandData } = values;
 
   try {
@@ -34,11 +39,16 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
 }
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
     console.error("Unauthorized attempt to add competitors.");
     return;
   }
+  const user = await getCurrentUser();
+
+  
   try {
     await brandRequest("/brands/competitors/", "POST", {
       body: JSON.stringify({
@@ -53,9 +63,12 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  const user = await getCurrentUser();
-  if (!user) return [];
 
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken)  return [];
+  const user = await getCurrentUser();
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
@@ -71,10 +84,12 @@ export async function getBrands(): Promise<Brand[]> {
 export async function getCompetitors(
   brand_id: string
 ): Promise<{ brand_id: string; competitors: Competitor[] }> {
-  const user = await getCurrentUser();
   const emptyResult = { brand_id, competitors: [] };
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
 
-  if (!user) return emptyResult;
+  if (!accessToken)  return emptyResult;
+  const user = await getCurrentUser();
 
   try {
     const result = await brandRequest(
@@ -91,9 +106,12 @@ export async function getCompetitors(
 export async function getBrandById(
   brand_id: string
 ): Promise<Brand | null> {
-  const user = await getCurrentUser();
-  if (!user) return null;
 
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) return null;
+  const user = await getCurrentUser();
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"
@@ -106,11 +124,14 @@ export async function getBrandById(
 }
 
 export async function deleteBrand(brand_id: string) {
-  const user = await getCurrentUser();
-  if (!user) {
+
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
     return { success: false, error: "Unauthorized" };
   }
-
+  const user = await getCurrentUser();
   try {
     await brandRequest(
       `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,

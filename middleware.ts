@@ -1,27 +1,32 @@
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-import { NextRequest, NextResponse } from 'next/server';
-
-export function middleware(req: NextRequest) {
-    const accessToken = req.cookies.get('access_token')?.value;
-    const url = req.nextUrl.clone();
-
-    if (!accessToken) {
-        if (url.pathname !== '/login' && url.pathname !== '/register') {
-            url.pathname = '/login';
-            return NextResponse.redirect(url);
-        }
-    } else {
-        if (url.pathname === '/login' || url.pathname === '/register') {
-            url.pathname = '/';
-            return NextResponse.redirect(url);
-        }
+export function middleware(request: NextRequest) {
+  const accessToken = request.cookies.get('access_token')?.value
+  const { pathname } = request.nextUrl;
+  if (!accessToken) {
+    if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
+      return NextResponse.next();
     }
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+  if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
+    return NextResponse.redirect(new URL('/brands', request.url));
+  }
 
-    const res = NextResponse.next();
-    res.headers.set('x-pathname', req.nextUrl.pathname);
-    return res;
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  /*
+   * Match all request paths except for the ones starting with:
+   * - api (API routes)
+   * - _next/static (static files)
+   * - _next/image (image optimization files)
+   * - favicon.ico (favicon file)
+   * - assets in public folder
+   */
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|file.svg|globe.svg|next.svg|placeholder.svg|vercel.svg|window.svg).*)',
+  ],
 };

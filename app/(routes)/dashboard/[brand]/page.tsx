@@ -1,18 +1,13 @@
 import { getBrandData } from '@/data/brands'
 import DashboardLayout from '../page'
 import BrandDashboard from '@/components/dashboard/BrandDashboard'
-import { redirect } from 'next/navigation'
 import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
-import { getCurrentUser } from '@/server/actions/authActions'
-import LightRaysWrapper from '@/components/ui/react-bits/LightRaysWrapper'
+import { checkAuth } from '@/lib/checkAuth'
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
+    await checkAuth();
     const { brand } = await params
-    const user: any = await getCurrentUser();
     const brandData = await getBrandData(brand)
-    if (!user) {
-        redirect('/')
-    }
     if (!brandData) {
         return <div>Brand not found</div>
     }

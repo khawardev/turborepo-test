@@ -1,15 +1,11 @@
-import { redirect } from "next/navigation";
 import { ContainerMd } from "@/components/shared/containers";
 import { getCurrentUser } from "@/server/actions/authActions";
-import ProfileLoading from "./loading";
-import { Suspense } from "react";
 import ProfileComp from "@/components/profile/ProfileComp";
+import { checkAuth } from "@/lib/checkAuth";
 
 export default async function MePage() {
+  await checkAuth();
   const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login");
-  }
 
   return (
       <ContainerMd>

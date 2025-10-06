@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "./authActions";
+import { cookies } from "next/headers";
 
 type ScrapeWebsiteParams = {
   url: string;
@@ -41,11 +42,14 @@ export async function scrapeBrandAndCompetitors(
 }
 
 export async function scrapeWebsite(params: ScrapeWebsiteParams) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
     console.error("Unauthorized attempt to scrape website.");
     return { success: false, error: "Unauthorized" };
   }
+  const user = await getCurrentUser();
 
   const { url, brand_id, competitor_id } = params;
 
@@ -69,11 +73,14 @@ export async function scrapeWebsite(params: ScrapeWebsiteParams) {
 }
 
 export async function getBulkWebsiteCrawlContent(brand_id: string) {
-  const user = await getCurrentUser();
-  if (!user) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
     console.error("Unauthorized attempt to get crawl content.");
     return { success: false, error: "Unauthorized" };
   }
+  const user = await getCurrentUser();
 
   try {
     const result = await brandRequest(
