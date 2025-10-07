@@ -90,13 +90,13 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
         onClick: async () => {
           const result = await deleteBrand(brand.brand_id);
 
-          // if (result.success) {
-          //   router.refresh();
-          //   toast.success(result.message);
-          // } else {
-          //   console.log(result.console, `<-> result.console <->`);
-          //   toast.error(result.message);
-          // }
+          if (result.success) {
+            router.refresh();
+            toast.success(result.message);
+          } else {
+            console.log(result.console, `<-> result.console <->`);
+            toast.error(result.message);
+          }
         },
       },
     });

@@ -135,21 +135,17 @@ export async function deleteBrand(brand_id: string) {
   const user = await getCurrentUser();
 
   try {
+    const brandDelete = await brandRequest(
+      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
+      "DELETE"
+    );
 
-    const getClientDetail = await getClientDetails();
-    console.log(getClientDetail, `<-> getClientDetail <->`);
-
-    // const brandDelete = await brandRequest(
-    //   `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
-    //   "DELETE"
-    // );
-
-    // revalidatePath("/brands");
-    // return {
-    //   success: true,
-    //   message: brandDelete?.message || "Brand deleted successfully",
-    //   data: brandDelete,
-    // };
+    revalidatePath("/brands");
+    return {
+      success: true,
+      message: "Brand deleted successfully",
+      data: brandDelete,
+    };
   } catch (error: any) {
     console.error(`Failed to delete brand ${brand_id}:`, error);
     return {

@@ -22,7 +22,7 @@ const ProfileComp = ({ user }:any) => {
                   <p className="text-muted-foreground">Email</p>
                   <p>{user.email}</p>
               </div>
-              <Separator />
+              {/* <Separator />
               <div className="flex justify-between">
                   <p className="text-muted-foreground">User ID</p>
                   <p>{user.user_id}</p>
@@ -31,7 +31,7 @@ const ProfileComp = ({ user }:any) => {
               <div className="flex justify-between">
                   <p className="text-muted-foreground">Client ID</p>
                   <p>{user.client_id}</p>
-              </div>
+              </div> */}
           </Card>
           <div className="flex justify-end">
               <LogoutButton />

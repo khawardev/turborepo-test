@@ -141,10 +141,10 @@ export async function getBulkWebsiteCrawlContent(brand_id: string) {
 export async function getBatchId(client_id: string, brand_id: string) {
   try {
     const response = await brandRequest(`/batch/website-scrapes?client_id=${client_id}&brand_id=${brand_id}`, "GET")
-
+    
     if (!Array.isArray(response) || response.length === 0) return null
     const latest = response.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
-
+    
     return latest?.batch_id || null
   } catch (error) {
     console.error("Error fetching batch_id:", error)
