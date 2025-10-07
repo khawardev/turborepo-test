@@ -12,6 +12,7 @@ import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import { extractedData } from "@/data/response/agents/2.GET_bedrock-extraction-report";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
+import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
 
 export default function BrandDashboard({ data }: any) {
     if (!data) return null;
@@ -26,15 +27,13 @@ export default function BrandDashboard({ data }: any) {
 
     return (
         <div>
-            <DashboardHeader title={data.brandName}
-                subtitle="Raw website and social data, extracted insights, synthesized reports, and analytics dashboards."
-            />
+            <DashboardHeader title={data.brandName} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards."/>
 
-            <Tabs defaultValue="raw_data" className="mt-4">
+            <Tabs defaultValue="raw_data">
                 <TabsList>
                     <TabsTrigger value="raw_data">Raw Data</TabsTrigger>
-                    <TabsTrigger value="extracted_data">Extracted Data</TabsTrigger>
-                    <TabsTrigger value="synthesized_reports">Synthesized Report</TabsTrigger>
+                    <TabsTrigger value="website_audit">Website Audit Reports</TabsTrigger>
+                    <TabsTrigger value="social_audit">Social Media Audit Reports</TabsTrigger>
                     <TabsTrigger value="analytics_dashboards">Analytics Dashboard</TabsTrigger>
                 </TabsList>
 
@@ -42,12 +41,59 @@ export default function BrandDashboard({ data }: any) {
                     <RawDataDashboard data={rawData} />
                 </TabsContent>
 
-                <TabsContent value="extracted_data">
-                    <ExtractedDataDashboard data={extractedData} />
+                <TabsContent value="website_audit">
+                    <Tabs defaultValue="extracted_data">
+                        <TabsList>
+                            <TabsTrigger value="extracted_data">Extracted Data</TabsTrigger>
+                            <TabsTrigger value="synthesized_reports">Synthesized Report</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="extracted_data">
+                            <ExtractedDataDashboard data={extractedData} />
+                        </TabsContent>
+
+                        <TabsContent value="synthesized_reports">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+                    </Tabs>
                 </TabsContent>
 
-                <TabsContent value="synthesized_reports">
-                    <SynthesizedReportsDashboard data={SynthesizedReport} />
+            
+                <TabsContent value="social_audit">
+                    <Tabs defaultValue="facebook">
+                        <TabsList>
+                            <TabsTrigger value="facebook">Facebook</TabsTrigger>
+                            <TabsTrigger value="instagram">Instagram</TabsTrigger>
+                            <TabsTrigger value="x_twitter">X (Twitter)</TabsTrigger>
+                            <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
+                            <TabsTrigger value="youtube">YouTube</TabsTrigger>
+                            <TabsTrigger value="tiktok">TikTok</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="facebook">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+
+                        <TabsContent value="instagram">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+
+                        <TabsContent value="x_twitter">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+
+                        <TabsContent value="linkedin">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+
+                        <TabsContent value="youtube">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+
+                        <TabsContent value="tiktok">
+                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                        </TabsContent>
+                    </Tabs>
                 </TabsContent>
 
                 <TabsContent value="analytics_dashboards">
@@ -55,6 +101,7 @@ export default function BrandDashboard({ data }: any) {
                         <TabsList>
                             <TabsTrigger value="social_media">Social Media</TabsTrigger>
                             <TabsTrigger value="earned_media">Earned Media</TabsTrigger>
+                            <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="social_media">
@@ -63,6 +110,10 @@ export default function BrandDashboard({ data }: any) {
 
                         <TabsContent value="earned_media">
                             <EarnedMediaDashboard data={data.earnedMedia} />
+                        </TabsContent>
+
+                        <TabsContent value="brand_perception">
+                            <BrandPerceptionDashboard />
                         </TabsContent>
                     </Tabs>
                 </TabsContent>

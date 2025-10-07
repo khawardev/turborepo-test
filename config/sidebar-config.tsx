@@ -10,11 +10,6 @@ export const SidebarHrefTree = {
                     title: "Magna",
                     url: "/dashboard/magna",
                 },
-                {
-                    seprator: <BreadcrumbSeparator />,
-                    title: "Brand Perception Audit",
-                    url: "/dashboard",
-                },
             ],
         },
         {
