@@ -2,15 +2,13 @@ import { getBrandData } from '@/data/brands'
 import BrandDashboard from '@/components/dashboard/BrandDashboard'
 import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
 import { checkAuth } from '@/lib/checkAuth'
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
 
-export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
-    await checkAuth();
-    const { brand } = await params
-    const brandData = await getBrandData(brand)
-    if (!brandData) {
-        return <div>Brand not found</div>
-    }
+export default async function CompetitorPage({ params }: { params: { competitorId: string } }) {
+    await checkAuth()
+    const { competitorId } = params
+    const brandData = await getBrandData(competitorId)
+    if (!brandData) return <div>Competitor not found</div>
 
     return (
         <DashboardLayout>
@@ -18,6 +16,5 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
                 <BrandDashboard data={brandData} />
             </DashboardInnerLayout>
         </DashboardLayout>
-
     )
 }

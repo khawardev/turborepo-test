@@ -5,25 +5,14 @@ import DashboardHeader from "./shared/DashboardHeader";
 import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
 import EarnedMediaDashboard from "./earned-media/EarnedMediaDashboard";
 import RawDataDashboard from "./raw-data/RawDataDashboard";
-import { facebookData } from "@/data/ayaz_socials/facebook";
-import { linkedinData } from "@/data/ayaz_socials/linkedin";
-import { youtubeData } from "@/data/ayaz_socials/youtube";
 import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
-import { extractedData } from "@/data/response/agents/2.GET_bedrock-extraction-report";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
+import { extractedData } from "@/data/response/agents/2.GET_bedrock-extraction-report";
 
 export default function BrandDashboard({ data }: any) {
     if (!data) return null;
-
-    const rawData = {
-        socialMedia: {
-            facebook: facebookData,
-            linkedin: linkedinData,
-            youtube: youtubeData,
-        }
-    };
 
     return (
         <div>
@@ -38,7 +27,7 @@ export default function BrandDashboard({ data }: any) {
                 </TabsList>
 
                 <TabsContent value="raw_data">
-                    <RawDataDashboard data={rawData} />
+                    <RawDataDashboard />
                 </TabsContent>
 
                 <TabsContent value="website_audit">
@@ -100,7 +89,7 @@ export default function BrandDashboard({ data }: any) {
                     <Tabs defaultValue="social_media">
                         <TabsList>
                             <TabsTrigger value="social_media">Social Media</TabsTrigger>
-                            <TabsTrigger value="earned_media">Earned Media</TabsTrigger>
+                            {/* <TabsTrigger value="earned_media">Earned Media</TabsTrigger> */}
                             <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 

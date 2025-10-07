@@ -26,10 +26,8 @@ interface NavItem {
     isRoot?: boolean
 }
 
-export function TreeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function SidebarList({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const pathname = usePathname()
-
- 
     return (
         <Sidebar {...props} variant='inset'>
             <SidebarHeader>

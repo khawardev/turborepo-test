@@ -1,4 +1,4 @@
-import { getBrands, getCompetitors } from "@/server/actions/brandActions";
+import { getBrands, getClientDetails, getCompetitors } from "@/server/actions/brandActions";
 import { Brand, Competitor } from "@/types";
 import BrandItem from "@/components/brands/list_brand/BrandItem";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ async function BrandList() {
   const brands: Brand[] = await getBrands();
   const user = await getCurrentUser()
 
+  
   if (brands.length === 0) {
     return (
       <Card className="flex flex-col gap-3 items-center justify-center text-center h-64 border-dashed border-2">

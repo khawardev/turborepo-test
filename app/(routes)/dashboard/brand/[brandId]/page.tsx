@@ -1,9 +1,22 @@
-import React from 'react'
+import { getBrandData } from '@/data/brands'
+import BrandDashboard from '@/components/dashboard/BrandDashboard'
+import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
+import { checkAuth } from '@/lib/checkAuth'
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
 
-const page = () => {
+export default async function BrandPage({ params }: { params: { brandId: string } }) {
+  await checkAuth()
+  const { brandId } = params
+  const brandData: any[] = []
+
+  const brandCompetitorData = await getBrandData(brandId)
+  brandData.push({ type: 'brandCompetitor', data: brandCompetitorData })
+
   return (
-    <div>page</div>
+    <DashboardLayout brandId={brandId}>
+      <DashboardInnerLayout>
+        <BrandDashboard data={brandData} />
+      </DashboardInnerLayout>
+    </DashboardLayout>
   )
 }
-
-export default page

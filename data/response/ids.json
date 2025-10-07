@@ -1,67 +1,70 @@
 {
-    "client_id": "763d503f-9d24-42c4-b6d5-0fa2beba5da9",
-    "brand": {
-        "id": "18302825-9a8a-4fc1-80b0-726d7d70ff49",
-        "name": "magna",
-        "website": "https://magna.com/",
-        "socials": {
-            "linkedin": "https://magnalin.com/",
-            "twitter": "https://twitter.com/MagnaInt",
-            "instagram": "https://INvercel.com/",
-            "youtube": "https://YTvercel.com/",
-            "facebook": "https://magnafb.com/"
-        },
-        "website-batches": [
-            {
-                "id": "4b1c7172-62dc-444d-9c8e-68d95ba857bc",
-                "name": "magna_scrape",
-                "created_at": "2025-10-03T15:11:35.711590",
-                "scraped_pages": "10",
-                "status": "Completed"
-            }
-        ],
-        "reports": {
-            "extractor": [
-                {
-                    "id": "a64e05c6-f359-41ef-919c-35066d70491e",
-                    "report_name": "magna report"
-                },
-                {
-                    "id": "cb9a84ff-74df-4d57-9d23-732bb5148354",
-                    "report_name": null
-                }
-            ],
-            "synthesiser": [
-                {
-                    "id": "1d4bb2b0-fba7-4896-8860-94f054ca4076",
-                    "report_name": "report"
-                },
-                {
-                    "id": "f89a1f09-34b9-4534-9684-2c09925b85c8",
-                    "report_name": null
-                }
-            ],
-            "social": []
-        }
-    },
-    "competitors": [
-        {
-            "id": "32906bac-70db-4192-bc5f-9720ec7972e3",
-            "name": "ZF",
-            "website": "https://www.zf.com/",
+    "success": true,
+    "data": {
+        "client_id": "763d503f-9d24-42c4-b6d5-0fa2beba5da9",
+        "brand": {
+            "id": "4d7ca7b3-8b46-4a3c-aa18-448517b7a312",
+            "name": "magna",
+            "website": "https://magna.com/",
             "socials": {
-                "linkedin": "https://linkedin.com/company/zf-group",
-                "twitter": "https://twitter.com/zf_group",
-                "instagram": "https://instagram.com/zf_group",
-                "youtube": "https://youtube.com/user/ZFChannel",
-                "facebook": "https://facebook.com/ZFGroup"
+                "linkedin": "https://magnalin.com/",
+                "twitter": "https://twitter.com/MagnaInt",
+                "instagram": "https://INvercel.com/",
+                "youtube": "https://YTvercel.com/",
+                "facebook": "https://magnafb.com/"
             },
-            "website-batches": [],
+            "website-batches": [
+                {
+                    "id": "1969f698-33dc-4cd9-915c-73c513bbe792",
+                    "name": "vercel_scrape",
+                    "created_at": "2025-10-07T07:55:36.368161",
+                    "scraped_pages": "10",
+                    "status": "Completed"
+                }
+            ],
             "reports": {
                 "extractor": [],
                 "synthesiser": [],
                 "social": []
             }
-        }
-    ]
+        },
+        "competitors": [
+            {
+                "id": "13c3ece5-e1fb-4001-b2a8-20773e5a1d2e",
+                "name": "ZF",
+                "website": "https://www.zf.com/",
+                "socials": {
+                    "linkedin": "https://linkedin.com/company/zf-group",
+                    "twitter": "https://twitter.com/zf_group",
+                    "instagram": "https://instagram.com/zf_group",
+                    "youtube": "https://youtube.com/user/ZFChannel",
+                    "facebook": "https://facebook.com/ZFGroup"
+                },
+                "website-batches": [],
+                "reports": {
+                    "extractor": [],
+                    "synthesiser": [],
+                    "social": []
+                }
+            },
+            {
+                "id": "697bcb94-949d-4e69-b888-891c9b69c4c4",
+                "name": "NEXT.JS",
+                "website": "https://nextjs.org/",
+                "socials": {
+                    "linkedin": "https://LNnextjs.org/",
+                    "twitter": "https://XCnextjs.org/",
+                    "instagram": "https://INnextjs.org/",
+                    "youtube": "https://YTnextjs.org/",
+                    "facebook": "https://FBnextjs.org/"
+                },
+                "website-batches": [],
+                "reports": {
+                    "extractor": [],
+                    "synthesiser": [],
+                    "social": []
+                }
+            }
+        ]
+    }
 }

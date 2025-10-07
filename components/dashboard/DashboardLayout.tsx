@@ -11,26 +11,20 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { DashboardInnerLayout } from '@/components/shared/DashboardLayout';
-import BrandPerceptionDashboard from '@/components/dashboard/brand-perception/BrandPerceptionDashboard';
-import { TreeSidebar } from '@/components/ui/sidebar-list';
+import { SidebarList } from '@/components/ui/sidebar-list';
 import { getCurrentUser } from '@/server/actions/authActions';
 import { UserNav } from '@/components/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
-import LightRaysWrapper from '@/components/ui/react-bits/LightRaysWrapper';
 import { checkAuth } from '@/lib/checkAuth';
-import BrandDashboard from '@/components/dashboard/BrandDashboard';
-import { brandData } from '@/data/brands/brand_perception';
 
-const DashboardLayout = async ({ children }: any) => {
+const DashboardLayout = async ({ children, brandId }: any) => {
     await checkAuth();
     const user: any = await getCurrentUser();
-
-
+    
 
     return (
         <SidebarProvider>
-            <TreeSidebar />
+            <SidebarList />
             <SidebarInset  >
                 <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
                     <div className="flex items-center gap-2">
@@ -50,11 +44,7 @@ const DashboardLayout = async ({ children }: any) => {
                     </div>
                 </header>
                 <div className='relative'>
-                    {children ? children :
-                        <DashboardInnerLayout>
-                            <BrandDashboard data={brandData} />
-                        </DashboardInnerLayout>
-                    }
+                    {children}
                 </div>
             </SidebarInset>
         </SidebarProvider>
