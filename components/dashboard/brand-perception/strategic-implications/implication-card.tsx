@@ -38,14 +38,14 @@ export default function ImplicationCard({ attribute, searchQuery }: ImplicationC
                     <Card
                         key={brand}
                         className={cn(
-                            "transition-all hover:shadow-lg",
-                            brand === 'MAGNA' && "border-2 border-red-500 bg-red-500/5"
+                            "transition-all shadow-sm",
+                            brand === 'MAGNA' && "bg-primary/10"
                         )}
                     >
                         <CardHeader className="pb-3">
                             <CardTitle className={cn(
                                 "text-base",
-                                brand === 'MAGNA' ? "text-red-500" : ""
+                                brand === 'MAGNA' ? "text-primary " : ""
                             )}>
                                 {brand}
                             </CardTitle>

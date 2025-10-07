@@ -38,9 +38,9 @@ export default function Synthesis({ attribute, searchQuery }: SynthesisProps) {
             icon: Shield,
             title: "Strength to Leverage",
             content: getStrength(attribute),
-            color: "text-green-500",
-            bgColor: "bg-green-500/10",
-            borderColor: "border-green-500/30"
+            color: "text-primary",
+            bgColor: "bg-primary/10",
+            borderColor: "border-primary/30"
         },
         {
             icon: AlertTriangle,
@@ -69,9 +69,9 @@ export default function Synthesis({ attribute, searchQuery }: SynthesisProps) {
     ];
 
     return (
-        <Card className="border-2 border-red-500 bg-gradient-to-br from-red-500/10 to-red-500/5">
+        <Card className=" bg-gradient-to-br from-primary/10 to-primary/5">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-500">
+                <CardTitle className="flex items-center gap-2 text-primary">
                     <Zap className="h-5 w-5" />
                     Strategic Synthesis for Magna
                 </CardTitle>

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { brandData } from "@/data/brands/brand_perception";
+import { Card } from "@/components/ui/card";
 
 interface BrandTableProps {
     attributes: AttributeKey[];
@@ -110,47 +111,47 @@ export default function BrandTable({ attributes, searchQuery, allExpanded }: Bra
     };
 
     return (
-        <div className="bg-accent/40 text-card-foreground flex flex-col gap-6 rounded-xl border shadow-sm  border-border ring-border/70 ring-offset-background ring-1 ring-offset-3">
-                <Table>
-                    <TableHeader>
-                        <TableRow className=" ">
-                            <TableHead >
-                                Attribute
+        <Card className="p-0" >
+            <Table>
+                <TableHeader>
+                    <TableRow className=" ">
+                        <TableHead >
+                            Attribute
+                        </TableHead>
+                        {brands.map((brand) => (
+                            <TableHead
+                                key={brand}
+                                className={cn(
+                                    "font-semibold min-w-[200px]",
+                                    brand === 'MAGNA' && "text-primary bg-primary/5"
+                                )}
+                            >
+                                {brand}
                             </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {attributes.map((attr) => (
+                        <TableRow key={attr} className="">
+                            <TableCell className="sticky left-0 backdrop-blur-3xl font-medium ">
+                                {getAttributeLabel(attr)}
+                            </TableCell>
                             {brands.map((brand) => (
-                                <TableHead
-                                    key={brand}
+                                <TableCell
+                                    key={`${attr}-${brand}`}
                                     className={cn(
-                                        "font-semibold min-w-[200px]",
-                                        brand === 'MAGNA' && "text-red-500 bg-red-500/10"
+                                        "align-top",
+                                        brand === 'MAGNA' && " bg-primary/5"
                                     )}
                                 >
-                                    {brand}
-                                </TableHead>
+                                    {renderCellContent(brandData[brand][attr], attr, brand)}
+                                </TableCell>
                             ))}
                         </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {attributes.map((attr) => (
-                            <TableRow key={attr} className="">
-                                <TableCell className="sticky left-0 backdrop-blur-md font-medium ">
-                                    {getAttributeLabel(attr)}
-                                </TableCell>
-                                {brands.map((brand) => (
-                                    <TableCell
-                                        key={`${attr}-${brand}`}
-                                        className={cn(
-                                            "align-top",
-                                            brand === 'MAGNA' && "bg-red-500/5"
-                                        )}
-                                    >
-                                        {renderCellContent(brandData[brand][attr], attr, brand)}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-        </div>
+                    ))}
+                </TableBody>
+            </Table>
+        </Card>
     );
 }

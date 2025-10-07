@@ -75,7 +75,7 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
       const result = await scrapeBatchWebsite(brand);
       if (result.success) {
         router.refresh();
-        toast.success("Scraping completed successfully!");
+        toast.success("Scraping completed successfully 🎉");
       } else {
         toast.error("Scraping failed.");
       }
@@ -120,8 +120,8 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
           <div className="flex items-center space-x-2">
             {isScrapped ?
               <Button variant={'outline'} asChild  >
-                <Link href={`/brands/${brand.brand_id}`} >
-                  {brand.name} dashboard
+              <Link href={`/brands/${brand.brand_id}`} >
+                   {brand.name.charAt(0).toUpperCase() + brand.name.slice(1)} Dashboard
                 </Link>
               </Button> :
               <Button disabled={isPending} onClick={scrapeBrand} >
