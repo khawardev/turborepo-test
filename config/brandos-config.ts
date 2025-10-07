@@ -10,7 +10,7 @@ export const BrandOSConfig: any = {
         },
         {
             title: "Dashboard",
-            href: "/dashboard",
+            href: "/dashboard/magna",
         },
     ],
 };

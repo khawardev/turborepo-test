@@ -19,6 +19,8 @@ import { UserNav } from '@/components/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import LightRaysWrapper from '@/components/ui/react-bits/LightRaysWrapper';
 import { checkAuth } from '@/lib/checkAuth';
+import BrandDashboard from '@/components/dashboard/BrandDashboard';
+import { brandData } from '@/data/brands/brand_perception';
 
 const DashboardLayout = async ({ children }: any) => {
     await checkAuth();
@@ -27,35 +29,35 @@ const DashboardLayout = async ({ children }: any) => {
 
 
     return (
-            <SidebarProvider>
-                <TreeSidebar />
-                <SidebarInset  >
-                    <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
-                        <div className="flex items-center gap-2">
-                            <SidebarTrigger className="-ml-1" />
-                            <Separator orientation='vertical' />
-                            <Breadcrumb>
-                                <BreadcrumbList>
-                                    <BreadcrumbItem>
-                                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                                    </BreadcrumbItem>
-                                </BreadcrumbList>
-                            </Breadcrumb>
-                        </div>
-                        <div className='flex gap-2 items-center'>
-                            {user && <UserNav user={user} />}
-                            <ThemeSwitcher />
-                        </div>
-                    </header>
-                    <div className='relative'>
-                        {children ? children :
-                            <DashboardInnerLayout>
-                                <BrandPerceptionDashboard />
-                            </DashboardInnerLayout>
-                        }
+        <SidebarProvider>
+            <TreeSidebar />
+            <SidebarInset  >
+                <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
+                    <div className="flex items-center gap-2">
+                        <SidebarTrigger className="-ml-1" />
+                        <Separator orientation='vertical' />
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
                     </div>
-                </SidebarInset>
-            </SidebarProvider>
+                    <div className='flex gap-2 items-center'>
+                        {user && <UserNav user={user} />}
+                        <ThemeSwitcher />
+                    </div>
+                </header>
+                <div className='relative'>
+                    {children ? children :
+                        <DashboardInnerLayout>
+                            <BrandDashboard data={brandData} />
+                        </DashboardInnerLayout>
+                    }
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 export default DashboardLayout;
