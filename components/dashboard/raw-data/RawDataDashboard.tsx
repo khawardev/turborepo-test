@@ -3,13 +3,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WebsiteDataView from "./WebsiteDataView";
 import SocialMediaDataView from "./social-media/SocialMediaDataView";
-import { websiteScrapedData } from "@/data/response/scraping/4.batch-website-scrape-results";
 import { facebookData } from "@/data/ayaz_socials/facebook";
 import { linkedinData } from "@/data/ayaz_socials/linkedin";
 import { youtubeData } from "@/data/ayaz_socials/youtube";
 
-export default function RawDataDashboard() {
-    const rawData = {
+export default function RawDataDashboard({ rawData }: any) {
+    
+    const rawsocialMediaData = {
         socialMedia: {
             facebook: facebookData,
             linkedin: linkedinData,
@@ -24,11 +24,11 @@ export default function RawDataDashboard() {
             </TabsList>
 
             <TabsContent value="website">
-                <WebsiteDataView data={websiteScrapedData} />
+                <WebsiteDataView rawData={rawData} />
             </TabsContent>
 
             <TabsContent value="social_media">
-                <SocialMediaDataView data={rawData.socialMedia} />
+                <SocialMediaDataView data={rawsocialMediaData.socialMedia} />
             </TabsContent>
         </Tabs>
     );

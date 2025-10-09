@@ -21,7 +21,7 @@ export async function brandRequest(
             Authorization: `Bearer ${token}`,
         },
         body: prepareRequestBody(body),
-        cache: "no-store",
+        cache: 'force-cache',
     });
 
     const text = await res.text();

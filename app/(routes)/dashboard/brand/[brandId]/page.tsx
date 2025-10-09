@@ -1,21 +1,23 @@
-import { getBrandData } from '@/data/brands'
 import BrandDashboard from '@/components/dashboard/BrandDashboard'
 import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
 import { checkAuth } from '@/lib/checkAuth'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
+import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
+import { getBatchWebsiteScrapeResults } from '@/server/actions/scrapeActions'
 
-export default async function BrandPage({ params }: { params: { brandId: string } }) {
+export default async function BrandPage({ params }: any) {
+
   await checkAuth()
-  const { brandId } = params
-  const brandData: any[] = []
-
-  const brandCompetitorData = await getBrandData(brandId)
-  brandData.push({ type: 'brandCompetitor', data: brandCompetitorData })
-
+  const { brandId } = await params
+  const brand = await getBrandbyIdWithCompetitors(brandId);
+  const rawData = await getBatchWebsiteScrapeResults(brandId);
+  const brandTitle = brand.name
+  console.log(rawData, `<-> rawData <->`);
+  
   return (
-    <DashboardLayout brandId={brandId}>
+    <DashboardLayout Brand={brand}>
       <DashboardInnerLayout>
-        <BrandDashboard data={brandData} />
+        <BrandDashboard title={brandTitle} brand={brand} rawData={rawData.brand} />
       </DashboardInnerLayout>
     </DashboardLayout>
   )

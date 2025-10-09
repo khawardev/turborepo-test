@@ -2,8 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "./shared/DashboardHeader";
-import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
-import EarnedMediaDashboard from "./earned-media/EarnedMediaDashboard";
 import RawDataDashboard from "./raw-data/RawDataDashboard";
 import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
@@ -11,12 +9,12 @@ import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesi
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
 import { extractedData } from "@/data/response/agents/2.GET_bedrock-extraction-report";
 
-export default function BrandDashboard({ data }: any) {
-    if (!data) return null;
+export default function BrandDashboard({ brand, competitor, rawData, title }: any) {
+    if (!brand) return null;
 
     return (
         <div>
-            <DashboardHeader title={data.brandName} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards."/>
+            <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards."/>
 
             <Tabs defaultValue="raw_data">
                 <TabsList>
@@ -27,7 +25,7 @@ export default function BrandDashboard({ data }: any) {
                 </TabsList>
 
                 <TabsContent value="raw_data">
-                    <RawDataDashboard />
+                    <RawDataDashboard rawData={rawData} />
                 </TabsContent>
 
                 <TabsContent value="website_audit">
@@ -93,13 +91,13 @@ export default function BrandDashboard({ data }: any) {
                             <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="social_media">
+                        {/* <TabsContent value="social_media">
                             <SocialMediaDashboard data={data.socialMedia} />
-                        </TabsContent>
+                        </TabsContent> */}
 
-                        <TabsContent value="earned_media">
+                        {/* <TabsContent value="earned_media">
                             <EarnedMediaDashboard data={data.earnedMedia} />
-                        </TabsContent>
+                        </TabsContent> */}
 
                         <TabsContent value="brand_perception">
                             <BrandPerceptionDashboard />

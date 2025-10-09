@@ -81,6 +81,54 @@ export async function getBrands(): Promise<Brand[]> {
   }
 }
 
+export async function getBrandById(
+  brand_id: string
+): Promise<Brand | null> {
+
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) return null;
+  const user = await getCurrentUser();
+  try {
+    const brands = await brandRequest(
+      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"
+    );
+    return brands[0] || null;
+  } catch (error) {
+    console.error(`Failed to fetch brand ${brand_id}:`, error);
+    return null;
+  }
+}
+
+export async function getBrandbyIdWithCompetitors(brand_id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+  if (!accessToken) return null;
+
+  const user = await getCurrentUser();
+
+  try {
+    const [brandResponse, competitorResponse] = await Promise.all([
+      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"),
+      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET")
+    ]);
+
+    const brand = brandResponse?.[0] || null;
+    const competitors = competitorResponse?.competitors || [];
+
+    if (!brand) return null;
+
+    return {
+      ...brand,
+      competitors
+    };
+  } catch (error) {
+    console.error(`Failed to fetch brand or competitors for ${brand_id}:`, error);
+    return null;
+  }
+}
+
 export async function getCompetitors(
   brand_id: string
 ): Promise<{ brand_id: string; competitors: Competitor[] }> {
@@ -104,25 +152,7 @@ export async function getCompetitors(
   }
 }
 
-export async function getBrandById(
-  brand_id: string
-): Promise<Brand | null> {
 
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
-
-  if (!accessToken) return null;
-  const user = await getCurrentUser();
-  try {
-    const brands = await brandRequest(
-      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"
-    );
-    return brands[0] || null;
-  } catch (error) {
-    console.error(`Failed to fetch brand ${brand_id}:`, error);
-    return null;
-  }
-}
 
 export async function deleteBrand(brand_id: string) {
   const cookieStore = await cookies();
@@ -178,3 +208,5 @@ export async function getClientDetails() {
     return { success: false, error: error.message || "Failed to fetch client details" };
   }
 }
+
+

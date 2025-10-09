@@ -21,7 +21,7 @@ import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
-import { getBatchWebsiteTaskStatus, scrapeBatchWebsite } from "@/server/actions/scrapeActions";
+import { scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
 import { deleteBrand } from "@/server/actions/brandActions";
@@ -66,7 +66,7 @@ function BrandItemSkeleton() {
   );
 }
 
-export default function BrandItem({ brand, competitors, isScrapped, index }: any) {
+export default function BrandItem({ brand, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -118,22 +118,6 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            {isScrapped ?
-              <Button variant={'outline'} asChild  >
-              <Link href={`/brands/${brand.brand_id}`} >
-                   {brand.name.charAt(0).toUpperCase() + brand.name.slice(1)} Dashboard
-                </Link>
-              </Button> :
-              <Button disabled={isPending} onClick={scrapeBrand} >
-                {isPending ? (
-                  <ButtonSpinner>
-                    Scraping
-                  </ButtonSpinner>
-                ) : (
-                  "Scrape"
-                )}
-              </Button>
-            }
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" >
@@ -149,6 +133,23 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {isScrapped ?
+              <Button variant={'outline'} asChild  >
+              <Link href={`/dashboard/brand/${brand.brand_id}`} >
+                   Dashboard
+                </Link>
+              </Button> :
+              <Button disabled={isPending} onClick={scrapeBrand} >
+                {isPending ? (
+                  <ButtonSpinner>
+                    Scraping
+                  </ButtonSpinner>
+                ) : (
+                  "Scrape"
+                )}
+              </Button>
+            }
+           
           </div>
         </CardHeader>
         <CardContent >
@@ -169,7 +170,7 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
 
               <div>
                 <h4 className="text-md font-medium mb-2">Competitors</h4>
-                {competitors.length > 0 ? (
+                  {brand.competitors.length > 0 ? (
                   <div >
                     <Table>
                       <TableHeader>
@@ -180,7 +181,7 @@ export default function BrandItem({ brand, competitors, isScrapped, index }: any
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {competitors.map((competitor: any) => {
+                          {brand.competitors.map((competitor: any) => {
                           return (
                             <TableRow key={competitor.competitor_id}>
                               <TableCell className="font-medium">{competitor.name}</TableCell>

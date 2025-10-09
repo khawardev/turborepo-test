@@ -16,15 +16,17 @@ import { getCurrentUser } from '@/server/actions/authActions';
 import { UserNav } from '@/components/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { checkAuth } from '@/lib/checkAuth';
+import { generateSidebarHrefTree } from '@/lib/generateSidebarHrefTree';
 
-const DashboardLayout = async ({ children, brandId }: any) => {
+const DashboardLayout = async ({ children, Brand }: any) => {
     await checkAuth();
     const user: any = await getCurrentUser();
+    const SidebarHrefTree: any = generateSidebarHrefTree(Brand);
     
 
     return (
         <SidebarProvider>
-            <SidebarList />
+            <SidebarList SidebarHrefTree={SidebarHrefTree} />
             <SidebarInset  >
                 <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
                     <div className="flex items-center gap-2">

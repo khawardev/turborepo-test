@@ -16,17 +16,14 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FullLogo } from "@/components/shared/logo"
-import { SidebarHrefTree } from "@/config/sidebar-config"
+import { BreadcrumbSeparator } from "./breadcrumb"
 
-interface NavItem {
-    title: string
-    url?: string
-    items?: NavItem[]
-    isExpandable?: boolean
-    isRoot?: boolean
-}
 
-export function SidebarList({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+export function SidebarList({
+    SidebarHrefTree,
+    ...props
+}: React.ComponentProps<typeof Sidebar> & { SidebarHrefTree: any }) {
     const pathname = usePathname()
     return (
         <Sidebar {...props} variant='inset'>
@@ -41,17 +38,17 @@ export function SidebarList({ ...props }: React.ComponentProps<typeof Sidebar>) 
             </SidebarHeader>
 
             <SidebarContent>
-                {SidebarHrefTree.navMain.map((item) => (
+                {SidebarHrefTree.navMain.map((item:any) => (
                     <SidebarGroup key={item.title}>
                         <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
-                                {item.items.map((item) => (
+                                {item.items.map((item: any) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton variant={pathname !== item.url ? "default" : "primary"} asChild >
                                             <Link href={item.url} className="flex justify-between w-full">
-                                                <span className="flex items-center gap-2">{item.title}</span>
-                                                {pathname === item.url && <p>{item.seprator}</p>}
+                                                <span className="flex items-center gap-2">{item.title.charAt(0).toUpperCase() + item.title.slice(1)}</span>
+                                                {pathname === item.url && <p><BreadcrumbSeparator /></p>}
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
