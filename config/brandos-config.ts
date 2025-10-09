@@ -8,9 +8,5 @@ export const BrandOSConfig: any = {
             title: "Brands",
             href: "/brands",
         },
-        {
-            title: "Dashboard",
-            href: "/dashboard/magna",
-        },
     ],
 };
