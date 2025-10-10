@@ -10,10 +10,10 @@ import Link from 'next/link';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
-import { cleanAndFlattenBulletsGoogle } from '@/lib/cleanMarkdown';
+import { cleanAndFlattenBullets } from '@/lib/cleanMarkdown';
 
-export default function WebsiteDataView({ rawData }: any) {
-    const pages = rawData?.pages || [];
+export default function WebsiteDataView({ scrapedData }: any) {
+    const pages = scrapedData?.pages || [];
     const [selectedPage, setSelectedPage] = useState<any>(null);
     const [isCopied, setIsCopied] = useState(false);
 
@@ -23,7 +23,7 @@ export default function WebsiteDataView({ rawData }: any) {
         } else {
             setSelectedPage(null);
         }
-    }, [rawData]);
+    }, [scrapedData]);
 
     if (pages.length === 0) {
         return (
@@ -74,7 +74,7 @@ export default function WebsiteDataView({ rawData }: any) {
                 </div>
             </ScrollArea>
 
-            <CardContent className=" space-y-4 ">
+            <CardContent className=" space-y-4 w-full">
                 <div className='w-full flex items-center justify-between'>
                     <Link href={selectedPage?.url} target='_blank' className="text-sm text-muted-foreground truncate max-w-[500px]">
                         {selectedPage?.url ? selectedPage.url : 'No URL available'}
@@ -87,17 +87,17 @@ export default function WebsiteDataView({ rawData }: any) {
                 <Separator />
                 <ScrollArea className="h-full w-full">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
-                        <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{
+                     
+                        <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">
+                            <ReactMarkdown components={{
                                 img: ({ node, ...props }) => {
                                     if (!props.src) return null
                                     return <img {...props} alt={props.alt || ""} />
                                 },
-                            }}
-                        >
-                            {cleanAndFlattenBulletsGoogle(selectedPage?.content)}
-                        </ReactMarkdown>
+                            }} remarkPlugins={[remarkGfm]}>
+                                {cleanAndFlattenBullets(selectedPage?.content)}
+                            </ReactMarkdown>
+                        </div>
                     </div>
                 </ScrollArea>
             </CardContent>

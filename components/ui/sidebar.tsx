@@ -486,6 +486,8 @@ const sidebarMenuButtonVariants = cva(
         default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         link: "text-primary hover:bg-none",
         primary: "bg-primary text-primary-foreground hover:text-primary-foreground",
+        ghost:
+          "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-muted/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
       },

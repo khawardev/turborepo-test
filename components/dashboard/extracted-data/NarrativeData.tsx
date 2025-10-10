@@ -16,7 +16,7 @@ export default function NarrativeData({ data }: any) {
                         <TabsTrigger value="verbs">Action Verbs</TabsTrigger>
                         <TabsTrigger value="statements">Future Statements</TabsTrigger>
                     </TabsList>
-                    <ScrollArea className="h-72 mt-4">
+                    <ScrollArea className="h-72">
                         <TabsContent value="verbs">
                             <Table>
                                 <TableHeader>

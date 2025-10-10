@@ -18,7 +18,7 @@ export default function VerbalIdentity({ data }: any) {
                         <TabsTrigger value="verbs">Top Verbs</TabsTrigger>
                         <TabsTrigger value="terms">Proprietary</TabsTrigger>
                     </TabsList>
-                    <ScrollArea className="h-72 mt-4">
+                    <ScrollArea className="h-72 ">
                         <TabsContent value="nouns">
                             <Table>
                                 <TableHeader>
@@ -56,7 +56,7 @@ export default function VerbalIdentity({ data }: any) {
                             </Table>
                         </TabsContent>
                         <TabsContent value="terms">
-                            <div className="p-4 flex flex-wrap gap-2">
+                            <div className="py-4 flex flex-wrap gap-2">
                                 {data.lexical_frequency.proprietary_terms.map((term: string) => (
                                     <Badge key={term} variant="secondary">{term}</Badge>
                                 ))}

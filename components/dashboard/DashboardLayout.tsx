@@ -18,10 +18,10 @@ import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { checkAuth } from '@/lib/checkAuth';
 import { generateSidebarHrefTree } from '@/lib/generateSidebarHrefTree';
 
-const DashboardLayout = async ({ children, Brand }: any) => {
+const DashboardLayout = async ({ children, brandData }: any) => {
     await checkAuth();
     const user: any = await getCurrentUser();
-    const SidebarHrefTree: any = generateSidebarHrefTree(Brand);
+    const SidebarHrefTree: any = generateSidebarHrefTree(brandData);
     
 
     return (

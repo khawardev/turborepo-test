@@ -75,7 +75,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       const result = await scrapeBatchWebsite(brand);
       if (result.success) {
         router.refresh();
-        toast.success("Scraping completed successfully 🎉");
+        toast.success("Scraping and extraction completed successfully 🎉");
       } else {
         toast.error("Scraping failed.");
       }
@@ -94,7 +94,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
             router.refresh();
             toast.success(result.message);
           } else {
-            console.log(result.console, `<-> result.console <->`);
             toast.error(result.message);
           }
         },

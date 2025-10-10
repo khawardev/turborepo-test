@@ -7,14 +7,12 @@ import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
-import { extractedData } from "@/data/response/agents/2.GET_bedrock-extraction-report";
 
-export default function BrandDashboard({ brand, competitor, rawData, title }: any) {
-    if (!brand) return null;
+export default function BrandDashboard({ scrapedData, title, extractorReport, synthesizerReport }: any) {
 
     return (
         <div>
-            <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards."/>
+            <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards." />
 
             <Tabs defaultValue="raw_data">
                 <TabsList>
@@ -25,7 +23,7 @@ export default function BrandDashboard({ brand, competitor, rawData, title }: an
                 </TabsList>
 
                 <TabsContent value="raw_data">
-                    <RawDataDashboard rawData={rawData} />
+                    <RawDataDashboard scrapedData={scrapedData} />
                 </TabsContent>
 
                 <TabsContent value="website_audit">
@@ -36,16 +34,16 @@ export default function BrandDashboard({ brand, competitor, rawData, title }: an
                         </TabsList>
 
                         <TabsContent value="extracted_data">
-                            <ExtractedDataDashboard data={extractedData} />
+                            <ExtractedDataDashboard extractorReport={extractorReport} title={title} />
                         </TabsContent>
 
                         <TabsContent value="synthesized_reports">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
+                            <SynthesizedReportsDashboard synthesizerReport={synthesizerReport} title={title} />
                         </TabsContent>
                     </Tabs>
                 </TabsContent>
 
-            
+
                 <TabsContent value="social_audit">
                     <Tabs defaultValue="facebook">
                         <TabsList>

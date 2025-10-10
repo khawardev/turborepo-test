@@ -45,7 +45,7 @@ export function SidebarList({
                             <SidebarMenu>
                                 {item.items.map((item: any) => (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton variant={pathname !== item.url ? "default" : "primary"} asChild >
+                                        <SidebarMenuButton variant={pathname !== item.url ? "ghost" : "primary"} asChild >
                                             <Link href={item.url} className="flex justify-between w-full">
                                                 <span className="flex items-center gap-2">{item.title.charAt(0).toUpperCase() + item.title.slice(1)}</span>
                                                 {pathname === item.url && <p><BreadcrumbSeparator /></p>}

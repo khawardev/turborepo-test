@@ -7,23 +7,22 @@ import { Copy, DownloadCloud } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
-import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
-export default function SynthesizedReportsDashboard({ data }: any) {
+import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
+export default function SynthesizedReportsDashboard({ synthesizerReport, title }: any) {
     const [copied, setCopied] = useState(false);
 
-    if (!data || data.length === 0) {
+    if (!synthesizerReport) {
         return (
-            <div className="mt-4 p-6 border rounded-lg h-[70vh] flex items-center justify-center">
+            <div className="mt-4 p-6  h-[70vh] flex items-center justify-center">
                 <p className="text-muted-foreground">No synthesized reports available.</p>
             </div>
         );
     }
 
-    const content = data[0].data || "No content available for this report.";
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(content);
+            await navigator.clipboard.writeText(synthesizerReport);
             toast.success('Content Copied to Clipboard')
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -32,7 +31,7 @@ export default function SynthesizedReportsDashboard({ data }: any) {
             try {
                 toast.success('Content Copied to Clipboard')
                 const textarea = document.createElement("textarea");
-                textarea.value = content;
+                textarea.value = synthesizerReport;
                 document.body.appendChild(textarea);
                 textarea.select();
                 document.execCommand("copy");
@@ -46,11 +45,11 @@ export default function SynthesizedReportsDashboard({ data }: any) {
     };
 
     const handleDownload = () => {
-        const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+        const blob = new Blob([synthesizerReport], { type: "text/markdown;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${data[0].title || "synthesized-report"}.md`;
+        a.download = `${title}_synthesized-report.md`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -60,7 +59,9 @@ export default function SynthesizedReportsDashboard({ data }: any) {
     return (
         <div className="relative">
             <div className="flex items-center justify-between gap-2 mb-4">
-                <h2 className="text-xl tracking-tight font-bold">Synthesized Report</h2>
+                <h2 className="text-xl tracking-tighter font-semibold">
+                    {title.charAt(0).toUpperCase() + title.slice(1)} Synthesized Report
+                </h2>
                 <div className="flex items-center gap-2">
                     <Button onClick={handleDownload} variant="outline" aria-label="Download report">
                         <DownloadCloud />
@@ -74,11 +75,9 @@ export default function SynthesizedReportsDashboard({ data }: any) {
             </div>
 
             <ScrollArea className="h-[74vh]  flex gap-2 w-full bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10  text-card-foreground rounded-lg p-6 ring-border dark:ring-offset-background ring-offset-background ring-1 ring-offset-2">
-                <div className="prose prose-neutral max-w-none markdown-body space-y-5 dark:prose-invert">
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                    >
-                        {cleanAndFlattenBulletsGoogle(content)}
+                <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {cleanAndFlattenBullets(synthesizerReport)}
                     </ReactMarkdown>
                 </div>
             </ScrollArea>

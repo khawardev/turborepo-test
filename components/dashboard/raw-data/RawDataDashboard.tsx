@@ -7,7 +7,7 @@ import { facebookData } from "@/data/ayaz_socials/facebook";
 import { linkedinData } from "@/data/ayaz_socials/linkedin";
 import { youtubeData } from "@/data/ayaz_socials/youtube";
 
-export default function RawDataDashboard({ rawData }: any) {
+export default function RawDataDashboard({ scrapedData }: any) {
     
     const rawsocialMediaData = {
         socialMedia: {
@@ -24,7 +24,7 @@ export default function RawDataDashboard({ rawData }: any) {
             </TabsList>
 
             <TabsContent value="website">
-                <WebsiteDataView rawData={rawData} />
+                <WebsiteDataView scrapedData={scrapedData} />
             </TabsContent>
 
             <TabsContent value="social_media">

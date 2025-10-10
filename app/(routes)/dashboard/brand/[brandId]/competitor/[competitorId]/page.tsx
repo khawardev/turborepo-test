@@ -3,24 +3,30 @@ import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
 import { checkAuth } from '@/lib/checkAuth'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
-import { getBatchWebsiteScrapeResults } from '@/server/actions/scrapeActions'
+import { getscrapeBatchWebsite } from '@/server/actions/scrapeActions'
+import { getBatchWebsiteReports } from '@/server/actions/reportsActions'
+import { parseJsonFromMarkdown } from '@/lib/jsonParser'
 
-export default async function CompetitorPage({ params }: { params: { brandId: string; competitorId: string }}) {
-    const { brandId, competitorId } = params
-    
+export default async function CompetitorPage({ params }: { params: Promise<{ brandId: string; competitorId: string }> }) {
+
+    const { brandId, competitorId } = await params
+
     await checkAuth()
-    const brand = await getBrandbyIdWithCompetitors(brandId);
-    const rawData = await getBatchWebsiteScrapeResults(brandId);
-    const competitorDetails = brand.competitors.find((c:any) => c.competitor_id === competitorId)
-    const competitorRawData = rawData.competitors.find((c:any) => c.competitor_id === competitorId)
-    
-    console.log(competitorRawData, `<-> rawData <->`);
-
+    const brandData = await getBrandbyIdWithCompetitors(brandId);
+    const batchWebsiteScraps = await getscrapeBatchWebsite(brandId);
+    const competitorScrapeData = await batchWebsiteScraps.competitors.find((c: any) => c.competitor_id === competitorId)
+    const batchWebsiteReports = await getBatchWebsiteReports(brandId);
+    const batchCompetitorsWebsiteReports = await batchWebsiteReports.data[0].competitor_reports.find((c: any) => c.competitor_id === competitorId)
 
     return (
-        <DashboardLayout Brand={brand}>
+        <DashboardLayout brandData={brandData}>
             <DashboardInnerLayout>
-                <BrandDashboard title={competitorRawData.name} competitor={competitorDetails} competitorId={competitorId} brand={brand} rawData={competitorRawData} />
+                <BrandDashboard
+                    extractorReport={parseJsonFromMarkdown(batchCompetitorsWebsiteReports?.extraction_report.response)}
+                    synthesizerReport={batchCompetitorsWebsiteReports?.synthesizer_report.response}
+                    title={competitorScrapeData?.name}
+                    scrapedData={competitorScrapeData}
+                />
             </DashboardInnerLayout>
         </DashboardLayout>
     )

@@ -12,7 +12,7 @@ export default function BusinessStructures({ data }: any) {
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h4 className="font-semibold text-sm mb-2">Discovered Product Groups</h4>
-                    <ScrollArea className="h-60">
+                    <ScrollArea className="h-full">
                         <Table>
                             <TableBody>
                                 {data.discovered_product_groups.map((item: any) => (
@@ -27,7 +27,7 @@ export default function BusinessStructures({ data }: any) {
                 </div>
                 <div>
                     <h4 className="font-semibold text-sm mb-2">Discovered Strategic Themes</h4>
-                    <ScrollArea className="h-60">
+                    <ScrollArea className="h-full">
                         <Table>
                             <TableBody>
                                 {data.discovered_strategic_themes.map((item: any) => (

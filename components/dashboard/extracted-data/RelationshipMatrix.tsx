@@ -25,7 +25,7 @@ export default function RelationshipMatrix({ data, themes }: any) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="border rounded-lg overflow-hidden">
+                <div className="overflow-hidden">
                     <Table>
                         <TableHeader>
                             <TableRow>

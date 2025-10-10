@@ -9,7 +9,7 @@ export default function BrandsPage() {
     <ContainerMd>
       <div className="flex justify-between items-center ">
         <div>
-          <h3 className="text-lg font-medium">Brands</h3>
+          <h3 className="text-lg font-medium ">Brands</h3>
           <p className="text-sm text-muted-foreground">
             View and manage your brands and competitors.
           </p>

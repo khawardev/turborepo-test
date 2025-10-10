@@ -2,22 +2,28 @@ import BrandDashboard from '@/components/dashboard/BrandDashboard'
 import { DashboardInnerLayout } from '@/components/shared/DashboardLayout'
 import { checkAuth } from '@/lib/checkAuth'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
-import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
-import { getBatchWebsiteScrapeResults } from '@/server/actions/scrapeActions'
+import { getBrandbyIdWithCompetitors, getClientDetails } from '@/server/actions/brandActions'
+import { getscrapeBatchWebsite } from '@/server/actions/scrapeActions'
+import { getBatchWebsiteReports } from '@/server/actions/reportsActions'
+import { parseJsonFromMarkdown } from '@/lib/jsonParser'
 
 export default async function BrandPage({ params }: any) {
 
   await checkAuth()
   const { brandId } = await params
-  const brand = await getBrandbyIdWithCompetitors(brandId);
-  const rawData = await getBatchWebsiteScrapeResults(brandId);
-  const brandTitle = brand.name
-  console.log(rawData, `<-> rawData <->`);
-  
+  const brandData = await getBrandbyIdWithCompetitors(brandId);
+  const batchWebsiteScraps = await getscrapeBatchWebsite(brandId);
+  const batchWebsiteReports = await getBatchWebsiteReports(brandId);
+
   return (
-    <DashboardLayout Brand={brand}>
+    <DashboardLayout brandData={brandData}>
       <DashboardInnerLayout>
-        <BrandDashboard title={brandTitle} brand={brand} rawData={rawData.brand} />
+        <BrandDashboard
+          extractorReport={parseJsonFromMarkdown(batchWebsiteReports.data[0].brand_extraction.response)}
+          synthesizerReport={batchWebsiteReports.data[0].brand_synthesizer.response}
+          title={brandData.name}
+          scrapedData={batchWebsiteScraps.brand}
+        />
       </DashboardInnerLayout>
     </DashboardLayout>
   )

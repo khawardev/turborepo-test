@@ -3,12 +3,11 @@
 import { cookies } from "next/headers";
 const API_URL = process.env.API_URL;
 
-
-
 export async function brandRequest(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
-    body?: any
+    body?: any,
+    cacheOption: RequestCache = "no-store"
 ) {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
@@ -21,14 +20,23 @@ export async function brandRequest(
             Authorization: `Bearer ${token}`,
         },
         body: prepareRequestBody(body),
-        cache: 'force-cache',
+        cache: cacheOption,
     });
 
     const text = await res.text();
     const data = text ? JSON.parse(text) : null;
 
     if (!res.ok) {
-        const message = data?.detail || data?.message || "Request failed";
+        let message = "Request failed";
+        if (data) {
+            const errorContent = data.detail || data.message || data;
+
+            if (typeof errorContent === 'object' && errorContent !== null) {
+                message = JSON.stringify(errorContent, null, 2);
+            } else {
+                message = String(errorContent);
+            }
+        }
         throw new Error(message);
     }
 

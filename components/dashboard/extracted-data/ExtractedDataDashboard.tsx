@@ -8,39 +8,36 @@ import BusinessStructures from "./BusinessStructures";
 import RelationshipMatrix from "./RelationshipMatrix";
 import AudienceAndSignals from "./AudienceAndSignals";
 
-export default function ExtractedDataDashboard({ data }: any) {
+export default function ExtractedDataDashboard({ extractorReport, title }: any) {
 
-    const extractedData = useMemo(() => {
-        if (!data || !data[0] || !data[0].data) {
-            return null;
-        }
-        return data[0].data;
-    }, [data]);
 
-    if (!extractedData) {
+    if (!extractorReport) {
         return (
-            <div className="mt-4 p-6 border rounded-lg text-center text-muted-foreground">
+            <div className="mt-4 p-6  text-center text-muted-foreground">
                 No valid extracted data to display.
             </div>
         );
     }
 
     return (
-        <div className="mt-4 space-y-6">
+        <div className="space-y-6">
+            <h2 className="text-xl tracking-tighter font-semibold">
+                {title.charAt(0).toUpperCase() + title.slice(1)} Extractor Report
+            </h2>
             <AuditAndCorpusSummary
-                audit={extractedData.audit_metadata}
-                corpus={extractedData.corpus_baseline}
+                audit={extractorReport.audit_metadata}
+                corpus={extractorReport.corpus_baseline}
             />
-                <VerbalIdentity data={extractedData.verbal_identity_data_points} />
-                <NarrativeData data={extractedData.narrative_data_points} />
+            <VerbalIdentity data={extractorReport.verbal_identity_data_points} />
+            <NarrativeData data={extractorReport.narrative_data_points} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <BusinessStructures data={extractedData.emergent_business_structures} />
+                <BusinessStructures data={extractorReport.emergent_business_structures} />
                 <AudienceAndSignals
-                    audience={extractedData.audience_data}
-                    signals={extractedData.nuanced_signals}
+                    audience={extractorReport.audience_data}
+                    signals={extractorReport.nuanced_signals}
                 />
             </div>
-            <RelationshipMatrix data={extractedData.relationship_matrix} themes={extractedData.emergent_business_structures.discovered_strategic_themes} />
+            <RelationshipMatrix data={extractorReport.relationship_matrix} themes={extractorReport.emergent_business_structures.discovered_strategic_themes} />
         </div>
     );
 }

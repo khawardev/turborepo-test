@@ -72,7 +72,8 @@ export async function getBrands(): Promise<Brand[]> {
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
-      "GET"
+      "GET",
+      undefined, 'force-cache'
     );
     return brands;
   } catch (error) {
@@ -110,8 +111,8 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
 
   try {
     const [brandResponse, competitorResponse] = await Promise.all([
-      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"),
-      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET")
+      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache'),
+      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache')
     ]);
 
     const brand = brandResponse?.[0] || null;
