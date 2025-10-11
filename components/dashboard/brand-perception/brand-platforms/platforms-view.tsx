@@ -1,58 +1,43 @@
-import { FilterType } from "../brand";
-import {
-    attributes1to8,
-    attributes9to12,
-    attributes13to14,
-    attributes15to18
-} from "../utils";
+import { FILTER_CONFIG } from "@/config/brandPerception-config";
 import DeliverableSection from "./deliverable-section";
+import { useMemo } from "react";
+import SubNav from "../navigation/sub-nav";
 
 interface PlatformsViewProps {
-    filter: FilterType;
+    brandPerceptionReport: any;
+    filter: any;
     searchQuery: string;
     allExpanded: boolean;
 }
 
-export default function PlatformsView({ filter, searchQuery, allExpanded }: PlatformsViewProps) {
-    const sections = [
-        {
-            id: "narrative",
-            title: "Section I: Brand Narrative & Platform (Deliverables 1-8)",
-            attributes: attributes1to8,
-            show: filter === "all" || filter === "narrative"
-        },
-        {
-            id: "verbal",
-            title: "Section II: Verbal Identity (Deliverables 9-12)",
-            attributes: attributes9to12,
-            show: filter === "all" || filter === "verbal"
-        },
-        {
-            id: "archetype",
-            title: "Section III: Holistic Narrative & Archetype (Deliverables 13-14)",
-            attributes: attributes13to14,
-            show: filter === "all" || filter === "archetype"
-        },
-        {
-            id: "strategic",
-            title: "Section IV: Strategic Foundation (Deliverables 15-18)",
-            attributes: attributes15to18,
-            show: filter === "all" || filter === "strategic"
+export default function PlatformsView({ brandPerceptionReport, filter, searchQuery, allExpanded, currentFilter, setCurrentFilter }: any) {
+    const visibleSections = useMemo(() => {
+        if (filter === 'all') {
+            return Object.entries(FILTER_CONFIG).map(([key, value]:any) => ({
+                id: key,
+                title: value.label,
+                attributes: value.attributes
+            }));
         }
-    ];
+        const config = FILTER_CONFIG[filter as Exclude<any, 'all'>];
+        return config ? [{ id: filter, title: config.label, attributes: config.attributes }] : [];
+    }, [filter]);
 
     return (
-        <div className="py-8 space-y-8">
-            {sections.map((section) => (
-                section.show && (
-                    <DeliverableSection
-                        key={section.id}
-                        title={section.title}
-                        attributes={section.attributes}
-                        searchQuery={searchQuery}
-                        allExpanded={allExpanded}
-                    />
-                )
+        <div className="space-y-8">
+            <SubNav
+                currentFilter={currentFilter}
+                setCurrentFilter={setCurrentFilter}
+            />
+            {visibleSections.map((section) => (
+                <DeliverableSection
+                    key={section.id}
+                    title={section.title}
+                    attributes={section.attributes}
+                    searchQuery={searchQuery}
+                    allExpanded={allExpanded}
+                    brandPerceptionReport={brandPerceptionReport}
+                />
             ))}
         </div>
     );

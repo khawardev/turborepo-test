@@ -1,19 +1,14 @@
-import { AttributeKey } from "../brand";
 import BrandTable from "./brand-table";
 
-interface DeliverableSectionProps {
-    title: string;
-    attributes: AttributeKey[];
-    searchQuery: string;
-    allExpanded: boolean;
-}
+
 
 export default function DeliverableSection({
     title,
     attributes,
     searchQuery,
     allExpanded,
-}: DeliverableSectionProps) {
+    brandPerceptionReport
+}: any) {
     return (
         <div className="space-y-4">
             <h3 className=" text-lg font-semibold tracking-tight">
@@ -23,6 +18,7 @@ export default function DeliverableSection({
                 attributes={attributes}
                 searchQuery={searchQuery}
                 allExpanded={allExpanded}
+                brandPerceptionReport={brandPerceptionReport}
             />
         </div>
     );

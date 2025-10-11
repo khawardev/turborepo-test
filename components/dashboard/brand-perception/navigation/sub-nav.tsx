@@ -1,28 +1,28 @@
 "use client"
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FilterType } from "../brand"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FILTER_CONFIG } from "@/config/brandPerception-config";
 
 interface SubNavProps {
-    currentFilter: FilterType
-    setCurrentFilter: (filter: FilterType) => void
+    currentFilter: any
+    setCurrentFilter: (filter: any) => void
 }
 
 export default function SubNav({ currentFilter, setCurrentFilter }: SubNavProps) {
-    const filters: { value: FilterType; label: string }[] = [
+    const filters = [
         { value: "all", label: "All Deliverables" },
-        { value: "narrative", label: "Narrative" },
-        { value: "verbal", label: "Verbal Identity" },
-        { value: "archetype", label: "Archetype" },
-        { value: "strategic", label: "Strategic Foundation" },
-    ]
+        ...Object.entries(FILTER_CONFIG).map(([key, value]: any) => ({
+            value: key as any,
+            label: value.label
+        }))
+    ];
 
     return (
         <Tabs
             value={currentFilter}
-            onValueChange={(value) => setCurrentFilter(value as FilterType)}
+            onValueChange={(value) => setCurrentFilter(value as any)}
         >
-            <TabsList >
+            <TabsList>
                 {filters.map((filter) => (
                     <TabsTrigger
                         key={filter.value}

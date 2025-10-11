@@ -2,22 +2,27 @@
 
 import { useState } from "react";
 import { exportToCSV } from "./utils";
-import { FilterType, ViewType } from "./brand";
 import MainNav from "./navigation/main-nav";
 import SubNav from "./navigation/sub-nav";
 import PlatformsView from "./brand-platforms/platforms-view";
 import ImplicationsView from "./strategic-implications/implications-view";
-import DashboardHeader from "../shared/DashboardHeader";
-import { brandData } from "@/data/brands/brand_perception";
 
-export default function BrandPerceptionDashboard() {
-    const [currentView, setCurrentView] = useState<ViewType>("platforms");
-    const [currentFilter, setCurrentFilter] = useState<FilterType>("all");
+
+
+export default function BrandPerceptionDashboard({ brandPerceptionReport }: any) {
+    const [currentView, setCurrentView] = useState<any>("platforms");
+    const [currentFilter, setCurrentFilter] = useState<any>("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [allExpanded, setAllExpanded] = useState(false);
 
+    if (!brandPerceptionReport || Object.keys(brandPerceptionReport).length === 0) {
+        return <div>Loading report data or no data available.</div>;
+    }
+
+    const primaryBrandName = Object.keys(brandPerceptionReport)[0] || 'Brand';
+
     const handleExport = () => {
-        exportToCSV(brandData);
+        exportToCSV(brandPerceptionReport, `${primaryBrandName.toLowerCase()}-perception-report.csv`);
     };
 
     const toggleAllSections = () => {
@@ -34,20 +39,22 @@ export default function BrandPerceptionDashboard() {
                 allExpanded={allExpanded}
                 toggleAllSections={toggleAllSections}
                 handleExport={handleExport}
+                primaryBrandName={primaryBrandName}
             />
-            <SubNav
-                currentFilter={currentFilter}
-                setCurrentFilter={setCurrentFilter}
-            />
-            <main >
+            
+            <main>
                 {currentView === "platforms" ? (
                     <PlatformsView
+                        currentFilter={currentFilter}
+                        setCurrentFilter={setCurrentFilter}
+                        brandPerceptionReport={brandPerceptionReport}
                         filter={currentFilter}
                         searchQuery={searchQuery}
                         allExpanded={allExpanded}
                     />
                 ) : (
                     <ImplicationsView
+                        brandPerceptionReport={brandPerceptionReport}
                         filter={currentFilter}
                         searchQuery={searchQuery}
                         allExpanded={allExpanded}

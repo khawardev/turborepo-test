@@ -1,18 +1,13 @@
-import { ViewType } from "../brand";
-import ViewToggle from "./view-toggle";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, FileDown, Maximize2, Minimize2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Download, Expand, Shrink, Search } from "lucide-react";
+import DashboardHeader from "../../shared/DashboardHeader";
 
-interface MainNavProps {
-    currentView: ViewType;
-    setCurrentView: (view: ViewType) => void;
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-    allExpanded: boolean;
-    toggleAllSections: () => void;
-    handleExport: () => void;
-}
+
+
 export default function MainNav({
     currentView,
     setCurrentView,
@@ -21,55 +16,40 @@ export default function MainNav({
     allExpanded,
     toggleAllSections,
     handleExport,
-}: MainNavProps) {
+    primaryBrandName,
+}: any) {
     return (
-        <nav>
-            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 sm:gap-6">
-                <ViewToggle
-                    currentView={currentView}
-                    setCurrentView={setCurrentView}
-                />
-
-                <div className="flex-1 w-full sm:max-w-md">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <header>
+            <DashboardHeader
+                title={`${primaryBrandName} - Brand Perception Report`}
+                description="Analysis of brand narrative, identity, and strategic foundation against key competitors."
+            />
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)}>
+                    <TabsList>
+                        <TabsTrigger value="platforms">Platforms View</TabsTrigger>
+                        <TabsTrigger value="implications">Implications View</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+                <div className="flex w-full sm:w-auto items-center gap-2">
+                    <div className="relative w-full sm:w-auto">
+                        <Search className="absolute left-2.5 top-[9px] h-4 w-3 text-muted-foreground" />
                         <Input
-                            type="text"
-                            placeholder="Search across all brand data..."
+                            type="search"
+                            placeholder="Search content..."
+                            className="pl-7 h-8  sm:w-[200px] md:w-[300px]"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 h-7.5 w-full"
                         />
                     </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <Button
-                        size="sm"
-                        className="h-7 w-full sm:w-auto"
-                        onClick={toggleAllSections}
-                        variant="outline"
-                    >
-                        {allExpanded ? (
-                            <>
-                                Collapse All
-                            </>
-                        ) : (
-                            <>
-                                Expand All
-                            </>
-                        )}
+                    <Button variant="outline" size="icon" onClick={toggleAllSections} title={allExpanded ? "Collapse All" : "Expand All"}>
+                        {allExpanded ? <Shrink /> : <Expand />}
                     </Button>
-
-                    <Button
-                        size="sm"
-                        className="h-7 w-full sm:w-auto"
-                        onClick={handleExport}
-                    >
-                        Export Data
+                    <Button variant="outline" size="icon" onClick={handleExport} title="Export to CSV">
+                        <Download />
                     </Button>
                 </div>
             </div>
-        </nav>
+        </header>
     );
 }

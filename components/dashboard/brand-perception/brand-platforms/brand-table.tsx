@@ -1,35 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { AttributeKey, BrandName } from "../brand";
+import { useState, useEffect, useMemo } from "react";
 import { getAttributeLabel, cn } from "../utils";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { brandData } from "@/data/brands/brand_perception";
 import { Card } from "@/components/ui/card";
 
-interface BrandTableProps {
-    attributes: AttributeKey[];
-    searchQuery: string;
-    allExpanded: boolean;
-}
 
-const brands: BrandName[] = ['MAGNA', 'APTIV', 'BOSCH MOBILITY', 'CONTINENTAL', 'DENSO', 'FORVIA', 'GENTEX', 'LEAR', 'VALEO', 'ZF'];
-
-export default function BrandTable({ attributes, searchQuery, allExpanded }: BrandTableProps) {
+export default function BrandTable({ brandPerceptionReport, attributes, searchQuery, allExpanded }: any) {
     const [expandedCells, setExpandedCells] = useState<Set<string>>(new Set());
+
+    const brands = useMemo(() => Object.keys(brandPerceptionReport), [brandPerceptionReport]);
+    const primaryBrand = brands[0];
 
     useEffect(() => {
         if (allExpanded) {
             const allCells = new Set<string>();
-            attributes.forEach(attr => {
+            attributes.forEach((attr:any) => {
                 brands.forEach(brand => {
                     allCells.add(`${attr}-${brand}`);
                 });
@@ -38,36 +25,30 @@ export default function BrandTable({ attributes, searchQuery, allExpanded }: Bra
         } else {
             setExpandedCells(new Set());
         }
-    }, [allExpanded, attributes]);
+    }, [allExpanded, attributes, brands]);
 
     const toggleCell = (cellId: string) => {
-        const newExpanded = new Set(expandedCells);
-        if (newExpanded.has(cellId)) {
-            newExpanded.delete(cellId);
-        } else {
-            newExpanded.add(cellId);
-        }
-        setExpandedCells(newExpanded);
+        setExpandedCells(prevExpanded => {
+            const newExpanded = new Set(prevExpanded);
+            if (newExpanded.has(cellId)) {
+                newExpanded.delete(cellId);
+            } else {
+                newExpanded.add(cellId);
+            }
+            return newExpanded;
+        });
     };
 
     const highlightText = (text: string) => {
         if (!searchQuery) return text;
-
         const regex = new RegExp(`(${searchQuery})`, 'gi');
         const parts = text.split(regex);
-
         return parts.map((part, index) =>
-            regex.test(part) ? (
-                <span key={index} className="bg-primary/30 font-semibold">
-                    {part}
-                </span>
-            ) : (
-                part
-            )
+            regex.test(part) ? <span key={index} className="bg-primary/30 font-semibold">{part}</span> : part
         );
     };
 
-    const renderCellContent = (data: any, attr: AttributeKey, brand: BrandName) => {
+    const renderCellContent = (data: any, attr: any, brand: string) => {
         const cellId = `${attr}-${brand}`;
         const isExpanded = expandedCells.has(cellId);
         const content = data?.text;
@@ -77,17 +58,14 @@ export default function BrandTable({ attributes, searchQuery, allExpanded }: Bra
         if (Array.isArray(content)) {
             return (
                 <div>
-                    <button
-                        onClick={() => toggleCell(cellId)}
-                        className="flex items-center gap-1 mb-2"
-                    >
-                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                    <button onClick={() => toggleCell(cellId)} className="flex items-center gap-1 mb-2 text-left">
+                        {isExpanded ? <ChevronDown className="h-4 w-4 flex-shrink-0" /> : <ChevronRight className="h-4 w-4 flex-shrink-0" />}
                         <span className="text-sm font-medium">View {content.length} items</span>
                     </button>
                     {isExpanded && (
                         <ul className="space-y-2 mt-2">
                             {content.map((item, index) => (
-                                <li key={index} className="pl-4 relative before:content-['•'] before:absolute before:left-0 ">
+                                <li key={index} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
                                     <span className="text-sm">{highlightText(item)}</span>
                                 </li>
                             ))}
@@ -98,54 +76,34 @@ export default function BrandTable({ attributes, searchQuery, allExpanded }: Bra
         }
 
         return (
-            <div
-                className={cn(
-                    "cursor-pointer transition-all",
-                    isExpanded ? "" : "line-clamp-3"
-                )}
-                onClick={() => toggleCell(cellId)}
-            >
+            <div className={cn("cursor-pointer transition-all", isExpanded ? "" : "line-clamp-3")} onClick={() => toggleCell(cellId)}>
                 <span className="text-sm">{highlightText(content)}</span>
             </div>
         );
     };
 
     return (
-        <Card className="p-0" >
+        <Card className="p-0 overflow-x-auto">
             <Table>
                 <TableHeader>
-                    <TableRow className=" ">
-                        <TableHead >
-                            Attribute
-                        </TableHead>
+                    <TableRow>
+                        <TableHead className="sticky left-0 bg-background z-10">Attribute</TableHead>
                         {brands.map((brand) => (
-                            <TableHead
-                                key={brand}
-                                className={cn(
-                                    "font-semibold min-w-[200px]",
-                                    brand === 'MAGNA' && "text-primary bg-primary/5"
-                                )}
-                            >
+                            <TableHead key={brand} className={cn("font-semibold min-w-[200px]", brand === primaryBrand && "text-primary bg-primary/5")}>
                                 {brand}
                             </TableHead>
                         ))}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {attributes.map((attr) => (
-                        <TableRow key={attr} className="">
-                            <TableCell className="sticky left-0 backdrop-blur-3xl font-medium ">
+                    {attributes.map((attr: any) => (
+                        <TableRow key={attr}>
+                            <TableCell className="sticky left-0 bg-background z-10 font-medium">
                                 {getAttributeLabel(attr)}
                             </TableCell>
                             {brands.map((brand) => (
-                                <TableCell
-                                    key={`${attr}-${brand}`}
-                                    className={cn(
-                                        "align-top",
-                                        brand === 'MAGNA' && " bg-primary/5"
-                                    )}
-                                >
-                                    {renderCellContent(brandData[brand][attr], attr, brand)}
+                                <TableCell key={`${attr}-${brand}`} className={cn("align-top", brand === primaryBrand && "bg-primary/5")}>
+                                    {renderCellContent(brandPerceptionReport[brand]?.[attr], attr, brand)}
                                 </TableCell>
                             ))}
                         </TableRow>

@@ -171,27 +171,68 @@ export const getRecommendation = (attr: AttributeKey): string => {
     return recommendations[attr] || "Strategic refinement recommended to strengthen competitive position.";
 };
 
-export const exportToCSV = (data: any): void => {
-    const brands = Object.keys(data);
-    const allAttributes = [...attributes1to8, ...attributes9to12, ...attributes13to14, ...attributes15to18];
+export const exportToCSV = (data: any, fileName: any): void => {
+    {
+        if (!data || Object.keys(data).length === 0) {
+            console.error("Export failed: No data provided.");
+            return;
+        }
 
-    let csv = 'Brand,Deliverable,Content,Strategic Implication\n';
+        const headers = ["Brand", "Attribute", "Type", "Content"];
+        const rows = [headers];
 
-    brands.forEach(brand => {
-        allAttributes.forEach(attr => {
-            const content = Array.isArray(data[brand][attr]?.text)
-                ? data[brand][attr].text.join('; ')
-                : (data[brand][attr]?.text || 'N/A');
-            const implication = data[brand][attr]?.implication || 'N/A';
-            csv += `"${brand}","${getAttributeLabel(attr)}","${content}","${implication}"\n`;
-        });
-    });
+        const escapeCSV = (value: string | undefined | null): string => {
+            if (value === null || value === undefined) return '""';
+            const stringValue = String(value);
+            return `"${stringValue.replace(/"/g, '""')}"`;
+        };
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'magna_complete_brand_analysis_deliverables_1-18.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-};
+        for (const brandName in data) {
+            if (Object.prototype.hasOwnProperty.call(data, brandName)) {
+                const brandAttributes = data[brandName];
+                for (const attributeKey in brandAttributes) {
+                    if (Object.prototype.hasOwnProperty.call(brandAttributes, attributeKey)) {
+                        const attributeData = brandAttributes[attributeKey];
+
+                        const textContent = Array.isArray(attributeData.text)
+                            ? attributeData.text.join("\n")
+                            : attributeData.text;
+
+                        if (textContent) {
+                            rows.push([
+                                brandName,
+                                attributeKey,
+                                "Text",
+                                textContent
+                            ]);
+                        }
+
+                        if (attributeData.implication) {
+                            rows.push([
+                                brandName,
+                                attributeKey,
+                                "Implication",
+                                attributeData.implication
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        const csvContent = rows.map(row =>
+            row.map(escapeCSV).join(',')
+        ).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+}

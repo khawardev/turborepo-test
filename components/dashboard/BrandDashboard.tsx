@@ -8,12 +8,11 @@ import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReport
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
 
-export default function BrandDashboard({ scrapedData, title, extractorReport, synthesizerReport }: any) {
+export default function BrandDashboard({ scrapedData, title, extractorReport, synthesizerReport, brandPerceptionReport }: any) {
 
     return (
         <div>
             <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards." />
-
             <Tabs defaultValue="raw_data">
                 <TabsList>
                     <TabsTrigger value="raw_data">Raw Data</TabsTrigger>
@@ -98,7 +97,7 @@ export default function BrandDashboard({ scrapedData, title, extractorReport, sy
                         </TabsContent> */}
 
                         <TabsContent value="brand_perception">
-                            <BrandPerceptionDashboard />
+                            <BrandPerceptionDashboard brandPerceptionReport={brandPerceptionReport} />
                         </TabsContent>
                     </Tabs>
                 </TabsContent>

@@ -27,7 +27,7 @@ export default function WebsiteDataView({ scrapedData }: any) {
 
     if (pages.length === 0) {
         return (
-            <Card className="mt-6 border-dashed border-2 text-center p-8 text-muted-foreground h-[70vh] flex items-center justify-center">
+            <Card className=" text-center p-8 text-muted-foreground h-[70vh] flex items-center justify-center">
                 No website data available.
             </Card>
         );
@@ -45,10 +45,8 @@ export default function WebsiteDataView({ scrapedData }: any) {
 
     if (!selectedPage) {
         return (
-            <div className="flex h-[70vh] items-center justify-center">
-                <Card className="border-dashed border-2 text-center p-8 text-muted-foreground">
+            <div className="flex h-[70vh] items-center justify-center text-muted-foreground">
                     Loading page content...
-                </Card>
             </div>
         );
     }

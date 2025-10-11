@@ -1,8 +1,8 @@
 export async function pollUntilComplete<T>(
     fn: () => Promise<T>,
     checkCondition: (res: T) => boolean,
-    delayMs = 10000,
-    maxRetries = 60
+    delayMs = 60000, 
+    maxRetries = 10
 ) {
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 
