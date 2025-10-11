@@ -7,9 +7,9 @@ import { getscrapeBatchWebsite } from '@/server/actions/scrapeActions'
 import { getBatchWebsiteReports, getBrandPerceptionReport } from '@/server/actions/reportsActions'
 import { parseJsonFromMarkdown } from '@/lib/jsonParser'
 import { prioritizeBrandReport } from '@/lib/prioritizeBrandReport'
-export default async function BrandPage({ params }: any) {
+export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   await checkAuth();
-  const { brandId } = params;
+  const { brandId } = await params;
 
   const brandData = await getBrandbyIdWithCompetitors(brandId);
   const batchWebsiteScraps = await getscrapeBatchWebsite(brandId);

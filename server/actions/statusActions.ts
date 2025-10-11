@@ -30,7 +30,6 @@ export async function getBatchWebsiteScrapeStatus(brand_id: string, scrape_batch
 }
 
 
-// In getBatchWebsiteReportsStatus
 
 export async function getBatchWebsiteReportsStatus(brand_id: string, report_batch_id: string) {
     const cookieStore = await cookies();
@@ -41,9 +40,7 @@ export async function getBatchWebsiteReportsStatus(brand_id: string, report_batc
     if (!user) return { success: false, error: "User not found" };
 
     try {
-        const cacheBuster = new Date().getTime();
-        const endpoint = `/batch/website-reports-status/${report_batch_id}?client_id=${user.client_id}&brand_id=${brand_id}&_=${cacheBuster}`;
-
+        const endpoint = `/batch/website-reports-status/${report_batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`;
         const response = await brandRequest(endpoint, "GET");
 
         console.log(response, `<-> response <->`);
