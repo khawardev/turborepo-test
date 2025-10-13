@@ -40,7 +40,6 @@ export async function createAudit(url: string) {
         return { error: "Failed to create audit record." };
     }
     const crawlResult = await spiderCrawlWebsite(url);
-    console.log(crawlResult, `<-> crawlResult <->`);
 
     if (crawlResult.error) {
         console.error("Analysis failed:", crawlResult.error);
@@ -52,7 +51,11 @@ export async function createAudit(url: string) {
         crawledContent: crawlResult.content,
     });
     const generatedResult = await generateNewContent(prompt)
-
+    if (generatedResult.errorReason) {
+        return {
+            error: generatedResult.errorReason
+        }
+    }
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)

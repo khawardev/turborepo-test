@@ -15,7 +15,7 @@ export async function spiderCrawlWebsite(url: any) {
 
         const crawlParams = {
             limit: 10,
-            metadata: true
+            metadata: false
         };
 
         const crawlData = await app.crawlUrl(url, crawlParams);

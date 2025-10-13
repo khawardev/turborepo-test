@@ -36,7 +36,7 @@ export async function generateNewContent(prompt: any): Promise<any> {
         });
         return {
             generatedText: null,
-            errorReason: `The AI service failed to process the request. ${error instanceof Error ? error.message : 'An unknown error occurred.'}`,
+            errorReason: `${error instanceof Error ? error.message : 'An unknown error occurred.'}`,
         };
     }
 }
