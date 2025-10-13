@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import LightRaysWrapper from "@/components/ui/react-bits/LightRaysWrapper";
 import HeaderServer from "@/components/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
+import { siteConfig } from "@/config/brandos-config";
 const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
@@ -15,8 +16,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Brand OS",
-  description: "Brand OS is a brand management platform.",
+  title: siteConfig.name,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({
