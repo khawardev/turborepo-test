@@ -1,7 +1,7 @@
 import { Spider } from '@spider-cloud/spider-client';
 import { logger } from "@/lib/utils";
 
-export async function crawlWebsite(url: any) {
+export async function spiderCrawlWebsite(url: any) {
     const functionName = "crawlWebsite";
     logger.info("Spider crawl initiated.", { url });
 

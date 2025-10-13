@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import UserMenu from "./UserMenu";
 import AuthButtons from "./AuthButtons";
+import { FullLogo } from "../ui/logo";
+import { ThemeSwitcher } from "../ui/theme-switcher";
 
 type Props = {
     user: any;
@@ -35,7 +37,7 @@ const ConfigTrayClient = ({ user, appConfig }: Props) => {
             }
             scrollTimeout.current = setTimeout(() => {
                 setIsVisible(true);
-            }, 200); 
+            }, 200);
             setLastScrollY(currentScrollY);
         };
 
@@ -60,21 +62,7 @@ const ConfigTrayClient = ({ user, appConfig }: Props) => {
                 ${isVisible ? "translate-y-0" : "-translate-y-[150%]"}
             `}
         >
-            <div>
-                <Link href="/" className="block relative">
-                    <img
-                        src="https://i.postimg.cc/c1jwNRnH/HB-logo-name-mark-side-green-1.png"
-                        alt="Full Logo"
-                        className="hidden md:block w-[150px] h-auto"
-                    />
-                    <img
-                        src="https://i.postimg.cc/5ythqc3x/HB-Green-Halflogo-name-mark-side-green-1.png"
-                        alt="Half Logo"
-                        className="block md:hidden w-[45px] h-auto"
-                    />
-                </Link>
-            </div>
-
+            <FullLogo />
             <div className="flex items-center gap-1 bg-background/50 backdrop-blur border p-1 rounded-full">
                 <Button
                     className={`rounded-full border border-transparent hover:border-border hover:border ${isActive("/")}`}
@@ -106,6 +94,7 @@ const ConfigTrayClient = ({ user, appConfig }: Props) => {
                 )}
 
                 {!user && <AuthButtons />}
+                <ThemeSwitcher/>
             </div>
         </section>
     );

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 const page = async ({ params }: any) => {
     const resolvedParams = await params;
-    const auditId = resolvedParams?.auditId; 
+    const auditId = resolvedParams?.auditId;
     const auditData = await getAuditById(auditId);
     const userData = await getCurrentUser();
 

@@ -20,6 +20,7 @@ import { GrDocumentPerformance } from "react-icons/gr";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import { PiQuotes } from "react-icons/pi";
+import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
 
 interface AuditResultsProps {
     audit: any;
@@ -225,7 +226,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                         <Separator className="mb-4" />
                     </div>
                     <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{audit.auditGenratedContent}</ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
                     </div>
                 </section>
             }

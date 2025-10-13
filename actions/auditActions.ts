@@ -8,8 +8,9 @@ import { user as userSchema } from "@/db/schema/users";
 import { audit as auditSchema } from "@/db/schema/audits";
 import { generateNewContent } from "./generateContent";
 import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
-import { cleanAndFlattenBulletsGoogle } from "@/lib/cleanMarkdown";
-import { crawlWebsite } from "./spider-crawl";
+
+import { spiderCrawlWebsite } from "./spider-crawl";
+import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
 
 export async function createAudit(url: string) {
     const session = await getSession();
@@ -38,18 +39,8 @@ export async function createAudit(url: string) {
     if (!newAudit?.id) {
         return { error: "Failed to create audit record." };
     }
-
-    await new Promise(resolve => setTimeout(resolve, 4000));
-
-    if (url.includes("fail-test.com")) {
-        await db.update(auditSchema)
-            .set({ status: 'failed', updatedAt: new Date() })
-            .where(eq(auditSchema.id, newAudit.id));
-        revalidatePath(`/audit/${newAudit.id}`);
-        return { auditId: newAudit.id };
-    }
-    const crawlResult = await crawlWebsite(url);
-
+    const crawlResult = await spiderCrawlWebsite(url);
+    console.log(crawlResult, `<-> crawlResult <->`);
 
     if (crawlResult.error) {
         console.error("Analysis failed:", crawlResult.error);
@@ -61,12 +52,11 @@ export async function createAudit(url: string) {
         crawledContent: crawlResult.content,
     });
     const generatedResult = await generateNewContent(prompt)
-    const cleanedMarkdown = cleanAndFlattenBulletsGoogle(generatedResult.generatedText)
 
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
-                .set({ status: 'completed', results: null, crawledContent: crawlResult.content, auditGenratedContent: cleanedMarkdown, updatedAt: new Date() })
+                .set({ status: 'completed', results: null, crawledContent: crawlResult.content, auditGenratedContent: generatedResult, updatedAt: new Date() })
                 .where(eq(auditSchema.id, newAudit.id));
 
             await tx.update(userSchema)
