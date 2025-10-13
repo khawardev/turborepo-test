@@ -124,7 +124,7 @@
   }
 
   .bg-outline {
-    @apply bg-linear-to-t from-background/50 to-background/20 dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground ring-border ring-offset-border ring-1 backdrop-blur-[10px] shadow-2xl;
+    @apply bg-linear-to-t from-background/60 dark:from-border/50 to-background/10 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground ring-border ring-offset-border ring-1 backdrop-blur-[10px] shadow-2xl;
   }
 
   .victor {

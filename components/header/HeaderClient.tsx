@@ -14,13 +14,13 @@ export function HeaderClient({ user }: any) {
   if (pathname.startsWith("/dashboard")) return null
 
   return (
-    <header className="z-30 fixed  top-7 w-full">
-      <div className="flex h-15 items-center mx-auto max-w-6xl justify-between gap-3 px-3  rounded-xl  bg-outline">
+    <header className="z-30 fixed  top-5 w-full">
+      <div className="flex bg-outline px-2 h-14 items-center mx-auto max-w-6xl justify-between gap-3  rounded-xl  ">
         <Link href="/">
           <FullLogo />
         </Link>
         <ul className="flex flex-1 items-center justify-end gap-2">
-          <li className="lg:pr-4 md:not-sr-only sr-only">
+          {/* <li className="lg:pr-4 md:not-sr-only sr-only">
             {user &&
               BrandOSConfig.mainNav.map((item: any, index: number) => (
                 <Button variant="ghost" size="sm" key={index}>
@@ -29,7 +29,7 @@ export function HeaderClient({ user }: any) {
                   </Link>
                 </Button>
               ))}
-          </li>
+          </li> */}
           <div className="md:border-l pl-4 flex items-center gap-2">
             {!user && (
               <Button asChild>
