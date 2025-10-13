@@ -9,7 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-[_0_0_14px_0_rgba(52,52,52,0.3),_inset_0_-1px_0.4px_0_rgba(52,52,52,0.2)] dark:shadow-[_0_0_14px_0_rgba(255,255,255,0.2),_inset_0_-1px_0.4px_0_rgba(255,255,255,0.1),_inset_0_1px_0.4px_0_rgba(255,255,255,0.15)] hover:bg-primary/90",
+        default: `
+  bg-gradient-to-b from-[#36393E] to-[#030712]
+  text-primary-foreground
+  border border-black
+  shadow-[inset_0px_0.5px_0px_0px_rgba(255,255,255,0.40),inset_0px_0px_0px_0.5px_rgba(255,255,255,0.30)]
+  hover:from-[#3a3f45] hover:to-[#1a1f2e]
+  dark:bg-primary dark:from-primary dark:to-primary/90
+  dark:shadow-[_0_0_14px_0_rgba(255,255,255,0.2),_inset_0_-1px_0.4px_0_rgba(255,255,255,0.1),_inset_0_1px_0.4px_0_rgba(255,255,255,0.15)]
+  dark:hover:bg-primary/90
+`,
         background: "bg-background text-primary hover:bg-background/90",
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
@@ -20,6 +29,17 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-muted/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
         link: "text-primary underline-offset-4 hover:underline",
+        mail: `
+  bg-gradient-to-b from-[#36393E] to-[#030712]
+  border border-black
+  shadow-[inset_0px_0.5px_0px_0px_rgba(255,255,255,0.40),inset_0px_0px_0px_0.5px_rgba(255,255,255,0.30)]
+  hover:from-[#3a3f45] hover:to-[#1a1f2e]
+  text-slate-50
+  dark:bg-primary
+  dark:text-primary-foreground
+  dark:shadow-[_0_0_14px_0_rgba(255,255,255,0.2),_inset_0_-1px_0.4px_0_rgba(255,255,255,0.1),_inset_0_1px_0.4px_0_rgba(255,255,255,0.15)]
+  dark:hover:bg-primary/90
+`,
       },
       size: {
         default: "h-8 px-4 rounded-md py-2 has-[>svg]:px-3",

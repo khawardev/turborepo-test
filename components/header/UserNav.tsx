@@ -19,6 +19,8 @@ import { User } from "@/types";
 import { CiUser } from "react-icons/ci";
 import { FaRegUser } from "react-icons/fa6";
 import { TiUserOutline } from "react-icons/ti";
+import { GiEgyptianProfile } from "react-icons/gi";
+import { RiUserSmileLine } from "react-icons/ri";
 
 type UserNavProps = {
   user: User;
@@ -48,7 +50,7 @@ export function UserNav({ user }: UserNavProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-52" align="end" forceMount>
+      <DropdownMenuContent className="w-50" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -58,8 +60,14 @@ export function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href={'/profile'}>
+            <span ><RiUserSmileLine /></span>
+            <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
+          <LogOut />
           <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

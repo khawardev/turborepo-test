@@ -47,7 +47,7 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          " bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border-zinc-300 shadow-zinc-950/10 duration-200 backdrop-blur rounded-lg text-accent-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[--radix-dropdown-menu-content-available-height] min-w-[6.5rem] origin-[--radix-dropdown-menu-content-transform-origin] overflow-x-hidden overflow-y-auto border p-1 shadow-md",
+          " p-1 bg-outline duration-200 rounded-xl  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[--radix-dropdown-menu-content-available-height] min-w-[6.5rem] origin-[--radix-dropdown-menu-content-transform-origin] overflow-x-hidden overflow-y-auto  shadow-md",
           className
         )}
         {...props}
@@ -79,7 +79,16 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-input/30 hover:cursor-pointer  border border-transparent focus:border-muted-foreground/30 focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:border-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex items-center gap-2 select-none rounded-lg px-2 py-1.5 text-sm outline-hidden cursor-default",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8",
+        "border border-transparent focus:border-muted-foreground/20 data-[variant=destructive]:focus:border-destructive/20",
+        "data-[variant=default]:focus:bg-gradient-to-t focus:from-muted focus:to-border focus:dark:from-muted/50",
+        "data-[variant=destructive]:focus:bg-destructive/10  dark:data-[variant=destructive]:focus:bg-destructive/20",
+        "focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:text-destructive",
+        "data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground",
+        "focus:shadow-zinc-950/10 hover:cursor-pointer hover:duration-200",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+
         className
       )}
       {...props}
@@ -176,7 +185,7 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
+      className={cn("bg-border/90 -mx-1 my-1 h-px", className)}
       {...props}
     />
   )

@@ -7,14 +7,15 @@ import { FullLogo } from "../shared/logo"
 import { ThemeSwitcher } from "../ui/theme-switcher"
 import { BrandOSConfig } from "@/config/brandos-config"
 import { usePathname } from "next/navigation"
+import { ContainerLg } from "../shared/containers"
 
 export function HeaderClient({ user }: any) {
   const pathname = usePathname()
   if (pathname.startsWith("/dashboard")) return null
 
   return (
-    <header className="z-30 absolute top-5 w-full">
-      <div className="flex h-14 items-center mx-auto max-w-6xl justify-between gap-3 px-3">
+    <header className="z-30 fixed  top-7 w-full">
+      <div className="flex h-15 items-center mx-auto max-w-6xl justify-between gap-3 px-3  rounded-xl  bg-outline">
         <Link href="/">
           <FullLogo />
         </Link>

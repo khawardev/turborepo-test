@@ -7,9 +7,12 @@ import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
+import EarnedMediaDashboard from "./earned-media/EarnedMediaDashboard";
+import { getBrandData } from "@/data/brands";
+import { magnaData } from "@/data/brands/magna";
+import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
 
 export default function BrandDashboard({ scrapedData, title, extractorReport, synthesizerReport, brandPerceptionReport }: any) {
-
     return (
         <div>
             <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards." />
@@ -88,12 +91,12 @@ export default function BrandDashboard({ scrapedData, title, extractorReport, sy
                             <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 
-                        {/* <TabsContent value="social_media">
-                            <SocialMediaDashboard data={data.socialMedia} />
-                        </TabsContent> */}
+                     <TabsContent value="social_media">
+                            <SocialMediaDashboard data={magnaData.socialMedia} />
+                        </TabsContent> 
 
                         {/* <TabsContent value="earned_media">
-                            <EarnedMediaDashboard data={data.earnedMedia} />
+                            <EarnedMediaDashboard data={magnaData.earnedMedia} />
                         </TabsContent> */}
 
                         <TabsContent value="brand_perception">

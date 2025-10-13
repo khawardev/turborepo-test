@@ -1,4 +1,4 @@
-import { ContainerMd } from "@/components/shared/containers";
+import { ContainerLg, ContainerMd } from "@/components/shared/containers";
 import { getCurrentUser } from "@/server/actions/authActions";
 import ProfileComp from "@/components/profile/ProfileComp";
 import { checkAuth } from "@/lib/checkAuth";
@@ -8,8 +8,8 @@ export default async function MePage() {
   const user = await getCurrentUser();
 
   return (
-      <ContainerMd>
+    <ContainerLg>
           <ProfileComp user={user} />
-      </ContainerMd>
+    </ContainerLg>
   );
 }

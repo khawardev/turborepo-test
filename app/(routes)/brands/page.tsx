@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ContainerMd } from "@/components/shared/containers";
+import { ContainerLg, ContainerMd } from "@/components/shared/containers";
 import { Plus } from "lucide-react";
 import BrandList from "@/components/brands/list_brand/BrandList";
 
@@ -14,7 +14,7 @@ export default function BrandsPage() {
             View and manage your brands and competitors.
           </p>
         </div>
-        <Button asChild>
+        <Button  asChild>
           <Link href="/brands/new">
             <Plus />
             Brand
