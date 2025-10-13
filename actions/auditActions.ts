@@ -59,7 +59,7 @@ export async function createAudit(url: string) {
     try {
         await db.transaction(async (tx) => {
             await tx.update(auditSchema)
-                .set({ status: 'completed', results: null, crawledContent: crawlResult.content, auditGenratedContent: generatedResult, updatedAt: new Date() })
+                .set({ status: 'completed', results: null, crawledContent: crawlResult.content, auditGenratedContent: generatedResult.generatedText, updatedAt: new Date() })
                 .where(eq(auditSchema.id, newAudit.id));
 
             await tx.update(userSchema)

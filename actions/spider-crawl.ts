@@ -14,7 +14,7 @@ export async function spiderCrawlWebsite(url: any) {
         const app = new Spider({ apiKey: process.env.SPIDER_API_KEY! });
 
         const crawlParams = {
-            limit: 10,
+            limit: 5,
             metadata: false
         };
 
