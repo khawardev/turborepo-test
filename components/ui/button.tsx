@@ -23,11 +23,11 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "shadow-xs bg-linear-to-t  to-border/50 from-muted dark:from-muted/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 duration-200 hover:to-border",
+          "shadow-xs bg-linear-to-t  from-border dark:from-border  to-border/40  dark:border-border border border-zinc-300 shadow-zinc-950/10  duration-200 hover:to-border/80",
         secondary:
           "bg-secondary  text-secondary-foreground shadow-xs hover:bg-secondary/65",
         ghost:
-          "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-muted/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
+          "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-border/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
         link: "text-primary underline-offset-4 hover:underline",
         mail: `
   bg-gradient-to-b from-[#36393E] to-[#030712]
