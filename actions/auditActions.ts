@@ -40,20 +40,20 @@ export async function createAudit(url: string) {
     if (crawlResult.error) return { error: crawlResult.error };
 
     let tokenCount = analyzeToken(crawlResult.content);
-    console.log(tokenCount, `<-> crawlResult tokenCount <->`);
+    // console.log(tokenCount, `<-> crawlResult tokenCount <->`);
 
     if (tokenCount > MAX_TOKENS) {
         const avgTokensPerPage = Math.ceil(tokenCount / crawlLimit);
         const safePageCount = Math.floor(MAX_TOKENS / avgTokensPerPage);
         crawlLimit = Math.max(1, safePageCount);
 
-        console.log(`Token overflow detected! Avg per page: ${avgTokensPerPage}, safe pages: ${crawlLimit}`);
+        // console.log(`Token overflow detected! Avg per page: ${avgTokensPerPage}, safe pages: ${crawlLimit}`);
 
         crawlResult = await spiderCrawlWebsite(url, crawlLimit);
         if (crawlResult.error) return { error: crawlResult.error };
 
         tokenCount = analyzeToken(crawlResult.content);
-        console.log(tokenCount, `<-> new crawlResult tokenCount after reducing limit <->`);
+        // console.log(tokenCount, `<-> new crawlResult tokenCount after reducing limit <->`);
     }
 
     const processedContent = crawlResult.content;
