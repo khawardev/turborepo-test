@@ -61,6 +61,7 @@ export async function createAudit(url: string) {
     const prompt = INITIAL_AUDIT_PROMPT({
         website_url: url,
         crawledContent: processedContent,
+        pagelimit: crawlLimit
     });
 
     const generatedResult = await generateNewContent(prompt);
