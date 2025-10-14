@@ -13,7 +13,7 @@ export function HeaderClient({ user }: any) {
   if (pathname.startsWith("/dashboard")) return null
 
   return (
-    <header className="z-30 fixed  top-5 w-full">
+    <header className="z-30 fixed top-5 w-full">
       <div className="flex  h-14 items-center mx-auto max-w-6xl justify-between gap-3  rounded-xl  ">
         <Link href="/">
           <FullLogo />

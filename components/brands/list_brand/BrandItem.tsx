@@ -101,158 +101,167 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     });
   };
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Do not navigate if a link, button, or dropdown item was clicked
+    if (
+      (e.target as HTMLElement).closest("a") ||
+      (e.target as HTMLElement).closest("button") ||
+      (e.target as HTMLElement).closest('[role="menuitem"]')
+    ) {
+      return;
+    }
+    router.push(`/brands/${brand.brand_id}`);
+  };
+
   return (
-    <div className="flex gap-4">
-      <Card className="w-full relative">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>
-              {brand.name}
-            </CardTitle>
-            <CardDescription>
-              <Link href={brand.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
-                {brand.url}
-                <LinkIcon className="size-3" />
-              </Link>
-            </CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" >
-                  Actions<ChevronDown />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {isScrapped ?
-              <Button variant={'outline'} asChild  >
-              <Link href={`/dashboard/brand/${brand.brand_id}`} >
-                   Dashboard
-                </Link>
-              </Button> :
-              <Button disabled={isPending} onClick={scrapeBrand} >
-                {isPending ? (
-                  <ButtonSpinner>
-                    Scraping
-                  </ButtonSpinner>
-                ) : (
-                  "Scrape"
-                )}
+    <Card className="w-full relative  transition-all  hover:bg-border/40 cursor-pointer" onClick={handleCardClick}>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>
+            {brand.name}
+          </CardTitle>
+          <CardDescription>
+            <Link href={brand.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
+              {brand.url}
+              <LinkIcon className="size-3" />
+            </Link>
+          </CardDescription>
+        </div>
+        <div className="flex items-center space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" >
+                Actions<ChevronDown />
               </Button>
-            }
-           
-          </div>
-        </CardHeader>
-        <CardContent >
-          {isPending ? (
-            <BrandItemSkeleton />
-          ) : (
-            <div className="space-y-4 ">
-              <div>
-                <h4 className="text-md font-medium mb-2">Social Links</h4>
-                <div className="flex flex-wrap gap-2">
-                  {brand.facebook_url && <Badge asChild variant='secondary'><Link href={brand.facebook_url} target="_blank">Facebook</Link></Badge>}
-                  {brand.instagram_url && <Badge asChild variant="secondary" ><Link href={brand.instagram_url} target="_blank">Instagram</Link></Badge>}
-                  {brand.linkedin_url && <Badge asChild variant="secondary" ><Link href={brand.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
-                  {brand.x_url && <Badge asChild variant="secondary" ><Link href={brand.x_url} target="_blank">X</Link></Badge>}
-                  {brand.youtube_url && <Badge asChild variant="secondary" ><Link href={brand.youtube_url} target="_blank">YouTube</Link></Badge>}
-                </div>
-              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isScrapped ?
+            <Button variant={'outline'} asChild  >
+              <Link href={`/dashboard/brand/${brand.brand_id}`} >
+                Dashboard
+              </Link>
+            </Button> :
+            <Button disabled={isPending} onClick={scrapeBrand} >
+              {isPending ? (
+                <ButtonSpinner>
+                  Scraping
+                </ButtonSpinner>
+              ) : (
+                "Scrape"
+              )}
+            </Button>
+          }
 
-              <div>
-                <h4 className="text-md font-medium mb-2">Competitors</h4>
-                  {brand.competitors.length > 0 ? (
-                  <div >
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Website</TableHead>
-                          <TableHead>Socials</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                          {brand.competitors.map((competitor: any) => {
-                          return (
-                            <TableRow key={competitor.competitor_id}>
-                              <TableCell className="font-medium">{competitor.name}</TableCell>
-                              <TableCell>
-                                <Link
-                                  href={competitor.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1 hover:underline"
-                                >
-                                  {competitor.url}
-                                  <LinkIcon className="size-3" />
-                                </Link>
-                              </TableCell>
-                              <TableCell className="flex flex-wrap gap-1">
-                                {competitor.facebook_url && (
-                                  <Badge asChild variant="secondary">
-                                    <Link href={competitor.facebook_url} target="_blank">
-                                      Facebook
-                                    </Link>
-                                  </Badge>
-                                )}
-                                {competitor.instagram_url && (
-                                  <Badge asChild variant="secondary">
-                                    <Link href={competitor.instagram_url} target="_blank">
-                                      Instagram
-                                    </Link>
-                                  </Badge>
-                                )}
-                                {competitor.linkedin_url && (
-                                  <Badge asChild variant="secondary">
-                                    <Link href={competitor.linkedin_url} target="_blank">
-                                      LinkedIn
-                                    </Link>
-                                  </Badge>
-                                )}
-                                {competitor.x_url && (
-                                  <Badge asChild variant="secondary">
-                                    <Link href={competitor.x_url} target="_blank">
-                                      X
-                                    </Link>
-                                  </Badge>
-                                )}
-                                {competitor.youtube_url && (
-                                  <Badge asChild variant="secondary">
-                                    <Link href={competitor.youtube_url} target="_blank">
-                                      YouTube
-                                    </Link>
-                                  </Badge>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground p-4 border rounded-md text-center">
-                    No competitors found for this brand.
-                  </div>
-                )}
+        </div>
+      </CardHeader>
+      <CardContent >
+        {isPending ? (
+          <BrandItemSkeleton />
+        ) : (
+          <div className="space-y-4 ">
+            <div>
+              <h4 className="text-md font-medium mb-2">Social Links</h4>
+              <div className="flex flex-wrap gap-2">
+                {brand.facebook_url && <Badge asChild variant='secondary'><Link href={brand.facebook_url} target="_blank">Facebook</Link></Badge>}
+                {brand.instagram_url && <Badge asChild variant="secondary" ><Link href={brand.instagram_url} target="_blank">Instagram</Link></Badge>}
+                {brand.linkedin_url && <Badge asChild variant="secondary" ><Link href={brand.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
+                {brand.x_url && <Badge asChild variant="secondary" ><Link href={brand.x_url} target="_blank">X</Link></Badge>}
+                {brand.youtube_url && <Badge asChild variant="secondary" ><Link href={brand.youtube_url} target="_blank">YouTube</Link></Badge>}
               </div>
-
-              <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
-                B{index + 1}
-              </span>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-    </div>
+            <div>
+              <h4 className="text-md font-medium mb-2">Competitors</h4>
+              {brand.competitors.length > 0 ? (
+                <div >
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Website</TableHead>
+                        <TableHead>Socials</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {brand.competitors.map((competitor: any) => {
+                        return (
+                          <TableRow key={competitor.competitor_id}>
+                            <TableCell className="font-medium">{competitor.name}</TableCell>
+                            <TableCell>
+                              <Link
+                                href={competitor.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 hover:underline"
+                              >
+                                {competitor.url}
+                                <LinkIcon className="size-3" />
+                              </Link>
+                            </TableCell>
+                            <TableCell className="flex flex-wrap gap-1">
+                              {competitor.facebook_url && (
+                                <Badge asChild variant="secondary">
+                                  <Link href={competitor.facebook_url} target="_blank">
+                                    Facebook
+                                  </Link>
+                                </Badge>
+                              )}
+                              {competitor.instagram_url && (
+                                <Badge asChild variant="secondary">
+                                  <Link href={competitor.instagram_url} target="_blank">
+                                    Instagram
+                                  </Link>
+                                </Badge>
+                              )}
+                              {competitor.linkedin_url && (
+                                <Badge asChild variant="secondary">
+                                  <Link href={competitor.linkedin_url} target="_blank">
+                                    LinkedIn
+                                  </Link>
+                                </Badge>
+                              )}
+                              {competitor.x_url && (
+                                <Badge asChild variant="secondary">
+                                  <Link href={competitor.x_url} target="_blank">
+                                    X
+                                  </Link>
+                                </Badge>
+                              )}
+                              {competitor.youtube_url && (
+                                <Badge asChild variant="secondary">
+                                  <Link href={competitor.youtube_url} target="_blank">
+                                    YouTube
+                                  </Link>
+                                </Badge>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground p-4 border rounded-md text-center">
+                  No competitors found for this brand.
+                </div>
+              )}
+            </div>
+
+            <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
+              B{index + 1}
+            </span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
