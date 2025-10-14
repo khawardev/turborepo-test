@@ -83,7 +83,8 @@ export default function WebsiteDataView({ scrapedData }: any) {
                     </Button>
                 </div>
                 <Separator />
-                <ScrollArea className="h-full w-full">
+                
+                <ScrollArea className="h-[65vh] w-full bg-linear">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
                      
                         <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">

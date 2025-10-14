@@ -53,9 +53,9 @@
   transition: color 0.3s;
 }
 
-.markdown-body a:hover {
+/* .markdown-body a:hover {
   color: var(--color-primary-foreground);
-}
+} */
 
 .markdown-body strong {
   font-weight: 700;

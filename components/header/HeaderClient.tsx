@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button"
 import { UserNav } from "./UserNav"
 import { FullLogo } from "../shared/logo"
 import { ThemeSwitcher } from "../ui/theme-switcher"
-import { BrandOSConfig } from "@/config/brandos-config"
 import { usePathname } from "next/navigation"
-import { ContainerLg } from "../shared/containers"
 
 export function HeaderClient({ user }: any) {
   const pathname = usePathname()
@@ -15,7 +13,7 @@ export function HeaderClient({ user }: any) {
 
   return (
     <header className="z-30 fixed  top-5 w-full">
-      <div className="flex bg-outline px-2 h-14 items-center mx-auto max-w-6xl justify-between gap-3  rounded-xl  ">
+      <div className="flex  h-14 items-center mx-auto max-w-6xl justify-between gap-3  rounded-xl  ">
         <Link href="/">
           <FullLogo />
         </Link>
