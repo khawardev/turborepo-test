@@ -85,7 +85,7 @@ const ConfigTrayClient = ({ user, appConfig }: Props) => {
                 )}
 
                 {user && (
-                    <div className="flex items-center justify-center space-x-2 bg-transparent shadow-xs rounded-full dark:bg-input/30 px-1 py-0.5">
+                    <div className="flex items-center justify-center space-x-2 bg-transparent rounded-full dark:bg-input/30 px-1 py-0.5">
                         <div className="text-xs select-none text-muted-foreground pl-2">
                             <span className="font-semibold text-foreground">{user.auditCredits}</span> / {appConfig.audits.freeTierLimit} Credits
                         </div>

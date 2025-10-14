@@ -1,7 +1,7 @@
 import { Spider } from '@spider-cloud/spider-client';
 import { logger } from "@/lib/utils";
 
-export async function spiderCrawlWebsite(url: any) {
+export async function spiderCrawlWebsite(url: any, limit:any) {
     const functionName = "crawlWebsite";
     logger.info("Spider crawl initiated.", { url });
 
@@ -14,7 +14,7 @@ export async function spiderCrawlWebsite(url: any) {
         const app = new Spider({ apiKey: process.env.SPIDER_API_KEY! });
 
         const crawlParams = {
-            limit: 5,
+            limit: limit,
             metadata: false
         };
 

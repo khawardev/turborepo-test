@@ -24,9 +24,6 @@ GOALS
 \- Human vs. Machine Views: Explicitly differentiate: Human View (readable text for narrative/emotion); Machine View (non-readable signals like meta/schema for AI/SEO findability). Note gaps between views.
 \- Preview Focus: Note limitations of 10-page scope and suggest full-site analysis for depth from Humanbrand AI. Include subtle benchmarks vs. industry norms (e.g., readability Grade 8-10 for accessibility).
 
-USER INPUTS (Provided by the application)
-\- WEBSITE\_URL \= ${params.website_url}
-\- SCRAPED\_CONTENT \= ${params.crawledContent} (limited to first 10 pages, including all layers: human - readable text and machine - readable elements like meta tags, schema, alt text, URLs)
 
 TASK
 First, determine the client's Brand Name from the SCRAPED\_CONTENT (e.g., from page titles, headers, or frequent usage; cross-check with domain if possible). Then, infer the Business Model (e.g., B2B if patterns reference "partners/businesses/solutions"; B2C/D2C if "customers/you/experiences/direct channels"). Use this throughout for tailored analysis. If BUSINESS\_MODEL provided, override inference. Generate the full Preview Brand Health Audit by following the structure and instructions below precisely, in numbered sequence. Complete each section fully before proceeding. For any element not found, note "Not explicitly stated; inferred from \[brief context with instance count\]" or "Absent from first 10 pages; deeper analysis may reveal more" and adjust scores accordingly.  
@@ -200,36 +197,44 @@ The Critical Insight: \[One - sentence summary of untapped potential, e.g., B2B 
 Note: This preview from Humanbrand AI highlights opportunities from initial pages.For a full - site audit with advanced pattern synthesis, verbal identity, AI perception analysis, and social monitoring via our Brand OS, contact Humanbrand AI for deeper assessments.  
 
 Humanbrand AI \- Brand clarity today. On - brand content forever.
+
+
+=======
+
+USER INPUTS (Provided by the application)
+\- WEBSITE\_URL \= ${params.website_url}
+\- SCRAPED\_CONTENT \= ${params.crawledContent} (limited to first 10 pages, including all layers: human - readable text and machine - readable elements like meta tags, schema, alt text, URLs)
+
 `;
 
 
 
 
-export const METRICS_EXTRACTION_PROMPT = (params: {
-  generatedText: string;
-}) => `
-You are a data extraction assistant. Your job is to analyze the given brand audit content and return a clean JSON with specific scoring metrics and the executive summary.
+// export const METRICS_EXTRACTION_PROMPT = (params: {
+//   generatedText: string;
+// }) => `
+// You are a data extraction assistant. Your job is to analyze the given brand audit content and return a clean JSON with specific scoring metrics and the executive summary.
 
-STRICT RULES:
-- Return only valid raw JSON (without markdown, code blocks, or backticks).
-- No explanation, no commentary, no markdown — just pure JSON.
-- If a score is not found, return null for that field.
-- Round all scores to 1 decimal place if necessary.
+// STRICT RULES:
+// - Return only valid raw JSON (without markdown, code blocks, or backticks).
+// - No explanation, no commentary, no markdown — just pure JSON.
+// - If a score is not found, return null for that field.
+// - Round all scores to 1 decimal place if necessary.
 
-FROM THE INPUT TEXT BELOW, EXTRACT THE FOLLOWING FIELDS INTO A JSON OBJECT:
+// FROM THE INPUT TEXT BELOW, EXTRACT THE FOLLOWING FIELDS INTO A JSON OBJECT:
 
-{
-  "overallBrandScore": number (1–100),
-  "corePurpose": number (1–100),
-  "lexicalDistinctiveness": number (1–100),
-  "portfolioClarity": number (1–100),
-  "consistency": number (1–100),
-  "audienceConnection": number (1–100),
-  "executiveSummary": string (≤ 110 words)
-}
+// {
+//   "overallBrandScore": number (1–100),
+//   "corePurpose": number (1–100),
+//   "lexicalDistinctiveness": number (1–100),
+//   "portfolioClarity": number (1–100),
+//   "consistency": number (1–100),
+//   "audienceConnection": number (1–100),
+//   "executiveSummary": string (≤ 110 words)
+// }
 
-INPUT TEXT:
-"""
-${params.generatedText}
-"""
-`;
+// INPUT TEXT:
+// """
+// ${params.generatedText}
+// """
+// `;

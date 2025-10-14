@@ -12,9 +12,8 @@ export async function crawlWebsite(url: any) {
 
     try {
         const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY! });
-        const crawlResponse: any = await app.crawlUrl(url, {
+        const crawlResponse: any = await app.crawl(url, {
             limit: 10,
-            maxDepth: 3,
             scrapeOptions: {
                 formats: ['markdown'],
             }
