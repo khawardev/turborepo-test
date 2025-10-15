@@ -8,7 +8,7 @@ import { batchWebsiteReports } from "./reportsActions";
 import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getBatchWebsiteReportsStatus, getBatchWebsiteScrapeStatus } from "./statusActions";
 
-export async function scrapeBatchWebsite(brand_id: any) {
+export async function scrapeBatchandExtractionWebsite(brand_id: any) {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get("access_token")?.value
   if (!accessToken) return { success: false, error: "Unauthorized" }
@@ -43,6 +43,42 @@ export async function scrapeBatchWebsite(brand_id: any) {
     return { success: false, error: error.message || "Batch scraping failed" }
   }
 }
+
+
+export async function scrapeBatchWebsite(brand_id: any, limit:any) {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get("access_token")?.value
+  if (!accessToken) return { success: false, error: "Unauthorized" }
+
+  const user = await getCurrentUser()
+  if (!user) return { success: false, error: "User not found" }
+
+  try {
+    const scrapePayload = {
+      client_id: user.client_id,
+      brand_id: brand_id,
+      limit: limit,
+      name: `${brand_id}_scrape`,
+    }
+
+    const batchWebsiteScrape = await brandRequest("/batch/website", "POST", scrapePayload)
+
+    await pollUntilComplete(
+      async () => await getBatchWebsiteScrapeStatus(brand_id, batchWebsiteScrape.task_id),
+      (res) => res.success && res.data?.status === "Completed"
+    )
+   
+    revalidatePath(`/brands/${brand_id}`)
+    return { success: true, message: "Scraping and report extraction completed successfully 🎉" }
+  } catch (error: any) {
+    console.error(`Failed batch scrape for brand ${brand_id}:`, error)
+    return { success: false, error: error.message || "Batch scraping failed" }
+  }
+}
+
+
+
+
 
 export async function getscrapeBatchWebsite(brand_id: string, batch_id:any) {
   const cookieStore = await cookies();

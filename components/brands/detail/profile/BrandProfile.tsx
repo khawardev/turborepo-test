@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
+import DashboardHeader from "@/components/dashboard/shared/DashboardHeader";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const [isPending, startTransition] = useTransition();
@@ -42,19 +43,13 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
       },
     });
   };
-  const scrapeBrand = (brand_id:any) => {
-    startTransition(async () => {
-      const result = await scrapeBatchWebsite(brand_id);
-      if (result.success) {
-        router.refresh();
-        toast.success("Scraping and extraction completed successfully 🎉");
-      } else {
-        toast.error("Scraping failed.");
-      }
-    });
-  };
+
   return (
     <div className="flex flex-col space-y-8">
+      {/* <DashboardHeader
+        title="Brand Profile"
+        subtitle="View detailed information about Brand and its Competitors"
+      /> */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight capitalize">{brand.name}</h1>
@@ -84,21 +79,11 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {isScrapped ? (
-            <Button variant={"outline"} asChild>
-              <Link href={`/dashboard/brand/${brand.brand_id}`}>
-                Dashboard
-              </Link>
-            </Button>
-          ) : (
-              <Button disabled={isPending} onClick={() => (scrapeBrand(brand.brand_id))}>
-              {isPending ? (
-                <ButtonSpinner>Scraping</ButtonSpinner>
-              ) : (
-                "Scrape"
-              )}
-            </Button>
-          )}
+          <Button variant={"outline"} asChild>
+            <Link href={`/dashboard/brand/${brand.brand_id}`}>
+              Dashboard
+            </Link>
+          </Button>
         </div>
       </div>
 

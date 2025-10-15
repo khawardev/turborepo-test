@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import {
   Card,
   CardContent,
@@ -17,16 +17,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Link as LinkIcon } from "lucide-react";
+import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
 import { scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
-import { deleteBrand } from "@/server/actions/brandActions";
 import { useRouter } from "next/navigation";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AskLimitToast } from "@/hooks/AskLimitToast";
 
 function BrandItemSkeleton() {
   return (
@@ -81,19 +80,31 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     }
     router.push(`/brands/${brand.brand_id}`);
   };
-  const scrapeBrand = () => {
+
+  const askLimit = () => {
+    toast.custom((t: any) => (
+      <AskLimitToast
+        t={t}
+        onConfirm={(parsedLimit) => {
+          scrapeBrand(parsedLimit)
+        }}
+      />
+    ))
+  }
+
+  const scrapeBrand = (limit:any) => {
     startTransition(async () => {
-      const result = await scrapeBatchWebsite(brand.brand_id);
+      const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
         router.refresh();
-        toast.success("Scraping and Extraction completed successfully 🎉");
+        toast.success("Scraping completed successfully 🎉");
       } else {
         toast.error("Scraping failed.");
       }
     });
   };
   return (
-    <Card className="w-full relative  transition-all  hover:bg-border/40 cursor-pointer" onClick={handleCardClick}>
+    <Card className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer`}`} onClick={isScrapped && handleCardClick}>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>
@@ -122,13 +133,24 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu> */}
-          {isScrapped ?
+          {/* {isScrapped ?
             <Button variant={'outline'} asChild  >
               <Link href={`/dashboard/brand/${brand.brand_id}`} >
                 Dashboard
               </Link>
             </Button> :
-            <Button disabled={isPending} onClick={scrapeBrand} >
+            <Button disabled={isPending} onClick={askLimit} >
+              {isPending ? (
+                <ButtonSpinner>
+                  Scraping
+                </ButtonSpinner>
+              ) : (
+                "Scrape"
+              )}
+            </Button>
+          } */}
+          {!isScrapped &&
+            <Button disabled={isPending} onClick={askLimit} >
               {isPending ? (
                 <ButtonSpinner>
                   Scraping
@@ -139,6 +161,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
             </Button>
           }
 
+         
         </div>
       </CardHeader>
       <CardContent >

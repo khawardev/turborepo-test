@@ -7,8 +7,6 @@ import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
 import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
-import EarnedMediaDashboard from "./earned-media/EarnedMediaDashboard";
-import { getBrandData } from "@/data/brands";
 import { magnaData } from "@/data/brands/magna";
 import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
 

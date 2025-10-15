@@ -1,21 +1,24 @@
 'use client'
 
-import { useState, useMemo, useEffect, startTransition, useTransition } from 'react';
+import React, { useState, useMemo, useEffect, startTransition, useTransition } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from '@/lib/date-utils';
-import WebsiteDataView from './WebsiteDataView';
+import WebsiteDataView from '../../../dashboard/raw-data/website/WebsiteDataView';
 import { ButtonSpinner } from '@/components/shared/spinner';
 import { scrapeBatchWebsite } from '@/server/actions/scrapeActions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { AskLimitToast } from '@/hooks/AskLimitToast';
+import { timeAgo } from '@/lib/date-utils';
+import DashboardHeader from '@/components/dashboard/shared/DashboardHeader';
 
 export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: any) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const [selectedScrapBatchId, setSelectedScrapBatchId] = useState<string | null>(null);
     const [selectedDataSource, setSelectedDataSource] = useState<any>(null);
-
+   
+   
     const sortedScraps = useMemo(() => {
         if (!allScrapsData || allScrapsData.length === 0) return [];
         return [...allScrapsData].sort((a, b) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
@@ -68,19 +71,35 @@ export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: 
             </div>
         );
     }
-    const scrapeBrand = () => {
+    const askLimit = () => {
+        toast.custom((t: any) => (
+            <AskLimitToast
+                t={t}
+                onConfirm={(parsedLimit) => {
+                    scrapeBrand(parsedLimit)
+                }}
+            />
+        ))
+    }
+
+    const scrapeBrand = async (limit: number) => {
         startTransition(async () => {
-            const result = await scrapeBatchWebsite(brand_id);
-            if (result.success) {
-                router.refresh();
-                toast.success("Scraping completed successfully 🎉");
+            const result = await scrapeBatchWebsite(brand_id, limit)
+            if (result?.success) {
+                router.refresh()
+                toast.success("Scraping completed successfully 🎉")
             } else {
-                toast.error("Scraping failed.");
+                toast.error("Scraping failed.")
             }
-        });
-    };
+        })
+    }
     return (
-        <div className="space-y-8">
+        <div className="flex flex-col space-y-8">
+            <DashboardHeader
+                title="Brands Scraps"
+                subtitle="View all scraping reports and competitor data"
+            />
+
             <div className="flex items-center justify-between gap-2">
                 <div className='flex items-center gap-2'>
                     {dataSources.map(source => (
@@ -96,7 +115,7 @@ export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: 
                </div>
 
                 <div className='flex items-center gap-2'>
-                    <Button disabled={isPending} onClick={scrapeBrand}>
+                    <Button disabled={isPending} onClick={askLimit}>
                         {isPending ? (
                             <ButtonSpinner>Scraping</ButtonSpinner>
                         ) : (
@@ -104,13 +123,13 @@ export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: 
                         )}
                     </Button>
                     <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
-                        <SelectTrigger className="w-[200px]">
+                        <SelectTrigger className="w-[140px]">
                             <SelectValue placeholder="Select a scrap run" />
                         </SelectTrigger>
                         <SelectContent>
                             {sortedScraps.map((scrap: any, index: number) => (
                                 <SelectItem key={scrap.batch_id} value={scrap.batch_id}>
-                                    {`${index === 0 ? 'Latest' : formatDistanceToNow(scrap.scraped_at)} - ${new Date(scrap.scraped_at).toLocaleDateString()}`}
+                                    {`${timeAgo(scrap.scraped_at)}`}
                                 </SelectItem>
                             ))}
                         </SelectContent>
