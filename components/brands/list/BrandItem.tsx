@@ -102,7 +102,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   };
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Do not navigate if a link, button, or dropdown item was clicked
     if (
       (e.target as HTMLElement).closest("a") ||
       (e.target as HTMLElement).closest("button") ||
@@ -128,7 +127,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
           </CardDescription>
         </div>
         <div className="flex items-center space-x-2">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" >
                 Actions<ChevronDown />
@@ -142,8 +141,8 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
-          {isScrapped ?
+          </DropdownMenu> */}
+          {/* {isScrapped ?
             <Button variant={'outline'} asChild  >
               <Link href={`/dashboard/brand/${brand.brand_id}`} >
                 Dashboard
@@ -158,7 +157,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 "Scrape"
               )}
             </Button>
-          }
+          } */}
 
         </div>
       </CardHeader>

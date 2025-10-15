@@ -7,7 +7,7 @@ import { scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { Button } from "@/components/ui/button";
 import { ButtonSpinner } from "@/components/shared/spinner";
 import Link from "next/link";
-import { Link as LinkIcon } from "lucide-react";
+import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -18,11 +18,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ContainerMd } from "@/components/shared/containers";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { deleteBrand } from "@/server/actions/brandActions";
 
 const BrandProfile = ({brand, isScrapped}:any) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  const confirmDelete = () => {
+    toast(`Delete ${brand.name}?`, {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Confirm",
+        onClick: async () => {
+          const result = await deleteBrand(brand.brand_id);
+
+          if (result.success) {
+            router.refresh();
+            toast.success(result.message);
+          } else {
+            toast.error(result.message);
+          }
+        },
+      },
+    });
+  };
   const scrapeBrand = () => {
     startTransition(async () => {
       const result = await scrapeBatchWebsite(brand);
@@ -38,7 +58,7 @@ const BrandProfile = ({brand, isScrapped}:any) => {
     <div className="flex flex-col space-y-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{brand.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight capitalize">{brand.name}</h1>
           <Link
             href={brand.url}
             target="_blank"
@@ -49,7 +69,22 @@ const BrandProfile = ({brand, isScrapped}:any) => {
             <LinkIcon className="size-3" />
           </Link>
         </div>
-        <div>
+        <div className="flex items-center space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" >
+                Actions<ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {isScrapped ? (
             <Button variant={"outline"} asChild>
               <Link href={`/dashboard/brand/${brand.brand_id}`}>
