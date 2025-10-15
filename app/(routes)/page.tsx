@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ContainerMd } from "@/components/shared/containers";
 import { Plus } from "lucide-react";
-import BrandList from "@/components/brands/list_brand/BrandList";
+import BrandList from "@/components/brands/list/BrandList";
 
 export default function Home() {
   return (

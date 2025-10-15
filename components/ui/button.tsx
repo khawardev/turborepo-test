@@ -27,7 +27,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary  text-secondary-foreground shadow-xs hover:bg-secondary/65",
         ghost:
-          "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-border/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
+          "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-border/50 dark:hover:border-border dark:hover:to-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 ",
         link: "text-primary underline-offset-4 hover:underline",
         mail: `
   bg-gradient-to-b from-[#36393E] to-[#030712]

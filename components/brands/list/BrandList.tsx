@@ -1,6 +1,6 @@
 import { getBrandbyIdWithCompetitors, getBrands, getCompetitors } from "@/server/actions/brandActions";
 import { Brand } from "@/types";
-import BrandItem from "@/components/brands/list_brand/BrandItem";
+import BrandItem from "@/components/brands/list/BrandItem";
 import { Card } from "@/components/ui/card";
 import { getBatchId } from "@/server/actions/scrapeActions";
 import { getCurrentUser } from "@/server/actions/authActions";
