@@ -3,9 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, Edit, Trash2, FileText } from "lucide-react";
 import Image from "next/image";
-import { Button } from "../../ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
-import { Textarea } from "../../ui/textarea";
+import { Button } from "../../../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../ui/dropdown-menu";
+import { Textarea } from "../../../ui/textarea";
 import { formatDistanceToNow } from 'date-fns';
 import { facebookData } from "@/data/ayaz_socials/facebook";
 

@@ -1,9 +1,9 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "../../ui/avatar";
-import { Button } from "../../ui/button";
+import { Avatar, AvatarFallback } from "../../../ui/avatar";
+import { Button } from "../../../ui/button";
 import { MoreVertical, Edit, Trash2, FileText, Link as LinkIcon } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../ui/dropdown-menu";
 import Link from "next/link";
 import { useState } from "react";
 import { youtubeData } from "@/data/ayaz_socials/youtube";

@@ -17,11 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ContainerMd } from "@/components/shared/containers";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 
-const BrandProfile = ({brand, isScrapped}:any) => {
+const BrandProfile = ({ brand, isScrapped }: any) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -43,9 +42,9 @@ const BrandProfile = ({brand, isScrapped}:any) => {
       },
     });
   };
-  const scrapeBrand = () => {
+  const scrapeBrand = (brand_id:any) => {
     startTransition(async () => {
-      const result = await scrapeBatchWebsite(brand);
+      const result = await scrapeBatchWebsite(brand_id);
       if (result.success) {
         router.refresh();
         toast.success("Scraping and extraction completed successfully 🎉");
@@ -92,7 +91,7 @@ const BrandProfile = ({brand, isScrapped}:any) => {
               </Link>
             </Button>
           ) : (
-            <Button disabled={isPending} onClick={scrapeBrand}>
+              <Button disabled={isPending} onClick={() => (scrapeBrand(brand.brand_id))}>
               {isPending ? (
                 <ButtonSpinner>Scraping</ButtonSpinner>
               ) : (

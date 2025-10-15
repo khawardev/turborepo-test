@@ -134,7 +134,7 @@ export function AnimatedTabs({
 
     return (
         <div className="w-full">
-            <div className="relative flex w-full items-center   border-b-2">
+            <div className="relative flex w-full items-center   border-b-2 dark:border-border border-border/40">
                 <Tabs {...framer.tabProps} />
             </div>
             <AnimatePresence mode="wait">

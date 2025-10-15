@@ -1,7 +1,7 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WebsiteDataView from "./WebsiteDataView";
+import WebsiteDataView from "./website/WebsiteDataView";
 import SocialMediaDataView from "./social-media/SocialMediaDataView";
 import { facebookData } from "@/data/ayaz_socials/facebook";
 import { linkedinData } from "@/data/ayaz_socials/linkedin";

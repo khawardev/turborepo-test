@@ -8,7 +8,7 @@ import { batchWebsiteReports } from "./reportsActions";
 import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getBatchWebsiteReportsStatus, getBatchWebsiteScrapeStatus } from "./statusActions";
 
-export async function scrapeBatchWebsite(brand: any) {
+export async function scrapeBatchWebsite(brand_id: any) {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get("access_token")?.value
   if (!accessToken) return { success: false, error: "Unauthorized" }
@@ -19,39 +19,32 @@ export async function scrapeBatchWebsite(brand: any) {
   try {
     const scrapePayload = {
       client_id: user.client_id,
-      brand_id: brand.brand_id,
+      brand_id: brand_id,
       limit: 5,
-      name: `${brand.brand_id}_scrape`,
+      name: `${brand_id}_scrape`,
     }
 
     const batchWebsiteScrape = await brandRequest("/batch/website", "POST", scrapePayload)
 
     await pollUntilComplete(
-      async () => await getBatchWebsiteScrapeStatus(brand.brand_id, batchWebsiteScrape.task_id),
+      async () => await getBatchWebsiteScrapeStatus(brand_id, batchWebsiteScrape.task_id),
       (res) => res.success && res.data?.status === "Completed"
     )
-
-    const batchReports = await batchWebsiteReports(brand.brand_id, batchWebsiteScrape.task_id)
-    console.log(brand.brand_id, `<-> brand.brand_id <->`);
-    console.log(user.client_id, `<-> user.client_id <->`);
-    console.log(batchReports.task_id, `<-> batchReports <->`);
+    const batchReports = await batchWebsiteReports(brand_id, batchWebsiteScrape.task_id)
 
     await pollUntilComplete(
-      async () => await getBatchWebsiteReportsStatus(brand.brand_id, batchReports.task_id),
+      async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
       (res) => res.success && res.data?.status === "Completed"
     )
-    console.log(`<-> getBatchWebsiteReportsStatus Completed <->`);
-
-
     revalidatePath(`/brands`)
     return { success: true, message: "Scraping and report extraction completed successfully 🎉" }
   } catch (error: any) {
-    console.error(`Failed batch scrape for brand ${brand.brand_id}:`, error)
+    console.error(`Failed batch scrape for brand ${brand_id}:`, error)
     return { success: false, error: error.message || "Batch scraping failed" }
   }
 }
 
-export async function getscrapeBatchWebsite(brand_id: string) {
+export async function getscrapeBatchWebsite(brand_id: string, batch_id:any) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
@@ -61,8 +54,6 @@ export async function getscrapeBatchWebsite(brand_id: string) {
   }
 
   const user = await getCurrentUser();
-
-  const batch_id = await getBatchId(user.client_id, brand_id);
   if (!batch_id) {
     return { success: false, error: "No batch_id found for this brand." };
   }
@@ -92,6 +83,28 @@ export async function getBatchId(client_id: string, brand_id: string) {
   } catch (error) {
     console.error("Error fetching batch_id:", error)
     return null
+  }
+}
+
+
+export async function getpreviousScraps(client_id: string, brand_id: string) {
+  try {
+    const response = await brandRequest(`/batch/website-scrapes?client_id=${client_id}&brand_id=${brand_id}`, "GET")
+    if (!Array.isArray(response) || response.length === 0) return []
+
+    const filtered = response.map((item: any) => ({
+      brand_id: item.brand_id,
+      client_id: item.client_id,
+      created_at: item.created_at,
+      status: item.status,
+      scraped_pages: item.scraped_pages,
+      batch_id: item.batch_id
+    }))
+
+    return filtered
+  } catch (error) {
+    console.error("Error fetching batch data:", error)
+    return []
   }
 }
 

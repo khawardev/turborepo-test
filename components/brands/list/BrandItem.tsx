@@ -70,36 +70,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const scrapeBrand = () => {
-    startTransition(async () => {
-      const result = await scrapeBatchWebsite(brand);
-      if (result.success) {
-        router.refresh();
-        toast.success("Scraping and extraction completed successfully 🎉");
-      } else {
-        toast.error("Scraping failed.");
-      }
-    });
-  };
-
-  const confirmDelete = () => {
-    toast(`Delete ${brand.name}?`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Confirm",
-        onClick: async () => {
-          const result = await deleteBrand(brand.brand_id);
-
-          if (result.success) {
-            router.refresh();
-            toast.success(result.message);
-          } else {
-            toast.error(result.message);
-          }
-        },
-      },
-    });
-  };
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (
@@ -111,7 +81,17 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     }
     router.push(`/brands/${brand.brand_id}`);
   };
-
+  const scrapeBrand = () => {
+    startTransition(async () => {
+      const result = await scrapeBatchWebsite(brand.brand_id);
+      if (result.success) {
+        router.refresh();
+        toast.success("Scraping and Extraction completed successfully 🎉");
+      } else {
+        toast.error("Scraping failed.");
+      }
+    });
+  };
   return (
     <Card className="w-full relative  transition-all  hover:bg-border/40 cursor-pointer" onClick={handleCardClick}>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -142,7 +122,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu> */}
-          {/* {isScrapped ?
+          {isScrapped ?
             <Button variant={'outline'} asChild  >
               <Link href={`/dashboard/brand/${brand.brand_id}`} >
                 Dashboard
@@ -157,7 +137,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 "Scrape"
               )}
             </Button>
-          } */}
+          }
 
         </div>
       </CardHeader>

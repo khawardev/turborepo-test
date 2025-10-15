@@ -52,9 +52,8 @@ export default function WebsiteDataView({ scrapedData }: any) {
     }
 
     return (
-        <div className="flex h-[70vh] ">
-            <ScrollArea className="h-screen w-1/4 border-r">
-                <div className="p-2">
+        <div className="flex gap-6 h-[70vh] ">
+            <ScrollArea className="h-screen w-1/4 min-w-0 border-r">
                     <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
                     <ul className="space-y-1">
                         {pages.map((page: any) => (
@@ -69,10 +68,9 @@ export default function WebsiteDataView({ scrapedData }: any) {
                             </li>
                         ))}
                     </ul>
-                </div>
             </ScrollArea>
 
-            <CardContent className=" space-y-4 w-full">
+            <CardContent className="px-0  space-y-4 w-full min-w-0 ">
                 <div className='w-full flex items-center justify-between'>
                     <Link href={selectedPage?.url} target='_blank' className="text-sm text-muted-foreground truncate max-w-[500px]">
                         {selectedPage?.url ? selectedPage.url : 'No URL available'}
@@ -84,10 +82,9 @@ export default function WebsiteDataView({ scrapedData }: any) {
                 </div>
                 <Separator />
                 
-                <ScrollArea className="h-[65vh] w-full">
+                <ScrollArea className="h-[65vh] w-full ">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
-                     
-                        <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">
+                        <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert ">
                             <ReactMarkdown components={{
                                 img: ({ node, ...props }) => {
                                     if (!props.src) return null

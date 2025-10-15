@@ -4,9 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import twitterData from "@/data/dummy/social-media/twitter.json";
 import { MessageCircle, Repeat, Heart, MoreHorizontal, Link, MapPin, Edit, Trash2, FileText } from "lucide-react";
 import Image from "next/image";
-import { Button } from "../../ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu";
-import { Textarea } from "../../ui/textarea";
+import { Button } from "../../../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../ui/dropdown-menu";
+import { Textarea } from "../../../ui/textarea";
 
 interface TwitterLayoutProps {
     onGenerateReport: () => void;
