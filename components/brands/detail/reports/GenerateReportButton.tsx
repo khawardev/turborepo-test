@@ -8,9 +8,11 @@ import { genrateReports } from "@/server/actions/reportsActions"
 import { ModelSelector } from "@/components/brands/detail/reports/ModelSelector"
 import { ButtonSpinner } from "@/components/shared/spinner"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 
 export function GenerateReportButton({ brand_id, batch_id }: any) {
+    const router= useRouter()
     const [open, setOpen] = useState(false)
     const [prompt, setPrompt] = useState("")
     const [isPending, startTransition] = useTransition()
@@ -30,6 +32,7 @@ export function GenerateReportButton({ brand_id, batch_id }: any) {
             })
             setSelectedModels([])
             setPrompt("")
+            router.refresh();
             toast.success('Reports has been genrated successfully 🎉')
         })
     }

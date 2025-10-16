@@ -53,24 +53,24 @@ export default function WebsiteDataView({ scrapedData }: any) {
 
     return (
         <div className="flex gap-6 min-h-0 ">
-            <ScrollArea className="h-[75vh] w-1/4 min-w-0 border-r">
+            <ScrollArea className="h-[75vh] w-1/3 min-w-0 ">
                     <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
                     <ul className="space-y-1">
                         {pages.map((page: any) => (
                             <li key={page.url}>
                                 <Button
                                     variant={selectedPage.url === page.url ? 'outline' : 'ghost'}
-                                    className=" justify-start font-normal w-[210px] h-9 text-left"
+                                    className=" justify-start font-normal  h-9 text-left"
                                     onClick={() => setSelectedPage(page)}
                                 >
-                                    <span className="truncate">{new URL(page.url).pathname}</span>
+                                    <span className="truncate w-[190px]">{new URL(page.url).pathname}</span>
                                 </Button>
                             </li>
                         ))}
                     </ul>
             </ScrollArea>
 
-            <CardContent className="px-0  space-y-4 w-full min-w-0 ">
+            <CardContent className="px-0 space-y-4 w-full min-w-0 ">
                 <div className='w-full flex items-center justify-between'>
                     <Link href={selectedPage?.url} target='_blank' className="text-sm text-muted-foreground truncate max-w-[500px]">
                         {selectedPage?.url ? selectedPage.url : 'No URL available'}
