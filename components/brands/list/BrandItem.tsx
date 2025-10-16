@@ -160,8 +160,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               )}
             </Button>
           }
-
-         
         </div>
       </CardHeader>
       <CardContent >
