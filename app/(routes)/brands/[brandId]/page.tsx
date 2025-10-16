@@ -17,12 +17,8 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ br
   }
 
   const brand = await getBrandbyIdWithCompetitors(brandId);
-  const batch_id = await getBatchId(user.client_id, brandId);
-
   const previousScraps = await getpreviousScraps(user.client_id, brandId);
-  const allScrapsDataPromises = previousScraps.map((scrap: any) =>
-    getscrapeBatchWebsite(brandId, scrap.batch_id)
-  );
+  const allScrapsDataPromises = previousScraps.map((scrap: any) => getscrapeBatchWebsite(brandId, scrap.batch_id));
   const allScrapsDataResults = await Promise.all(allScrapsDataPromises);
   const validScraps = allScrapsDataResults.filter(data => data !== null && data !== undefined);
 

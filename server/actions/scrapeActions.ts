@@ -125,7 +125,7 @@ export async function getBatchId(client_id: string, brand_id: string) {
 
 export async function getpreviousScraps(client_id: string, brand_id: string) {
   try {
-    const response = await brandRequest(`/batch/website-scrapes?client_id=${client_id}&brand_id=${brand_id}`, "GET")
+    const response = await brandRequest(`/batch/website-scrapes?client_id=${client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache')
     if (!Array.isArray(response) || response.length === 0) return []
 
     const filtered = response.map((item: any) => ({
