@@ -63,7 +63,7 @@ export default function AddBrandPage() {
     setIsLoading(false);
     if (brandResult.success) {
       toast.success("Brand has been added successfully 🎉");
-      router.push("/brands");
+      router.push("/");
     }
   }
 

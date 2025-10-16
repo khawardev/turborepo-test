@@ -104,7 +104,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     });
   };
   return (
-    <Card className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer`}`} onClick={isScrapped && handleCardClick}>
+    <Card className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer`}`} onClick={isScrapped ? handleCardClick : undefined}>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>
@@ -118,37 +118,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
           </CardDescription>
         </div>
         <div className="flex items-center space-x-2">
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" >
-                Actions<ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
-          {/* {isScrapped ?
-            <Button variant={'outline'} asChild  >
-              <Link href={`/dashboard/brand/${brand.brand_id}`} >
-                Dashboard
-              </Link>
-            </Button> :
-            <Button disabled={isPending} onClick={askLimit} >
-              {isPending ? (
-                <ButtonSpinner>
-                  Scraping
-                </ButtonSpinner>
-              ) : (
-                "Scrape"
-              )}
-            </Button>
-          } */}
           {!isScrapped &&
             <Button disabled={isPending} onClick={askLimit} >
               {isPending ? (
