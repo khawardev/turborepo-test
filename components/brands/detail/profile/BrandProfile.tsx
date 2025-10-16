@@ -1,11 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { Button } from "@/components/ui/button";
-import { ButtonSpinner } from "@/components/shared/spinner";
 import Link from "next/link";
 import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,10 +16,9 @@ import {
 } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
-import DashboardHeader from "@/components/dashboard/shared/DashboardHeader";
+import { BrandDashboardButton } from "./BrandDashboardButton";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const confirmDelete = () => {
@@ -79,11 +75,12 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant={"outline"} asChild>
+          {/* <Button variant={"outline"} asChild>
             <Link href={`/dashboard/brand/${brand.brand_id}`}>
               Dashboard
             </Link>
-          </Button>
+          </Button> */}
+          <BrandDashboardButton brand_id={brand.brand_id} isScrapped={isScrapped} />
         </div>
       </div>
 

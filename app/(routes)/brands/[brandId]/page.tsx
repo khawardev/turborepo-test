@@ -29,9 +29,8 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ br
   const batchWebsiteReportsResult = await getBatchWebsiteReports(brandId);
   const allReportsData = batchWebsiteReportsResult?.data || [];
 
-
   const tabs = [
-    { label: "Brand Profile", value: "brand_profile", content: <BrandProfile brand={brand} isScrapped={batch_id} /> },
+    { label: "Brand Profile", value: "brand_profile", content: <BrandProfile brand={brand} isScrapped={allReportsData && allReportsData.length > 0} /> },
     { label: "Scraps", value: "scraps", content: <ScrapDataViewer allScrapsData={validScraps} brand_id={brandId} brandName={brand.name} /> },
     { label: "Reports", value: "reports", content: <ReportDataViewer competitors={brand.competitors} allReportsData={allReportsData} brandName={brand.name} /> },
   ];

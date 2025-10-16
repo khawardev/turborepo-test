@@ -97,6 +97,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
         router.refresh();
+        router.push(`/brands/${brand.brand_id}`);
         toast.success("Scraping completed successfully 🎉");
       } else {
         toast.error("Scraping failed.");

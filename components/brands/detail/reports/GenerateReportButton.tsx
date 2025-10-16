@@ -17,8 +17,11 @@ export function GenerateReportButton({ brand_id, batch_id }: any) {
     const [selectedModels, setSelectedModels] = useState<string[]>([])
 
     async function handleGenerate() {
+        toast.info("Reports generation started", { duration: 4000 })
+        toast.info("It may take 20–25 minutes to complete")
+
         startTransition(async () => {
-            () => setOpen(false)
+            setOpen(false)
             await genrateReports({
                 brand_id,
                 batch_id,

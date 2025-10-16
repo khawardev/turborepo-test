@@ -68,17 +68,17 @@ export default function ReportDataViewer({ allReportsData, brandName, competitor
 
     if (sortedReports.length === 0) {
         return (
-            <Card className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
+            <div className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
                 No report data available.
-            </Card>
+            </div>
         )
     }
 
     if (!selectedSource) {
         return (
-            <Card className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
+            <div className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
                 Loading report data...
-            </Card>
+            </div>
         )
     }
 

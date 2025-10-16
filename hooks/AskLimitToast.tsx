@@ -22,7 +22,7 @@ export function AskLimitToast({ t, onConfirm }: { t: any; onConfirm: (limit: num
     }
 
     return (
-        <div className="flex flex-col gap-3 bg-border/60 border border-border p-4 rounded-xl shadow-lg">
+        <div className="flex flex-col gap-3 bg-border/60 backdrop-blur-3xl border border-border p-4 rounded-xl shadow-lg">
             <p className="text-sm font-medium">Enter scraping limit</p>
             <Input
                 type="number"
