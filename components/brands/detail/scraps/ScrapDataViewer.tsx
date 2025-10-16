@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { AskLimitToast } from '@/hooks/AskLimitToast';
 import { timeAgo } from '@/lib/date-utils';
 import DashboardHeader from '@/components/dashboard/shared/DashboardHeader';
+import { GenerateReportButton } from '../reports/GenerateReportButton';
 
 export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: any) {
     const [isPending, startTransition] = useTransition();
@@ -122,6 +123,8 @@ export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: 
                             "Scrape"
                         )}
                     </Button>
+                 
+                    <GenerateReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id } />
                     <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
                         <SelectTrigger className="w-[140px]">
                             <SelectValue placeholder="Select a scrap run" />

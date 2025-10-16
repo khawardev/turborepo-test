@@ -58,7 +58,7 @@ export default function SynthesizedReportsDashboard({ synthesizerReport, title }
     };
 
     return (
-        <div className="relative space-y-6">
+        <div className="relative space-y-6 min-h-0">
             <div className="flex items-center justify-between gap-2 ">
                 <h2 className="text-xl tracking-tighter font-semibold">
                     {title.charAt(0).toUpperCase() + title.slice(1)} Synthesized Report

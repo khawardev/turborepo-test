@@ -38,7 +38,7 @@ export const ContainerSm = ({ children, className = "" }: ContainerProps) => {
 export const ContainerMd = ({ children, className = "" }: ContainerProps) => {
     return (
         <div
-            className={`flex flex-col space-y-8 xl:px-0 px-4 py-26 mx-auto max-w-6xl xl:py-36 ${className}`}
+            className={`flex flex-col space-y-8 xl:px-0 px-4 pt-26 mx-auto max-w-6xl xl:pt-36 ${className}`}
         >
             {children}
         </div>

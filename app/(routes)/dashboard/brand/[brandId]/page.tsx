@@ -18,13 +18,21 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   const batchWebsiteReports = await getBatchWebsiteReports(brandId);
   const brandPerceptionReport = await getBrandPerceptionReport(brandId);
   const prioritizedReport = prioritizeBrandReport(brandPerceptionReport.data, brandData.name);
+  const sortedReports = batchWebsiteReports?.data
+    ? [...batchWebsiteReports.data].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    : []
+
 
   return (
     <DashboardLayout brandData={brandData}>
       <DashboardInnerLayout>
         <BrandDashboard
-          extractorReport={parseJsonFromMarkdown(batchWebsiteReports.data[0].brand_extraction.response)}
-          synthesizerReport={batchWebsiteReports.data[0].brand_synthesizer.response}
+          extractorReport={sortedReports?.[0]?.brand_extraction?.response ? parseJsonFromMarkdown(sortedReports?.[0]?.brand_extraction?.response): null}
+          synthesizerReport={
+            sortedReports?.[0]?.brand_synthesizer?.response ?? null
+          }
           title={brandData.name}
           brandPerceptionReport={prioritizedReport}
           scrapedData={batchWebsiteScraps.brand}

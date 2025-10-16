@@ -30,12 +30,12 @@ export async function scrapeBatchandExtractionWebsite(brand_id: any) {
       async () => await getBatchWebsiteScrapeStatus(brand_id, batchWebsiteScrape.task_id),
       (res) => res.success && res.data?.status === "Completed"
     )
-    const batchReports = await batchWebsiteReports(brand_id, batchWebsiteScrape.task_id)
+    // const batchReports = await batchWebsiteReports(brand_id, batchWebsiteScrape.task_id)
 
-    await pollUntilComplete(
-      async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
-      (res) => res.success && res.data?.status === "Completed"
-    )
+    // await pollUntilComplete(
+    //   async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
+    //   (res) => res.success && res.data?.status === "Completed"
+    // )
     revalidatePath(`/brands`)
     return { success: true, message: "Scraping and report extraction completed successfully 🎉" }
   } catch (error: any) {

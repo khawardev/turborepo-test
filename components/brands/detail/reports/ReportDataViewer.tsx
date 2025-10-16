@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { formatDistanceToNow } from 'date-fns'
 import ReportDisplay from './ReportDisplay'
 import DashboardHeader from '@/components/dashboard/shared/DashboardHeader'
 import { timeAgo } from '@/lib/date-utils'

@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/server/actions/authActions";
 import { getpreviousScraps, getscrapeBatchWebsite, getBatchId } from "@/server/actions/scrapeActions";
 import { notFound } from "next/navigation";
 import { ContainerMd } from "@/components/shared/containers";
-import { AnimatedTabs } from "@/components/AnimatedTabs";
+import { AnimatedTabs } from "@/components/brands/detail/AnimatedTabs";
 import BrandProfile from "@/components/brands/detail/profile/BrandProfile";
 import ScrapDataViewer from "@/components/brands/detail/scraps/ScrapDataViewer";
 import { getBatchWebsiteReports } from "@/server/actions/reportsActions";
@@ -28,10 +28,6 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ br
 
   const batchWebsiteReportsResult = await getBatchWebsiteReports(brandId);
   const allReportsData = batchWebsiteReportsResult?.data || [];
-
-
-console.log(brand, `<-> brand <->`);
-
 
 
   const tabs = [

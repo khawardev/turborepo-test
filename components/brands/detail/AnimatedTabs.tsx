@@ -3,7 +3,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
+import { Button } from '../../ui/button';
 import { useTabs } from '@/hooks/UseTabs';
 
 const transition: any = {

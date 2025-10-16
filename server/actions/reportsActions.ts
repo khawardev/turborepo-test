@@ -4,8 +4,27 @@ import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "./authActions";
 import { cookies } from "next/headers";
 import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/prompt";
+import { pollUntilComplete } from "@/lib/pollUntilComplete";
+import { getBatchWebsiteReportsStatus } from "./statusActions";
+import { revalidatePath } from "next/cache";
 
-export async function batchWebsiteReports(brand_id: any, batch_id: any) {
+export async function genrateReports({
+    brand_id,
+    batch_id,
+    selectedModel,
+    sythesizerPrompt,
+}: any) {
+    const batchReports = await batchWebsiteReports(brand_id, batch_id, selectedModel, sythesizerPrompt)
+
+    await pollUntilComplete(
+        async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
+        (res) => res.success && res.data?.status === "Completed"
+    )
+    revalidatePath(`/brands/${brand_id}`);
+    return batchReports.task_id
+}
+
+export async function batchWebsiteReports(brand_id: any, batch_id: any, selectedModel: any, sythesizerPrompt: any) {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
     if (!accessToken) return { success: false, error: "Unauthorized" };
@@ -14,15 +33,14 @@ export async function batchWebsiteReports(brand_id: any, batch_id: any) {
     if (!user) return { success: false, error: "User not found" };
 
     try {
-
         const payload = {
             client_id: user.client_id,
             brand_id: brand_id,
             batch_id: batch_id,
             batch_name: `${brand_id}_scrape`,
             extraction_prompt: EXTRACTOR_PROMPT,
-            synthesizer_prompt: SYNTHESIS_PROMPT,
-            model_id: "claude-4-1-opus"
+            synthesizer_prompt: sythesizerPrompt ? sythesizerPrompt : SYNTHESIS_PROMPT,
+            model_id: `${selectedModel}`
         };
 
         const response = await brandRequest("/batch/website-reports", "POST", payload);

@@ -52,15 +52,15 @@ export default function WebsiteDataView({ scrapedData }: any) {
     }
 
     return (
-        <div className="flex gap-6 h-[70vh] ">
-            <ScrollArea className="h-screen w-1/4 min-w-0 border-r">
+        <div className="flex gap-6 min-h-0 ">
+            <ScrollArea className="h-[75vh] w-1/4 min-w-0 border-r">
                     <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
                     <ul className="space-y-1">
                         {pages.map((page: any) => (
                             <li key={page.url}>
                                 <Button
                                     variant={selectedPage.url === page.url ? 'outline' : 'ghost'}
-                                    className="w-full justify-start font-normal h-9 text-left"
+                                    className=" justify-start font-normal w-[210px] h-9 text-left"
                                     onClick={() => setSelectedPage(page)}
                                 >
                                     <span className="truncate">{new URL(page.url).pathname}</span>
@@ -80,9 +80,10 @@ export default function WebsiteDataView({ scrapedData }: any) {
                         {isCopied ? "Copied!" : "Copy"}
                     </Button>
                 </div>
+
                 <Separator />
                 
-                <ScrollArea className="h-[65vh] w-full ">
+                <ScrollArea className="h-[70vh] w-full ">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
                         <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert ">
                             <ReactMarkdown components={{

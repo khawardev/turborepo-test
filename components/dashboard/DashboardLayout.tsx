@@ -22,12 +22,11 @@ const DashboardLayout = async ({ children, brandData }: any) => {
     await checkAuth();
     const user: any = await getCurrentUser();
     const SidebarHrefTree: any = generateSidebarHrefTree(brandData);
-    
 
     return (
         <SidebarProvider>
             <SidebarList SidebarHrefTree={SidebarHrefTree} />
-            <SidebarInset  >
+            <SidebarInset>
                 <header className="flex h-16 relative justify-between items-center gap-2 border-b px-4 ">
                     <div className="flex items-center gap-2">
                         <SidebarTrigger className="-ml-1" />
