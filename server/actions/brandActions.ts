@@ -63,7 +63,6 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
 }
 
 export async function getBrands(): Promise<Brand[]> {
-
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
@@ -73,7 +72,6 @@ export async function getBrands(): Promise<Brand[]> {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
       "GET",
-      undefined, 'force-cache'
     );
     return brands;
   } catch (error) {

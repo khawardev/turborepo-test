@@ -22,14 +22,14 @@ async function BrandList() {
   return (
     <div className="space-y-4">
       {brands.map(async (brand, index) => {
-        const BrandById = await getBrandbyIdWithCompetitors(brand.brand_id);
-        const batch_id = await getBatchId(user.client_id, BrandById.brand_id);
+        const brandData = await getBrandbyIdWithCompetitors(brand.brand_id);
+        const batch_id = await getBatchId(user.client_id, brandData.brand_id);
         return (
           <BrandItem
             key={brand.brand_id}
             index={index}
             isScrapped={batch_id ? true : false}
-            brand={BrandById}
+            brand={brandData}
           />
         );
       })}

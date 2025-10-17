@@ -17,6 +17,8 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
+import BlogPostCard from '@/components/BlogPostCard';
+import { posts } from "@/components/blog";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();
@@ -28,7 +30,6 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
         label: "Confirm",
         onClick: async () => {
           const result = await deleteBrand(brand.brand_id);
-
           if (result.success) {
             router.refresh();
             toast.success(result.message);
@@ -46,6 +47,7 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
         title="Brand Profile"
         subtitle="View detailed information about Brand and its Competitors"
       /> */}
+    
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight capitalize">{brand.name}</h1>
