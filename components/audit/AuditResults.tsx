@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
-import { MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
+import { MdOutlineRemoveCircleOutline } from "react-icons/md";
 import Link from "next/link";
-
 import { IoArrowBackOutline } from "react-icons/io5";
 import { Separator } from "../ui/separator";
 import ReactMarkdown from "react-markdown";
@@ -17,7 +16,8 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { generateQuestionnairePdf } from "@/lib/genrate-pdfs/questionare";
+import { generateQuestionnairePdf } from "@/lib/genrate-pdfs/questionare-pdf";
+import { generateQuestionnaireDocx } from "@/lib/genrate-pdfs/questionnaire-docx";
 
 interface AuditResultsProps {
     audit: any;
@@ -25,40 +25,12 @@ interface AuditResultsProps {
     generateQuestionnaire: (auditContent: string) => Promise<{ generatedText: string | null; errorReason: string | null; }>;
 }
 
-const ScoreWidget = ({
-    title,
-    score,
-    icon,
-}: {
-    title: string;
-    score: number;
-    icon: React.ReactNode;
-}) => {
-    const getScoreColor = () => {
-        if (score >= 80) return "text-primary";
-        if (score >= 40) return "text-lime-green";
-        return "text-red-500";
-    };
-
-    return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <div className="text-muted-foreground">{icon}</div>
-            </CardHeader>
-            <CardContent>
-                <div className={`text-2xl font-bold ${getScoreColor()}`}>{score}</div>
-                <p className="text-xs text-muted-foreground/60">out of 100</p>
-            </CardContent>
-        </Card>
-    );
-};
-
 export default function AuditResults({ audit, user, generateQuestionnaire }: AuditResultsProps) {
     const hasCredits = user?.auditCredits > 0;
     const hasReachedLimit = user?.auditCredits <= 0 && user?.auditCredits !== appConfig.audits.freeTierLimit;
     const [isDownloadingReport, setIsDownloadingReport] = useState(false);
-    const [isDownloadingQuestionnaire, setIsDownloadingQuestionnaire] = useState(false);
+    const [isDownloadingQuestionnairePdf, setIsDownloadingQuestionnairePdf] = useState(false);
+    const [isDownloadingQuestionnaireDocx, setIsDownloadingQuestionnaireDocx] = useState(false);
     const [isGeneratingQuestionnaire, setIsGeneratingQuestionnaire] = useState(false);
     const [questionnaire, setQuestionnaire] = useState<string | null>(null);
     const [questionnaireError, setQuestionnaireError] = useState<string | null>(null);
@@ -83,9 +55,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
         return (
             <div className="container max-w-4xl mx-auto md:py-30 py-28 px-4 text-center">
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="text-2xl">You've Used All Your Free Audits!</CardTitle>
-                    </CardHeader>
+                    <CardHeader><CardTitle className="text-2xl">You've Used All Your Free Audits!</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <p>Thank you for using our service. You have reached the limit of {appConfig.audits.freeTierLimit} free reports.</p>
                         <Button size="lg">Upgrade to Pro for More Audits</Button>
@@ -138,22 +108,40 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
         }
     };
 
-    const handleDownloadQuestionnairePdf = () => {
+    const handleDownloadQuestionnairePdf = async () => {
         if (!questionnaire) {
             toast.error("Questionnaire content is not available.");
             return;
         }
 
-        setIsDownloadingQuestionnaire(true);
+        setIsDownloadingQuestionnairePdf(true);
         try {
             const fileName = `${audit.url}_humanbrandai_questionnaire_${currentDate}.pdf`;
-            generateQuestionnairePdf({ markdownContent: questionnaire }, fileName);
-            toast.info("Questionnaire PDF Generated");
+            await generateQuestionnairePdf({ markdownContent: questionnaire }, fileName);
+            toast.success("Questionnaire PDF Generated");
         } catch (error) {
             console.error("Questionnaire PDF generation failed:", error);
             toast.error("Failed to generate questionnaire PDF.");
         } finally {
-            setIsDownloadingQuestionnaire(false);
+            setIsDownloadingQuestionnairePdf(false);
+        }
+    };
+
+    const handleDownloadQuestionnaireDocx = async () => {
+        if (!questionnaire) {
+            toast.error("Questionnaire content is not available.");
+            return;
+        }
+        setIsDownloadingQuestionnaireDocx(true);
+        try {
+            const fileName = `${audit.url}_humanbrandai_questionnaire_${currentDate}.docx`;
+            await generateQuestionnaireDocx(questionnaire, fileName);
+            toast.success("Questionnaire DOCX Generated");
+        } catch (error) {
+            console.error("Questionnaire DOCX generation failed:", error);
+            toast.error("Failed to generate questionnaire DOCX.");
+        } finally {
+            setIsDownloadingQuestionnaireDocx(false);
         }
     };
 
@@ -168,57 +156,45 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                     </AlertDescription>
                 </Alert>
             )}
-
             {!hasCredits && user?.auditCredits !== appConfig.audits.freeTierLimit && (
                 <Alert variant="destructive" className="mb-8">
                     <MdOutlineRemoveCircleOutline className="h-4 w-4" />
                     <AlertTitle className="font-semibold">Usage Limit Reached</AlertTitle>
-                    <AlertDescription>
-                        You have used all your free reports.
-                    </AlertDescription>
+                    <AlertDescription>You have used all your free reports.</AlertDescription>
                 </Alert>
             )}
 
             <Button className="w-fit rounded-full" variant="outline" asChild>
-                <Link href="/audit">
-                    <IoArrowBackOutline /> back
-                </Link>
+                <Link href="/audit"><IoArrowBackOutline /> back</Link>
             </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary">Brand Health Audit </span>  is ready</h1>
+                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary">Brand Health Audit </span> is ready</h1>
                     <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
                 </div>
             </div>
-
+            <Button size={'sm'} onClick={handleGenerateQuestionnaire} disabled={isGeneratingQuestionnaire || !!questionnaire}>
+                {isGeneratingQuestionnaire ? (<><Loader2 className="mr-2 size-3 animate-spin" /> Generating...</>) : ('Generate Questionnaire')}
+            </Button>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="report">Audit Report</TabsTrigger>
-                    <TabsTrigger value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
+                    <TabsTrigger className=" col-span-2" value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
+
                 </TabsList>
+
                 <TabsContent value="report">
                     {audit.crawledContent &&
                         <section>
                             <div className={"flex flex-col md:flex-row md:items-center items-end justify-between mb-4 gap-4"}>
-                                {!questionnaire && (
-                                    <Button
-                                        onClick={handleGenerateQuestionnaire}
-                                        disabled={isGeneratingQuestionnaire}
-                                    >
-                                        {isGeneratingQuestionnaire ? (
-                                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                                        ) : (
-                                            'Generate Questionnaire'
-                                        )}
-                                    </Button>
-                                )}
-                                <div className="flex justify-end w-full">
+                                <div className="flex justify-end w-full gap-3 mt-1">
                                     <ContentActions
                                         content={audit.auditGenratedContent}
                                         auditURL={audit.url}
                                         handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_humanbrandai_report_${currentDate}.pdf`)}
-                                        isDownloading={isDownloadingReport}
+                                        isDownloadingPdf={isDownloadingReport}
                                     />
+
                                 </div>
                             </div>
                             <Separator className="mb-4" />
@@ -236,15 +212,16 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                             <AlertDescription>{questionnaireError}</AlertDescription>
                         </Alert>
                     )}
-
                     {questionnaire && (
                         <section>
-                            <div className="flex justify-end mb-4">
+                            <div className="flex justify-end mb-4 mt-1">
                                 <ContentActions
                                     content={questionnaire}
                                     auditURL={audit.url}
                                     handleDownloadPdf={handleDownloadQuestionnairePdf}
-                                    isDownloading={isDownloadingQuestionnaire}
+                                    handleDownloadDocx={handleDownloadQuestionnaireDocx}
+                                    isDownloadingPdf={isDownloadingQuestionnairePdf}
+                                    isDownloadingDocx={isDownloadingQuestionnaireDocx}
                                 />
                             </div>
                             <Separator className="mb-4" />

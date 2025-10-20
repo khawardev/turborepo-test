@@ -1,13 +1,20 @@
-// src/lib/parse-markdown.ts
+// src/lib/genrate-pdfs/parse-questionaire-markdown.ts
 
 export interface ContentBlock {
-    type: 'mainTitle' | 'sectionHeader' | 'paragraph' | 'question' | 'bulletedList' | 'footerLine';
+    type: 'mainTitle' | 'sectionHeader' | 'paragraph' | 'question' | 'fillInTheBlank' | 'bulletedList' | 'footerLine';
     content: any;
 }
 
 interface QuestionContent {
     number: string;
     text: string;
+    context: string;
+}
+
+interface FillInTheBlankContent {
+    number: string;
+    startText: string;
+    endText: string;
     context: string;
 }
 
@@ -21,45 +28,57 @@ export function parseQuestionnaireMarkdown(markdown: string): ContentBlock[] {
     while (i < lines.length) {
         const line = lines[i]?.trim() || '';
 
-        // Skip horizontal rules and empty lines
         if (line === '---' || line === '') {
             i++;
             continue;
         }
 
-        // Section Headers (###)
         if (line.startsWith('### ')) {
-            // The first '###' is the main title
             const type = blocks.length === 0 ? 'mainTitle' : 'sectionHeader';
             blocks.push({ type, content: line.substring(4) });
             i++;
             continue;
         }
 
-        // Questions (e.g., "1. Some question text...")
         const questionMatch = line.match(/^(\d+)\.\s+(.*)/);
         if (questionMatch) {
             const number = questionMatch[1];
             let text = questionMatch[2];
             let context = '';
 
-            // Look ahead to the next line for multi-line text or context
-            i++;
-            while (i < lines.length && lines[i] && !lines[i].match(/^\d+\.\s/) && !lines[i].startsWith('###')) {
-                const nextLine = lines[i].trim();
-                if (nextLine.startsWith('**Context:**')) {
-                    context = nextLine.replace(/\*\*Context:\*\*/, '').trim();
-                } else if (nextLine) {
-                    text += ` ${nextLine}`; // Append multi-line question text
-                }
-                i++;
-            }
+            const blankPattern = '_____';
+            const blankIndex = text.indexOf(blankPattern);
 
-            blocks.push({ type: 'question', content: { number, text, context } as QuestionContent });
+            if (blankIndex !== -1) {
+                const startText = text.substring(0, blankIndex).trim();
+                const endText = text.substring(blankIndex + blankPattern.length).trim();
+
+                i++;
+                while (i < lines.length && lines[i] && !lines[i].match(/^\d+\.\s/) && !lines[i].startsWith('###')) {
+                    const nextLine = lines[i].trim();
+                    if (nextLine.startsWith('**Context:**')) {
+                        context = nextLine.replace(/\*\*Context:\*\*/, '').trim();
+                    }
+                    i++;
+                }
+                blocks.push({ type: 'fillInTheBlank', content: { number, startText, endText, context } as FillInTheBlankContent });
+
+            } else {
+                i++;
+                while (i < lines.length && lines[i] && !lines[i].match(/^\d+\.\s/) && !lines[i].startsWith('###')) {
+                    const nextLine = lines[i].trim();
+                    if (nextLine.startsWith('**Context:**')) {
+                        context = nextLine.replace(/\*\*Context:\*\*/, '').trim();
+                    } else if (nextLine) {
+                        text += ` ${nextLine}`;
+                    }
+                    i++;
+                }
+                blocks.push({ type: 'question', content: { number, text, context } as QuestionContent });
+            }
             continue;
         }
 
-        // Bulleted Lists (-)
         if (line.startsWith('- ')) {
             const items = [];
             while (i < lines.length && lines[i]?.trim().startsWith('- ')) {
@@ -70,7 +89,6 @@ export function parseQuestionnaireMarkdown(markdown: string): ContentBlock[] {
             continue;
         }
 
-        // Footer Lines (**Label:** Value)
         const footerMatch = line.match(/^\*\*(.*?):\*\*\s*(.*)/);
         if (footerMatch) {
             blocks.push({ type: 'footerLine', content: { label: footerMatch[1], value: footerMatch[2] } });
@@ -78,7 +96,6 @@ export function parseQuestionnaireMarkdown(markdown: string): ContentBlock[] {
             continue;
         }
 
-        // Paragraphs (anything else)
         blocks.push({ type: 'paragraph', content: line });
         i++;
     }

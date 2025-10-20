@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
-import { InterRegular } from './inter-fonts'; // Using InterRegular for the test
-import { parseQuestionnaireMarkdown } from './parse-questionaire-markdown';
+import { InterRegular } from './inter-fonts';
+import { parseQuestionnaireMarkdown, ContentBlock } from './parse-questionaire-markdown';
 
 const PRIMARY_COLOR = '#111827';
 const SECONDARY_COLOR = '#4B5563';
@@ -14,13 +14,19 @@ interface PdfData {
     markdownContent: string;
 }
 
-export function generateQuestionnairePdf(data: PdfData, fileName: string) {
+const toBase64 = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+
+export async function generateQuestionnairePdf(data: PdfData, fileName: string) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     doc.addFileToVFS('Inter-Regular.ttf', InterRegular);
     doc.addFont('Inter-Regular.ttf', 'Inter', 'normal');
-    // Note: To use bold/italic, you would need to add those fonts as well
-    // For now, we will simulate them with font settings or just use 'normal'.
     doc.setFont('Inter', 'normal');
 
     const blocks = parseQuestionnaireMarkdown(data.markdownContent);
@@ -37,12 +43,32 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
         }
     };
 
+    const addHeader = async () => {
+        const logoUrl = 'https://i.postimg.cc/yY06gqFK/HB-logo-name-mark-side-black-1.png';
+        try {
+            const response = await fetch(logoUrl);
+            const blob = await response.blob();
+            const base64Image = await toBase64(blob);
+            const imgProps = doc.getImageProperties(base64Image);
+            const imgWidth = 65;
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            doc.addImage(base64Image, 'PNG', PAGE_MARGIN, y, imgWidth, imgHeight);
+            y += imgHeight + 15;
+        } catch (error) {
+            console.error("Failed to load logo image:", error);
+            doc.setFontSize(20);
+            doc.setTextColor(PRIMARY_COLOR);
+            doc.text('Humanbrand AI', PAGE_MARGIN, y);
+            y += 20;
+        }
+    };
+
     const addMainTitle = (title: string) => {
         addPageIfNeeded(20);
-        doc.setFont('Inter', 'normal'); // Use 'bold' if font is available
+        doc.setFont('Inter', 'normal');
         doc.setFontSize(20);
         doc.setTextColor(PRIMARY_COLOR);
-        doc.text(title.toUpperCase(), PAGE_MARGIN, y);
+        doc.text(title, PAGE_MARGIN, y);
         y += SECTION_SPACING;
     };
 
@@ -58,7 +84,7 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
 
     const addSectionHeader = (title: string) => {
         addPageIfNeeded(25);
-        doc.setFont('Inter', 'normal'); // Use 'bold' if font is available
+        doc.setFont('Inter', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(PRIMARY_COLOR);
         doc.text(title, PAGE_MARGIN, y);
@@ -71,7 +97,7 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
 
     const addQuestion = (content: { number: string; text: string; context: string }) => {
         addPageIfNeeded(40);
-        doc.setFont('Inter', 'normal'); // Use 'bold' if font is available
+        doc.setFont('Inter', 'normal');
         doc.setFontSize(12);
         doc.setTextColor(PRIMARY_COLOR);
         const question = `${content.number}. ${content.text}`;
@@ -80,7 +106,40 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
         y += splitQ.length * LINE_HEIGHT + 3;
 
         if (content.context) {
-            doc.setFont('Inter', 'normal'); // Use 'italic' if font is available
+            doc.setFont('Inter', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(SECONDARY_COLOR);
+            const splitC = doc.splitTextToSize(`Context: ${content.context}`, contentWidth);
+            doc.text(splitC, PAGE_MARGIN, y);
+            y += splitC.length * (LINE_HEIGHT - 1) + 10;
+        } else {
+            y += 10;
+        }
+    };
+
+    const addFillInTheBlank = (content: { number: string; startText: string; endText: string; context: string }) => {
+        addPageIfNeeded(35);
+        doc.setFont('Inter', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor(PRIMARY_COLOR);
+
+        const prefix = `${content.number}. ${content.startText}`;
+        const prefixWidth = doc.getTextWidth(prefix);
+        const lineLength = 70;
+        const space = 2;
+
+        doc.text(prefix, PAGE_MARGIN, y);
+
+        const lineY = y - 1.5;
+        doc.setDrawColor(SECONDARY_COLOR);
+        doc.setLineWidth(0.2);
+        doc.line(PAGE_MARGIN + prefixWidth + space, lineY, PAGE_MARGIN + prefixWidth + space + lineLength, lineY);
+
+        doc.text(content.endText, PAGE_MARGIN + prefixWidth + space + lineLength + space, y);
+        y += LINE_HEIGHT + 3;
+
+        if (content.context) {
+            doc.setFont('Inter', 'normal');
             doc.setFontSize(10);
             doc.setTextColor(SECONDARY_COLOR);
             const splitC = doc.splitTextToSize(`Context: ${content.context}`, contentWidth);
@@ -105,8 +164,8 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
         y += 5;
     };
 
-    const addFooter = (footerLines: any[]) => {
-        doc.setFont('Inter', 'normal'); // Use 'italic' if font is available
+    const addFooter = (footerLines: ContentBlock[]) => {
+        doc.setFont('Inter', 'normal');
         doc.setFontSize(9);
         doc.setTextColor(SECONDARY_COLOR);
         const footerY = pageHeight - 20;
@@ -116,7 +175,8 @@ export function generateQuestionnairePdf(data: PdfData, fileName: string) {
         });
     };
 
-    // --- DYNAMIC CONTENT GENERATION ---
+    await addHeader();
+
     const contentBlocks = blocks.filter(b => b.type !== 'footerLine');
     const footerBlocks = blocks.filter(b => b.type === 'footerLine');
 

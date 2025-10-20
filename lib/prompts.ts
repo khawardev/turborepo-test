@@ -234,33 +234,174 @@ Output:
 `;
 
 
+
+const brandQuestionaireTemp = `Brand Questionnaire
+Thank you for taking the time to complete this customized brand questionnaire. Based on our initial brand audit of goodwolfcompany.com, we've identified specific areas where deeper insights from your leadership team will help strengthen and differentiate your brand position.
+This questionnaire is designed to address the key opportunities revealed in the audit—particularly around developing a more distinctive brand voice, clarifying your values, and building stronger emotional connections with your target audiences. Please answer as thoroughly as possible; the more detail you provide, the more powerful and authentic your brand narrative will become.
+I. Purpose, Vision & Values
+The audit demonstrated strong clarity around what you do (Marketing & Technology services), but identified opportunities to deepen the why and articulate explicit values. These questions will help uncover the emotional and cultural foundations of Good Wolf.
+1. Beyond helping clients 'outsmart, outpace, and outperform,' what deeper purpose drives Good Wolf Company?
+**Context:** The audit noted that your current purpose primarily focuses on achieving a competitive advantage. We'd like to understand the human motivation behind why you started this company and what impact you hope to have on your clients' businesses and lives.
+
+
+2. The name 'Good Wolf' suggests guidance, protection, and partnership—yet this narrative doesn't come through in your current messaging. What story or meaning inspired this name?
+**Context:** The audit identified this as a major untapped opportunity. Understanding the origin will help us develop a more emotionally resonant brand narrative.
+
+
+3. What are the 3-5 core values that are non-negotiable in how Good Wolf operates?
+**Context:** The audit revealed that your values are currently implicit rather than explicit (score: 5.4/10). Defining these clearly will strengthen your cultural identity and help differentiate you from other agencies.
+
+
+4. When you think about Good Wolf's role in the lives of your clients, what metaphor or analogy best captures your relationship with them?
+**Context:** Examples: Are you a guide? A partner? A catalyst? An architect? This will help develop more distinctive brand language.
+
+
+5. Describe your ideal future: What does Good Wolf look like in 5-10 years, and what will you have accomplished for the Midwest business community?
+**Context:** The audit noted your vision statement is present but underdeveloped (score: 6.6/10). This will help create a more compelling future-oriented narrative.
+
+
+II. Brand Character & Emotional Connection
+The audit found that while your brand voice is professional and confident, it's also functionally generic with minimal emotional language (only 2% of content). These questions will help develop a more distinctive and memorable brand personality.
+6. If Good Wolf were a person at a business networking event, how would you describe their personality? What makes them memorable?
+**Context:** Beyond 'smart' and 'expert,' what human qualities does your brand embody? Think about traits like warmth, boldness, playfulness, intensity, patience, etc.
+
+
+7. What emotions do you want clients to feel when they work with Good Wolf? And what emotions do you want them to feel when they think about their future after partnering with you?
+**Context:** The audit shows low emotional language usage. Understanding target emotions will help us craft more resonant messaging.
+
+
+8. Complete this sentence: 'Clients choose Good Wolf over competitors because we make them feel _____.'
+**Context:** This focuses specifically on the emotional differentiator beyond functional benefits.
+
+
+9. What do you want your brand to be famous for in the Detroit/Midwest business community?
+**Context:** Not just known for, but what you want people to immediately think of when they hear 'Good Wolf.'
+
+
+10. Are there any words or phrases you DON'T want associated with Good Wolf? Any perceptions you actively want to avoid?
+**Context:** Understanding what you're NOT helps clarify positioning.
+
+
+III. Target Audiences & Client Relationships
+The audit gave your audience clarity a strong score (8/10) but noted that 'Modern Brands' could be more precisely defined. These questions will help sharpen your targeting and value proposition.
+11. When you say 'Modern Brands,' what specific characteristics define these companies beyond just being contemporary?
+**Context:** What behaviors, attitudes, challenges, or aspirations make a brand 'modern' in your view?
+
+
+12. Describe your absolute best client relationship. What makes them ideal beyond just paying on time?
+**Context:** Think about their culture, decision-making style, ambitions, and how they engage with you.
+
+
+13. What types of clients or projects have you turned down, and why?
+**Context:** Understanding who you DON'T serve helps clarify your positioning and ideal client profile.
+
+
+14. What fundamental problem or pain point keeps your ideal clients awake at night?
+**Context:** Go beyond the functional (need a website) to the existential (fear of becoming irrelevant).
+
+
+15. Before clients find you, what are they typically doing to solve their marketing and technology challenges? And why isn't it working?
+**Context:** This reveals your competitive context and the gap you fill.
+
+
+IV. Differentiation & Market Position
+The audit identified that while your dual marketing-and-technology approach is a strong differentiator, your language relies heavily on generic industry terms like 'solutions' and 'services.' These questions will uncover your unique advantages.
+16. What can Good Wolf do (or does routinely) that your competitors can't or won't do?
+**Context:** Think about specific capabilities, approaches, or commitments that set you apart.
+
+
+17. Why did you decide to combine marketing AND technology services rather than specializing in one?
+**Context:** Understanding the strategic reasoning will help articulate this differentiator more compellingly.
+
+
+18. Who are 2-3 companies (in any industry) that you admire for their brand, culture, or approach? What specifically do you admire?
+**Context:** This reveals aspirational positioning and values.
+
+
+19. Complete this sentence: 'Our competitors help clients _____, but Good Wolf helps clients _____.'
+**Context:** Force a clear distinction between you and others in the space.
+
+
+20. What's something important about how Good Wolf works that clients might not notice or understand at first?
+**Context:** Hidden differentiators or behind-the-scenes approaches that deliver value.
+
+
+V. Results, Proof Points & Success Stories
+The audit noted that while proof points exist (DBusiness Magazine feature, testimonials), they could be more prominent and specific. These questions will help build stronger credibility elements.
+21. Describe your most transformative client success story. What was their situation before, what did you do, and what changed for them?
+**Context:** Focus on transformation, not just deliverables. Use the Challenge-Solution-Results framework.
+
+
+22. What's the most unexpected or surprising result you've delivered for a client?
+**Context:** Stories that break expectations are memorable and demonstrate unique value.
+
+
+23. If you could only share ONE metric or result that proves Good Wolf's value, what would it be?
+**Context:** This forces prioritization of your most compelling proof point.
+
+
+24. What do clients say about you in testimonials or referrals? Are there specific phrases they use repeatedly?
+**Context:** Actual client language is powerful and reveals perceived differentiators.
+
+
+25. Beyond client work, what credentials, expertise, or recognition positions Good Wolf as an authority?
+**Context:** Think: certifications, published thought leadership, speaking engagements, awards, industry involvement, etc.
+
+
+VI. Brand Promise & Positioning Statement
+These final questions synthesize everything into a cohesive brand promise and positioning.
+26. If you could make ONE promise to clients that Good Wolf will always deliver on, what would it be?
+**Context:** This should be both meaningful and defensible—something you can truly guarantee.
+
+
+27. Complete this positioning statement: 'Good Wolf helps [target audience] achieve [desired outcome] by [unique approach], unlike [competitors] who [alternative approach].'
+**Context:** This creates a clear, distinctive market position.
+
+
+28. What should clients expect from their experience of working with Good Wolf from day one through project completion?
+**Context:** Describe the journey and what makes it distinctively 'Good Wolf.'
+
+
+29. Are there any aspects of your brand identity, messaging, or positioning that you feel are misunderstood or need clarification?
+**Context:** This is your opportunity to address any gaps or concerns.
+
+
+30. Looking at your current website and marketing materials, what feels most authentically 'you' and what feels like it needs to change?
+**Context:** Your gut instinct on alignment between current brand expression and who you truly are.
+`
+
+
 export const companyReportQuestionnairePrompt = (params: {
   company_report: any;
   company_name:any
 }) => `
 You are a senior brand strategist AI. Your task is to generate a **customized Brand Questionnaire** for a company based on their provided report.
 
-Below is the **Company Report** you will use as context:
+Below is the **Company Report** you will use as **context:**
 ${params.company_report}
 
 ---
-Using the company report above, generate a questionnaire following this exact format and tone:
+Using the company report above, generate a questionnaire following this exact templete, format and tone:
 ---
+
+Templete, just for assessing the questions and the delivery of questions and **context:**
+${brandQuestionaireTemp}
+
+Format and tone:
 
 \#\#\# Brand Questionnaire
 
 Thank you for taking the time to complete this customized brand questionnaire. Based on our initial brand audit of ${params.company_name}, we've identified specific areas where deeper insights from your leadership team will help strengthen and differentiate your brand position.
-This questionnaire is designed to address the key opportunities revealed in the audit—particularly around developing a more distinctive brand voice, clarifying your values, and building stronger emotional connections with your target audiences. Please answer as thoroughly as possible; the more detail you provide, the more powerful and authentic your brand narrative will become.
+This questionnaire is designed to address the key opportunities revealed in the audit particularly around developing a more distinctive brand voice, clarifying your values, and building stronger emotional connections with your target audiences. Please answer as thoroughly as possible; the more detail you provide, the more powerful and authentic your brand narrative will become.
 
----
 
 \#\#\# I. Purpose, Vision & Values
+---
 Introduce this section by summarizing insights from the company report related to mission, vision, and purpose.  
 Then, generate 4–5 personalized, high-impact questions that help uncover the deeper “why,” values, and motivations behind the company.
 
-Each question should include a **Context** note that ties back to insights or gaps from the company report.
+In new line Each question should include a **Context** note that ties back to insights or gaps from the company report.
 
----
 
 \#\#\# II. Brand Character & Emotional Connection**  
 ---
@@ -268,37 +409,38 @@ Introduce this section by summarizing findings about tone, brand personality, an
 Then, generate 4–5 questions to help the company articulate its emotional impact, personality traits, and desired perception.  
 Each question should include a contextual note from the report findings.
 
----
 
 \#\#\# III. Target Audiences & Client Relationships**  
+---
 Introduce this section referencing audience clarity and targeting insights from the company report.  
 Generate 4–5 detailed questions exploring the company’s ideal clients, relationships, and value perception.  
-Each question should have a “Context” paragraph linking back to the report’s observations.
+Each question should include a contextual note from the report findings.
 
----
+
 
 \#\#\# IV. Differentiation & Market Position**  
+---
 Summarize how the report describes the company’s differentiation, competitors, and market position.  
 Then, craft 4–5 questions that reveal competitive advantage, market gaps, and strategic reasoning.  
-Each question should have a contextual note.
+Each question should include a contextual note from the report findings.
 
----
 
 \#\#\# V. Results, Proof Points & Success Stories**  
+---
 Summarize what the company report says about results, testimonials, or proof of performance.  
 Generate 4–5 questions designed to extract transformation stories, measurable impact, and key success metrics.  
-Each question should include a context note from the report.
+Each question should include a contextual note from the report findings.
 
----
 
 \#\#\# VI. Brand Promise & Positioning Statement**  
+---
 Summarize how the report characterizes the company’s current brand promise, mission, or tagline.  
 Then, create 4–5 questions that help synthesize everything into a cohesive brand promise, positioning statement, and client experience narrative.  
-Each question should include a contextual note.
+Each question should include a contextual note from the report findings.
 
 ---
 
-**Next Steps**
+Next Steps
 
 Thank you for completing this questionnaire. Your responses will be synthesized with the brand audit findings to develop:
 - A refined brand positioning and messaging framework  
@@ -315,11 +457,13 @@ Please return your completed questionnaire by [DATE]. If you have questions or n
 ---
 
 **Your Output Should:**
+- keep the [Brand Questionnaire] name capitlized not UPPERCASE
 - Follow the exact formatting and tone shown above  
 - Automatically adapt “Good Wolf Company” references to ${params.company_name} 
-- Include contextual “Context:” notes derived directly from ${params.company_report} insights  
+- Include contextual “**Context:**” notes derived directly from ${params.company_report} insights  
 - Contain 25–30 total customized questions  
 - Be ready-to-present as a final document
+- Dont include em dashes —
 `;
 
 // export const METRICS_EXTRACTION_PROMPT = (params: {

@@ -13,7 +13,6 @@ async function generateQuestionnaire(auditContent: string) {
 
     const questionnaire = companyReportQuestionnairePrompt({ company_report: auditContent, company_name: companyName  });
     const result = await generateNewContent(questionnaire);
-    console.log(result, `<-> result <->`);
     
     return result;
 }
