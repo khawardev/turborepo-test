@@ -1,18 +1,29 @@
 import { getUserWithAudits } from "@/actions/userActions";
 import AuditCard from "@/components/audit/AuditCard";
+import PaginationControls from "@/components/audit/PaginationControls";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function AuditsListPage() {
-    const userWithAudits = await getUserWithAudits();
+interface AuditsListPageProps {
+    searchParams?: {
+        page?: string;
+    };
+}
 
-    if (!userWithAudits) {
+export default async function AuditsListPage({ searchParams }: any) {
+    const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
+    const pageSize = 9;
+
+    const data = await getUserWithAudits({ page, pageSize });
+
+    if (!data) {
         redirect("/");
     }
 
-    const { audits } = userWithAudits;
+    const { audits, totalAudits } = data;
+    const totalPages = Math.ceil(totalAudits / pageSize);
 
     return (
         <div className="container max-w-5xl mx-auto md:py-30 py-28 px-4">
@@ -27,16 +38,23 @@ export default async function AuditsListPage() {
                 <div className="text-center py-16 border-2 border-dashed rounded-lg">
                     <h2 className="font-semibold text-medium">No Audits Found</h2>
                     <p className="text-muted-foreground mt-1 mb-4">You haven't generated any audits yet.</p>
-                    <Button  size={'sm'} asChild>
+                    <Button size={'sm'} asChild>
                         <Link href="/">Start your First Audit</Link>
                     </Button>
                 </div>
             ) : (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {audits.map((audit: any) => (
-                        <AuditCard key={audit.id} audit={audit} />
-                    ))}
-                </div>
+                <>
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {audits.map((audit: any) => (
+                            <AuditCard key={audit.id} audit={audit} />
+                        ))}
+                    </div>
+                    <PaginationControls
+                        currentPage={page}
+                        totalPages={totalPages}
+                        className="mt-8"
+                    />
+                </>
             )}
         </div>
     );

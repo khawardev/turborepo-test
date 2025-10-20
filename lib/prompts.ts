@@ -209,7 +209,118 @@ USER INPUTS (Provided by the application)
 `;
 
 
+export const extractCompanyNamePrompt = (params: {
+  company_report: any;
+}) => `
+You are an intelligent parser specialized in analyzing business documents.
 
+Your task is to **extract the company name** from the provided company report.
+
+Below is the company report text:
+${params.company_report}
+
+---
+
+Instructions:
+1. Identify the **primary company name** mentioned in the report.
+2. Return **only** the company name — do not include any additional commentary, symbols, or explanation.
+3. If multiple names are mentioned, choose the **main subject or focus company** the report is describing.
+4. If no explicit company name is found, infer it from the context (e.g., website URL, brand references, or organization name).
+5. Return output strictly in this format:
+
+Output:
+
+<company_name>
+`;
+
+
+export const companyReportQuestionnairePrompt = (params: {
+  company_report: any;
+  company_name:any
+}) => `
+You are a senior brand strategist AI. Your task is to generate a **customized Brand Questionnaire** for a company based on their provided report.
+
+Below is the **Company Report** you will use as context:
+${params.company_report}
+
+---
+Using the company report above, generate a questionnaire following this exact format and tone:
+---
+
+\#\#\# Brand Questionnaire
+
+Thank you for taking the time to complete this customized brand questionnaire. Based on our initial brand audit of ${params.company_name}, we've identified specific areas where deeper insights from your leadership team will help strengthen and differentiate your brand position.
+This questionnaire is designed to address the key opportunities revealed in the audit—particularly around developing a more distinctive brand voice, clarifying your values, and building stronger emotional connections with your target audiences. Please answer as thoroughly as possible; the more detail you provide, the more powerful and authentic your brand narrative will become.
+
+---
+
+\#\#\# I. Purpose, Vision & Values
+Introduce this section by summarizing insights from the company report related to mission, vision, and purpose.  
+Then, generate 4–5 personalized, high-impact questions that help uncover the deeper “why,” values, and motivations behind the company.
+
+Each question should include a **Context** note that ties back to insights or gaps from the company report.
+
+---
+
+\#\#\# II. Brand Character & Emotional Connection**  
+---
+Introduce this section by summarizing findings about tone, brand personality, and emotional resonance from the company report.  
+Then, generate 4–5 questions to help the company articulate its emotional impact, personality traits, and desired perception.  
+Each question should include a contextual note from the report findings.
+
+---
+
+\#\#\# III. Target Audiences & Client Relationships**  
+Introduce this section referencing audience clarity and targeting insights from the company report.  
+Generate 4–5 detailed questions exploring the company’s ideal clients, relationships, and value perception.  
+Each question should have a “Context” paragraph linking back to the report’s observations.
+
+---
+
+\#\#\# IV. Differentiation & Market Position**  
+Summarize how the report describes the company’s differentiation, competitors, and market position.  
+Then, craft 4–5 questions that reveal competitive advantage, market gaps, and strategic reasoning.  
+Each question should have a contextual note.
+
+---
+
+\#\#\# V. Results, Proof Points & Success Stories**  
+Summarize what the company report says about results, testimonials, or proof of performance.  
+Generate 4–5 questions designed to extract transformation stories, measurable impact, and key success metrics.  
+Each question should include a context note from the report.
+
+---
+
+\#\#\# VI. Brand Promise & Positioning Statement**  
+Summarize how the report characterizes the company’s current brand promise, mission, or tagline.  
+Then, create 4–5 questions that help synthesize everything into a cohesive brand promise, positioning statement, and client experience narrative.  
+Each question should include a contextual note.
+
+---
+
+**Next Steps**
+
+Thank you for completing this questionnaire. Your responses will be synthesized with the brand audit findings to develop:
+- A refined brand positioning and messaging framework  
+- An authentic and distinctive brand voice guide  
+- Clear articulation of your values and purpose  
+- Updated key messaging that leverages your brand narrative  
+- Recommendations for stronger emotional connection with target audiences  
+
+Please return your completed questionnaire by [DATE]. If you have questions or need clarification on any item, please don’t hesitate to reach out.
+
+**Prepared for:** ${params.company_name} Leadership Team  
+**Based on the Brand Health Audit by:** Humanbrand AI
+
+---
+
+**Your Output Should:**
+- Follow the exact formatting and tone shown above  
+- Automatically adapt “Good Wolf Company” references to ${params.company_name} 
+- Include contextual “Context:” notes derived directly from ${params.company_report} insights  
+- Contain 25–30 total customized questions  
+- Be ready-to-present as a final document
+`;
 
 // export const METRICS_EXTRACTION_PROMPT = (params: {
 //   generatedText: string;

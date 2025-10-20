@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
-import { AlertTriangle, CheckCircle2, CheckSquare, FileText, Loader2, Quote, Target, TrendingUp, Users, Volume2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { MdOutlineDownloading, MdOutlineRemoveCircleOutline } from "react-icons/md";
 import Link from "next/link";
 
@@ -15,16 +15,14 @@ import remarkGfm from "remark-gfm";
 import { ContentActions } from "./ContentActions";
 import { toast } from "sonner";
 import { useState } from "react";
-import { FaRegCircleCheck } from "react-icons/fa6";
-import { GrDocumentPerformance } from "react-icons/gr";
-import { HiOutlineUsers } from "react-icons/hi2";
-import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import { PiQuotes } from "react-icons/pi";
 import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { generateQuestionnairePdf } from "@/lib/genrate-pdfs/questionare";
 
 interface AuditResultsProps {
     audit: any;
     user: any;
+    generateQuestionnaire: (auditContent: string) => Promise<{ generatedText: string | null; errorReason: string | null; }>;
 }
 
 const ScoreWidget = ({
@@ -56,45 +54,16 @@ const ScoreWidget = ({
     );
 };
 
-export default function AuditResults({ audit, user }: AuditResultsProps) {
+export default function AuditResults({ audit, user, generateQuestionnaire }: AuditResultsProps) {
     const hasCredits = user?.auditCredits > 0;
     const hasReachedLimit = user?.auditCredits <= 0 && user?.auditCredits !== appConfig.audits.freeTierLimit;
-
-    const matricsData = {
-        Matrics: [
-            {
-                title: "Brand Score",
-                score: audit.results?.overallBrandScore ?? 0,
-                icon: <TrendingUp className="size-5" />,
-            },
-            {
-                title: "Core Purpose",
-                score: audit.results?.corePurpose ?? 0,
-                icon: <Target className="size-4" />,
-            },
-            {
-                title: "Lexical Distinctiveness",
-                score: audit.results?.lexicalDistinctiveness ?? 0,
-                icon: <PiQuotes className="size-5" />,
-            },
-            {
-                title: "Portfolio Clarity",
-                score: audit.results?.portfolioClarity ?? 0,
-                icon: <FaRegCircleCheck className="size-4" />,
-            },
-            {
-                title: "Consistency",
-                score: audit.results?.consistency ?? 0,
-                icon: <IoShieldCheckmarkOutline className="size-5" />,
-            },
-            {
-                title: "Audience Connection",
-                score: audit.results?.audienceConnection ?? 0,
-                icon: <HiOutlineUsers className="size-5" />,
-            },
-        ],
-        executiveSummary: audit.results?.executiveSummary ?? "",
-    };
+    const [isDownloadingReport, setIsDownloadingReport] = useState(false);
+    const [isDownloadingQuestionnaire, setIsDownloadingQuestionnaire] = useState(false);
+    const [isGeneratingQuestionnaire, setIsGeneratingQuestionnaire] = useState(false);
+    const [questionnaire, setQuestionnaire] = useState<string | null>(null);
+    const [questionnaireError, setQuestionnaireError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState("report");
+    const currentDate = new Date().toISOString().split("T")[0];
 
     if (audit.status === 'failed') {
         return (
@@ -125,26 +94,69 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
             </div>
         )
     }
-    const [isDownloading, setIsDownloading] = useState(false);
-    const currentDate = new Date().toISOString().split("T")[0];
 
-    const handleDownloadPdf = async () => {
-        setIsDownloading(true);
-        if (!audit?.auditGenratedContent) {
-            toast.error("No report content available to download.");
+    const handleDownloadReportPdf = async (content: string, fileName: string) => {
+        setIsDownloadingReport(true);
+        if (!content) {
+            toast.error("No content available to download.");
+            setIsDownloadingReport(false);
             return;
         }
         try {
-            toast.info("Preparing your PDF report...");
-            const { generateSimplePdfFromMarkdown } = await import('@/lib/generatePdf');
-            generateSimplePdfFromMarkdown(audit.auditGenratedContent, `${audit.url}_humanbrandai_${currentDate}.pdf`);
+            const { generateReportPdfFromMarkdown } = await import('@/lib/genrate-pdfs/report');
+            generateReportPdfFromMarkdown(content, fileName);
+            toast.info("Report PDF Generated");
         } catch (error) {
             console.error("PDF generation failed:", error);
             toast.error("Failed to generate PDF report.");
         } finally {
-            setIsDownloading(false);
+            setIsDownloadingReport(false);
         }
     };
+
+    const handleGenerateQuestionnaire = async () => {
+        setIsGeneratingQuestionnaire(true);
+        setQuestionnaire(null);
+        setQuestionnaireError(null);
+        try {
+            toast.info("Generating your questionnaire...");
+            const result = await generateQuestionnaire(audit.auditGenratedContent);
+            if (result.generatedText) {
+                setQuestionnaire(result.generatedText);
+                toast.success("Questionnaire generated successfully.");
+                setActiveTab("questionnaire");
+            } else {
+                setQuestionnaireError(result.errorReason || "An unknown error occurred.");
+                toast.error(result.errorReason || "Failed to generate questionnaire.");
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
+            setQuestionnaireError(errorMessage);
+            toast.error(errorMessage);
+        } finally {
+            setIsGeneratingQuestionnaire(false);
+        }
+    };
+
+    const handleDownloadQuestionnairePdf = () => {
+        if (!questionnaire) {
+            toast.error("Questionnaire content is not available.");
+            return;
+        }
+
+        setIsDownloadingQuestionnaire(true);
+        try {
+            const fileName = `${audit.url}_humanbrandai_questionnaire_${currentDate}.pdf`;
+            generateQuestionnairePdf({ markdownContent: questionnaire }, fileName);
+            toast.info("Questionnaire PDF Generated");
+        } catch (error) {
+            console.error("Questionnaire PDF generation failed:", error);
+            toast.error("Failed to generate questionnaire PDF.");
+        } finally {
+            setIsDownloadingQuestionnaire(false);
+        }
+    };
+
     return (
         <div className="container flex flex-col space-y-6 max-w-5xl mx-auto md:py-30 py-28 px-4">
             {hasCredits && (
@@ -166,7 +178,7 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                     </AlertDescription>
                 </Alert>
             )}
-           
+
             <Button className="w-fit rounded-full" variant="outline" asChild>
                 <Link href="/audit">
                     <IoArrowBackOutline /> back
@@ -177,61 +189,72 @@ export default function AuditResults({ audit, user }: AuditResultsProps) {
                     <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary">Brand Health Audit </span>  is ready</h1>
                     <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
                 </div>
-                <Button size={'sm'} onClick={handleDownloadPdf} disabled={isDownloading}>
-                    {isDownloading ? (
-                        <>
-                            <Loader2 className="animate-spin" />
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            Save Report <MdOutlineDownloading />
-                        </>
-                    )}
-                </Button>
             </div>
-            {/* <Card className="bg-muted/30">
-                <CardHeader>
-                    <CardTitle>Executive Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="text-muted-foreground">
-                    {matricsData.executiveSummary}
-                </CardContent>
-            </Card>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {matricsData.Matrics.map(({ title, score, icon }) => (
-                    <ScoreWidget
-                        key={title}
-                        title={title}
-                        score={score}
-                        icon={icon}
-                    />
-                ))}
-            </div> */}
-          
 
-            {
-                audit.crawledContent &&
-                <section>
-                    <div>
-                        <div className={"flex md:items-center items-end justify-end mb-4"}>
-                            <h1 className="text-xl tracking-tight font-semibold font-heading hidden">Website Audit Report Content</h1>
-                            <div className="flex justify-end">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="report">Audit Report</TabsTrigger>
+                    <TabsTrigger value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
+                </TabsList>
+                <TabsContent value="report">
+                    {audit.crawledContent &&
+                        <section>
+                            <div className={"flex flex-col md:flex-row md:items-center items-end justify-between mb-4 gap-4"}>
+                                {!questionnaire && (
+                                    <Button
+                                        onClick={handleGenerateQuestionnaire}
+                                        disabled={isGeneratingQuestionnaire}
+                                    >
+                                        {isGeneratingQuestionnaire ? (
+                                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                                        ) : (
+                                            'Generate Questionnaire'
+                                        )}
+                                    </Button>
+                                )}
+                                <div className="flex justify-end w-full">
+                                    <ContentActions
+                                        content={audit.auditGenratedContent}
+                                        auditURL={audit.url}
+                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_humanbrandai_report_${currentDate}.pdf`)}
+                                        isDownloading={isDownloadingReport}
+                                    />
+                                </div>
+                            </div>
+                            <Separator className="mb-4" />
+                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
+                            </div>
+                        </section>
+                    }
+                </TabsContent>
+                <TabsContent value="questionnaire">
+                    {questionnaireError && (
+                        <Alert variant="destructive">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Error Generating Questionnaire</AlertTitle>
+                            <AlertDescription>{questionnaireError}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    {questionnaire && (
+                        <section>
+                            <div className="flex justify-end mb-4">
                                 <ContentActions
-                                    content={audit.auditGenratedContent}
+                                    content={questionnaire}
                                     auditURL={audit.url}
+                                    handleDownloadPdf={handleDownloadQuestionnairePdf}
+                                    isDownloading={isDownloadingQuestionnaire}
                                 />
                             </div>
-                        </div>
-                        <Separator className="mb-4" />
-                    </div>
-                    <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
-                    </div>
-                </section>
-            }
+                            <Separator className="mb-4" />
+                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{questionnaire}</ReactMarkdown>
+                            </div>
+                        </section>
+                    )}
+                </TabsContent>
+            </Tabs>
         </div>
-
-
     );
 }

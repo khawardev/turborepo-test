@@ -11,7 +11,7 @@ import { Copy, Download, Stars } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast } from "sonner";
 
-export function ContentActions({ content, auditURL }: any) {
+export function ContentActions({ content, auditURL, handleDownloadPdf }: any) {
     const handleCopy = () => {
         navigator.clipboard.writeText(content);
         toast.success("Content copied to clipboard");
@@ -38,14 +38,14 @@ export function ContentActions({ content, auditURL }: any) {
                         Actions <IoIosArrowDown />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-22" align="end">
+                <DropdownMenuContent className="w-8" align="end">
                     <DropdownMenuItem onClick={handleCopy}>
                         <Copy size={16} className="opacity-60 mr-2" aria-hidden="true" />
                         <span>Copy</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleDownloadTxt}>
+                    <DropdownMenuItem onClick={handleDownloadPdf}>
                         <Download size={16} className="opacity-60 mr-2" aria-hidden="true" />
-                        <span>Save Report .txt</span>
+                        <span>Save Report .pdf</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

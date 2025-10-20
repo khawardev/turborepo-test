@@ -6,7 +6,7 @@ const HEADING_COLOR = '#111827';
 const TEXT_COLOR = '#111827';
 const BORDER_COLOR = '#9CA3AF';
 
-export function generateSimplePdfFromMarkdown(markdownContent: string, fileName: string) {
+export function generateReportPdfFromMarkdown(markdownContent: string, fileName: string) {
     const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',

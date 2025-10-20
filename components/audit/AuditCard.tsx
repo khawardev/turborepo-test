@@ -3,15 +3,24 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { capitalize } from "@/lib/utils";
-import { Badge } from "../ui/badge";
+import { Badge } from "@/components/ui/badge";
+
+type AuditStatus = 'completed' | 'failed' | 'pending';
+
+interface Audit {
+    id: string;
+    url: string;
+    createdAt: string | Date;
+    status: AuditStatus;
+}
 
 interface AuditCardProps {
-    audit: any;
+    audit: Audit;
 }
 
 export default function AuditCard({ audit }: AuditCardProps) {
 
-    const getBadgeVariant = (status: string) => {
+    const getBadgeVariant = (status: AuditStatus) => {
         switch (status) {
             case 'completed':
                 return 'default';

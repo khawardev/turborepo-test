@@ -102,7 +102,7 @@ export default function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                     )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className=" h-4 w-4 animate-spin" />}
+                    {isLoading && <Loader2 className=" size-3 animate-spin" />}
                     Sign Up
                 </Button>
             </form>

@@ -74,7 +74,7 @@ export default function UrlSubmissionForm({
                     className="w-full rounded-full font-semibold sm:w-auto"
                     disabled={isLoading}
                 >
-                    {isLoading && <Loader2 className="animate-spin" />}
+                    {isLoading && <Loader2 className="size-3 animate-spin" />}
                     Start Audit
                 </Button>
             </form>
