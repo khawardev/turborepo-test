@@ -193,6 +193,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                         auditURL={audit.url}
                                         handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_humanbrandai_report_${currentDate}.pdf`)}
                                         isDownloadingPdf={isDownloadingReport}
+                                        notdocx={false}
                                     />
 
                                 </div>
@@ -222,6 +223,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                     handleDownloadDocx={handleDownloadQuestionnaireDocx}
                                     isDownloadingPdf={isDownloadingQuestionnairePdf}
                                     isDownloadingDocx={isDownloadingQuestionnaireDocx}
+                                    notdocx={true}
                                 />
                             </div>
                             <Separator className="mb-4" />
