@@ -173,14 +173,13 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                     <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
                 </div>
             </div>
-            <Button size={'sm'} onClick={handleGenerateQuestionnaire} disabled={isGeneratingQuestionnaire || !!questionnaire}>
-                {isGeneratingQuestionnaire ? (<><Loader2 className="mr-2 size-3 animate-spin" /> Generating...</>) : ('Generate Questionnaire')}
+            <Button size={'sm'} onClick={handleGenerateQuestionnaire} >
+                {isGeneratingQuestionnaire ? (<><Loader2 className="size-3 animate-spin" /> Generating...</>) : ('Generate Questionnaire')}
             </Button>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="report">Audit Report</TabsTrigger>
                     <TabsTrigger className=" col-span-2" value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
-
                 </TabsList>
 
                 <TabsContent value="report">
@@ -195,7 +194,6 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                         isDownloadingPdf={isDownloadingReport}
                                         notdocx={false}
                                     />
-
                                 </div>
                             </div>
                             <Separator className="mb-4" />
