@@ -173,7 +173,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                     <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
                 </div>
             </div>
-            <Button size={'sm'} onClick={handleGenerateQuestionnaire} >
+            <Button size={'sm'} onClick={handleGenerateQuestionnaire} disabled={isGeneratingQuestionnaire} >
                 {isGeneratingQuestionnaire ? (<><Loader2 className="size-3 animate-spin" /> Generating...</>) : ('Generate Questionnaire')}
             </Button>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
