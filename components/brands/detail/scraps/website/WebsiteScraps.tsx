@@ -164,7 +164,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                     </TooltipProvider>
                 </div>
             </div>
-            <WebsiteDataView scrapedData={selectedDataSource} />
+            <WebsiteDataView websiteScrapsData={selectedDataSource} />
         </div>
     );
 }

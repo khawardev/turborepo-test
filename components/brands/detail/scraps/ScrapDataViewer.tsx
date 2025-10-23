@@ -6,6 +6,8 @@ import WebsiteScraps from './website/WebsiteScraps';
 import SocialScraps from './social/SocialScraps';
 
 export default function ScrapDataViewer({ allWebsiteScrapsData, allSocialScrapsData, brandName, brand_id }: any) {
+    console.log(allWebsiteScrapsData, `<-> allWebsiteScrapsData <->`);
+    
     return (
         <div className="flex flex-col space-y-8">
             <DashboardHeader
