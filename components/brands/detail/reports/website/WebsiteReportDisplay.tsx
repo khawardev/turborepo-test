@@ -21,7 +21,7 @@ export default function WebsiteReportDisplay({ standardizedReportData, title }: 
     }, [standardizedReportData]);
 
     return (
-        <div className="flex flex-col  pt-4">
+        <div className="flex flex-col">
             <Tabs defaultValue="extracted_data" className=" flex flex-col">
                 <div className="shrink-0">
                     <TabsList>
