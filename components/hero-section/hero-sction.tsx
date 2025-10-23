@@ -11,7 +11,7 @@ export default function HeroSection() {
             <div>
                 <Blur
                     className="max-w-2xl text-balance tracking-tighter text-5xl font-medium md:text-6xl ">
-                    Brand Power Returns to your Team
+                    Brand Control Returns to your Team
                 </Blur>
                 <BlurDelay className="mt-8 max-w-2xl text-pretty font-medium text-muted-foreground md:text-xl text-lg">
                     Humanbrand AI is the Brand OS that puts brand control back in your team's hands, enabling instant clarity, secure governance, and the freedom to create on-brand content at scale
@@ -19,7 +19,7 @@ export default function HeroSection() {
 
                 <BlurDelay2 className="mt-12 flex items-center gap-2">
                     <Button asChild size={'lg'}>
-                        <Link href="#link">
+                        <Link href="/brands">
                             Get Started
                         </Link>
                     </Button>
