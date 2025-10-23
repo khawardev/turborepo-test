@@ -11,11 +11,11 @@ function ScrollArea({
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   return (
     <ScrollAreaPrimitive.Root
-      className={cn("relative w-full  h-full overflow-hidden", className)}
+      className={cn("relative w-full   h-full ", className)}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
-        className="w-full h-full px-1"
+        className="w-full h-full px-1 overflow-x-hidden "
       >
         {children}
       </ScrollAreaPrimitive.Viewport>

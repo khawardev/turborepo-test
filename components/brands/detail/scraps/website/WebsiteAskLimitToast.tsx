@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import React from 'react'
 import { toast } from 'sonner';
 
-export function AskLimitToast({ t, onConfirm }: { t: any; onConfirm: (limit: number) => void }) {
+export function WebsiteAskLimitToast({ t, onConfirm }: { t: any; onConfirm: (limit: number) => void }) {
     const [limit, setLimit] = React.useState("")
 
     const handleConfirm = () => {
@@ -14,6 +14,7 @@ export function AskLimitToast({ t, onConfirm }: { t: any; onConfirm: (limit: num
         }
         toast.dismiss(t.id)
         toast.success(`Limit set to ${parsedLimit}`)
+        toast.success(`Scraping Started`)
         onConfirm(parsedLimit)
     }
 

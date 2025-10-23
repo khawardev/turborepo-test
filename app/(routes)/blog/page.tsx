@@ -1,5 +1,5 @@
-import BlogPostCard from '@/components/BlogPostCard'
-import { posts } from '@/components/blog'
+import BlogPostCard from '@/components/blogs/BlogPostCard'
+import { posts } from '@/components/blogs/blog'
 import { ContainerLg } from '@/components/shared/containers'
 import React from 'react'
 

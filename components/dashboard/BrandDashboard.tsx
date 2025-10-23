@@ -5,12 +5,14 @@ import DashboardHeader from "./shared/DashboardHeader";
 import RawDataDashboard from "./raw-data/RawDataDashboard";
 import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
 import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
-import { SynthesizedReport } from "@/data/response/agents/4.GET_bedrock-synthesizor-report";
 import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
 import { magnaData } from "@/data/brands/magna";
 import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
+import SocialReportDisplay from "../brands/detail/reports/social/SocialReportDisplay";
+// import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
 
-export default function BrandDashboard({ scrapedData, title, extractorReport, synthesizerReport, brandPerceptionReport }: any) {
+export default function BrandDashboard({ websiteScrapsData, title, extractorReport, synthesizerReport, brandPerceptionReport, socialScrapsData, socialReportsData }: any) {
+    
     return (
         <div>
             <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards." />
@@ -23,7 +25,7 @@ export default function BrandDashboard({ scrapedData, title, extractorReport, sy
                 </TabsList>
 
                 <TabsContent value="raw_data">
-                    <RawDataDashboard scrapedData={scrapedData} />
+                    <RawDataDashboard websiteScrapsData={websiteScrapsData} socialScrapsData={socialScrapsData} />
                 </TabsContent>
 
                 <TabsContent value="website_audit">
@@ -45,40 +47,7 @@ export default function BrandDashboard({ scrapedData, title, extractorReport, sy
 
 
                 <TabsContent value="social_audit">
-                    <Tabs defaultValue="facebook">
-                        <TabsList>
-                            <TabsTrigger value="facebook">Facebook</TabsTrigger>
-                            <TabsTrigger value="instagram">Instagram</TabsTrigger>
-                            <TabsTrigger value="x_twitter">X (Twitter)</TabsTrigger>
-                            <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
-                            <TabsTrigger value="youtube">YouTube</TabsTrigger>
-                            <TabsTrigger value="tiktok">TikTok</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="facebook">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-
-                        <TabsContent value="instagram">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-
-                        <TabsContent value="x_twitter">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-
-                        <TabsContent value="linkedin">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-
-                        <TabsContent value="youtube">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-
-                        <TabsContent value="tiktok">
-                            <SynthesizedReportsDashboard data={SynthesizedReport} />
-                        </TabsContent>
-                    </Tabs>
+                    <SocialReportDisplay entityReports={socialReportsData} selectedEntityName={socialReportsData[0].entity_name} />
                 </TabsContent>
 
                 <TabsContent value="analytics_dashboards">
@@ -89,9 +58,11 @@ export default function BrandDashboard({ scrapedData, title, extractorReport, sy
                             <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 
-                     <TabsContent value="social_media">
+                        <TabsContent value="social_media">
                             <SocialMediaDashboard data={magnaData.socialMedia} />
-                        </TabsContent> 
+
+                            {/* <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} /> */}
+                        </TabsContent>
 
                         {/* <TabsContent value="earned_media">
                             <EarnedMediaDashboard data={magnaData.earnedMedia} />

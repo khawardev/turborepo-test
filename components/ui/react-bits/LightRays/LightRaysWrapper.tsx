@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
-import DarkVeil from "./DarkVeil";
+import DarkVeil from "../DarkVeil/DarkVeil";
 import LightRays from "./LightRays";
 
 

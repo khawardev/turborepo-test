@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Badge } from './ui/badge';
+import { Badge } from '../ui/badge';
 
 interface BlogPostCardProps {
     post: any;

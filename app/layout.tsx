@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "@/app/(css)/globals.css";
 import { ThemeProvider } from "next-themes";
-import LightRaysWrapper from "@/components/ui/react-bits/LightRaysWrapper";
+import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrapper";
 import HeaderServer from "@/components/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/brandos-config";
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: 'swap', });
 
 export const viewport: Viewport = {
   initialScale: 1,

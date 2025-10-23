@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseJsonFromMarkdown } from "@/lib/jsonParser";
 import { useMemo } from "react";
 
-export default function ReportDisplay({ standardizedReportData, title }: any) {
+export default function WebsiteReportDisplay({ standardizedReportData, title }: any) {
 
     const { extractorReport, synthesizerReport } = useMemo(() => {
         const rawExtractionResponse = standardizedReportData?.extraction?.response;
@@ -21,7 +21,7 @@ export default function ReportDisplay({ standardizedReportData, title }: any) {
     }, [standardizedReportData]);
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col  pt-4">
             <Tabs defaultValue="extracted_data" className=" flex flex-col">
                 <div className="shrink-0">
                     <TabsList>
@@ -30,7 +30,7 @@ export default function ReportDisplay({ standardizedReportData, title }: any) {
                     </TabsList>
                 </div>
 
-                <TabsContent value="extracted_data" >
+                <TabsContent value="extracted_data"  >
                     <ExtractedDataDashboard extractorReport={extractorReport} title={title} />
                 </TabsContent>
 

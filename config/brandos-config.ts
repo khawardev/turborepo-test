@@ -1,8 +1,12 @@
 export const BrandOSConfig: any = {
     mainNav: [
         {
-            title: "Brands",
+            title: "Home",
             href: "/",
+        },
+        {
+            title: "Brands",
+            href: "/brands",
         },
     ],
 };

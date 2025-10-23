@@ -19,16 +19,14 @@ export function HeaderClient({ user }: any) {
           <FullLogo />
         </Link>
         <ul className="flex flex-1 items-center justify-end gap-2">
-          <li className="lg:pr-4 md:not-sr-only sr-only">
-            {user &&
-              BrandOSConfig.mainNav.map((item: any, index: number) => (
-                <Button variant={pathname === "/" ? "outline" : "ghost"} size="sm" key={index}>
-                  <Link href={item.href}>
-                    <span>{item.title}</span>
-                  </Link>
-                </Button>
-              ))}
-          </li>
+          {user &&
+            BrandOSConfig.mainNav.map((item: any, index: number) => (
+              <Button variant={pathname === item.href ? "outline" : "ghost"} size="sm" key={index}>
+                <Link href={item.href}>
+                  <span>{item.title}</span>
+                </Link>
+              </Button>
+            ))}
           <div className="md:border-l pl-4 flex items-center gap-2">
             {!user && (
               <Button asChild>

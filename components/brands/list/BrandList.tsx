@@ -2,8 +2,8 @@ import { getBrandbyIdWithCompetitors, getBrands, getCompetitors } from "@/server
 import { Brand } from "@/types";
 import BrandItem from "@/components/brands/list/BrandItem";
 import { Card } from "@/components/ui/card";
-import { getBatchId } from "@/server/actions/scrapeActions";
 import { getCurrentUser } from "@/server/actions/authActions";
+import { getWebsiteBatchId } from "@/server/actions/website/websiteScrapeActions";
 
 async function BrandList() {
   const brands: Brand[] = await getBrands();
@@ -23,7 +23,7 @@ async function BrandList() {
     <div className="space-y-4">
       {brands.map(async (brand, index) => {
         const brandData = await getBrandbyIdWithCompetitors(brand.brand_id);
-        const batch_id = await getBatchId(user.client_id, brandData.brand_id);
+        const batch_id = await getWebsiteBatchId(user.client_id, brandData.brand_id);
         return (
           <BrandItem
             key={brand.brand_id}

@@ -2,16 +2,16 @@
 
 import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { genrateReports } from "@/server/actions/reportsActions"
-import { ModelSelector } from "@/components/brands/detail/reports/ModelSelector"
 import { ButtonSpinner } from "@/components/shared/spinner"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { batchWebsiteReports } from "@/server/actions/website/websiteReportActions"
+import { WebsiteModelSelector } from "./WebsiteModelSelector"
 
 
-export function GenerateReportButton({ brand_id, batch_id }: any) {
+export function WebsiteReportButton({ brand_id, batch_id }: any) {
     const router= useRouter()
     const [open, setOpen] = useState(false)
     const [prompt, setPrompt] = useState("")
@@ -19,49 +19,54 @@ export function GenerateReportButton({ brand_id, batch_id }: any) {
     const [selectedModels, setSelectedModels] = useState<string[]>([])
 
     async function handleGenerate() {
-        toast.info("Reports generation started", { duration: 4000 })
-        toast.info("It may take 20–25 minutes to complete")
+        toast.info("Reports generation may take 20–25 minutes to complete")
 
+        setOpen(false)
         startTransition(async () => {
-            setOpen(false)
-            await genrateReports({
+            const websiteReports = await batchWebsiteReports({
                 brand_id,
                 batch_id,
-                selectedModel: selectedModels[0],
+                model_id: selectedModels[0],
                 sythesizerPrompt: prompt || null,
             })
             setSelectedModels([])
             setPrompt("")
             router.refresh();
-            toast.success('Reports has been genrated successfully 🎉')
+            if (websiteReports.success) {
+                toast.success('Reports has been genrated successfully 🎉')
+            } else {
+                toast.success(websiteReports.error)
+            }
         })
     }
     return (
         <>
-            <Button disabled={isPending} onClick={() => setOpen(true)}>
-                {isPending ? (
-                    <ButtonSpinner>Genrating</ButtonSpinner>
-                ) : (
-                    "Generate Reports"
-                )}
-            </Button>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-lg">
+                <DialogTrigger asChild>
+                    <Button disabled={isPending}>
+                        {isPending ? (
+                            <ButtonSpinner>Genrating</ButtonSpinner>
+                        ) : (
+                            "Generate Website Reports"
+                        )}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent >
                     <DialogHeader>
-                        <DialogTitle>Generate Reports</DialogTitle>
+                        <DialogTitle>Generate Website Reports</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4">
                         <div>
                             <p className="text-sm font-medium mb-2">Select LLM Models</p>
-                            <ModelSelector
+                            <WebsiteModelSelector
                                 selectedModel={selectedModels[0]}
                                 setSelectedModel={(modelId: string) => setSelectedModels([modelId])}
                             />
                         </div>
 
                         <div>
-                            <p className="text-sm font-medium mb-2">Synthesizer Prompt (optional)</p>
+                            <p className="text-sm font-medium mb-2">Website Synthesizer Prompt (optional)</p>
                             <Textarea
                                 placeholder="Enter your custom prompt..."
                                 value={prompt}

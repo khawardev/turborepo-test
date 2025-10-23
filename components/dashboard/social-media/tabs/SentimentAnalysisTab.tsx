@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomChartTooltipContent from "@/components/dashboard/shared/CustomChartTooltipContent";
+import { BRAND_SOCIAL_COLOR } from "@/components/shared/dashboard-color";
 
 export default function SentimentAnalysisTab({ data }: any) {
-    const { platforms, colors } = data;
-    const { SENTIMENT_COLORS } = colors;
+    const { platforms } = data;
+    const { SENTIMENT_COLORS }:any = BRAND_SOCIAL_COLOR;
     const platformKeys = Object.keys(platforms);
 
     return (

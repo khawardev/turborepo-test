@@ -5,18 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center  justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex items-center select-none  justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+          "border-transparent shadow-[inset_0px_0.5px_0px_0px_rgba(255,255,255,0.40),inset_0px_0px_0px_0.5px_rgba(255,255,255,0.30)] dark:shadow-[_0_0_14px_0_rgba(255,255,255,0.2),_inset_0_-1px_0.4px_0_rgba(255,255,255,0.1),_inset_0_1px_0.4px_0_rgba(255,255,255,0.15)] bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
         secondary:
           "border bg-accent/60  text-secondary-foreground [a&]:hover:bg-accent/90",
         destructive:
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "shadow-xs bg-linear-to-t hover:to-muted to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 duration-200",
+        label: "border-transparent   text-xs   text-[#000000] bg-[#adfa1d] ml-2 hover:bg-[#adfa1d]/80",
       },
     },
     defaultVariants: {

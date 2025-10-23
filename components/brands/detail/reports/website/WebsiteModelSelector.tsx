@@ -16,7 +16,7 @@ const MODELS = [
     { id: "claude-3-7-sonnet", name: "Anthropic Claude 3.7 Sonnet — 200K tokens" },
 ]
 
-export function ModelSelector({ selectedModel, setSelectedModel }: any) {
+export function WebsiteModelSelector({ selectedModel, setSelectedModel }: any) {
     const [open, setOpen] = useState(false)
 
     const handleSelect = (modelId: string) => {

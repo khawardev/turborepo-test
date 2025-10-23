@@ -12,8 +12,7 @@ export default function ContentDriversTab({ data }: any) {
     const tickColor = theme === 'dark' ? '#888888' : '#333333';
     const gridColor = theme === 'dark' ? '#444444' : '#dddddd';
 
-    const { platforms, colors } = data;
-    const { PLATFORM_COLORS } = colors;
+    const { platforms } = data;
     const platformKeys = Object.keys(platforms);
 
     return (

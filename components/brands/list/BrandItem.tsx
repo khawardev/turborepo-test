@@ -17,15 +17,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Link as LinkIcon } from "lucide-react";
+import { ChevronDown, Edit2, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
-import { scrapeBatchWebsite } from "@/server/actions/scrapeActions";
 import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { AskLimitToast } from "@/hooks/AskLimitToast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteBrand } from "@/server/actions/brandActions";
+import { scrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
+import { WebsiteAskLimitToast } from "../detail/scraps/website/WebsiteAskLimitToast";
 
 function BrandItemSkeleton() {
   return (
@@ -83,7 +85,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
 
   const askLimit = () => {
     toast.custom((t: any) => (
-      <AskLimitToast
+      <WebsiteAskLimitToast
         t={t}
         onConfirm={(parsedLimit) => {
           scrapeBrand(parsedLimit)
@@ -102,6 +104,24 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       } else {
         toast.error("Scraping failed.");
       }
+    });
+  };
+
+  const confirmDelete = () => {
+    toast(`Delete ${brand.name}?`, {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Confirm",
+        onClick: async () => {
+          const result = await deleteBrand(brand.brand_id);
+          if (result.success) {
+            router.refresh();
+            toast.success(result.message);
+          } else {
+            toast.error(result.message);
+          }
+        },
+      },
     });
   };
   return (
@@ -130,6 +150,21 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               )}
             </Button>
           }
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button  variant="outline" >
+                Actions <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardHeader>
       <CardContent >

@@ -7,14 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomChartTooltipContent from "@/components/dashboard/shared/CustomChartTooltipContent";
 import CustomLegend from "../../shared/Legend";
+import { BRAND_SOCIAL_COLOR } from "@/components/shared/dashboard-color";
 
 export default function MandatedDriversTab({ data }: any) {
     const { theme } = useTheme();
     const tickColor = theme === 'dark' ? '#888888' : '#333333';
     const gridColor = theme === 'dark' ? '#444444' : '#dddddd';
 
-    const { platforms, colors } = data;
-    const { DRIVER_COLORS } = colors;
+    const { platforms } = data;
+    const { DRIVER_COLORS }: any = BRAND_SOCIAL_COLOR;
     const platformKeys = Object.keys(platforms);
 
     return (

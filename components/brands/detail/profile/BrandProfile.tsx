@@ -17,8 +17,8 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
-import BlogPostCard from '@/components/BlogPostCard';
-import { posts } from "@/components/blog";
+import BlogPostCard from '@/components/blogs/BlogPostCard';
+import { posts } from "@/components/blogs/blog";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();

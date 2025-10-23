@@ -1,30 +1,19 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { getCurrentUser } from "./authActions";
 import { cookies } from "next/headers";
 import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/prompt";
 import { pollUntilComplete } from "@/lib/pollUntilComplete";
-import { getBatchWebsiteReportsStatus } from "./statusActions";
 import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "../authActions";
+import { getBatchWebsiteReportsStatus } from "./websiteStatusAction";
 
-export async function genrateReports({
+export async function batchWebsiteReports({
     brand_id,
     batch_id,
-    selectedModel,
+    model_id,
     sythesizerPrompt,
 }: any) {
-    const batchReports = await batchWebsiteReports(brand_id, batch_id, selectedModel, sythesizerPrompt)
-
-    await pollUntilComplete(
-        async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
-        (res) => res.success && res.data?.status === "Completed"
-    )
-    revalidatePath(`/brands/${brand_id}`);
-    return batchReports.task_id
-}
-
-export async function batchWebsiteReports(brand_id: any, batch_id: any, selectedModel: any, sythesizerPrompt: any) {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
     if (!accessToken) return { success: false, error: "Unauthorized" };
@@ -37,14 +26,20 @@ export async function batchWebsiteReports(brand_id: any, batch_id: any, selected
             client_id: user.client_id,
             brand_id: brand_id,
             batch_id: batch_id,
-            batch_name: `${brand_id}_scrape`,
+            batch_name: `${brand_id}_report`,
             extraction_prompt: EXTRACTOR_PROMPT,
             synthesizer_prompt: sythesizerPrompt ? sythesizerPrompt : SYNTHESIS_PROMPT,
-            model_id: `${selectedModel}`
+            model_id: `${model_id}`
         };
 
-        const response = await brandRequest("/batch/website-reports", "POST", payload);
-        return response;
+        const batchReports = await brandRequest("/batch/website-reports", "POST", payload);
+
+        await pollUntilComplete(
+            async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
+            (res) => res.success && res.data?.status === "Completed"
+        )
+        revalidatePath(`/brands/${brand_id}`);
+        return batchReports.task_id
     } catch (error: any) {
         console.error("Error in createBatchWebsiteReports:", error);
         return { success: false, error: error.message };

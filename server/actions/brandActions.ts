@@ -31,7 +31,7 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
       await addCompetitors(brandResult.brand_id, competitors);
     }
 
-    revalidatePath("/");
+    revalidatePath("/brands");
     return { success: true, data: brandResult };
   } catch (error: any) {
     return { success: false, error: error.message || "Something went wrong" };
@@ -169,7 +169,7 @@ export async function deleteBrand(brand_id: string) {
       "DELETE"
     );
 
-    revalidatePath("/");
+    revalidatePath("/brands");
     return {
       success: true,
       message: "Brand deleted successfully 🎉",

@@ -419,3 +419,177 @@ This summary chart provides a consolidated view of the core identity elements sy
 
 The attributes synthesized in this report represent an authentic, evidence-based reflection of the emergent brand. This Humanbrand AI perception analysis, conducted as a comprehensive outside-in audit, provides a stable, unbiased foundation upon which all future brand strategy, competitive analysis, and creative development can be built. This is the ground truth of the brand today.
 `;
+
+
+
+export const SOCIAL_SYNTHESIS_PROMPT: string = `
+ROLE & MANDATE
+You are a Senior Strategist at Humanbrand AI. Perform an outside‑in audit for ONE social channel using ONLY the provided TEXT data (Amnesia Protocol). Do not use external knowledge. Focus strictly on written elements (post text, captions, hashtags, mentions, emojis-as-text, comments, transcripts). Ignore images and thumbnails entirely.
+
+INPUTS
+
+- channel_name: one of [LinkedIn, X, YouTube, Instagram, Facebook, TikTok]
+- channel_homepage_snapshot (text fields; best-effort if some are missing):
+   follower_count (integer, snapshot date), following_count (optional), verified_flag (optional),
+   profile_about_text (brand/about/pinned text visible on the homepage),
+   pinned_text (if any) + pinned_date (if any).
+- DATA: a table (CSV or Excel) with best-effort columns:
+   post_id, post_text, permalink, posted_datetime, like_count, share_count, comment_count, view_count (optional),
+   hashtags, mentions, emojis, author_handle, transcript_text (optional).
+- COMMENTS (optional): post_id, comment_id, comment_text, commented_datetime.
+- analysis_window (optional): YYYY-MM-DD → YYYY-MM-DD.
+  If any field/column is missing, proceed without it and log a coverage shortfall.
+
+CHANNEL POLICY (which attributes are allowed per channel)
+Apply strictly. Items in "skip" must be refused with the string “Not inferable (channel policy)”.
+policy:
+ LinkedIn:
+  synthesize: [Positioning, BrandPromise, KeyThemes, VoiceTone, LexiconExecIndustry, RhetoricalStyle, PersonasBuyerTalent, BusinessDrivers]
+  optional:  [Values]
+  skip:    [Mission, Vision]
+  extras:   [ContentPillars, ProofDensity_per1k, CTA_Patterns]
+ X:
+  synthesize: [KeyThemes, HookLines, VoiceTone, RhetoricalStyle, PersonasMediaTech, InfluencerPressProfile]
+  optional:  [Positioning, BrandPromise]
+  skip:    [Mission, Vision, Values]
+  extras:   [RealTimeStance, TopicCadence, QuoteTweetHubs]
+ YouTube:
+  synthesize: [BrandPromise, KeyThemes, VoiceTone, LexiconTechnical, PersonasEngineersBuyers, BusinessDrivers]
+  optional:  [Positioning]
+  skip:    [Mission, Vision]
+  extras:   [FormatDNA, EvidenceMontage_Timestamps]
+ Instagram:
+  synthesize: [ValuesCultureESG, VoiceTone, KeyThemesEmployerEvents, PersonasEmployeesEnthusiasts]
+  optional:  [Positioning, BrandPromise]
+  skip:    [Mission, Vision]
+  extras:   [TextualVisualLexicon, CommunityInteractionThemes]
+ Facebook:
+  synthesize: [ValuesCommunity, VoiceTone, KeyThemesCSRLocal, PersonasEmployeesCommunity]
+  optional:  [BrandPromise]
+  skip:    [Mission, Vision]
+  extras:   [LocalityCues, Sponsorships, ServiceUpdates]
+ TikTok:
+  synthesize: [VoiceTone, ValuesCulture, KeyThemesPeopleInnovation, PersonasStudentsEarlyCareer]
+  optional:  [BrandPromise]
+  skip:    [Mission, Vision]
+  extras:   [TrendParticipationTypes, CreatorCollabTypes]
+
+ACCEPTANCE CRITERIA (strict)
+
+- Evidence Ledger REQUIRED: every numeric claim or example has an [e:ID] pointing to a post/comment (permalink, timestamp, verbatim excerpt).
+- Demographics: Do NOT infer age/gender/ethnicity from text; personas are role/intent based (bios, lexicon, network cues).
+- Hook/Tagline recognition (relevant to X/LinkedIn only): 3–8 word phrase, ≥3 occurrences ≥14 days apart AND (each occurrence at/above channel-median engagement OR present in profile/pinned text). Else: “Not inferable (coverage shortfall)”.
+- Computations: If a metric cannot be computed from available fields, write “Not computable (field missing)”.
+- ALWAYS output exactly FIVE recommendations at the end—each channel‑specific, evidence‑tied (≥2 evidence markers), and measurable.
+
+METRIC DEFINITIONS (use precisely)
+
+- engagement_per_post = likes + comments + shares (if share_count missing, use likes + comments).
+- median_engagement_per_post = median of engagement_per_post over all posts.
+- engagement_rate_per_post = engagement_per_post / follower_count_snapshot.
+   NOTE: follower_count is a snapshot; if snapshot is >60 days from the end of analysis_window, label engagement_rate_per_post as “Approximate (stale follower snapshot)”.
+- proof_density = (problem–solution sentences counted) per 100 posts.
+- specifics_density = (mentions of specs/metrics/standards/KPIs) per 100 posts.
+
+OUTPUT (≤1,500 words, CMO-ready). Use EXACT section headers & tables.
+
+0. Channel Identification & Corpus Baseline
+
+- Confirm channel_name (from homepage snapshot) and analysis_window.
+- Baseline table:
+   | Metric | Value |
+   | Total posts | # |
+   | Posts with comments available | # |
+   | Total comments analyzed | # |
+   | Median engagement/post (likes+comments+shares) | # |
+   | Engagement rate/post (median; uses follower snapshot) | value or “Approximate” |
+   | Posting cadence (median days between posts) | # |
+   | Follower snapshot (count; date) | 123,456 • 2025‑08‑07 |
+   | Analysis window | YYYY‑MM‑DD → YYYY‑MM‑DD |
+
+0b) Homepage → Feed Alignment (what the channel promises vs. what it posts)
+
+- Extract top 8 nouns/bigrams from profile_about_text and compare with top feed themes.
+- Table:
+   | Homepage Claim (verbatim phrase) | Feed Theme Overlap (Y/N) | Share of Posts on This Theme (%) | Representative Examples [e:ID] |
+- One‑paragraph note on alignment or drift (neutral tone).
+
+1. Emergent Intended Audience (Channel‑Specific)
+
+- Role‑based segments from bios/lexicon/interaction patterns (no visual inference).
+- Table:
+   | Audience Segment | Share of Engagement (%) | Defining Cues (phrases/hashtags/bios) | Top Content They Engage With (examples) | Confidence (H/M/L) |
+- 2–3 sentence rationale with [e:ID] citations.
+
+2. Emergent Key Channel Drivers (Engagement & Growth)
+
+- Patterns that drive engagement/growth: themes, post types, timing, hashtags/mentions/emojis-as-text, transcript cues.
+- Matrix:
+   | Driver | Evidence Pattern (theme+timing+metric) | Lift vs. Median (%, if computable) | Example (post_id/permalink + date) |
+
+3. Channel‑Fit Brand Attributes (per policy)
+
+- Only synthesize items permitted by the policy; refuse “skip” items.
+- Consolidated table (EXACT columns):
+   | Attribute Type (from policy) | Description (concise) | Evidence/Examples (verbatim + post_id/permalink + date) | Prevalence (% of posts or found_n) |
+- Neutral “Deep Rationale” with [e:ID] citations.
+
+3a) Drivers — Emergent AND Mandated (for Phase‑3 roll‑ups)
+
+- _Emergent Drivers (discovered)_:
+   | Driver (discovered) | Share of Posts (%) | Representative Examples [e:ID] |
+- _Mandated Driver Coverage_ (taxonomy default: Electrification, ADAS, Lightweighting, Environmental Leadership, SDVs):
+   | Driver (mandated) | Posts Mentioning (n) | Share of Posts (%) | Representative Examples [e:ID] |
+
+3b) Evidence Metrics (countable, coherence‑ready)
+
+- _Depth / Proof Density_
+   | Metric | Value | Notes |
+   | Problem–Solution pairs per 100 posts | # | counted from text |
+   | Specifics/metrics mentions per 100 posts | # | specs, standards, KPIs |
+- _Authority Signals_
+   | Signal | Count | Notes |
+   | Third‑party citations/links (analysts, standards, media) | # | inferred from text/URLs |
+- _Narrative Clarity_
+   | Theme | Share of Posts (%) | Rank |
+   Also report concentration: % of posts in Top‑3 themes (or HHI if computable).
+- _Language & Anomalies_
+   - Languages detected with share of posts (text‑based only).
+   - Sponsorship/one‑offs (e.g., motorsport) tagged as theme; keep a one-line “Anomaly Log” with dates and [e:ID].
+
+4. Sentiment & Conversation Dynamics
+     4‑class diagnostic:
+       | Unit | Positive % | Neutral % | Negative % | Mixed % | Notes |
+       | Posts |   |   |   |   |   |
+       | Comments |   |   |   |   |   |
+     Collapsed (for exec roll‑ups): _Positive | Neutral | Challenging_
+       - Map: Positive→Positive; Neutral→Neutral; Negative→Challenging; Mixed→Positive/Neutral/Challenging via net polarity (±20% rule).
+       Report both raw shares and (if feasible) engagement‑weighted shares.
+
+5. Recommendations — EXACTLY FIVE (required)
+   Each recommendation must be channel‑specific, evidence‑tied (≥2 markers), budget‑neutral or reallocation‑friendly, and measurable via a leading indicator.
+
+- Table:
+   | Recommendation | Target Audience Segment | Target Driver (Emergent or Mandated) | Action & Asset | Expected Effect (leading indicator) | Measurement Plan | Confidence (H/M/L) | Evidence Basis [e:ID,e:ID] |
+- Micro‑template for the Action & Asset cell:
+   “Shift X% of monthly posts to [driver/topic] for [audience]; publish [asset type: case proof/POV/demo] weekly; CTA: [desired action].”
+   Measurement Plan: “Track engagement vs. median on [driver] posts; target +Δ%; increase Mandated Driver Coverage for [driver] by +Δ pp within 90 days.”
+
+EVIDENCE LEDGER (required)
+List every [e:ID] used above:
+ [e:post:12345] permalink • 2025‑03‑12 • “verbatim excerpt…”
+ [e:cmt:12345‑2] comment 2 on post 12345 • 2025‑03‑13 • “verbatim excerpt…”
+COVERAGE SHORTFALLS: list missing fields that prevented computations and where “Approximate” was used.
+
+GUARDRAILS
+
+- Amnesia Protocol; no external knowledge.
+- Text‑only; emojis treated as text tokens; ignore images.
+- No demographics from visuals; personas role‑based only.
+- If analysis is impossible for any required block, state the reason and proceed.
+
+Quick implementation notes
+
+-     	If your homepage snapshot is a single point in time, the prompt clearly marks engagement‑rate as “Approximate (stale follower snapshot)” when the window is old—so no CFO gotchas.
+-     	If you later collect follower history, add follower_count_timeseries and switch to time‑aligned engagement‑rate per post; the prompt already supports “Not computable” fallbacks.
+`;

@@ -1,145 +1,38 @@
 'use client'
 
-import React, { useState, useMemo, useEffect, startTransition, useTransition } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import WebsiteDataView from '../../../dashboard/raw-data/website/WebsiteDataView';
-import { ButtonSpinner } from '@/components/shared/spinner';
-import { scrapeBatchWebsite } from '@/server/actions/scrapeActions';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { AskLimitToast } from '@/hooks/AskLimitToast';
-import { timeAgo } from '@/lib/date-utils';
 import DashboardHeader from '@/components/dashboard/shared/DashboardHeader';
-import { GenerateReportButton } from '../reports/GenerateReportButton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import WebsiteScraps from './website/WebsiteScraps';
+import SocialScraps from './social/SocialScraps';
 
-export default function ScrapDataViewer({ allScrapsData, brandName, brand_id }: any) {
-    const [isPending, startTransition] = useTransition();
-    const router = useRouter();
-    const [selectedScrapBatchId, setSelectedScrapBatchId] = useState<string | null>(null);
-    const [selectedDataSource, setSelectedDataSource] = useState<any>(null);
-   
-   
-    const sortedScraps = useMemo(() => {
-        if (!allScrapsData || allScrapsData.length === 0) return [];
-        return [...allScrapsData].sort((a, b) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
-    }, [allScrapsData]);
-
-    useEffect(() => {
-        if (sortedScraps.length > 0) {
-            const latestScrap = sortedScraps[0];
-            setSelectedScrapBatchId(latestScrap.batch_id);
-            setSelectedDataSource(latestScrap.brand);
-        }
-    }, [sortedScraps]);
-
-    const selectedScrap = useMemo(() => {
-        if (!selectedScrapBatchId) return null;
-        return sortedScraps.find((scrap: any) => scrap.batch_id === selectedScrapBatchId);
-    }, [selectedScrapBatchId, sortedScraps]);
-
-    const dataSources = useMemo(() => {
-        if (!selectedScrap) return [];
-        const sources = [{ name: brandName, data: selectedScrap.brand }];
-        if (selectedScrap.competitors) {
-            selectedScrap.competitors.forEach((comp: any) => {
-                sources.push({ name: comp.name, data: comp });
-            });
-        }
-        return sources;
-    }, [selectedScrap, brandName]);
-
-    const handleScrapSelection = (batchId: string) => {
-        const newScrap = sortedScraps.find((s: any) => s.batch_id === batchId);
-        if (newScrap) {
-            setSelectedScrapBatchId(batchId);
-            setSelectedDataSource(newScrap.brand);
-        }
-    };
-
-    if (sortedScraps.length === 0) {
-        return (
-            <div className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
-                No scrap data available.
-            </div>
-        );
-    }
-
-    if (!selectedScrap || !selectedDataSource) {
-        return (
-            <div className="text-center p-8 text-muted-foreground h-[75vh] flex items-center justify-center">
-                Loading scrap data...
-            </div>
-        );
-    }
-    const askLimit = () => {
-        toast.custom((t: any) => (
-            <AskLimitToast
-                t={t}
-                onConfirm={(parsedLimit) => {
-                    scrapeBrand(parsedLimit)
-                }}
-            />
-        ))
-    }
-
-    const scrapeBrand = async (limit: number) => {
-        startTransition(async () => {
-            const result = await scrapeBatchWebsite(brand_id, limit)
-            if (result?.success) {
-                router.refresh()
-                toast.success("Scraping completed successfully 🎉")
-            } else {
-                toast.error("Scraping failed.")
-            }
-        })
-    }
+export default function ScrapDataViewer({ allWebsiteScrapsData, allSocialScrapsData, brandName, brand_id }: any) {
     return (
         <div className="flex flex-col space-y-8">
             <DashboardHeader
                 title="Brands Scraps"
-                subtitle="View all scraping reports and competitor data"
+                subtitle="View all website and social scraped data from Brand and Competitor"
             />
 
-            <div className="flex items-center justify-between gap-2">
-                <div className='flex items-center gap-2'>
-                    {dataSources.map(source => (
-                        <Button
-                            className='capitalize'
-                            key={source.name}
-                            variant={(selectedDataSource.name === source.name) || (source.name === brandName && !selectedDataSource.name) ? "outline" : "ghost"}
-                            onClick={() => setSelectedDataSource(source.data)}
-                        >
-                            {source.name}
-                        </Button>
-                    ))}
-               </div>
-
-                <div className='flex items-center gap-2'>
-                    <Button disabled={isPending} onClick={askLimit}>
-                        {isPending ? (
-                            <ButtonSpinner>Scraping</ButtonSpinner>
-                        ) : (
-                            "Scrape"
-                        )}
-                    </Button>
-                 
-                    <GenerateReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id } />
-                    <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
-                        <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Select a scrap run" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {sortedScraps.map((scrap: any, index: number) => (
-                                <SelectItem key={scrap.batch_id} value={scrap.batch_id}>
-                                    {`${timeAgo(scrap.scraped_at)}`}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-               </div>
-            </div>
-            <WebsiteDataView scrapedData={selectedDataSource} />
+            <Tabs defaultValue="website" >
+                <TabsList >
+                    <TabsTrigger value="website">Website Scraps</TabsTrigger>
+                    <TabsTrigger value="social-media">Social Media Scraps</TabsTrigger>
+                </TabsList>
+                <TabsContent value="website" className="pt-6">
+                    <WebsiteScraps
+                        allScrapsData={allWebsiteScrapsData}
+                        brandName={brandName}
+                        brand_id={brand_id}
+                    />
+                </TabsContent>
+                <TabsContent value="social-media" className="pt-6">
+                    <SocialScraps
+                        allSocialScrapsData={allSocialScrapsData}
+                        brandName={brandName}
+                        brand_id={brand_id}
+                    />
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }

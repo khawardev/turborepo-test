@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function StrategicInsightsTab({ data }: any) {
-    const { platforms, strategicRecommendations, colors } = data;
-    const { PLATFORM_COLORS } = colors;
+    const { platforms, strategicRecommendations } = data;
     const platformKeys = Object.keys(platforms);
 
     return (

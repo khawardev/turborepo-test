@@ -28,6 +28,8 @@ import { addBrand } from "@/server/actions/brandActions";
 import { ContainerMd } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
 import { Plus } from "lucide-react";
+import StaticBanner from "@/components/shared/staticBanner";
+import { BlurDelay, BlurDelay2 } from "@/components/shared/blur";
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 
@@ -63,18 +65,20 @@ export default function AddBrandPage() {
     setIsLoading(false);
     if (brandResult.success) {
       toast.success("Brand has been added successfully 🎉");
-      router.push("/");
+      router.push("/brands");
     }
   }
 
   return (
-    <ContainerMd>
-      <div>
+    <ContainerMd className=" pb-32">
+      <StaticBanner title={`Create New Brand`} badge={'New Brand Page'} />
+      <BlurDelay>
         <h3 className="text-lg  font-medium">Onboarding</h3>
         <p className="text-sm text-muted-foreground">
           Add your brand and competitors to get started.
         </p>
-      </div>
+      </BlurDelay>
+      <BlurDelay2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
@@ -363,7 +367,8 @@ export default function AddBrandPage() {
             Save Brand
           </Button>
         </form>
-      </Form>
+        </Form>
+      </BlurDelay2>
     </ContainerMd>
   );
 }

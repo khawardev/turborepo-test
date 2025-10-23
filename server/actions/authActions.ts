@@ -27,7 +27,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
       });
     }
 
-    revalidatePath("/");
+    revalidatePath("/brands");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.detail || "Login failed" };

@@ -44,8 +44,8 @@ const buttonVariants = cva(
       size: {
         default: "h-8 px-4 rounded-md py-2 has-[>svg]:px-3 ",
         sm: "h-7 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-9 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-8 rounded-md  [&_svg:not([class*='size-'])]:size-5 [&_svg:not([class*='size-'])]:opacity-50",
+        lg: "h-9 rounded-lg px-6 has-[>svg]:px-4",
+        icon: "size-8 rounded-md  [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='size-'])]:opacity-50",
       },
     },
     defaultVariants: {

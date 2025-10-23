@@ -1,39 +1,88 @@
 import { getBrandbyIdWithCompetitors } from "@/server/actions/brandActions";
 import { getCurrentUser } from "@/server/actions/authActions";
-import { getpreviousScraps, getscrapeBatchWebsite, getBatchId } from "@/server/actions/scrapeActions";
 import { notFound } from "next/navigation";
 import { ContainerMd } from "@/components/shared/containers";
 import { AnimatedTabs } from "@/components/brands/detail/AnimatedTabs";
 import BrandProfile from "@/components/brands/detail/profile/BrandProfile";
 import ScrapDataViewer from "@/components/brands/detail/scraps/ScrapDataViewer";
-import { getBatchWebsiteReports } from "@/server/actions/reportsActions";
 import ReportDataViewer from "@/components/brands/detail/reports/ReportDataViewer";
+import StaticBanner from "@/components/shared/staticBanner";
+import { BlurDelay3 } from "@/components/shared/blur";
+import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
+import { getPreviousSocialScrapes, getScrapeBatchSocial } from "@/server/actions/social/socialScrapeActions";
+import { getBatchWebsiteReports } from "@/server/actions/website/websiteReportActions";
+import { getBatchSocialReports } from "@/server/actions/social/socialReportActions";
 
 export default async function BrandDetailPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
+
   const user = await getCurrentUser();
-  if (!user) {
-    notFound();
-  }
+  if (!user) notFound();
 
-  const brand = await getBrandbyIdWithCompetitors(brandId);
-  const previousScraps = await getpreviousScraps(user.client_id, brandId);
-  const allScrapsDataPromises = previousScraps.map((scrap: any) => getscrapeBatchWebsite(brandId, scrap.batch_id));
-  const allScrapsDataResults = await Promise.all(allScrapsDataPromises);
-  const validScraps = allScrapsDataResults.filter(data => data !== null && data !== undefined);
+  const brandData = await getBrandbyIdWithCompetitors(brandId);
 
-  const batchWebsiteReportsResult = await getBatchWebsiteReports(brandId);
-  const allReportsData = batchWebsiteReportsResult?.data || [];
+  const previousWebsiteScrapes = await getpreviousWebsiteScraps(user.client_id, brandId);
+  const websiteScrapeBatchPromises = previousWebsiteScrapes.map(
+    async (scrape: any) => await getscrapeBatchWebsite(brandId, scrape.batch_id)
+  );
+  const websiteScrapeBatchResults = await Promise.all(websiteScrapeBatchPromises);
+  const validWebsiteScrapeData = websiteScrapeBatchResults.filter(data => data);
+
+  const websiteReportData = await getBatchWebsiteReports(brandId);
+
+  const previousSocialScrapes = await getPreviousSocialScrapes(user.client_id, brandId);
+  const socialScrapeBatchPromises = previousSocialScrapes.map(
+    async (scrape: any) => await getScrapeBatchSocial(brandId, scrape.batch_id)
+  );
+  const socialScrapeBatchResults = await Promise.all(socialScrapeBatchPromises);
+  const validSocialScrapeData = socialScrapeBatchResults.filter(data => data);
+
+
+  const allSocialReportsData = await getBatchSocialReports(brandId)
 
   const tabs = [
-    { label: "Brand Profile", value: "brand_profile", content: <BrandProfile brand={brand} isScrapped={allReportsData && allReportsData.length > 0} /> },
-    { label: "Scraps", value: "scraps", content: <ScrapDataViewer allScrapsData={validScraps} brand_id={brandId} brandName={brand.name} /> },
-    { label: "Reports", value: "reports", content: <ReportDataViewer competitors={brand.competitors} allReportsData={allReportsData} brandName={brand.name} /> },
+    {
+      label: "Brand Profile",
+      value: "brand_profile",
+      content: (
+        <BrandProfile
+          brand={brandData}
+          isScrapped={websiteReportData?.data && websiteReportData?.data.length > 0}
+        />
+      ),
+    },
+    {
+      label: "Scraps",
+      value: "scraps",
+      content: (
+        <ScrapDataViewer
+          allWebsiteScrapsData={validWebsiteScrapeData}
+          allSocialScrapsData={validSocialScrapeData}
+          brand_id={brandId}
+          brandName={brandData.name}
+        />
+      ),
+    },
+    {
+      label: "Reports",
+      value: "reports",
+      content: (
+        <ReportDataViewer
+          competitors={brandData.competitors}
+          allSocialReportsData={allSocialReportsData?.data}
+          allwebsiteReportsData={websiteReportData?.data}
+          brandName={brandData.name}
+        />
+      ),
+    },
   ];
 
   return (
     <ContainerMd>
-      <AnimatedTabs tabs={tabs} />
+      <StaticBanner title={`${brandData.name} Brand Details`} badge="Brand Page" />
+      <BlurDelay3>
+        <AnimatedTabs tabs={tabs} />
+      </BlurDelay3>
     </ContainerMd>
   );
 }

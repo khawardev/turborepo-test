@@ -13,6 +13,16 @@ import {
 export default function BrandsLoading() {
   return (
     <ContainerMd>
+      <div className="relative select-none py-14">
+        <section className="text-center flex-col space-y-4">
+          <div className="flex justify-center">
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+          <div className="flex justify-center">
+            <Skeleton className="h-10 w-2/4 rounded-md" />
+          </div>
+        </section>
+      </div>
       <div className="flex justify-between items-center ">
         <div className="space-y-4 w-full">
           <div className="flex justify-between items-center">

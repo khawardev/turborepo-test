@@ -12,8 +12,8 @@ import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/cleanMarkdown';
 
-export default function WebsiteDataView({ scrapedData }: any) {
-    const pages = scrapedData?.pages || [];
+export default function WebsiteDataView({ websiteScrapsData }: any) {
+    const pages = websiteScrapsData?.pages || [];
     const [selectedPage, setSelectedPage] = useState<any>(null);
     const [isCopied, setIsCopied] = useState(false);
 
@@ -23,7 +23,7 @@ export default function WebsiteDataView({ scrapedData }: any) {
         } else {
             setSelectedPage(null);
         }
-    }, [scrapedData]);
+    }, [websiteScrapsData]);
 
     if (pages.length === 0) {
         return (
@@ -85,7 +85,7 @@ export default function WebsiteDataView({ scrapedData }: any) {
                 
                 <ScrollArea className="h-[70vh] w-full ">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
-                        <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert ">
+                        <div className="prose prose-neutral  break-all max-w-none markdown-body  dark:prose-invert ">
                             <ReactMarkdown components={{
                                 img: ({ node, ...props }) => {
                                     if (!props.src) return null

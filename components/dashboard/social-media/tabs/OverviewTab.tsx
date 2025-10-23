@@ -7,10 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomChartTooltipContent from "@/components/dashboard/shared/CustomChartTooltipContent";
 import KpiCard from "../charts-and-cards/KpiCard";
 import CustomLegend from "../../shared/Legend";
+import { BRAND_SOCIAL_COLOR } from "@/components/shared/dashboard-color";
 
 export default function OverviewTab({ data }: any) {
-    const { platforms, colors } = data;
-    const { PLATFORM_COLORS } = colors;
+    const { platforms } = data;
+    const { PLATFORM_COLORS }: any = BRAND_SOCIAL_COLOR;
     const platformKeys = Object.keys(platforms);
 
     const platformData = Object.values(platforms).map((platform: any) => ({

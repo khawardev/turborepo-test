@@ -1,21 +1,11 @@
 'use client'
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WebsiteDataView from "./website/WebsiteDataView";
-import SocialMediaDataView from "./social-media/SocialMediaDataView";
-import { facebookData } from "@/data/ayaz_socials/facebook";
-import { linkedinData } from "@/data/ayaz_socials/linkedin";
-import { youtubeData } from "@/data/ayaz_socials/youtube";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import WebsiteDataView from './website/WebsiteDataView'
+import SocialDataView from '@/components/brands/detail/scraps/social/SocialDataView'
 
-export default function RawDataDashboard({ scrapedData }: any) {
-    
-    const rawsocialMediaData = {
-        socialMedia: {
-            facebook: facebookData,
-            linkedin: linkedinData,
-            youtube: youtubeData,
-        }
-    };
+
+export default function RawDataDashboard({ websiteScrapsData, socialScrapsData }: any) {
     return (
         <Tabs defaultValue="website">
             <TabsList>
@@ -24,12 +14,12 @@ export default function RawDataDashboard({ scrapedData }: any) {
             </TabsList>
 
             <TabsContent value="website">
-                <WebsiteDataView scrapedData={scrapedData} />
+                <WebsiteDataView websiteScrapsData={websiteScrapsData} />
             </TabsContent>
 
             <TabsContent value="social_media">
-                <SocialMediaDataView data={rawsocialMediaData.socialMedia} />
+                <SocialDataView socialScrapedData={socialScrapsData} />
             </TabsContent>
         </Tabs>
-    );
+    )
 }
