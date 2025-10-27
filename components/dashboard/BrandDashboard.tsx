@@ -61,7 +61,7 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
 
                         <TabsContent value="social_media" className=" space-y-14">
                             <SocialMediaDashboard data={magnaData.socialMedia} />
-                            <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} />
+                            {/* <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} /> */}
                         </TabsContent>
 
                         {/* <TabsContent value="earned_media">
