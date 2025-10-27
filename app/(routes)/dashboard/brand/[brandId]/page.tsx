@@ -34,6 +34,9 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   const socialReportsData: any = await getBatchSocialReports(brandId);
   const latestSocialReport = socialReportsData?.data?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
+  console.log(socialReportsData, `<-> latestSocialReport <->`);
+
+
   return (
     <DashboardLayout brandData={brandData}>
       <DashboardInnerLayout>

@@ -48,7 +48,7 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
 
 
                 <TabsContent value="social_audit">
-                    <SocialReportDisplay entityReports={socialReportsData} selectedEntityName={socialReportsData[0].entity_name} />
+                    <SocialReportDisplay entityReports={socialReportsData} selectedEntityName={socialReportsData[0]?.entity_name} />
                 </TabsContent>
 
                 <TabsContent value="analytics_dashboards">

@@ -4,7 +4,7 @@ function CustomChartTooltipContent({ active, payload, label, formatter }: any) {
 
     return (
         <div className='relative'>
-            <div className="bg-card border z-50 rounded-md p-1.5 text-sm text-foreground shadow-lg">
+            <div className="bg-border backdrop-blur-2xl border z-50 rounded-md p-1.5 text-sm text-foreground shadow-lg">
                 {label && <div className=" mb-2 text-xs">{label}</div>}
                 {payload.map((entry: any) => {
                     const name = entry.name || entry.dataKey || 'Value';
