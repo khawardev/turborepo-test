@@ -30,7 +30,7 @@ export default function SocialMediaDashboard({ data }: any) {
                 <TabsContent value="drivers"><ContentDriversTab data={data} /></TabsContent>
                 <TabsContent value="sentiment"><SentimentAnalysisTab data={data} /></TabsContent>
                 <TabsContent value="mandated"><MandatedDriversTab data={data} /></TabsContent>
-                {/* <TabsContent value="insights"><StrategicInsightsTab data={data} /></TabsContent> */}
+                <TabsContent value="insights"><StrategicInsightsTab data={data} /></TabsContent>
             </div>
         </Tabs>
     );

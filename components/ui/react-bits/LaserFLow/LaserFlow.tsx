@@ -592,21 +592,21 @@ const LaserFlowComponent: React.FC<Props> = ({
     hexToRGB,
   ]);
 
-  return <div ref={mountRef} className={`laser-flow-container ${className || ''}`} style={style} >
-    <BlurDelay3 className=" absolute top-1/2 left-1/2 -translate-x-1/2 w-full rounded-3xl z-[6] px-4 sm:px-6 md:px-0 lg:px-8 xl:px-10 2xl:px-12 mx-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
+  return <div ref={mountRef} className={`laser-flow-container  ${className || ''}`} style={style} >
+    <BlurDelay3 className=" absolute top-1/2 left-1/2 -translate-x-1/2 w-full rounded-3xl  px-4 sm:px-6 md:px-0 lg:px-8 xl:px-10 2xl:px-12 mx-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
       <div className="mask-b-from-5%">
         <div className="inset-shadow-2xs border ring-background dark:inset-shadow-border/20 bg-border relative mx-auto overflow-hidden rounded-2xl  p-1 shadow-lg shadow-zinc-950/15 ">
           <Image
-            className=" h-140 w-full relative hidden rounded-xl dark:block object-cover object-top"
-            src="https://i.postimg.cc/c1fXx2HC/screencapture-localhost-3000-dashboard-brand-a8254481-ac10-45a3-845c-4650679ac0c3-2025-10-21-17-27-5.png"
-            alt="Tailark hero section"
+            className=" h-140 w-full relative hidden rounded-xl dark:block object-cover  object-top"
+            src="https://i.postimg.cc/VkhcdNxC/screencapture-brand-os-theta-vercel-app-dashboard-brand-cb5b9cf6-a363-4c02-b066-ff2c5ab8639c-2025-10.png"
+            alt="BrandOS hero dark section"
             width={2074}
             height={2074}
           />
           <Image
             className="z-2 h-140 w-full  relative rounded-xl  dark:hidden object-cover object-top"
-            src="https://i.postimg.cc/qvwFkY15/screencapture-localhost-3000-dashboard-brand-a8254481-ac10-45a3-845c-4650679ac0c3-2025-10-21-17-28-0.png"
-            alt="Tailark hero section"
+            src="https://i.postimg.cc/cL0cwMS1/screencapture-brand-os-theta-vercel-app-dashboard-brand-cb5b9cf6-a363-4c02-b066-ff2c5ab8639c-2025-10.png"
+            alt="BrandOS hero light section"
             width={1440}
             height={2074}
           />

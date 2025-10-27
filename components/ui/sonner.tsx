@@ -9,10 +9,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="toaster group rounded-xl shadow-xs bg-linear-to-t hover:to-muted/50 to-background/30 from-muted dark:from-muted/50 text-muted-foreground font-Inter font-medium"
+      className="toaster group rounded-xl shadow-xs  text-muted-foreground  font-medium"
       style={
         {
-          "--normal-bg": "var(--accent)",
+          "--normal-bg": "var(--border)",
           "--normal-text": "var(--accent-foreground)",
           "--normal-border": "var(--border)",
         } as React.CSSProperties

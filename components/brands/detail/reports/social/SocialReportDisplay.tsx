@@ -34,7 +34,7 @@ export default function SocialReportDisplay({ entityReports, selectedEntityName 
 
     if (availablePlatforms.length === 0) {
         return (
-            <div className="flex mt-4 h-[40vh] items-center justify-center rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+            <div className="flex mt-4 h-[40vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
                 <p>No platforms with reports found for {selectedEntityName}.</p>
             </div>
         )

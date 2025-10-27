@@ -17,17 +17,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Edit2, Link as LinkIcon } from "lucide-react";
+import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../ui/badge";
 import { ButtonSpinner } from "../../shared/spinner";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { deleteBrand } from "@/server/actions/brandActions";
 import { scrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
 import { WebsiteAskLimitToast } from "../detail/scraps/website/WebsiteAskLimitToast";
+import { UpdateBrandDialog } from "./update/UpdateBrandDialog";
+import { AddCompetitorsDialog } from "./update/AddCompetitorsDialog";
+import { UpdateCompetitorsDialog } from "./update/UpdateCompetitorsDialog";
 
 function BrandItemSkeleton() {
   return (
@@ -46,17 +54,29 @@ function BrandItemSkeleton() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                <TableHead><Skeleton className="h-5 w-32" /></TableHead>
-                <TableHead><Skeleton className="h-5 w-28" /></TableHead>
+                <TableHead>
+                  <Skeleton className="h-5 w-24" />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className="h-5 w-32" />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className="h-5 w-28" />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {[...Array(2)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-full" />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -70,7 +90,6 @@ function BrandItemSkeleton() {
 export default function BrandItem({ brand, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (
@@ -88,13 +107,13 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       <WebsiteAskLimitToast
         t={t}
         onConfirm={(parsedLimit) => {
-          scrapeBrand(parsedLimit)
+          scrapeBrand(parsedLimit);
         }}
       />
-    ))
-  }
+    ));
+  };
 
-  const scrapeBrand = (limit:any) => {
+  const scrapeBrand = (limit: any) => {
     startTransition(async () => {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
@@ -125,49 +144,61 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     });
   };
   return (
-    <Card className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer`}`} onClick={isScrapped ? handleCardClick : undefined}>
+    <Card
+      className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
+      onClick={isScrapped ? handleCardClick : undefined}
+    >
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>
-            {brand.name}
-          </CardTitle>
+          <CardTitle>{brand.name}</CardTitle>
           <CardDescription>
-            <Link href={brand.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
+            <Link
+              href={brand.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 hover:underline"
+            >
               {brand.url}
               <LinkIcon className="size-3" />
             </Link>
           </CardDescription>
         </div>
-        <div className="flex items-center space-x-2">
-          {!isScrapped &&
-            <Button disabled={isPending} onClick={askLimit} >
-              {isPending ? (
-                <ButtonSpinner>
-                  Scraping
-                </ButtonSpinner>
-              ) : (
-                "Scrape"
-              )}
+        <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+          {!isScrapped && (
+            <Button disabled={isPending} onClick={askLimit}>
+              {isPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape"}
             </Button>
-          }
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button  variant="outline" >
+              <Button variant="outline">
                 Actions <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+              <UpdateBrandDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Update Brand
+                </DropdownMenuItem>
+              </UpdateBrandDialog>
+              <UpdateCompetitorsDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Update Competitors
+                </DropdownMenuItem>
+              </UpdateCompetitorsDialog>
+              <AddCompetitorsDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Add Competitors
+                </DropdownMenuItem>
+              </AddCompetitorsDialog>
+              <DropdownMenuItem onClick={confirmDelete} variant="destructive">
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent >
+      <CardContent>
         {isPending ? (
           <BrandItemSkeleton />
         ) : (
@@ -175,18 +206,48 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
             <div>
               <h4 className="text-md font-medium mb-2">Social Links</h4>
               <div className="flex flex-wrap gap-2">
-                {brand.facebook_url && <Badge asChild variant='secondary'><Link href={brand.facebook_url} target="_blank">Facebook</Link></Badge>}
-                {brand.instagram_url && <Badge asChild variant="secondary" ><Link href={brand.instagram_url} target="_blank">Instagram</Link></Badge>}
-                {brand.linkedin_url && <Badge asChild variant="secondary" ><Link href={brand.linkedin_url} target="_blank">LinkedIn</Link></Badge>}
-                {brand.x_url && <Badge asChild variant="secondary" ><Link href={brand.x_url} target="_blank">X</Link></Badge>}
-                {brand.youtube_url && <Badge asChild variant="secondary" ><Link href={brand.youtube_url} target="_blank">YouTube</Link></Badge>}
+                {brand.facebook_url && (
+                  <Badge asChild variant="secondary">
+                    <Link href={brand.facebook_url} target="_blank">
+                      Facebook
+                    </Link>
+                  </Badge>
+                )}
+                {brand.instagram_url && (
+                  <Badge asChild variant="secondary">
+                    <Link href={brand.instagram_url} target="_blank">
+                      Instagram
+                    </Link>
+                  </Badge>
+                )}
+                {brand.linkedin_url && (
+                  <Badge asChild variant="secondary">
+                    <Link href={brand.linkedin_url} target="_blank">
+                      LinkedIn
+                    </Link>
+                  </Badge>
+                )}
+                {brand.x_url && (
+                  <Badge asChild variant="secondary">
+                    <Link href={brand.x_url} target="_blank">
+                      X
+                    </Link>
+                </Badge>
+                )}
+                {brand.youtube_url && (
+                  <Badge asChild variant="secondary">
+                    <Link href={brand.youtube_url} target="_blank">
+                      YouTube
+                    </Link>
+                  </Badge>
+                )}
               </div>
             </div>
 
             <div>
               <h4 className="text-md font-medium mb-2">Competitors</h4>
               {brand.competitors.length > 0 ? (
-                <div >
+                <div>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -199,7 +260,9 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                       {brand.competitors.map((competitor: any) => {
                         return (
                           <TableRow key={competitor.competitor_id}>
-                            <TableCell className="font-medium">{competitor.name}</TableCell>
+                            <TableCell className="font-medium">
+                              {competitor.name}
+                            </TableCell>
                             <TableCell>
                               <Link
                                 href={competitor.url}
@@ -214,21 +277,30 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                             <TableCell className="flex flex-wrap gap-1">
                               {competitor.facebook_url && (
                                 <Badge asChild variant="secondary">
-                                  <Link href={competitor.facebook_url} target="_blank">
+                                  <Link
+                                    href={competitor.facebook_url}
+                                    target="_blank"
+                                  >
                                     Facebook
                                   </Link>
                                 </Badge>
                               )}
                               {competitor.instagram_url && (
                                 <Badge asChild variant="secondary">
-                                  <Link href={competitor.instagram_url} target="_blank">
+                                  <Link
+                                    href={competitor.instagram_url}
+                                    target="_blank"
+                                  >
                                     Instagram
                                   </Link>
                                 </Badge>
                               )}
                               {competitor.linkedin_url && (
                                 <Badge asChild variant="secondary">
-                                  <Link href={competitor.linkedin_url} target="_blank">
+                                  <Link
+                                    href={competitor.linkedin_url}
+                                    target="_blank"
+                                  >
                                     LinkedIn
                                   </Link>
                                 </Badge>
@@ -242,7 +314,10 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                               )}
                               {competitor.youtube_url && (
                                 <Badge asChild variant="secondary">
-                                  <Link href={competitor.youtube_url} target="_blank">
+                                  <Link
+                                    href={competitor.youtube_url}
+                                    target="_blank"
+                                  >
                                     YouTube
                                   </Link>
                                 </Badge>

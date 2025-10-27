@@ -62,6 +62,81 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
   }
 }
 
+
+export async function updateBrand(brandId: string, values: any) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const user = await getCurrentUser();
+  if (!user?.client_id) {
+    return { success: false, error: "Client not found for the current user." };
+  }
+  const clientId = user.client_id;
+
+  const { ...brandData } = values;
+
+  try {
+    const brandResult = await brandRequest(
+      `/brands?client_id=${clientId}&brand_id=${brandId}`,
+      "PUT",
+      { body: JSON.stringify(brandData) }
+    );
+
+    revalidatePath("/brands");
+    revalidatePath(`/brands/${brandId}`);
+
+    return { success: true, data: brandResult };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Something went wrong during the update process.",
+    };
+  }
+}
+
+export async function updateCompetitorAction(
+  brandId: string,
+  competitor: any,
+) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
+
+  if (!accessToken) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const user = await getCurrentUser();
+  if (!user?.client_id) {
+    return { success: false, error: "Client not found for the current user." };
+  }
+  const clientId = user.client_id;
+
+  if (!competitor.competitor_id) {
+    return { success: false, error: "Competitor ID is missing" };
+  }
+
+  const { competitor_id, ...competitorData } = competitor;
+  try {
+    await brandRequest(
+      `/brands/competitors?client_id=${clientId}&brand_id=${brandId}&competitor_id=${competitor_id}`,
+      "PUT",
+      { body: JSON.stringify(competitorData) }
+    );
+    revalidatePath("/brands");
+    return { success: true };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Something went wrong during competitor update.",
+    };
+  }
+}
+
+
 export async function getBrands(): Promise<Brand[]> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
@@ -109,8 +184,8 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
 
   try {
     const [brandResponse, competitorResponse] = await Promise.all([
-      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache'),
-      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache')
+      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"),
+      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET")
     ]);
 
     const brand = brandResponse?.[0] || null;
@@ -150,7 +225,6 @@ export async function getCompetitors(
     return emptyResult;
   }
 }
-
 
 
 export async function deleteBrand(brand_id: string) {

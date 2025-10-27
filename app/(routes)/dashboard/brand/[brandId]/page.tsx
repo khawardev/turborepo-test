@@ -44,7 +44,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
           brandPerceptionReport={latestbrandPerceptionReport}
           websiteScrapsData={websiteScrapsData.brand}
           socialScrapsData={socialScrapsData.brand}
-          socialReportsData={latestSocialReport.brand_reports}
+          socialReportsData={latestSocialReport?.brand_reports}
         />
       </DashboardInnerLayout>
     </DashboardLayout>

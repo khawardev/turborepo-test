@@ -94,11 +94,11 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
         return (
             <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
                 <p>No social media scrap data available.</p>
-                <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
+                {/* <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
                     <Button disabled={isScrapingPending}>
                         {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Run First Scrape"}
                     </Button>
-                </ScrapeSocialDialog>
+                </ScrapeSocialDialog> */}
             </div>
         );
     }

@@ -67,7 +67,7 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
 
     if (sortedReports.length === 0) {
         return (
-            <div className="flex h-[60vh] items-center justify-center rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+            <div className="flex h-[60vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
                 No website report data available.
             </div>
         )

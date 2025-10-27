@@ -9,6 +9,7 @@ import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboar
 import { magnaData } from "@/data/brands/magna";
 import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
 import SocialReportDisplay from "../brands/detail/reports/social/SocialReportDisplay";
+import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
 // import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
 
 export default function BrandDashboard({ websiteScrapsData, title, extractorReport, synthesizerReport, brandPerceptionReport, socialScrapsData, socialReportsData }: any) {
@@ -58,10 +59,9 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
                             <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="social_media">
+                        <TabsContent value="social_media" className=" space-y-14">
                             <SocialMediaDashboard data={magnaData.socialMedia} />
-
-                            {/* <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} /> */}
+                            <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} />
                         </TabsContent>
 
                         {/* <TabsContent value="earned_media">

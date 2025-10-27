@@ -3,7 +3,12 @@
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { loginSchema, registerSchema } from "@/lib/validations";
+import {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "@/lib/validations";
 import { authRequest } from "@/server/api/authRequest";
 
 export async function login(values: z.infer<typeof loginSchema>) {
@@ -42,6 +47,38 @@ export async function register(values: z.infer<typeof registerSchema>) {
     return { success: true, data };
   } catch (error: any) {
     return { success: false, error: error.detail || "Registration failed" };
+  }
+}
+
+export async function forgotPassword(
+  values: z.infer<typeof forgotPasswordSchema>
+) {
+  try {
+    const data = await authRequest("/forgot-password", "POST", {
+      body: JSON.stringify(values),
+    });
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error:
+        error.detail ||
+        "If an account with that email exists, a password reset link has been sent.",
+    };
+  }
+}
+
+export async function resetPassword(token: string, new_password: string) {
+  try {
+    const data = await authRequest("/reset-password", "POST", {
+      body: JSON.stringify({ token, new_password }),
+    });
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.detail || "Invalid or expired token",
+    };
   }
 }
 

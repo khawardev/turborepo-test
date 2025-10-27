@@ -17,8 +17,10 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
-import BlogPostCard from '@/components/blogs/BlogPostCard';
-import { posts } from "@/components/blogs/blog";
+import DashboardHeader from "@/components/dashboard/shared/DashboardHeader";
+import { UpdateBrandDialog } from "../../list/update/UpdateBrandDialog";
+import { UpdateCompetitorsDialog } from "../../list/update/UpdateCompetitorsDialog";
+import { AddCompetitorsDialog } from "../../list/update/AddCompetitorsDialog";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();
@@ -43,10 +45,10 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
 
   return (
     <div className="flex flex-col space-y-8">
-      {/* <DashboardHeader
+      <DashboardHeader
         title="Brand Profile"
         subtitle="View detailed information about Brand and its Competitors"
-      /> */}
+      /> 
     
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
@@ -64,24 +66,31 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" >
-                Actions<ChevronDown />
+              <Button variant="outline">
+                Actions <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={confirmDelete} variant='destructive' >
+              <UpdateBrandDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Update Brand
+                </DropdownMenuItem>
+              </UpdateBrandDialog>
+              <UpdateCompetitorsDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Update Competitors
+                </DropdownMenuItem>
+              </UpdateCompetitorsDialog>
+              <AddCompetitorsDialog brand={brand}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Add Competitors
+                </DropdownMenuItem>
+              </AddCompetitorsDialog>
+              <DropdownMenuItem onClick={confirmDelete} variant="destructive">
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/* <Button variant={"outline"} asChild>
-            <Link href={`/dashboard/brand/${brand.brand_id}`}>
-              Dashboard
-            </Link>
-          </Button> */}
           <BrandDashboardButton brand_id={brand.brand_id} isScrapped={isScrapped} />
         </div>
       </div>

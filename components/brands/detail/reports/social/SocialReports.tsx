@@ -66,7 +66,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
 
     if (sortedReports.length === 0) {
         return (
-            <div className="flex h-[60vh] items-center justify-center rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+            <div className="flex h-[60vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
                 No social media report data available.
             </div>
         )
