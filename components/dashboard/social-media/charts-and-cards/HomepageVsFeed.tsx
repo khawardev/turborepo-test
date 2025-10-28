@@ -14,13 +14,13 @@ export default function HomepageVsFeed({ data }: any) {
                     <span className="text-sm">Share of Posts</span>
                 </div>
                 <Separator />
-                {data.map((item: any) => (
-                    <div key={item.claim}>
+                {data.map((item: any, index:number) => (
+                    <div key={index}>
                         <div className="flex justify-between items-center mb-2">
                             <span className="font-medium">{item.claim}</span>
                             <span className="font-bold">{item.value}%</span>
                         </div>
-                        <div className="w-full bg-muted h-1 rounded-full">
+                        <div className="w-full bg-border h-1 rounded-full">
                             <div className="h-1 rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }}></div>
                         </div>
                     </div>

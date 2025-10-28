@@ -12,7 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group rounded-xl shadow-xs  text-muted-foreground  font-medium"
       style={
         {
-          "--normal-bg": "var(--border)",
+          "--normal-bg": "var(--accent)",
           "--normal-text": "var(--accent-foreground)",
           "--normal-border": "var(--border)",
         } as React.CSSProperties

@@ -23,10 +23,9 @@ export default function PerformanceTab({ data }: any) {
 
     const { platforms } = data;
     const platformKeys = Object.keys(platforms);
-    const defaultValue = platformKeys.includes("linkedin") ? "linkedin" : platformKeys[0];
 
     return (
-        <Tabs defaultValue={defaultValue}>
+        <Tabs defaultValue={platformKeys[0]}>
             <div className="w-full overflow-x-auto">
                 <TabsList>
                     {platformKeys.map(key => (

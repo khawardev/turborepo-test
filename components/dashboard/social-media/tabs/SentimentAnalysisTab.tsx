@@ -13,7 +13,7 @@ export default function SentimentAnalysisTab({ data }: any) {
     const platformKeys = Object.keys(platforms);
 
     return (
-        <Tabs defaultValue="linkedin">
+        <Tabs defaultValue={platformKeys[0]}>
             <div className="w-full overflow-x-auto">
                 <TabsList>
                     {platformKeys.map(key => <TabsTrigger key={key} value={key}>{platforms[key].name}</TabsTrigger>)}
@@ -22,7 +22,7 @@ export default function SentimentAnalysisTab({ data }: any) {
             <div className="mt-4">
                 {platformKeys.map(key => {
                     const platform = platforms[key];
-                    const chartData = Object.entries(platform.sentiment).map(([name, value]) => ({ name, value }));
+                    const chartData = Object.entries(platform.sentiment).map(([name, value]) => ({ name, value: Number(value) }));
                     return (
                         <TabsContent key={key} value={key} className="flex flex-col gap-8">
                             <Card>

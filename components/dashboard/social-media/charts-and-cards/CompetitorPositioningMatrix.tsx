@@ -24,10 +24,10 @@ export default function CompetitorPositioningMatrix({ data, magnaPosition }: any
                         <Tooltip content={<CustomChartTooltipContent />} />
                         <ReferenceLine x={0} stroke={brightGreen} strokeWidth={2} />
                         <ReferenceLine y={0} stroke={brightGreen} strokeWidth={2} />
-                        <Label value="Third-Party Validation" position="top" offset={10} style={{ fill: 'white' }} />
-                        <Label value="Internal Showcase" position="bottom" offset={10} style={{ fill: 'white' }} />
-                        <Label value="People-First" position="left" angle={-90} offset={20} style={{ fill: 'white' }} />
-                        <Label value="Technical Authority" position="right" angle={90} offset={20} style={{ fill: 'white' }} />
+                        <Label value="Third-Party Validation" position="top" offset={10}  />
+                        <Label value="Internal Showcase" position="bottom" offset={10}  />
+                        <Label value="People-First" position="left" angle={-90} offset={20}  />
+                        <Label value="Technical Authority" position="right" angle={90} offset={20}  />
                         <Scatter name="Competitors" data={points} fill="#ccc" shape="circle" >
                             <LabelList dataKey="name" position="bottom" fill="#ccc" fontSize="12" offset={8} />
                         </Scatter>

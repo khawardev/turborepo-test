@@ -7,7 +7,7 @@ export default function StrategicInsightsTab({ data }: any) {
     const platformKeys = Object.keys(platforms);
 
     return (
-        <Tabs defaultValue="linkedin">
+        <Tabs defaultValue={platformKeys[0]}>
             <div className="w-full overflow-x-auto">
                 <TabsList>
                     {platformKeys.map(key => <TabsTrigger key={key} value={key}>{platforms[key].name}</TabsTrigger>)}

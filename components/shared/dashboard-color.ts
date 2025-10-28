@@ -1,7 +1,7 @@
 export const BRAND_SOCIAL_COLOR = {
     PLATFORM_COLORS: {
         LinkedIn: "#75E80B",
-        "X/Twitter": "#6b7280",
+        "X": "#6b7280",
         Instagram: "#ef4444",
         TikTok: "#f59e0b",
         Facebook: "#3b82f6",

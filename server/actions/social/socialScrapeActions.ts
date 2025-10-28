@@ -65,7 +65,7 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
     try {
         const result = await brandRequest(
             `/batch/social-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
-            "GET",
+            "GET", undefined, 'force-cache'
         )
         
         return result
@@ -81,7 +81,7 @@ export async function getPreviousSocialScrapes(client_id: string, brand_id: stri
     try {
         const response = await brandRequest(
             `/batch/social-scrapes?client_id=${client_id}&brand_id=${brand_id}`,
-            "GET",
+            "GET", undefined, 'force-cache'
         )
 
         if (!Array.isArray(response) || response.length === 0) {

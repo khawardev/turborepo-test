@@ -10,6 +10,7 @@ import MandatedDriversTab from "./tabs/MandatedDriversTab";
 import StrategicInsightsTab from "./tabs/StrategicInsightsTab";
 
 export default function SocialMediaDashboard({ data }: any) {
+    
     return (
         <Tabs defaultValue="overview" className="w-full ">
             <div className="w-full overflow-x-auto">

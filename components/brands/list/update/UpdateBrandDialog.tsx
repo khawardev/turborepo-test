@@ -196,7 +196,7 @@ export function UpdateBrandDialog({
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Spinner />}
-                Update
+                Confirm
               </Button>
             </div>
            

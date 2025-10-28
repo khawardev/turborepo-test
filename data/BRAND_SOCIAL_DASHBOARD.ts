@@ -28,7 +28,7 @@ export const BRAND_SOCIAL_DASHBOARD = [
                             "mixed": "0",
                             "positive": "0"
                         },
-                        "followers": "0",
+                        "followers": "12200",
                         "mandatedDrivers": {
                             "adas": {
                                 "posts": "0",
@@ -52,7 +52,7 @@ export const BRAND_SOCIAL_DASHBOARD = [
                             }
                         },
                         "name": "X",
-                        "avgEngagement": "0",
+                        "avgEngagement": "12355",
                         "PerformanceData": {
                             "topEngagementDrivers": [
                                 {
@@ -319,7 +319,7 @@ export const BRAND_SOCIAL_DASHBOARD = [
                             "mixed": "5",
                             "positive": "26"
                         },
-                        "followers": "0",
+                        "followers": "12200",
                         "mandatedDrivers": {
                             "adas": {
                                 "posts": "0",
@@ -896,12 +896,12 @@ export const BRAND_SOCIAL_DASHBOARD = [
                             }
                         ],
                         "sentiment": {
-                            "neutral": "10",
+                            "neutral": "100",
                             "negative": "1",
                             "mixed": "0",
                             "positive": "89"
                         },
-                        "followers": "0",
+                        "followers": "1200",
                         "mandatedDrivers": {
                             "adas": {
                                 "posts": "5",
@@ -980,22 +980,22 @@ export const BRAND_SOCIAL_DASHBOARD = [
                                 {
                                     "color": "#84cc16",
                                     "claim": "Innovation Leadership",
-                                    "value": "0"
+                                    "value": "10"
                                 },
                                 {
                                     "color": "#3b82f6",
                                     "claim": "Sustainability Commitment",
-                                    "value": "0"
+                                    "value": "20"
                                 },
                                 {
                                     "color": "#ffffff",
                                     "claim": "People & Culture",
-                                    "value": "0"
+                                    "value": "30"
                                 },
                                 {
                                     "color": "#f97316",
                                     "claim": "Mobility/Automotive",
-                                    "value": "0"
+                                    "value": "40"
                                 }
                             ],
                             "contentStrategyGap": [
@@ -1192,7 +1192,7 @@ export const BRAND_SOCIAL_DASHBOARD = [
                             "mixed": "0",
                             "positive": "100"
                         },
-                        "followers": "0",
+                        "followers": "13220",
                         "mandatedDrivers": {
                             "adas": {
                                 "posts": "0",

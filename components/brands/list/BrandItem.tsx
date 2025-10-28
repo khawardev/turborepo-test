@@ -192,7 +192,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 </DropdownMenuItem>
               </AddCompetitorsDialog>
               <DropdownMenuItem onClick={confirmDelete} variant="destructive">
-                Delete
+                Delete Brand
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

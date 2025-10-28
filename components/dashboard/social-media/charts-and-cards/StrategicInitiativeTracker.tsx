@@ -8,12 +8,12 @@ export default function StrategicInitiativeTracker({ data }: any) {
             <CardContent className="space-y-4">
                 {data.map((item: any) => (
                     <div key={item.name}>
-                        <div className="flex justify-between mb-1">
+                        <div className="flex justify-between  mb-1">
                             <p className="text-sm font-medium">{item.name}</p>
                             <p className="text-sm text-muted-foreground">{item.current}% of {item.target}%</p>
                         </div>
-                        <Progress value={(item.current / item.target) * 100} />
-                        <p className="text-xs text-muted-foreground mt-1">{item.goal}</p>
+                        <Progress className="h-1" value={(item.current / item.target) * 100} />
+                        <p className="text-xs  text-muted-foreground mt-1">{item.goal}</p>
                     </div>
                 ))}
             </CardContent>

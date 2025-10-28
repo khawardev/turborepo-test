@@ -87,7 +87,7 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
                 </DropdownMenuItem>
               </AddCompetitorsDialog>
               <DropdownMenuItem onClick={confirmDelete} variant="destructive">
-                Delete
+                Delete Brand
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

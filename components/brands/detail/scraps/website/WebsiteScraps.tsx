@@ -133,9 +133,9 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                 <div className='flex items-center gap-2'>
                     <Button disabled={isScrapingPending} onClick={askLimit}>
                         {isScrapingPending ? (
-                            <ButtonSpinner>Scraping</ButtonSpinner>
+                            <ButtonSpinner>Capturing...</ButtonSpinner>
                         ) : (
-                            "Scrape Website"
+                            "Scrape Again"
                         )}
                     </Button>
                     <WebsiteReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id} />

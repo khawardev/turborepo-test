@@ -6,20 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomChartTooltipContent from "@/components/dashboard/shared/CustomChartTooltipContent";
-import CustomLegend from "../../shared/Legend";
 import { BRAND_SOCIAL_COLOR } from "@/components/shared/dashboard-color";
 
 export default function MandatedDriversTab({ data }: any) {
     const { theme } = useTheme();
     const tickColor = theme === 'dark' ? '#888888' : '#333333';
-    const gridColor = theme === 'dark' ? '#444444' : '#dddddd';
 
     const { platforms } = data;
     const { DRIVER_COLORS }: any = BRAND_SOCIAL_COLOR;
     const platformKeys = Object.keys(platforms);
 
     return (
-        <Tabs defaultValue="linkedin">
+        <Tabs defaultValue={platformKeys[0]}>
             <div className="w-full overflow-x-auto">
                 <TabsList>
                     {platformKeys.map(key => <TabsTrigger key={key} value={key}>{platforms[key].name}</TabsTrigger>)}
@@ -28,7 +26,7 @@ export default function MandatedDriversTab({ data }: any) {
             <div className="mt-4">
                 {platformKeys.map(key => {
                     const platform = platforms[key];
-                    const chartData = Object.entries(platform.mandatedDrivers).map(([name, d]: any) => ({ name, value: d.percentage }));
+                    const chartData = Object.entries(platform.mandatedDrivers).map(([name, d]: any) => ({ name, value: Number(d.percentage) }));
                     return (
                         <TabsContent key={key} value={key} className="flex flex-col gap-6">
                             <Card>

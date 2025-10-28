@@ -15,6 +15,7 @@ import { scrapeBatchSocial } from '@/server/actions/social/socialScrapeActions';
 import { SocialReportButton } from '../../reports/social/SocialReportButton';
 import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
 
+
 export default function SocialScraps({ allSocialScrapsData, brandName, brand_id }: any) {
     const router = useRouter();
     const [isScrapingPending, startScrapingTransition] = useTransition();
@@ -94,11 +95,11 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
         return (
             <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
                 <p>No social media scrap data available.</p>
-                {/* <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
+                <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
                     <Button disabled={isScrapingPending}>
-                        {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Run First Scrape"}
+                        {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape Social"}
                     </Button>
-                </ScrapeSocialDialog> */}
+                </ScrapeSocialDialog>
             </div>
         );
     }
@@ -133,7 +134,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                 <div className='flex items-center gap-2'>
                     <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
                         <Button disabled={isScrapingPending}>
-                            {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape Social"}
+                            {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape Social Again"}
                         </Button>
                     </ScrapeSocialDialog>
                     <SocialReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id} />

@@ -24,9 +24,9 @@ export default function AudienceEngagementProfile({ data }: any) {
                         <XAxis type="number" hide />
                         <YAxis type="category" dataKey="name" hide />
                         <Tooltip content={<CustomChartTooltipContent />} />
-                        {data.map((item: any) => (
+                        {data.map((item: any,index:any) => (
                             <Bar
-                                key={item.name}
+                                key={index}
                                 dataKey={item.name}
                                 name={`${item.name} (${item.value}%)`}
                                 stackId="a"
@@ -37,8 +37,8 @@ export default function AudienceEngagementProfile({ data }: any) {
                 </ResponsiveContainer>
                 <p className="text-center text-muted-foreground mt-4 mb-4 text-sm">Share of Engagement (%)</p>
                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
-                    {data.map((item: any) => (
-                        <div key={item.name} className="flex items-center space-x-2 text-sm">
+                    {data.map((item: any, index:number) => (
+                        <div key={index} className="flex items-center space-x-2 text-sm">
                             <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
                             <span>{item.name} ({item.value}%)</span>
                         </div>

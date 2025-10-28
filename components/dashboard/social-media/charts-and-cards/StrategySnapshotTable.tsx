@@ -15,8 +15,8 @@ export default function StrategySnapshotTable({ data }: any) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((item: any) => (
-                            <TableRow key={item.competitor}>
+                        {data.map((item: any,index:any) => (
+                            <TableRow key={index}>
                                 <TableCell className="font-semibold">{item.competitor}</TableCell>
                                 <TableCell>{item.strategy}</TableCell>
                                 <TableCell>{item.dataPoint}</TableCell>

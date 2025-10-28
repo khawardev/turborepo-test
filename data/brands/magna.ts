@@ -261,7 +261,7 @@ export const magnaData = {
                 followers: 5500,
                 posts: 26,
                 avgEngagement: 1334.7,
-                sentiment: { positive: 65, neutral: 35, negative: 0, mixed: 0 },
+                sentiment: { positive: 165, neutral: 35, negative: 0, mixed: 0 },
                 PerformanceData: {
                     topEngagementDrivers: [
                         { name: "Trending Audio Usage", value: 287 },

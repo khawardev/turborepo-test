@@ -895,7 +895,7 @@
             }
           ],
           "sentiment": {
-            "neutral": "10",
+            "neutral": "100",
             "negative": "1",
             "mixed": "0",
             "positive": "89"
