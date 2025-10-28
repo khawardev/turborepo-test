@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/server/actions/authActions";
 import ProfileComp from "@/components/profile/ProfileComp";
 import { checkAuth } from "@/lib/checkAuth";
 import StaticBanner from "@/components/shared/staticBanner";
-import { BlurDelay } from "@/components/shared/blur";
+import { BlurDelay } from "@/components/shared/Blur";
 
 export default async function MePage() {
   await checkAuth();

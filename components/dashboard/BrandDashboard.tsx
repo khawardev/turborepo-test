@@ -48,7 +48,18 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
 
 
                 <TabsContent value="social_audit">
-                    <SocialReportDisplay entityReports={socialReportsData} selectedEntityName={socialReportsData[0]?.entity_name} />
+                    {socialReportsData && socialReportsData.length > 0 ? (
+                        <SocialReportDisplay
+                            entityReports={socialReportsData}
+                            selectedEntityName={socialReportsData[0]?.entity_name}
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-[70vh]">
+                            <p className="text-muted-foreground text-center">
+                                No reports are present at the moment.
+                            </p>
+                        </div>
+                    )}
                 </TabsContent>
 
                 <TabsContent value="analytics_dashboards">
@@ -61,7 +72,7 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
 
                         <TabsContent value="social_media" className=" space-y-14">
                             <SocialMediaDashboard data={magnaData.socialMedia} />
-                            {/* <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} /> */}
+                            <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} />
                         </TabsContent>
 
                         {/* <TabsContent value="earned_media">

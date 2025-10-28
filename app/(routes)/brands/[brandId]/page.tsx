@@ -7,7 +7,7 @@ import BrandProfile from "@/components/brands/detail/profile/BrandProfile";
 import ScrapDataViewer from "@/components/brands/detail/scraps/ScrapDataViewer";
 import ReportDataViewer from "@/components/brands/detail/reports/ReportDataViewer";
 import StaticBanner from "@/components/shared/staticBanner";
-import { BlurDelay3 } from "@/components/shared/blur";
+import { BlurDelay3 } from "@/components/shared/Blur";
 import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
 import { getPreviousSocialScrapes, getScrapeBatchSocial } from "@/server/actions/social/socialScrapeActions";
 import { getBatchWebsiteReports } from "@/server/actions/website/websiteReportActions";

@@ -9,7 +9,7 @@ export default function ScrapDataViewer({ allWebsiteScrapsData, allSocialScrapsD
     return (
         <div className="flex flex-col space-y-8">
             <DashboardHeader
-                title="Brands Scraps"
+                title="Brand Scraps"
                 subtitle="View all website and social scraped data from Brand and Competitor"
             />
 

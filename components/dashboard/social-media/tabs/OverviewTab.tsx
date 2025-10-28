@@ -8,6 +8,7 @@ import CustomChartTooltipContent from "@/components/dashboard/shared/CustomChart
 import KpiCard from "../charts-and-cards/KpiCard";
 import CustomLegend from "../../shared/Legend";
 import { BRAND_SOCIAL_COLOR } from "@/components/shared/dashboard-color";
+import { formatCount } from "@/lib/utils";
 
 export default function OverviewTab({ data }: any) {
     const { platforms } = data;
@@ -21,8 +22,7 @@ export default function OverviewTab({ data }: any) {
         engagement: platform.avgEngagement,
         sentiment: platform.sentiment.positive,
     }));
-
-    const totalReach = platformData.reduce((sum: any, p: any) => sum + p.followers, 0);
+    const totalReach = platformData.reduce((sum: number, p: any) => sum + p.followers, 0);
     const totalPosts = platformData.reduce((sum: any, p: any) => sum + p.posts, 0);
     const avgSentiment = Math.round(platformData.reduce((sum: any, p: any) => sum + p.sentiment, 0) / platformData.length);
 
@@ -38,6 +38,7 @@ export default function OverviewTab({ data }: any) {
         platformFollowersInK = `${Math.round(topPlatform.followers / 1000)}k`;
     }
 
+    console.log(totalReach, `<-> totalReach <->`);
 
     return (
         <Tabs defaultValue="total_overview">
@@ -50,7 +51,7 @@ export default function OverviewTab({ data }: any) {
             <div>
                 <TabsContent value="total_overview" className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <KpiCard title="Total Reach" value={`${(totalReach / 1000).toFixed(0)}K+`} description="Combined followers" icon={Globe} />
+                        <KpiCard title="Total Reach" value={formatCount(totalReach)} description="Combined followers" icon={Globe} />
                         <KpiCard title="Total Content" value={totalPosts} description="Posts across all platforms" icon={Activity} />
                         <KpiCard title="Avg Positive Sentiment" value={`${avgSentiment}%`} description="Average across platforms" icon={Heart} />
                         <KpiCard title="Top Platform" value={platformName} description={`${platformFollowersInK} followers of reach`} icon={Award} />
@@ -90,7 +91,7 @@ export default function OverviewTab({ data }: any) {
                                         <Tooltip content={<CustomChartTooltipContent />} />
                                     </PieChart>
                                 </ResponsiveContainer>
-                             
+
                             </CardContent>
                         </Card>
                     </div>

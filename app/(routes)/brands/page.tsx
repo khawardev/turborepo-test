@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import BrandList from "@/components/brands/list/BrandList";
 import StaticBanner from "@/components/shared/staticBanner";
 import LaserFlow from "@/components/ui/react-bits/LaserFLow/LaserFlow";
-import { BlurDelay, BlurDelay2, BlurDelay3 } from "@/components/shared/blur";
+import { BlurDelay, BlurDelay2, BlurDelay3 } from "@/components/shared/Blur";
 
 export default function page() {
   return (

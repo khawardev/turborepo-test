@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import './LaserFlow.css';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { BlurDelay3, BlurDelay4 } from '@/components/shared/blur';
+import { BlurDelay3, BlurDelay4 } from '@/components/shared/Blur';
 
 type Props = {
   className?: string;

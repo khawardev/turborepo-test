@@ -1,4 +1,4 @@
-import { Blur, BlurDelay } from "./blur"
+import { Blur, BlurDelay } from "./Blur"
 import { Badge } from "../ui/badge"
 
 const StaticBanner = ({ title, badge }: { title: string, badge: string }) => {

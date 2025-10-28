@@ -8,8 +8,9 @@ import { prioritizeBrandReport } from '@/lib/prioritizeBrandReport'
 import { getCurrentUser } from '@/server/actions/authActions'
 import { getWebsiteBatchId, getscrapeBatchWebsite } from '@/server/actions/website/websiteScrapeActions'
 import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/social/socialScrapeActions'
-import { getBatchWebsiteReports, getBrandPerceptionReport } from '@/server/actions/website/websiteReportActions'
+import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions'
 import { getBatchSocialReports } from '@/server/actions/social/socialReportActions'
+import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionAction'
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   
   await checkAuth();

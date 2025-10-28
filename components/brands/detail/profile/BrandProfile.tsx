@@ -45,10 +45,10 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
 
   return (
     <div className="flex flex-col space-y-8">
-      <DashboardHeader
+      {/* <DashboardHeader
         title="Brand Profile"
         subtitle="View detailed information about Brand and its Competitors"
-      /> 
+      />  */}
     
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
