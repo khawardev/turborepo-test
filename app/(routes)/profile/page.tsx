@@ -3,9 +3,9 @@ import { getCurrentUser } from "@/server/actions/authActions";
 import ProfileComp from "@/components/profile/ProfileComp";
 import { checkAuth } from "@/lib/checkAuth";
 import StaticBanner from "@/components/shared/staticBanner";
-import { BlurDelay } from "@/components/shared/Blur";
+import { BlurDelay } from "../../../components/shared/Blur";
 
-export default async function MePage() {
+export default async function ProfilePage() {
   await checkAuth();
   const user = await getCurrentUser();
 
