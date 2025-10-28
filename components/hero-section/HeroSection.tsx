@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ContainerLg } from '../shared/containers'
-import { Blur, BlurDelay, BlurDelay2 } from '../shared/Blur'
+import { Blur, BlurDelay, BlurDelay2 } from '../shared/MagicBlur'
 import LaserFlow from '../ui/react-bits/LaserFLow/LaserFlow'
 export default function HeroSection() {
     return (

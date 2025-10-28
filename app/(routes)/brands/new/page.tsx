@@ -29,7 +29,7 @@ import { ContainerMd } from "@/components/shared/containers";
 import { Spinner } from "@/components/shared/spinner";
 import { Plus } from "lucide-react";
 import StaticBanner from "@/components/shared/staticBanner";
-import { BlurDelay, BlurDelay2 } from "@/components/shared/Blur";
+import { BlurDelay, BlurDelay2 } from "@/components/shared/MagicBlur";
 
 type BrandFormValues = z.infer<typeof brandSchema>;
 

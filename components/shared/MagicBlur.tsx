@@ -1,4 +1,3 @@
-import React from 'react'
 import BlurFade from '../ui/BlurFade'
 
 export const Blur = ({ children, className }: { children: React.ReactNode, className?: string }) => {
