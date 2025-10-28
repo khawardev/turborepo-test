@@ -1,14 +1,13 @@
 import React from 'react'
-import BlurFade from '../ui/blur-fade'
+import BlurFade from '../ui/BlurFade'
 
-const Blur = ({ children, className }: { children: React.ReactNode, className?: string }) => {
+export const Blur = ({ children, className }: { children: React.ReactNode, className?: string }) => {
     return (
         <BlurFade className={className} delay={0.035} inView>
             {children}
         </BlurFade>
     )
 }
-export default Blur
 
 export const BlurDelay = ({ children, className }: { children: React.ReactNode, className?: string }) => {
     return (
