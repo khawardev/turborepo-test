@@ -12,13 +12,16 @@
     "studio": "pnpm drizzle-kit studio",
     "check": "pnpm dlx npm-check",
     "check:interact": "pnpm dlx npm-check -u",
-    "auth:generate": "pnpm better-auth generate"
+    "auth:generate": "pnpm better-auth generate",
+    "analyze": "ANALYZE=true npm run build --webpack"
   },
   "dependencies": {
+    "@carrotsearch/foamtree": "^3.5.7",
     "@geist-ui/core": "^2.3.8",
     "@geist-ui/icons": "^1.0.2",
     "@hookform/resolvers": "^5.2.2",
     "@medusajs/ui": "^4.0.25",
+    "@next/bundle-analyzer": "^16.0.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.10",
