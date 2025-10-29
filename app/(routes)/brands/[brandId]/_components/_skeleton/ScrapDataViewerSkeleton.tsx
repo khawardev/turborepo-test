@@ -29,7 +29,7 @@ const PlatformCardSkeleton = () => {
       </CardHeader>
       <CardContent className='px-0'>
         <div className="flex flex-col space-y-6 w-full">
-          {Array.from({ length: 2 }).map((_, index) => (
+          {Array.from({ length: 1 }).map((_, index) => (
             <PostItemSkeleton key={index} />
           ))}
         </div>
@@ -41,7 +41,7 @@ const PlatformCardSkeleton = () => {
 const SocialDataViewSkeleton = () => {
   return (
     <div className="columns-1 md:columns-2 gap-6">
-      {Array.from({ length: 2 }).map((_, index) => (
+      {Array.from({ length: 4 }).map((_, index) => (
         <div key={index} className="break-inside-avoid mb-6">
           <PlatformCardSkeleton />
         </div>
