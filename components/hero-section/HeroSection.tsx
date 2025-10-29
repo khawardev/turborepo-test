@@ -9,7 +9,7 @@ export default function HeroSection() {
         <ContainerLg>
             <div>
                 <Blur
-                    className="max-w-2xl text-balance tracking-tighter text-5xl font-medium md:text-6xl ">
+                    className="max-w-2xl victor text-balance tracking-tighter text-5xl font-medium md:text-6xl ">
                     Brand Control Returns to your Team
                 </Blur>
                 <BlurDelay className="mt-8 max-w-2xl text-pretty text-muted-foreground md:text-xl text-lg">

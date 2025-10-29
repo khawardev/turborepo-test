@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
 import PostItem from './PostItem';

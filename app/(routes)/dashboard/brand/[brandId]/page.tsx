@@ -10,7 +10,8 @@ import { getWebsiteBatchId, getscrapeBatchWebsite } from '@/server/actions/websi
 import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/social/socialScrapeActions'
 import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions'
 import { getBatchSocialReports } from '@/server/actions/social/socialReportActions'
-import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionAction'
+import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionDashboardAction'
+import { getBrandSocialDashboard } from '@/server/actions/agent/brandSocialDashboardAction'
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   
   await checkAuth();
@@ -35,6 +36,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   const socialReportsData: any = await getBatchSocialReports(brandId);
   const latestSocialReport = socialReportsData?.data?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
+  const brandSocialDashboard = await getBrandSocialDashboard(brandId);
 
 
   return (
@@ -48,6 +50,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
           websiteScrapsData={websiteScrapsData.brand}
           socialScrapsData={socialScrapsData.brand}
           socialReportsData={latestSocialReport?.brand_reports}
+          socialAnalyticsDashboard={brandSocialDashboard}
         />
       </DashboardInnerLayout>
     </DashboardLayout>

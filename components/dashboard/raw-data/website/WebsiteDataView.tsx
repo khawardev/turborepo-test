@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +13,17 @@ import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/cleanMarkdown';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
-    const pages = websiteScrapsData?.pages || [];
+    const pages = useMemo(() => {
+        const originalPages = websiteScrapsData?.pages || [];
+        const uniquePagesMap = new Map();
+        originalPages.forEach((page: any) => {
+            if (page?.url && !uniquePagesMap.has(page.url)) {
+                uniquePagesMap.set(page.url, page);
+            }
+        });
+        return Array.from(uniquePagesMap.values());
+    }, [websiteScrapsData]);
+
     const [selectedPage, setSelectedPage] = useState<any>(null);
     const [isCopied, setIsCopied] = useState(false);
 
@@ -23,7 +33,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
         } else {
             setSelectedPage(null);
         }
-    }, [websiteScrapsData]);
+    }, [pages]);
 
     if (pages.length === 0) {
         return (
@@ -46,7 +56,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
     if (!selectedPage) {
         return (
             <div className="flex h-[70vh] items-center justify-center text-muted-foreground">
-                    Loading page content...
+                Loading page content...
             </div>
         );
     }
@@ -54,20 +64,20 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
     return (
         <div className="flex gap-6 min-h-0 ">
             <ScrollArea className="h-[75vh] w-1/3 min-w-0 ">
-                    <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
-                    <ul className="space-y-1">
-                        {pages.map((page: any) => (
-                            <li key={page.url}>
-                                <Button
-                                    variant={selectedPage.url === page.url ? 'outline' : 'ghost'}
-                                    className=" justify-start font-normal  h-9 text-left"
-                                    onClick={() => setSelectedPage(page)}
-                                >
-                                    <span className="truncate w-[190px]">{new URL(page.url).pathname}</span>
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
+                <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
+                <ul className="space-y-1">
+                    {pages.map((page: any, index: number) => (
+                        <li key={index}>
+                            <Button
+                                variant={selectedPage.url === page.url ? 'outline' : 'ghost'}
+                                className=" justify-start font-normal  h-9 text-left"
+                                onClick={() => setSelectedPage(page)}
+                            >
+                                <span className="truncate w-[190px]">{new URL(page.url).pathname}</span>
+                            </Button>
+                        </li>
+                    ))}
+                </ul>
             </ScrollArea>
 
             <CardContent className="px-0 space-y-4 w-full min-w-0 ">
@@ -82,7 +92,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                 </div>
 
                 <Separator />
-                
+
                 <ScrollArea className="h-[70vh] w-full ">
                     <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
                         <div className="prose prose-neutral  break-all max-w-none markdown-body  dark:prose-invert ">

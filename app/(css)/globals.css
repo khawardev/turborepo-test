@@ -115,9 +115,53 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@font-face {
+  font-family: "Patron Regular";
+  src: url("https://framerusercontent.com/assets/bbOgP2wbEZ3L7V0jCinX9fFrtQ.woff2");
+  font-display: swap
+}
+
+@font-face {
+  font-family: "Patron Medium";
+  src: url("https://framerusercontent.com/assets/5wgaYNyhGXCFsgjU1qv9gGo.woff2");
+  font-display: swap
+}
+
+@font-face {
+  font-family: "Patron Bold";
+  src: url("https://framerusercontent.com/assets/QivwknzlE7XI4E3fwkYRaWKjg.woff2");
+  font-display: swap
+}
+
+@font-face {
+  font-family: "Patron Light Italic";
+  src: url("https://framerusercontent.com/assets/K5J39C7Ze0n0DMvW7Kfv197V0.otf");
+  font-display: swap
+}
+
+@font-face {
+  font-family: "Patron Bold Italic";
+  src: url("https://framerusercontent.com/assets/4u7dmXv1ZazVmm3fOq4W38sOM.otf");
+  font-display: swap
+}
+
+@font-face {
+  font-family: "Patron Italic";
+  src: url("https://framerusercontent.com/assets/NCXuvHmrEVuP2QoKmK5w4RFrOAY.otf");
+  font-display: swap
+}
+
+
+
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  .victor {
+    font-family: 'Patron Regular';
   }
 
   body {
@@ -127,15 +171,14 @@
   .bg-outline {
     @apply shadow-xs backdrop-blur bg-linear-to-t from-border dark:from-border to-border/40 dark:border-border border border-zinc-300 shadow-zinc-950/10 duration-200;
   }
+
   .bg-linear {
     @apply bg-linear-to-t from-background to-background/50 dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 rounded-xl p-6 ring-border ring-offset-border/5 ring-1 ring-offset-2;
   }
 
-  .victor {
-    font-family: 'Victor';
-  }
 
-  .jetbrains{
+
+  .jetbrains {
     font-family: "JetBrains Mono", monospace;
     font-optical-sizing: auto;
   }

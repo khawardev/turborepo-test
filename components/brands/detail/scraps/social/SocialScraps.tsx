@@ -140,7 +140,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                     <SocialReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id} />
                     <TooltipProvider>
                         <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="w-[140px]">
                                 <SelectValue placeholder="Select a scrap run" />
                             </SelectTrigger>
 
@@ -155,7 +155,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
 
                                         <TooltipContent
                                             side="left"
-                                            className=" px-1"
+                                            className=" px-1 mx-3 mt-2"
                                         >
                                             <DateRangeDisplay
                                                 start_date={scrap?.start_date}

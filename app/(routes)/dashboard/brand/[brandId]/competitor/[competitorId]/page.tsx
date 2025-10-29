@@ -10,7 +10,7 @@ import { getWebsiteBatchId, getscrapeBatchWebsite } from '@/server/actions/websi
 import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/social/socialScrapeActions'
 import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions'
 import { getBatchSocialReports } from '@/server/actions/social/socialReportActions'
-import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionAction'
+import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionDashboardAction'
 
 export default async function CompetitorPage({params}: {params: Promise<{ brandId: string; competitorId: string }>}) {
     const { brandId, competitorId } = await params

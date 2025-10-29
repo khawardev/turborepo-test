@@ -12,11 +12,12 @@ import SocialReportDisplay from "../brands/detail/reports/social/SocialReportDis
 import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
 // import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
 
-export default function BrandDashboard({ websiteScrapsData, title, extractorReport, synthesizerReport, brandPerceptionReport, socialScrapsData, socialReportsData }: any) {
+export default function BrandDashboard({ websiteScrapsData, title, extractorReport, synthesizerReport, brandPerceptionReport, socialScrapsData, socialReportsData, socialAnalyticsDashboard }: any) {
+    console.log(socialAnalyticsDashboard, `<-> socialAnalyticsDashboard <->`);
     
     return (
         <div>
-            <DashboardHeader title={title} subtitle="Raw website and social data, extracted insights, Outside-In reports, Brand Perception and analytics dashboards." />
+            <DashboardHeader title={title} subtitle="Website and Social Captured Data, Extracted & Outside-In reports, Brand Perception and Analytics Dashboards." />
             <Tabs defaultValue="raw_data">
                 <TabsList>
                     <TabsTrigger value="raw_data">Raw Data</TabsTrigger>
