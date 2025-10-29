@@ -2,11 +2,15 @@
 
 import DashboardHeader from '@/components/dashboard/shared/DashboardHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WebsiteScraps from './website/WebsiteScraps';
-import SocialScraps from './social/SocialScraps';
+import React from 'react';
 
-export default function ScrapDataViewer({ allWebsiteScrapsData, allSocialScrapsData, brandName, brand_id }: any) {
-    
+export default function ScrapDataViewer({
+    websiteScrapsContent,
+    socialScrapsContent
+}: {
+    websiteScrapsContent: React.ReactNode,
+    socialScrapsContent: React.ReactNode
+}) {
     return (
         <div className="flex flex-col space-y-8">
             <DashboardHeader
@@ -20,18 +24,10 @@ export default function ScrapDataViewer({ allWebsiteScrapsData, allSocialScrapsD
                     <TabsTrigger value="social-media">Social Media Scraps</TabsTrigger>
                 </TabsList>
                 <TabsContent value="website" className="pt-6">
-                    <WebsiteScraps
-                        allScrapsData={allWebsiteScrapsData}
-                        brandName={brandName}
-                        brand_id={brand_id}
-                    />
+                    {websiteScrapsContent}
                 </TabsContent>
                 <TabsContent value="social-media" className="pt-6">
-                    <SocialScraps
-                        allSocialScrapsData={allSocialScrapsData}
-                        brandName={brandName}
-                        brand_id={brand_id}
-                    />
+                    {socialScrapsContent}
                 </TabsContent>
             </Tabs>
         </div>

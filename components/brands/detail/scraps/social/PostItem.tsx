@@ -1,13 +1,11 @@
 'use client'
 
-import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { timeAgo } from '@/lib/date-utils';
 import { AlertTriangle, CalendarDays, Heart, MessageSquare, Link as LinkIcon, Eye, Share2, PlayCircle } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import Image from 'next/image';
 
 const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null;
@@ -60,7 +58,7 @@ const PostMedia = ({ post }: any) => {
 
     return (
         <div className="aspect-video w-full overflow-hidden rounded-lg border relative group">
-            <Image src={mediaUrl} alt="Post media" className="h-full w-full object-cover" />
+            <img src={mediaUrl} alt="Post media" className="h-full w-full object-cover" />
             {isVideo && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <PlayCircle className="h-12 w-12 text-white/80" />

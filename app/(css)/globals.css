@@ -160,9 +160,6 @@
     @apply border-border outline-ring/50;
   }
 
-  .victor {
-    font-family: 'Patron Regular';
-  }
 
   body {
     @apply bg-background text-foreground;
@@ -176,7 +173,9 @@
     @apply bg-linear-to-t from-background to-background/50 dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 rounded-xl p-6 ring-border ring-offset-border/5 ring-1 ring-offset-2;
   }
 
-
+  .victor {
+    font-family: 'Patron Regular';
+  }
 
   .jetbrains {
     font-family: "JetBrains Mono", monospace;

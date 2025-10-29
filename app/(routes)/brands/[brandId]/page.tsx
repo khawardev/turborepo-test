@@ -3,15 +3,16 @@ import { getCurrentUser } from "@/server/actions/authActions";
 import { notFound } from "next/navigation";
 import { ContainerMd } from "@/components/shared/containers";
 import { AnimatedTabs } from "@/components/brands/detail/AnimatedTabs";
-import BrandProfile from "@/components/brands/detail/profile/BrandProfile";
-import ScrapDataViewer from "@/components/brands/detail/scraps/ScrapDataViewer";
-import ReportDataViewer from "@/components/brands/detail/reports/ReportDataViewer";
 import StaticBanner from "@/components/shared/staticBanner";
 import { BlurDelay3 } from "@/components/shared/MagicBlur";
-import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
-import { getPreviousSocialScrapes, getScrapeBatchSocial } from "@/server/actions/social/socialScrapeActions";
-import { getBatchWebsiteReports } from "@/server/actions/website/websiteReportActions";
-import { getBatchSocialReports } from "@/server/actions/social/socialReportActions";
+import { Suspense } from "react";
+import BrandProfileTab from "./_components/BrandProfileTab";
+import ScrapsTab from "./_components/ScrapsTab";
+import ReportsTab from "./_components/ReportsTab";
+import { BrandProfileSkeleton } from "./_components/_skeleton/BrandProfileSkeleton";
+import  ScrapDataViewerSkeleton  from "./_components/_skeleton/ScrapDataViewerSkeleton";
+import { ReportDataViewerSkeleton } from "./_components/_skeleton/ReportDataViewerSkeleton";
+import BrandsDetailsLoading from "./loading";
 
 export default async function BrandDetailPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
@@ -21,58 +22,32 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ br
 
   const brandData = await getBrandbyIdWithCompetitors(brandId);
 
-  const previousWebsiteScrapes = await getpreviousWebsiteScraps(user.client_id, brandId);
-  const websiteScrapeBatchPromises = previousWebsiteScrapes.map(
-    async (scrape: any) => await getscrapeBatchWebsite(brandId, scrape.batch_id)
-  );
-  const websiteScrapeBatchResults = await Promise.all(websiteScrapeBatchPromises);
-  const validWebsiteScrapeData = websiteScrapeBatchResults.filter(data => data);
-
-  const websiteReportData = await getBatchWebsiteReports(brandId);
-
-  const previousSocialScrapes = await getPreviousSocialScrapes(user.client_id, brandId);
-  const socialScrapeBatchPromises = previousSocialScrapes.map(
-    async (scrape: any) => await getScrapeBatchSocial(brandId, scrape.batch_id)
-  );
-  const socialScrapeBatchResults = await Promise.all(socialScrapeBatchPromises);
-  const validSocialScrapeData = socialScrapeBatchResults.filter(data => data);
-
-
-  const allSocialReportsData = await getBatchSocialReports(brandId)
-
   const tabs = [
     {
       label: "Brand Profile",
       value: "brand_profile",
       content: (
-        <BrandProfile
-          brand={brandData}
-          isScrapped={websiteReportData?.data && websiteReportData?.data.length > 0}
-        />
+        <Suspense fallback={<BrandProfileSkeleton />}>
+          <BrandProfileTab brandId={brandId} />
+        </Suspense>
       ),
     },
     {
       label: "Scraps",
       value: "scraps",
       content: (
-        <ScrapDataViewer
-          allWebsiteScrapsData={validWebsiteScrapeData}
-          allSocialScrapsData={validSocialScrapeData}
-          brand_id={brandId}
-          brandName={brandData.name}
-        />
+        <Suspense fallback={<ScrapDataViewerSkeleton />}>
+          <ScrapsTab brandId={brandId} />
+        </Suspense>
       ),
     },
     {
       label: "Reports",
       value: "reports",
       content: (
-        <ReportDataViewer
-          competitors={brandData.competitors}
-          allSocialReportsData={allSocialReportsData?.data}
-          allwebsiteReportsData={websiteReportData?.data}
-          brandName={brandData.name}
-        />
+        <Suspense fallback={<ReportDataViewerSkeleton />}>
+          <ReportsTab brandId={brandId} />
+        </Suspense>
       ),
     },
   ];

@@ -14,9 +14,7 @@ function ScrollArea({
       className={cn("relative w-full   h-full ", className)}
       {...props}
     >
-      <ScrollAreaPrimitive.Viewport
-        className="w-full h-full px-1 overflow-x-hidden "
-      >
+      <ScrollAreaPrimitive.Viewport className="w-full h-full px-1">
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />

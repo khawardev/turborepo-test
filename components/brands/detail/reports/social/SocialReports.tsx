@@ -113,7 +113,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                         <TooltipTrigger asChild>
                             <div className="inline-block">
                                 <Select onValueChange={setSelectedReportBatchId} value={selectedReportBatchId ?? ''}>
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger className="w-[140px]">
                                         <SelectValue placeholder="Select previous reports" />
                                     </SelectTrigger>
                                     <SelectContent>
