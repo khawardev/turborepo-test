@@ -2,7 +2,12 @@
 
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleIcon,
+} from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -27,10 +32,7 @@ function DropdownMenuTrigger({
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
-      className={cn(
-        "outline-none focus-visible:ring-0",
-        className
-      )}
+      className={cn("outline-none focus-visible:ring-0", className)}
       {...props}
     />
   )
@@ -95,7 +97,6 @@ function DropdownMenuItem({
     />
   )
 }
-
 
 function DropdownMenuCheckboxItem({
   className,
@@ -217,39 +218,55 @@ function DropdownMenuSubTrigger({
   className,
   inset,
   children,
+  side = "right",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
   inset?: boolean
+  side?: "left" | "right"
 }) {
   return (
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8",
+        "relative flex cursor-default select-none items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8",
+        "border border-transparent focus:border-muted-foreground/20 data-[state=open]:border-muted-foreground/20",
+        "focus:bg-gradient-to-t focus:from-muted focus:to-border focus:dark:from-muted/50",
+        "data-[state=open]:bg-gradient-to-t data-[state=open]:from-muted data-[state=open]:to-border data-[state=open]:dark:from-muted/50",
+        "focus:text-accent-foreground data-[state=open]:text-accent-foreground",
+        "hover:cursor-pointer",
+        "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
     >
+      {side === "left" && <ChevronLeftIcon className="size-4" />}
       {children}
-      <ChevronRightIcon className="ml-auto size-4" />
+      {side === "right" && <ChevronRightIcon className="ml-auto size-4" />}
     </DropdownMenuPrimitive.SubTrigger>
   )
 }
 
 function DropdownMenuSubContent({
   className,
+  sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
   return (
-    <DropdownMenuPrimitive.SubContent
-      data-slot="dropdown-menu-sub-content"
-      className={cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border border-accent p-1 shadow-lg",
-        className
-      )}
-      {...props}
-    />
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.SubContent
+        data-slot="dropdown-menu-sub-content"
+        sideOffset={sideOffset}
+        className={cn(
+          "p-1 bg-outline duration-200 rounded-xl shadow-md",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          "z-50 max-h-[--radix-dropdown-menu-content-available-height] min-w-[6.5rem] origin-[--radix-dropdown-menu-content-transform-origin] overflow-x-hidden overflow-y-auto",
+          className
+        )}
+        {...props}
+      />
+    </DropdownMenuPrimitive.Portal>
   )
 }
 

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ChevronDown, Link as LinkIcon } from "lucide-react";
+import { ArchiveIcon, ChevronDown, Link as LinkIcon, MailCheckIcon, Pencil, Plus, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -14,13 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
 import DashboardHeader from "@/components/dashboard/shared/DashboardHeader";
 import { UpdateBrandDialog } from "../../list/update/UpdateBrandDialog";
 import { UpdateCompetitorsDialog } from "../../list/update/UpdateCompetitorsDialog";
 import { AddCompetitorsDialog } from "../../list/update/AddCompetitorsDialog";
+import { FiEdit, FiEdit3 } from "react-icons/fi";
+import { CgAddR } from "react-icons/cg";
+import { BrandCompCrudButtons } from "@/components/brands/detail/profile/BrandCompCrudButtons";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();
@@ -49,7 +52,7 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
         title="Brand Profile"
         subtitle="View detailed information about Brand and its Competitors"
       />  */}
-    
+
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight capitalize">{brand.name}</h1>
@@ -64,33 +67,7 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
           </Link>
         </div>
         <div className="flex items-center space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Actions <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <UpdateBrandDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Update Brand
-                </DropdownMenuItem>
-              </UpdateBrandDialog>
-              <UpdateCompetitorsDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Update Competitors
-                </DropdownMenuItem>
-              </UpdateCompetitorsDialog>
-              <AddCompetitorsDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Add Competitors
-                </DropdownMenuItem>
-              </AddCompetitorsDialog>
-              <DropdownMenuItem onClick={confirmDelete} variant="destructive">
-                Delete Brand
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <BrandCompCrudButtons brand={brand} />
           <BrandDashboardButton brand_id={brand.brand_id} isScrapped={isScrapped} />
         </div>
       </div>

@@ -20,7 +20,7 @@ export function BrandDashboardButton({ brand_id, isScrapped }: { brand_id: any; 
                     )}
                 </TooltipTrigger>
                 <TooltipContent>
-                    {isScrapped ? "Go to Brand Dashboard" : "Please Genrate Reports First"}
+                    {isScrapped ? "Go to Brand Dashboard" : "Please Generate Reports First"}
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

@@ -175,7 +175,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 Actions <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent className="w-52" align="end">
               <UpdateBrandDialog brand={brand}>
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   Update Brand

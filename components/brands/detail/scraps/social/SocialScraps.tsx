@@ -1,24 +1,16 @@
 'use client'
 
 import React, { useState, useMemo, useEffect, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { timeAgo } from '@/lib/date-utils';
 import SocialDataView from './SocialDataView';
-import { ScrapeSocialDialog } from '@/components/brands/detail/scraps/social/AskSocialScrapeDialog';
-import { ButtonSpinner } from '@/components/shared/spinner';
-import { scrapeBatchSocial } from '@/server/actions/social/socialScrapeActions';
-import { SocialReportButton } from '../../reports/social/SocialReportButton';
 import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
+import { ScrapeReportActionButtons } from '@/components/brands/detail/ScrapeReportActionButtons';
 
 
 export default function SocialScraps({ allSocialScrapsData, brandName, brand_id }: any) {
-    const router = useRouter();
-    const [isScrapingPending, startScrapingTransition] = useTransition();
     const [isDataTransitioning, startDataTransition] = useTransition();
     const [selectedScrapBatchId, setSelectedScrapBatchId] = useState<string | null>(null);
     const [selectedSourceName, setSelectedSourceName] = useState<string>(brandName);
@@ -70,36 +62,15 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
         });
     };
 
-    const handleScrapeSocial = (details: {
-        startDate: string
-        endDate: string
-    }) => {
-        startScrapingTransition(async () => {
-            toast.info("Social scraping job started...");
-            const result = await scrapeBatchSocial(
-                brand_id,
-                details.startDate,
-                details.endDate
-            );
-
-            if (result?.success) {
-                toast.success(result.message || "Social Scraping completed successfully 🎉");
-                router.refresh();
-            } else {
-                toast.error(result?.error || "Social scraping failed.");
-            }
-        });
-    };
-
     if (sortedScraps.length === 0) {
         return (
             <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
                 <p>No social media scrap data available.</p>
-                <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
-                    <Button disabled={isScrapingPending}>
-                        {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape Social"}
-                    </Button>
-                </ScrapeSocialDialog>
+                <ScrapeReportActionButtons
+                    brand_id={brand_id}
+                    website_batch_id={null}
+                    social_batch_id={null}
+                />
             </div>
         );
     }
@@ -132,12 +103,11 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                 </div>
 
                 <div className='flex items-center gap-2'>
-                    <ScrapeSocialDialog isLoading={isScrapingPending} onConfirm={handleScrapeSocial}>
-                        <Button disabled={isScrapingPending}>
-                            {isScrapingPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape Social Again"}
-                        </Button>
-                    </ScrapeSocialDialog>
-                    <SocialReportButton brand_id={brand_id} batch_id={selectedScrapBatchId ? selectedScrapBatchId : sortedScraps[0].batch_id} />
+                    <ScrapeReportActionButtons
+                        brand_id={brand_id}
+                        website_batch_id={null}
+                        social_batch_id={selectedScrapBatchId}
+                    />
                     <TooltipProvider>
                         <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
                             <SelectTrigger className="w-[140px]">

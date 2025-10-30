@@ -1,12 +1,12 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
-import PostItem from './PostItem';
+import PostList from './PostList';
 import { FaFacebook, FaXTwitter } from 'react-icons/fa6';
 import { BsLinkedin } from "react-icons/bs";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
 
 const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -44,11 +44,7 @@ export default function PlatformCard({ platformData }: any) {
             <CardContent className='px-0'>
                 {uniquePosts && uniquePosts.length > 0 ? (
                     <ScrollArea className={hasError ? "" : "h-[750px]"}>
-                        <div className="flex flex-col space-y-4 w-full">
-                            {uniquePosts.map((post: any, index: number) => (
-                                <PostItem key={post.SK || index} post={post} />
-                            ))}
-                        </div>
+                        <PostList posts={uniquePosts} />
                     </ScrollArea>
                 ) : (
                     <div className="p-4 border rounded-lg bg-border/50 space-y-2">

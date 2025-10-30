@@ -1,22 +1,14 @@
 'use client'
 
-import React, { useState, useMemo, useTransition, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ButtonSpinner } from '@/components/shared/spinner';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { timeAgo } from '@/lib/date-utils';
-import { WebsiteReportButton } from '../../reports/website/WebsiteReportButton';
 import WebsiteDataView from '@/components/dashboard/raw-data/website/WebsiteDataView';
-import { scrapeBatchWebsite } from '@/server/actions/website/websiteScrapeActions';
-import { WebsiteAskLimitToast } from './WebsiteAskLimitToast';
+import { ScrapeReportActionButtons } from '@/components/brands/detail/ScrapeReportActionButtons';
 
 export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: any) {
-    const [isScrapingPending, startScrapingTransition] = useTransition();
-    const router = useRouter();
-
     const sortedScraps = useMemo(() => {
         if (!allScrapsData || allScrapsData.length === 0) return [];
         return [...allScrapsData].sort((a, b) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
@@ -56,31 +48,15 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
         }
     };
 
-    const scrapeBrand = async (limit: number) => {
-        startScrapingTransition(async () => {
-            const result = await scrapeBatchWebsite(brand_id, limit);
-            if (result?.success) {
-                router.refresh();
-                toast.success("Scraping completed successfully 🎉");
-            } else {
-                toast.error("Scraping failed.");
-            }
-        });
-    };
-
-    const askLimit = () => {
-        toast.custom((t: any) => (
-            <WebsiteAskLimitToast
-                t={t}
-                onConfirm={scrapeBrand}
-            />
-        ));
-    };
-
     if (sortedScraps.length === 0) {
         return (
-            <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center">
-                No website scrap data available.
+            <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
+                <p>No website scrap data available.</p>
+                <ScrapeReportActionButtons
+                    brand_id={brand_id}
+                    website_batch_id={null}
+                    social_batch_id={null}
+                />
             </div>
         );
     }
@@ -132,10 +108,11 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                 </div>
 
                 <div className='flex items-center gap-2'>
-                    <Button disabled={isScrapingPending} onClick={askLimit}>
-                        {isScrapingPending ? <ButtonSpinner>Scraping...</ButtonSpinner> : "Scrape Again"}
-                    </Button>
-                    <WebsiteReportButton brand_id={brand_id} batch_id={selectedScrapBatchId} />
+                    <ScrapeReportActionButtons
+                        brand_id={brand_id}
+                        website_batch_id={selectedScrapBatchId}
+                        social_batch_id={null}
+                    />
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
