@@ -8,6 +8,7 @@ import { timeAgo } from '@/lib/date-utils';
 import SocialDataView from './SocialDataView';
 import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
 import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
+import { SCRAPE } from '@/lib/constants';
 
 
 export default function SocialScraps({ allSocialScrapsData, brandName, brand_id }: any) {
@@ -65,7 +66,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
     if (sortedScraps.length === 0) {
         return (
             <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
-                <p>No social media scrap data available.</p>
+                <p>No social media {SCRAPE} data available.</p>
                 <ScrapeReportActionButtons
                     brand_id={brand_id}
                     website_batch_id={null}
@@ -111,7 +112,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                     <TooltipProvider>
                         <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
                             <SelectTrigger className="w-[140px]">
-                                <SelectValue placeholder="Select a scrap run" />
+                                <SelectValue placeholder={`Select a ${SCRAPE} run`} />
                             </SelectTrigger>
 
                             <SelectContent>

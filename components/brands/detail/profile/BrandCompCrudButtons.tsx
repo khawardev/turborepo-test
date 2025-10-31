@@ -22,7 +22,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export function BrandCompCrudButtons({ brand }: any) {
+export function BrandCompCrudButtons({ brand, side }: any) {
     const router = useRouter()
 
     const confirmBrandDelete = () => {
@@ -53,8 +53,8 @@ export function BrandCompCrudButtons({ brand }: any) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-34">
                 {/* Brand Sub Menu */}
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
+                <DropdownMenuSub >
+                    <DropdownMenuSubTrigger side={side}>
                         <span>Brand</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent sideOffset={10} >
@@ -71,12 +71,10 @@ export function BrandCompCrudButtons({ brand }: any) {
                         </DropdownMenuItem>
                     </DropdownMenuSubContent>
                 </DropdownMenuSub>
-
                 <DropdownMenuSeparator />
-
                 {/* Competitors Sub Menu */}
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger side={side}>
                         <span>Competitors</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent sideOffset={10} >

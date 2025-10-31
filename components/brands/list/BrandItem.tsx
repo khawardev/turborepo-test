@@ -37,6 +37,7 @@ import { UpdateBrandDialog } from "./update/UpdateBrandDialog";
 import { AddCompetitorsDialog } from "./update/AddCompetitorsDialog";
 import { UpdateCompetitorsDialog } from "./update/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
+import { BrandCompCrudButtons } from "../detail/profile/BrandCompCrudButtons";
 
 function BrandItemSkeleton() {
   return (
@@ -161,7 +162,8 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               </Button>
             </WebsiteAskLimitDialog>
           )}
-          <DropdownMenu>
+          <BrandCompCrudButtons side={'left'} brand={brand} />
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Actions <ChevronDown />
@@ -187,7 +189,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                 Delete Brand
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </div>
       </CardHeader>
       <CardContent>

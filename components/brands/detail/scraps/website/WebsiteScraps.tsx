@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { timeAgo } from '@/lib/date-utils';
 import WebsiteDataView from '@/components/dashboard/raw-data/website/WebsiteDataView';
 import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
-import { SCRAPS } from '@/lib/constants';
+import { SCRAPE, SCRAPED, SCRAPS } from '@/lib/constants';
 
 export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: any) {
     const sortedScraps = useMemo(() => {
@@ -52,7 +52,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
     if (sortedScraps.length === 0) {
         return (
             <div className="text-center p-8 text-muted-foreground h-[60vh] flex items-center justify-center flex-col gap-4">
-                <p>No website scrap data available.</p>
+                <p>No website {SCRAPED} data available.</p>
                 <ScrapeReportActionButtons
                     brand_id={brand_id}
                     website_batch_id={null}
@@ -120,7 +120,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                                 <div className="inline-block">
                                     <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
                                         <SelectTrigger className="w-[140px]">
-                                            <SelectValue placeholder="Select a scrap run" />
+                                            <SelectValue placeholder={`Select a ${SCRAPE} run`} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {sortedScraps.map((scrap: any) => (
