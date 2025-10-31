@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArchiveIcon, ChevronDown, Link as LinkIcon, MailCheckIcon, Pencil, Plus, Trash2Icon } from "lucide-react";
+import { Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -14,15 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
-import DashboardHeader from "@/components/dashboard/shared/DashboardHeader";
-import { UpdateBrandDialog } from "../../list/update/UpdateBrandDialog";
-import { UpdateCompetitorsDialog } from "../../list/update/UpdateCompetitorsDialog";
-import { AddCompetitorsDialog } from "../../list/update/AddCompetitorsDialog";
-import { FiEdit, FiEdit3 } from "react-icons/fi";
-import { CgAddR } from "react-icons/cg";
 import { BrandCompCrudButtons } from "@/components/brands/detail/profile/BrandCompCrudButtons";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {

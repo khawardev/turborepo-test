@@ -24,6 +24,7 @@ import {
 
 export function BrandCompCrudButtons({ brand, side }: any) {
     const router = useRouter()
+console.log(brand, `<-> brand <->`);
 
     const confirmBrandDelete = () => {
         toast(`Delete ${brand.name}?`, {

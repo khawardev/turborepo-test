@@ -52,7 +52,7 @@ function BrandItemSkeleton() {
       </div>
       <div>
         <Skeleton className="h-5 w-1/3" />
-        <div className="border rounded-md mt-2">
+        <div className="mt-2">
           <Table>
             <TableHeader>
               <TableRow>

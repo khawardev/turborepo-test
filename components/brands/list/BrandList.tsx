@@ -22,8 +22,8 @@ async function BrandList() {
   return (
     <div className="space-y-4">
       {brands.map(async (brand, index) => {
-        const brandData = await getBrandbyIdWithCompetitors(brand.brand_id);
-        const batch_id = await getWebsiteBatchId(user.client_id, brandData.brand_id);
+        const brandData = await getBrandbyIdWithCompetitors(brand?.brand_id);
+        const batch_id = await getWebsiteBatchId(user.client_id, brandData?.brand_id);
         return (
           <BrandItem
             key={brand.brand_id}

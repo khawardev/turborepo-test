@@ -1,9 +1,8 @@
 "use client"
 
-import * as React from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { FileText, MoreHorizontalIcon, Search } from "lucide-react"
+import { MoreHorizontalIcon } from "lucide-react"
 import { useTransition } from "react"
 
 import { scrapeBatchSocial } from "@/server/actions/social/socialScrapeActions"
@@ -21,9 +20,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import { SocialReportButton } from "@/components/brands/detail/reports/social/SocialReportButton"
 import { WebsiteReportButton } from "@/components/brands/detail/reports/website/WebsiteReportButton"
-import { BiAnalyse } from "react-icons/bi";
 import { MdOutlineWebAsset } from "react-icons/md";
 import { RiGeminiFill } from "react-icons/ri"
 import { ScrapeSocialDialog } from "./social/AskSocialScrapeDialog"
@@ -39,10 +38,8 @@ export function ScrapeReportActionButtons({
   social_batch_id: string | null
 }) {
   const router = useRouter()
-  const [isWebsiteScrapingPending, startWebsiteScrapingTransition] =
-    useTransition()
-  const [isSocialScrapingPending, startSocialScrapingTransition] =
-    useTransition()
+  const [isWebsiteScrapingPending, startWebsiteScrapingTransition] = useTransition()
+  const [isSocialScrapingPending, startSocialScrapingTransition] = useTransition()
 
   // Website Scraping Logic from WebsiteScraps.tsx
   const scrapeWebsite = async (limit: number) => {
@@ -130,7 +127,7 @@ export function ScrapeReportActionButtons({
 
         {/* Social Media Sub Menu */}
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={!social_batch_id}>
+          <DropdownMenuSubTrigger >
             <span>Social Media</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent   sideOffset={10}>
@@ -147,7 +144,7 @@ export function ScrapeReportActionButtons({
                 ) : (
                     <MdOutlineWebAsset  />
                 )}
-                <span>{SCRAPE} </span>
+                {!isSocialScrapingPending && <span>{SCRAPE}</span>}
               </DropdownMenuItem>
             </ScrapeSocialDialog>
             <DropdownMenuSeparator />
