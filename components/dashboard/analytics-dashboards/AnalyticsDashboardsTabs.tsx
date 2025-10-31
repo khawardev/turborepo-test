@@ -6,7 +6,6 @@ import BrandPerceptionDashboard from "../brand-perception/BrandPerceptionDashboa
 import { magnaData } from "@/data/brands/magna";
 
 export default function AnalyticsDashboardsTabs({ brandPerceptionReport, socialAnalyticsDashboard }: any) {
-  console.log(socialAnalyticsDashboard, `<-> socialAnalyticsDashboard <->`);
 
   return (
     <Tabs defaultValue="social_media">

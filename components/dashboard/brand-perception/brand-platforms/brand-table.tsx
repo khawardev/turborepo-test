@@ -84,7 +84,7 @@ export default function BrandTable({ brandPerceptionReport, attributes, searchQu
 
     return (
         <Card className="p-0 overflow-x-auto">
-            <Table>
+            <Table className="w-full border-collapse" >
                 <TableHeader>
                     <TableRow>
                         <TableHead className="sticky left-0 bg-background z-10">Attribute</TableHead>
@@ -102,7 +102,7 @@ export default function BrandTable({ brandPerceptionReport, attributes, searchQu
                                 {getAttributeLabel(attr)}
                             </TableCell>
                             {brands.map((brand) => (
-                                <TableCell key={`${attr}-${brand}`} className={cn("align-top", brand === primaryBrand && "bg-primary/5")}>
+                                <TableCell key={`${attr}-${brand}`} className={cn("align-top whitespace-normal ", brand === primaryBrand && "bg-primary/5")}>
                                     {renderCellContent(brandPerceptionReport[brand]?.[attr], attr, brand)}
                                 </TableCell>
                             ))}

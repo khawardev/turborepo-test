@@ -14,7 +14,6 @@ export default function OverviewTab({ data }: any) {
     const { platforms } = data
     const { PLATFORM_COLORS }: any = BRAND_SOCIAL_COLOR
     const platformKeys = Object.keys(platforms)
-    console.log(platformKeys, `<-> platformKeys <->`);
 
     const safeNumber = (val: any) => {
         if (val === null || val === undefined || val === "") return 0
@@ -29,7 +28,6 @@ export default function OverviewTab({ data }: any) {
         engagement: safeNumber(platform.avgEngagement),
         sentiment: safeNumber(platform.sentiment?.positive),
     }))
-console.log(platformData, `<-> platformData <->`);
 
     const totalReach = platformData.reduce((sum, p) => sum + p.followers, 0)
     const totalPosts = platformData.reduce((sum, p) => sum + p.posts, 0)

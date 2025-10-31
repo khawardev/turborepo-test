@@ -10,7 +10,6 @@ import MandatedDriversTab from "./tabs/MandatedDriversTab";
 import StrategicInsightsTab from "./tabs/StrategicInsightsTab";
 
 export default function SocialMediaDashboard({ data }: any) {
-    console.log(data, `<-> data <->`);
     
     return (
         <Tabs defaultValue="overview" className="w-full ">

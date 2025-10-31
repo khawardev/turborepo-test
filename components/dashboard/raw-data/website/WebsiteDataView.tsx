@@ -94,8 +94,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                 <Separator />
 
                 <ScrollArea className="h-[70vh] w-full ">
-                    <div className="prose prose-neutral max-w-none markdown-body space-y-3 dark:prose-invert">
-                        <div className="prose prose-neutral  break-all max-w-none markdown-body  dark:prose-invert ">
+                    <div className="prose prose-neutral  whitespace-normal max-w-none markdown-body dark:prose-invert ">
                             <ReactMarkdown components={{
                                 img: ({ node, ...props }) => {
                                     if (!props.src) return null
@@ -105,7 +104,6 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                                 {cleanAndFlattenBullets(selectedPage?.content)}
                             </ReactMarkdown>
                         </div>
-                    </div>
                 </ScrollArea>
             </CardContent>
         </div>

@@ -78,7 +78,7 @@ const PostContent = ({ post }: any) => {
     return (
         <div>
             {title && <p className="font-semibold text-foreground mb-1">{title}</p>}
-            {text && <p className="text-sm text-foreground whitespace-pre-wrap  break-all ">{text}</p>}
+            {text && <p className="text-sm text-foreground whitespace-pre-wrap  ">{text}</p>}
         </div>
     );
 };
@@ -117,7 +117,7 @@ const PostComments = ({ post }: any) => {
                             <div className="flex flex-col gap-2 ">
                                 {post.comments.map((comment: string, index: number) => (
                                     <div key={index} className="text-xs p-2 rounded-md bg-border border">
-                                        <p className="text-xs text-muted-foreground break-words [overflow-wrap:anywhere]">
+                                        <p className="text-xs text-muted-foreground whitespace-normal">
                                             {comment}
                                         </p>
                                     </div>

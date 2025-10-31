@@ -15,7 +15,7 @@ export default function SocialDataView({ socialScrapedData }: any) {
     return (
         <div className="columns-1 md:columns-2  gap-6">
             {socialScrapedData.social_platforms.map((platformData: any) => (
-                <div key={platformData.platform} className="break-inside-avoid mb-6">
+                <div key={platformData.platform} className="whitespace-normal mb-6">
                     <PlatformCard platformData={platformData} />
                 </div>
             ))}
