@@ -598,14 +598,14 @@ const LaserFlowComponent: React.FC<Props> = ({
         <div className="inset-shadow-2xs border ring-background dark:inset-shadow-border/20 bg-border relative mx-auto overflow-hidden rounded-2xl  p-1 shadow-lg shadow-zinc-950/15 ">
           <Image
             className=" h-140 w-full relative hidden rounded-xl dark:block object-cover  object-top"
-            src="https://i.postimg.cc/VkhcdNxC/screencapture-brand-os-theta-vercel-app-dashboard-brand-cb5b9cf6-a363-4c02-b066-ff2c5ab8639c-2025-10.png"
+            src="https://i.postimg.cc/mrV67BTn/Capture-2025-10-31-172856.png"
             alt="BrandOS hero dark section"
             width={2074}
             height={2074}
           />
           <Image
             className="z-2 h-140 w-full  relative rounded-xl  dark:hidden object-cover object-top"
-            src="https://i.postimg.cc/cL0cwMS1/screencapture-brand-os-theta-vercel-app-dashboard-brand-cb5b9cf6-a363-4c02-b066-ff2c5ab8639c-2025-10.png"
+            src="https://i.postimg.cc/DwGTQWNj/Capture-2025-10-31-172415.png"
             alt="BrandOS hero light section"
             width={1440}
             height={2074}
