@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
+import { SCRAPED } from '@/lib/constants';
 
 const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -50,7 +51,7 @@ export default function PlatformCard({ platformData }: any) {
                     <div className="p-4 border rounded-lg bg-border/50 space-y-2">
                         <div className="flex items-start gap-2 text-sm text-muted-foreground">
                             <AlertTriangle className="h-4 w-4 mt-0.5 " />
-                            <p>No posts were scraped for this platform during the specified period.</p>
+                                <p>No posts were {SCRAPED} for this platform during the specified period.</p>
                         </div>
                     </div>
                 )}

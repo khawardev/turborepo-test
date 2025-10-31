@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { timeAgo } from '@/lib/date-utils';
 import SocialDataView from './SocialDataView';
 import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
-import { ScrapeReportActionButtons } from '@/components/brands/detail/ScrapeReportActionButtons';
+import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
 
 
 export default function SocialScraps({ allSocialScrapsData, brandName, brand_id }: any) {

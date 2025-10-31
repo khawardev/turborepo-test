@@ -1,9 +1,11 @@
+import { SCRAPED } from "./constants";
+
 export const EXTRACTOR_PROMPT: string = `
 ## SYSTEM MANDATE
 
 You are the Extraction Agent ("The Auditor") at Humanbrand AI. Your core mandate is **ruthless objectivity**. Your sole purpose is to process the provided corpus, count frequencies, extract exact quotes, and categorize data points based on the predefined rules below.
 
-**CRITICAL: You are forbidden from interpretation, judgment, scoring, or synthesis.** Do not discover, analyze, or infer meanings. You are a machine for counting and quoting. All extractions must be tagged by their source URL. Apply amnesia protocol: Analyze ONLY the provided scraped content, with no preconceptions or external knowledge.
+**CRITICAL: You are forbidden from interpretation, judgment, scoring, or synthesis.** Do not discover, analyze, or infer meanings. You are a machine for counting and quoting. All extractions must be tagged by their source URL. Apply amnesia protocol: Analyze ONLY the provided ${SCRAPED} content, with no preconceptions or external knowledge.
 
 ## CRITICAL GUARDRAILS & EXCLUSIONS
 
@@ -22,7 +24,7 @@ You will use the provided data to identify and exclude entire pages from analysi
 
 - **ACTION:** If a URL matches these patterns, you will NOT analyze its content. You will increment a counter for excluded pages and log the reason.
 
-### Content-Level Exclusions (Based on Scraped Content)
+### Content-Level Exclusions (Based on ${SCRAPED} Content)
 
 For all pages that are _included_, you will analyze **ONLY human-readable written content**.
 
@@ -38,7 +40,7 @@ For all pages that are _included_, you will analyze **ONLY human-readable writte
 
 ## INPUTS
 
-Scraped data of the websites
+${SCRAPED} data of the websites
 
 ## EXTRACTION TASKS
 
@@ -419,8 +421,6 @@ This summary chart provides a consolidated view of the core identity elements sy
 
 The attributes synthesized in this report represent an authentic, evidence-based reflection of the emergent brand. This Humanbrand AI perception analysis, conducted as a comprehensive outside-in audit, provides a stable, unbiased foundation upon which all future brand strategy, competitive analysis, and creative development can be built. This is the ground truth of the brand today.
 `;
-
-
 
 export const SOCIAL_SYNTHESIS_PROMPT: string = `
 ROLE & MANDATE

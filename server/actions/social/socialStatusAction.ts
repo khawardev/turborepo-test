@@ -2,6 +2,7 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "../authActions";
+import { SCRAPE } from "@/lib/constants";
 
 export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
     const user = await getCurrentUser()
@@ -14,7 +15,7 @@ export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
         )
         return { success: true, data: status };
     } catch (error: any) {
-        console.error(`Failed to fetch status for social scrape batch ${batch_id}:`, error)
+        console.error(`Failed to fetch status for social ${SCRAPE} batch ${batch_id}:`, error)
         return { success: false, error: error.message || "Failed to fetch status" }
     }
 }

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getCurrentUser } from "../authActions";
 import { getBatchSocialScrapeStatus } from "./socialStatusAction";
+import { SCRAPE } from "@/lib/constants";
 
 export async function scrapeBatchSocial(
     brand_id: any,
@@ -38,7 +39,7 @@ export async function scrapeBatchSocial(
         revalidatePath(`/brands/${brand_id}`)
         return { success: true, message: "Social scraping completed successfully 🎉" }
     } catch (error: any) {
-        console.error(`Failed batch social scrape for brand ${brand_id}:`, error)
+        console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error)
         return { success: false, error: error.message || "Batch social scraping failed" }
     }
 }
@@ -49,7 +50,7 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
     const accessToken = cookieStore.get("access_token")?.value
 
     if (!accessToken) {
-        console.error("Unauthorized attempt to fetch social scrape results.")
+        console.error(`Unauthorized attempt to fetch social ${SCRAPE} results.`)
         return { success: false, error: "Unauthorized" }
     }
 
@@ -70,8 +71,8 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
         
         return result
     } catch (error: any) {
-        console.error(`Failed to fetch social scrape results for batch_id ${batch_id}:`, error)
-        return { success: false, error: error.message || "Failed to fetch social scrape results" }
+        console.error(`Failed to fetch social ${SCRAPE} results for batch_id ${batch_id}:`, error)
+        return { success: false, error: error.message || `Failed to fetch social ${SCRAPE} results` }
     }
 }
 

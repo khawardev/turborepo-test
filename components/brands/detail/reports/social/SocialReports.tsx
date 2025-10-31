@@ -114,7 +114,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                             <div className="inline-block">
                                 <Select onValueChange={setSelectedReportBatchId} value={selectedReportBatchId ?? ''}>
                                     <SelectTrigger className="w-[140px]">
-                                        <SelectValue placeholder="Select previous reports" />
+                                        <SelectValue placeholder="Select Previous reports" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {sortedReports.map((report: any) => (
@@ -127,7 +127,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                            Select previous Social Reports
+                            Select Previous Social Reports
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

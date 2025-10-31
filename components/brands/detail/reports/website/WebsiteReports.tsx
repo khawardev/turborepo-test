@@ -126,7 +126,7 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                            Select previous Website Reports
+                            Previous Website Reports
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

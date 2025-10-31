@@ -32,10 +32,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { deleteBrand } from "@/server/actions/brandActions";
 import { scrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
-import { WebsiteAskLimitToast } from "../detail/scraps/website/WebsiteAskLimitToast";
+import { WebsiteAskLimitDialog } from "../detail/scraps/website/WebsiteAskLimitDialog";
 import { UpdateBrandDialog } from "./update/UpdateBrandDialog";
 import { AddCompetitorsDialog } from "./update/AddCompetitorsDialog";
 import { UpdateCompetitorsDialog } from "./update/UpdateCompetitorsDialog";
+import { SCRAPE, SCRAPING } from "@/lib/constants";
 
 function BrandItemSkeleton() {
   return (
@@ -102,26 +103,15 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     router.push(`/brands/${brand.brand_id}`);
   };
 
-  const askLimit = () => {
-    toast.custom((t: any) => (
-      <WebsiteAskLimitToast
-        t={t}
-        onConfirm={(parsedLimit) => {
-          scrapeBrand(parsedLimit);
-        }}
-      />
-    ));
-  };
-
   const scrapeBrand = (limit: any) => {
     startTransition(async () => {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
         router.refresh();
         router.push(`/brands/${brand.brand_id}`);
-        toast.success("Scraping completed successfully 🎉");
+        toast.success(`${SCRAPING} completed successfully 🎉`);
       } else {
-        toast.error("Scraping failed.");
+        toast.error(`${SCRAPING} failed.`);
       }
     });
   };
@@ -165,9 +155,11 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
         </div>
         <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
           {!isScrapped && (
-            <Button disabled={isPending} onClick={askLimit}>
-              {isPending ? <ButtonSpinner>Scraping</ButtonSpinner> : "Scrape"}
-            </Button>
+            <WebsiteAskLimitDialog onConfirm={scrapeBrand}>
+              <Button disabled={isPending}>
+                {isPending ? <ButtonSpinner>{SCRAPING}</ButtonSpinner> : SCRAPE}
+              </Button>
+            </WebsiteAskLimitDialog>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

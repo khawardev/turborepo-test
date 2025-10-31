@@ -9,8 +9,7 @@ import { useTransition } from "react"
 import { scrapeBatchSocial } from "@/server/actions/social/socialScrapeActions"
 import { scrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions"
 import { ButtonSpinner } from "@/components/shared/spinner"
-import { ScrapeSocialDialog } from "@/components/brands/detail/scraps/social/AskSocialScrapeDialog"
-import { WebsiteAskLimitToast } from "@/components/brands/detail/scraps/website/WebsiteAskLimitToast"
+import { WebsiteAskLimitDialog } from "@/components/brands/detail/scraps/website/WebsiteAskLimitDialog"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -27,6 +26,8 @@ import { WebsiteReportButton } from "@/components/brands/detail/reports/website/
 import { BiAnalyse } from "react-icons/bi";
 import { MdOutlineWebAsset } from "react-icons/md";
 import { RiGeminiFill } from "react-icons/ri"
+import { ScrapeSocialDialog } from "./social/AskSocialScrapeDialog"
+import { SCRAPE, SCRAPING } from "@/lib/constants"
 
 export function ScrapeReportActionButtons({
   brand_id,
@@ -46,21 +47,15 @@ export function ScrapeReportActionButtons({
   // Website Scraping Logic from WebsiteScraps.tsx
   const scrapeWebsite = async (limit: number) => {
     startWebsiteScrapingTransition(async () => {
-      toast.info("Website scraping job started...")
+      toast.info(`Website ${SCRAPING} started...`)
       const result = await scrapeBatchWebsite(brand_id, limit)
       if (result?.success) {
         router.refresh()
-        toast.success("Scraping completed successfully 🎉")
+        toast.success(`${SCRAPING} completed successfully 🎉`)
       } else {
-        toast.error("Scraping failed.")
+        toast.error(`${SCRAPING} failed.`)
       }
     })
-  }
-
-  const askWebsiteScrapeLimit = () => {
-    toast.custom((t: any) => (
-      <WebsiteAskLimitToast t={t} onConfirm={scrapeWebsite} />
-    ))
   }
 
   // Social Scraping Logic from SocialScraps.tsx
@@ -69,7 +64,7 @@ export function ScrapeReportActionButtons({
     endDate: string
   }) => {
     startSocialScrapingTransition(async () => {
-      toast.info("Social scraping job started...")
+      toast.info(`Social ${SCRAPING} started...`)
       const result = await scrapeBatchSocial(
         brand_id,
         details.startDate,
@@ -78,11 +73,11 @@ export function ScrapeReportActionButtons({
 
       if (result?.success) {
         toast.success(
-          result.message || "Social Scraping completed successfully 🎉"
+          result.message || `Social ${SCRAPING} completed successfully 🎉`
         )
         router.refresh()
       } else {
-        toast.error(result?.error || "Social scraping failed.")
+        toast.error(result?.error || `Social ${SCRAPING} failed.`)
       }
     })
   }
@@ -98,21 +93,23 @@ export function ScrapeReportActionButtons({
       <DropdownMenuContent align="end" className="w-34">
         {/* Website Sub Menu */}
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger >
+          <DropdownMenuSubTrigger disabled={!website_batch_id}>
             <span>Website</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent  sideOffset={10}>
-            <DropdownMenuItem
-              onClick={askWebsiteScrapeLimit}
-              disabled={isWebsiteScrapingPending}
-            >
-              {isWebsiteScrapingPending ? (
-                <ButtonSpinner>Scraping</ButtonSpinner>
-              ) : (
-                  <MdOutlineWebAsset  />
-              )}
-              <span>Scrape</span>
-            </DropdownMenuItem>
+            <WebsiteAskLimitDialog onConfirm={scrapeWebsite}>
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                disabled={isWebsiteScrapingPending}
+              >
+                {isWebsiteScrapingPending ? (
+                  <ButtonSpinner>{SCRAPING}</ButtonSpinner>
+                ) : (
+                    <MdOutlineWebAsset  />
+                )}
+                <span>{SCRAPE}</span>
+              </DropdownMenuItem>
+            </WebsiteAskLimitDialog>
             <DropdownMenuSeparator />
             <WebsiteReportButton
               brand_id={brand_id}
@@ -133,7 +130,7 @@ export function ScrapeReportActionButtons({
 
         {/* Social Media Sub Menu */}
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger disabled={!social_batch_id}>
             <span>Social Media</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent   sideOffset={10}>
@@ -146,11 +143,11 @@ export function ScrapeReportActionButtons({
                 disabled={isSocialScrapingPending}
               >
                 {isSocialScrapingPending ? (
-                  <ButtonSpinner>Scraping</ButtonSpinner>
+                  <ButtonSpinner>{SCRAPING}</ButtonSpinner>
                 ) : (
                     <MdOutlineWebAsset  />
                 )}
-                <span>Scrape </span>
+                <span>{SCRAPE} </span>
               </DropdownMenuItem>
             </ScrapeSocialDialog>
             <DropdownMenuSeparator />

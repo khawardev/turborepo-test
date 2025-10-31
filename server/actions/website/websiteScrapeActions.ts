@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteScrapeStatus } from "./websiteStatusAction";
+import { SCRAPE, SCRAPING } from "@/lib/constants";
 
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
     const cookieStore = await cookies()
@@ -31,10 +32,10 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
         )
 
         revalidatePath(`/brands/${brand_id}`)
-        return { success: true, message: "Scraping and report extraction completed successfully 🎉" }
+        return { success: true, message: `${SCRAPING} and report extraction completed successfully 🎉` }
     } catch (error: any) {
-        console.error(`Failed batch scrape for brand ${brand_id}:`, error)
-        return { success: false, error: error.message || "Batch scraping failed" }
+        console.error(`Failed batch ${SCRAPE} for brand ${brand_id}:`, error)
+        return { success: false, error: error.message || `Batch ${SCRAPING} failed` }
     }
 }
 
@@ -45,7 +46,7 @@ export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
     const accessToken = cookieStore.get("access_token")?.value;
 
     if (!accessToken) {
-        console.error("Unauthorized attempt to fetch scrape results.");
+        console.error(`Unauthorized attempt to fetch ${SCRAPE} results.`);
         return { success: false, error: "Unauthorized" };
     }
 
@@ -62,8 +63,8 @@ export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
         );
         return result;
     } catch (error: any) {
-        console.error(`Failed to fetch scrape results for batch_id ${batch_id}:`, error);
-        return { success: false, error: error.message || "Failed to fetch scrape results" };
+        console.error(`Failed to fetch ${SCRAPE} results for batch_id ${batch_id}:`, error);
+        return { success: false, error: error.message || `Failed to fetch ${SCRAPE} results` };
     }
 }
 

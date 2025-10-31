@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { timeAgo } from '@/lib/date-utils';
 import WebsiteDataView from '@/components/dashboard/raw-data/website/WebsiteDataView';
-import { ScrapeReportActionButtons } from '@/components/brands/detail/ScrapeReportActionButtons';
+import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
+import { SCRAPS } from '@/lib/constants';
 
 export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: any) {
     const sortedScraps = useMemo(() => {
@@ -132,7 +133,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                Select previous Website Scraps
+                                Previous Website {SCRAPS}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>

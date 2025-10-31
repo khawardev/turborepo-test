@@ -18,6 +18,7 @@ import {
 import { ButtonSpinner } from "@/components/shared/spinner"
 import { DatePickerWithRange } from "./DatePickerwithRange"
 import { Label } from "@/components/ui/label"
+import { SCRAPE, SCRAPING } from "@/lib/constants"
 
 
 export function ScrapeSocialDialog({ isLoading, onConfirm, children }: any) {
@@ -46,9 +47,9 @@ export function ScrapeSocialDialog({ isLoading, onConfirm, children }: any) {
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Social Scrape</DialogTitle>
+                    <DialogTitle>Social {SCRAPE}</DialogTitle>
                     <DialogDescription>
-                        Select the date range for the Social scraping job.
+                        Select the date range for the Social ${SCRAPING}.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

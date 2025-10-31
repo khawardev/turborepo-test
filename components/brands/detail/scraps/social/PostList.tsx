@@ -22,7 +22,7 @@ const PostItemSkeleton = () => (
 );
 
 export default function PostList({ posts }: { posts: any[] }) {
-    const [visiblePosts, setVisiblePosts] = useState(10);
+    const [visiblePosts, setVisiblePosts] = useState(5);
     const { ref, inView } = useInView({
         threshold: 0,
         triggerOnce: false,
@@ -37,7 +37,7 @@ export default function PostList({ posts }: { posts: any[] }) {
     return (
         <div className="flex flex-col space-y-4 w-full">
             <Suspense fallback={<>
-                {[...Array(10)].map((_, i) => <PostItemSkeleton key={i} />)}
+                {[...Array(5)].map((_, i) => <PostItemSkeleton key={i} />)}
             </>}>
                 {posts.slice(0, visiblePosts).map((post: any, index: number) => (
                     <PostItem key={post.SK || index} post={post} />

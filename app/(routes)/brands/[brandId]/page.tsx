@@ -13,6 +13,7 @@ import { BrandProfileSkeleton } from "./_components/_skeleton/BrandProfileSkelet
 import  ScrapDataViewerSkeleton  from "./_components/_skeleton/ScrapDataViewerSkeleton";
 import { ReportDataViewerSkeleton } from "./_components/_skeleton/ReportDataViewerSkeleton";
 import BrandsDetailsLoading from "./loading";
+import { SCRAPS } from "@/lib/constants";
 
 export default async function BrandDetailPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params;
@@ -33,7 +34,7 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ br
       ),
     },
     {
-      label: "Scraps",
+      label: SCRAPS,
       value: "scraps",
       content: (
         <Suspense fallback={<ScrapDataViewerSkeleton />}>
