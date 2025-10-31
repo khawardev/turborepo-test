@@ -1,7 +1,7 @@
-export const BRAND_SOCIAL_DASHBOARD = [
+export const Stinger_SOCIAL_DASHBOARD = [
     {
         "brand": {
-            "brandName": "Stingertest",
+            "brandName": "Stinger Solution",
             "socialMedia": {
                 "platforms": {
                     "x": {
@@ -1652,6 +1652,1332 @@ export const BRAND_SOCIAL_DASHBOARD = [
             "client_id": "b20ffcc2-6ef0-41c7-91e2-7fc79d1eeee4",
             "brand_id": "05112532-32ce-4869-b450-776e7c177f7a"
         },
-     
+    }
+];
+
+export const Audio_SOCIAL_DASHBOARD = [
+    {
+        "brandName": "Audio Control",
+        "socialMedia": {
+            "platforms": {
+                "x": {
+                    "topDrivers": [
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "Crawl failed"
+                        },
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "Crawl failed"
+                        },
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "Crawl failed"
+                        }
+                    ],
+                    "sentiment": {
+                        "neutral": "0",
+                        "negative": "0",
+                        "mixed": "0",
+                        "positive": "0"
+                    },
+                    "mandatedDrivers": {
+                        "adas": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "electrification": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "lightweighting": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "environmental": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "sdvs": {
+                            "posts": "0",
+                            "percentage": "0"
+                        }
+                    },
+                    "avgEngagement": "0",
+                    "PerformanceData": {
+                        "topEngagementDrivers": [
+                            {
+                                "name": "Product Launches",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Community Engagement",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Innovation/Technology Showcases",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Renewable Energy/Sustainability Actions",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Facility Achievements & Milestones",
+                                "value": "0"
+                            }
+                        ],
+                        "brandVoice": [
+                            {
+                                "name": "Celebratory",
+                                "color": "#84cc16",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Forward-looking",
+                                "color": "#3b82f6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Collaborative",
+                                "color": "#f97316",
+                                "value": "0"
+                            }
+                        ],
+                        "whiteSpaceOpportunities": [
+                            {
+                                "title": "Lightweighting Content Share",
+                                "value": "0"
+                            },
+                            {
+                                "title": "SDVs Content Share",
+                                "value": "0"
+                            }
+                        ],
+                        "homepageVsFeed": [
+                            {
+                                "color": "#84cc16",
+                                "claim": "Innovation Leadership",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#3b82f6",
+                                "claim": "Sustainability Commitment",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#ffffff",
+                                "claim": "People & Culture",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#f97316",
+                                "claim": "Mobility/Automotive",
+                                "value": "0"
+                            }
+                        ],
+                        "contentStrategyGap": [
+                            {
+                                "name": "People & Culture",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Electrification",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "ADAS",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Lightweighting",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            }
+                        ],
+                        "primaryContentThemes": [
+                            {
+                                "name": "Innovation/Technology",
+                                "color": "#0ea5e9",
+                                "value": "0"
+                            },
+                            {
+                                "name": "People/Culture",
+                                "color": "#84cc16",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Mobility/Automotive",
+                                "color": "#f97316",
+                                "value": "0"
+                            }
+                        ],
+                        "audienceEngagement": [
+                            {
+                                "name": "Industry Engineers",
+                                "color": "#7CFC00",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Current Employees",
+                                "color": "#3B82F6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "OEM Decision Makers",
+                                "color": "#E57373",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Students/Early Career",
+                                "color": "#F3F4F6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Others",
+                                "color": "#9CA3AF",
+                                "value": "0"
+                            }
+                        ],
+                        "strategySnapshot": [
+                            {
+                                "strategy": "Technical",
+                                "color": "text-primary",
+                                "competitor": "Bosch",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "People-First",
+                                "color": "text-primary",
+                                "competitor": "Lear",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "Validation",
+                                "color": "text-primary",
+                                "competitor": "Continental",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "Balanced Blend",
+                                "color": "text-white",
+                                "competitor": "Magna",
+                                "dataPoint": "No data available"
+                            }
+                        ],
+                        "magnaPosition": {
+                            "x": "0",
+                            "name": "Audio Control",
+                            "y": "0",
+                            "strategy": "No Data"
+                        },
+                        "kpis": {
+                            "metricsMentions": "0",
+                            "thirdPartyCitations": "0",
+                            "positiveSentiment": "0"
+                        },
+                        "competitorPositioning": [
+                            {
+                                "x": "0",
+                                "name": "Continental (Validation)",
+                                "y": "0"
+                            },
+                            {
+                                "x": "0",
+                                "name": "Lear: People-First",
+                                "y": "0"
+                            },
+                            {
+                                "x": "0",
+                                "name": "Bosch (Technical)",
+                                "y": "0"
+                            }
+                        ],
+                        "strategicInitiatives": [
+                            {
+                                "name": "Establish TikTok Presence",
+                                "current": "0",
+                                "goal": "0 → 30+ posts",
+                                "target": "30"
+                            },
+                            {
+                                "name": "Build Follower Base",
+                                "current": "0",
+                                "goal": "0 → 500 followers",
+                                "target": "500"
+                            },
+                            {
+                                "name": "Create Content Strategy",
+                                "current": "0",
+                                "goal": "0% → 90% schedule adherence",
+                                "target": "90"
+                            }
+                        ]
+                    },
+                    "nts": "0",
+                    "audienceSegments": [
+                        {
+                            "share": "0",
+                            "followers": "0",
+                            "segment": "TikTok",
+                            "posent": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        }
+                    ]
+                },
+                "instagram": {
+                    "topDrivers": [
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "0 engagements"
+                        },
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "0 engagements"
+                        },
+                        {
+                            "driver": "No data available",
+                            "lift": "0",
+                            "example": "0 engagements"
+                        }
+                    ],
+                    "sentiment": {
+                        "neutral": "0",
+                        "negative": "0",
+                        "mixed": "0",
+                        "positive": "0"
+                    },
+                    "mandatedDrivers": {
+                        "adas": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "electrification": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "lightweighting": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "environmental": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "sdvs": {
+                            "posts": "0",
+                            "percentage": "0"
+                        }
+                    },
+                    "avgEngagement": "0",
+                    "PerformanceData": {
+                        "topEngagementDrivers": [
+                            {
+                                "name": "Product Launches",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Community Engagement",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Innovation/Technology Showcases",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Renewable Energy/Sustainability Actions",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Facility Achievements & Milestones",
+                                "value": "0"
+                            }
+                        ],
+                        "brandVoice": [
+                            {
+                                "name": "Celebratory",
+                                "color": "#84cc16",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Forward-looking",
+                                "color": "#3b82f6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Collaborative",
+                                "color": "#f97316",
+                                "value": "0"
+                            }
+                        ],
+                        "whiteSpaceOpportunities": [
+                            {
+                                "title": "Lightweighting Content Share",
+                                "value": "0"
+                            },
+                            {
+                                "title": "SDVs Content Share",
+                                "value": "0"
+                            }
+                        ],
+                        "homepageVsFeed": [
+                            {
+                                "color": "#84cc16",
+                                "claim": "Innovation Leadership",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#3b82f6",
+                                "claim": "Sustainability Commitment",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#ffffff",
+                                "claim": "People & Culture",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#f97316",
+                                "claim": "Mobility/Automotive",
+                                "value": "0"
+                            }
+                        ],
+                        "contentStrategyGap": [
+                            {
+                                "name": "People & Culture",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Electrification",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "ADAS",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Lightweighting",
+                                "Emergent": "0",
+                                "Mandated": "0"
+                            }
+                        ],
+                        "primaryContentThemes": [
+                            {
+                                "name": "Innovation/Technology",
+                                "color": "#0ea5e9",
+                                "value": "0"
+                            },
+                            {
+                                "name": "People/Culture",
+                                "color": "#84cc16",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Mobility/Automotive",
+                                "color": "#f97316",
+                                "value": "0"
+                            }
+                        ],
+                        "audienceEngagement": [
+                            {
+                                "name": "Industry Engineers",
+                                "color": "#7CFC00",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Current Employees",
+                                "color": "#3B82F6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "OEM Decision Makers",
+                                "color": "#E57373",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Students/Early Career",
+                                "color": "#F3F4F6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Others",
+                                "color": "#9CA3AF",
+                                "value": "0"
+                            }
+                        ],
+                        "strategySnapshot": [
+                            {
+                                "strategy": "Technical",
+                                "color": "text-primary",
+                                "competitor": "Bosch",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "People-First",
+                                "color": "text-primary",
+                                "competitor": "Lear",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "Validation",
+                                "color": "text-primary",
+                                "competitor": "Continental",
+                                "dataPoint": "No data available"
+                            },
+                            {
+                                "strategy": "Balanced Blend",
+                                "color": "text-white",
+                                "competitor": "Magna",
+                                "dataPoint": "No data available"
+                            }
+                        ],
+                        "magnaPosition": {
+                            "x": "0",
+                            "name": "Audio Control",
+                            "y": "0",
+                            "strategy": "No data"
+                        },
+                        "kpis": {
+                            "metricsMentions": "0",
+                            "thirdPartyCitations": "0",
+                            "positiveSentiment": "0"
+                        },
+                        "competitorPositioning": [
+                            {
+                                "x": "0",
+                                "name": "Continental (Validation)",
+                                "y": "0"
+                            },
+                            {
+                                "x": "0",
+                                "name": "Lear: People-First",
+                                "y": "0"
+                            },
+                            {
+                                "x": "0",
+                                "name": "Bosch (Technical)",
+                                "y": "0"
+                            }
+                        ],
+                        "strategicInitiatives": [
+                            {
+                                "name": "Amplify Lightweighting",
+                                "current": "0",
+                                "goal": "0% → 5% (90 days)",
+                                "target": "5"
+                            },
+                            {
+                                "name": "Launch SDV Leadership",
+                                "current": "0",
+                                "goal": "0% → 20% (now 0%)",
+                                "target": "20"
+                            },
+                            {
+                                "name": "ADAS Expansion",
+                                "current": "0",
+                                "goal": "0% → 15% (now 0%)",
+                                "target": "15"
+                            }
+                        ]
+                    },
+                    "nts": "0",
+                    "audienceSegments": [
+                        {
+                            "share": "0",
+                            "followers": "0",
+                            "segment": "Instagram",
+                            "posent": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Not inferable",
+                            "confidence": "L"
+                        }
+                    ]
+                },
+                "linkedin": {
+                    "topDrivers": [
+                        {
+                            "driver": "New Product Launch (Hyperion)",
+                            "lift": "113",
+                            "example": "62 likes"
+                        },
+                        {
+                            "driver": "Award Recognition",
+                            "lift": "93",
+                            "example": "54 likes"
+                        },
+                        {
+                            "driver": "Technical Deep-Dives",
+                            "lift": "41",
+                            "example": "50 likes"
+                        }
+                    ],
+                    "sentiment": {
+                        "neutral": "15",
+                        "negative": "0",
+                        "mixed": "0",
+                        "positive": "85"
+                    },
+                    "mandatedDrivers": {
+                        "adas": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "electrification": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "lightweighting": {
+                            "posts": "3",
+                            "percentage": "9"
+                        },
+                        "environmental": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "sdvs": {
+                            "posts": "0",
+                            "percentage": "0"
+                        }
+                    },
+                    "avgEngagement": "29",
+                    "PerformanceData": {
+                        "topEngagementDrivers": [
+                            {
+                                "name": "Award Recognition",
+                                "value": "93"
+                            },
+                            {
+                                "name": "New Product Launch (Hyperion)",
+                                "value": "113"
+                            },
+                            {
+                                "name": "Technical Deep-Dives",
+                                "value": "41"
+                            },
+                            {
+                                "name": "Partner Integration News",
+                                "value": "-14"
+                            },
+                            {
+                                "name": "Visual Rack/Install Photos",
+                                "value": "-24"
+                            }
+                        ],
+                        "brandVoice": [
+                            {
+                                "name": "Technical-confident",
+                                "color": "#84cc16",
+                                "value": "100"
+                            },
+                            {
+                                "name": "Achievement-focused",
+                                "color": "#3b82f6",
+                                "value": "100"
+                            },
+                            {
+                                "name": "Collaborative",
+                                "color": "#f97316",
+                                "value": "100"
+                            }
+                        ],
+                        "whiteSpaceOpportunities": [
+                            {
+                                "title": "45 years heritage",
+                                "value": "0"
+                            },
+                            {
+                                "title": "Pacific Northwest manufacturing",
+                                "value": "0"
+                            }
+                        ],
+                        "homepageVsFeed": [
+                            {
+                                "color": "#84cc16",
+                                "claim": "highest quality home theater",
+                                "value": "44"
+                            },
+                            {
+                                "color": "#3b82f6",
+                                "claim": "multi-channel amplifiers",
+                                "value": "38"
+                            },
+                            {
+                                "color": "#ffffff",
+                                "claim": "signal processors",
+                                "value": "12"
+                            },
+                            {
+                                "color": "#f97316",
+                                "claim": "distributed audio components",
+                                "value": "15"
+                            }
+                        ],
+                        "contentStrategyGap": [
+                            {
+                                "name": "Compact Power Innovation",
+                                "Emergent": "29",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Industry Recognition/Awards",
+                                "Emergent": "21",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Partner Ecosystem Integration",
+                                "Emergent": "15",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Lightweighting",
+                                "Emergent": "9",
+                                "Mandated": "0"
+                            }
+                        ],
+                        "primaryContentThemes": [
+                            {
+                                "name": "Product Innovation",
+                                "color": "#0ea5e9",
+                                "value": "32"
+                            },
+                            {
+                                "name": "Awards/Recognition",
+                                "color": "#84cc16",
+                                "value": "21"
+                            },
+                            {
+                                "name": "Partner Integration",
+                                "color": "#f97316",
+                                "value": "15"
+                            }
+                        ],
+                        "audienceEngagement": [
+                            {
+                                "name": "AV Integrators/Installers",
+                                "color": "#7CFC00",
+                                "value": "45"
+                            },
+                            {
+                                "name": "Industry Peers/Partners",
+                                "color": "#3B82F6",
+                                "value": "28"
+                            },
+                            {
+                                "name": "Audio Enthusiasts",
+                                "color": "#E57373",
+                                "value": "20"
+                            },
+                            {
+                                "name": "UK/International Dealers",
+                                "color": "#F3F4F6",
+                                "value": "7"
+                            },
+                            {
+                                "name": "Others",
+                                "color": "#9CA3AF",
+                                "value": "0"
+                            }
+                        ],
+                        "strategySnapshot": [
+                            {
+                                "strategy": "Technical",
+                                "color": "text-primary",
+                                "competitor": "Bosch",
+                                "dataPoint": "65% Technical / Innovation posts"
+                            },
+                            {
+                                "strategy": "People-First",
+                                "color": "text-primary",
+                                "competitor": "Lear",
+                                "dataPoint": "48% Employee & Culture content"
+                            },
+                            {
+                                "strategy": "Validation",
+                                "color": "text-primary",
+                                "competitor": "Continental",
+                                "dataPoint": "70% Third-Party Mentions"
+                            },
+                            {
+                                "strategy": "Product Innovation",
+                                "color": "text-white",
+                                "competitor": "Audio Control",
+                                "dataPoint": "32% Product Innovation focus"
+                            }
+                        ],
+                        "magnaPosition": {
+                            "x": "0",
+                            "name": "Audio Control",
+                            "y": "0",
+                            "strategy": "Product Innovation"
+                        },
+                        "kpis": {
+                            "metricsMentions": "47",
+                            "thirdPartyCitations": "12",
+                            "positiveSentiment": "85"
+                        },
+                        "competitorPositioning": [
+                            {
+                                "x": "2.5",
+                                "name": "Continental (Validation)",
+                                "y": "3.5"
+                            },
+                            {
+                                "x": "-2.5",
+                                "name": "Lear: People-First",
+                                "y": "-2"
+                            },
+                            {
+                                "x": "3.5",
+                                "name": "Bosch (Technical)",
+                                "y": "-3.5"
+                            }
+                        ],
+                        "strategicInitiatives": [
+                            {
+                                "name": "Amplify technical deep-dives",
+                                "current": "41",
+                                "goal": "+40% engagement",
+                                "target": "81"
+                            },
+                            {
+                                "name": "Launch Installer Spotlight series",
+                                "current": "45",
+                                "goal": "+25% dealer engagement",
+                                "target": "70"
+                            },
+                            {
+                                "name": "Create Hyperion countdown campaign",
+                                "current": "113",
+                                "goal": "+60% engagement",
+                                "target": "173"
+                            }
+                        ]
+                    },
+                    "nts": "34",
+                    "audienceSegments": [
+                        {
+                            "share": "45",
+                            "followers": "3095",
+                            "segment": "LinkedIn",
+                            "posent": "AV Integrators/Installers",
+                            "confidence": "H"
+                        },
+                        {
+                            "share": "28",
+                            "segment": "Industry Peers/Partners",
+                            "confidence": "H"
+                        },
+                        {
+                            "share": "20",
+                            "segment": "Audio Enthusiasts",
+                            "confidence": "M"
+                        },
+                        {
+                            "share": "7",
+                            "segment": "UK/International Dealers",
+                            "confidence": "M"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "Others",
+                            "confidence": "L"
+                        }
+                    ]
+                },
+                "facebook": {
+                    "topDrivers": [
+                        {
+                            "driver": "Facility Achievements & Milestones",
+                            "lift": "580",
+                            "example": "68 engagements"
+                        },
+                        {
+                            "driver": "Renewable Energy/Sustainability",
+                            "lift": "190",
+                            "example": "29 engagements"
+                        },
+                        {
+                            "driver": "Employee Recognition & Culture",
+                            "lift": "30",
+                            "example": "13 engagements"
+                        }
+                    ],
+                    "sentiment": {
+                        "neutral": "17",
+                        "negative": "4",
+                        "mixed": "7",
+                        "positive": "72"
+                    },
+                    "mandatedDrivers": {
+                        "adas": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "electrification": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "lightweighting": {
+                            "posts": "1",
+                            "percentage": "4"
+                        },
+                        "environmental": {
+                            "posts": "0",
+                            "percentage": "0"
+                        },
+                        "sdvs": {
+                            "posts": "0",
+                            "percentage": "0"
+                        }
+                    },
+                    "avgEngagement": "10",
+                    "PerformanceData": {
+                        "topEngagementDrivers": [
+                            {
+                                "name": "Product Launches",
+                                "value": "580"
+                            },
+                            {
+                                "name": "Community Engagement",
+                                "value": "190"
+                            },
+                            {
+                                "name": "Innovation/Technology Showcases",
+                                "value": "30"
+                            },
+                            {
+                                "name": "Renewable Energy/Sustainability Actions",
+                                "value": "-30"
+                            },
+                            {
+                                "name": "Facility Achievements & Milestones",
+                                "value": "0"
+                            }
+                        ],
+                        "brandVoice": [
+                            {
+                                "name": "Celebratory",
+                                "color": "#84cc16",
+                                "value": "35"
+                            },
+                            {
+                                "name": "Forward-looking",
+                                "color": "#3b82f6",
+                                "value": "100"
+                            },
+                            {
+                                "name": "Collaborative",
+                                "color": "#f97316",
+                                "value": "42"
+                            }
+                        ],
+                        "whiteSpaceOpportunities": [
+                            {
+                                "title": "Lightweighting Content Share",
+                                "value": "4"
+                            },
+                            {
+                                "title": "SDVs Content Share",
+                                "value": "0"
+                            }
+                        ],
+                        "homepageVsFeed": [
+                            {
+                                "color": "#84cc16",
+                                "claim": "Innovation Leadership",
+                                "value": "100"
+                            },
+                            {
+                                "color": "#3b82f6",
+                                "claim": "Sustainability Commitment",
+                                "value": "42"
+                            },
+                            {
+                                "color": "#ffffff",
+                                "claim": "People & Culture",
+                                "value": "0"
+                            },
+                            {
+                                "color": "#f97316",
+                                "claim": "Mobility/Automotive",
+                                "value": "0"
+                            }
+                        ],
+                        "contentStrategyGap": [
+                            {
+                                "name": "People & Culture",
+                                "Emergent": "46",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Electrification",
+                                "Emergent": "31",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "ADAS",
+                                "Emergent": "23",
+                                "Mandated": "0"
+                            },
+                            {
+                                "name": "Lightweighting",
+                                "Emergent": "0",
+                                "Mandated": "4"
+                            }
+                        ],
+                        "primaryContentThemes": [
+                            {
+                                "name": "Innovation/Technology",
+                                "color": "#0ea5e9",
+                                "value": "46"
+                            },
+                            {
+                                "name": "People/Culture",
+                                "color": "#84cc16",
+                                "value": "31"
+                            },
+                            {
+                                "name": "Mobility/Automotive",
+                                "color": "#f97316",
+                                "value": "23"
+                            }
+                        ],
+                        "audienceEngagement": [
+                            {
+                                "name": "Industry Engineers",
+                                "color": "#7CFC00",
+                                "value": "45"
+                            },
+                            {
+                                "name": "Current Employees",
+                                "color": "#3B82F6",
+                                "value": "35"
+                            },
+                            {
+                                "name": "OEM Decision Makers",
+                                "color": "#E57373",
+                                "value": "20"
+                            },
+                            {
+                                "name": "Students/Early Career",
+                                "color": "#F3F4F6",
+                                "value": "0"
+                            },
+                            {
+                                "name": "Others",
+                                "color": "#9CA3AF",
+                                "value": "0"
+                            }
+                        ],
+                        "strategySnapshot": [
+                            {
+                                "strategy": "Technical",
+                                "color": "text-primary",
+                                "competitor": "Bosch",
+                                "dataPoint": "65% Technical / Innovation posts"
+                            },
+                            {
+                                "strategy": "People-First",
+                                "color": "text-primary",
+                                "competitor": "Lear",
+                                "dataPoint": "48% Employee & Culture content"
+                            },
+                            {
+                                "strategy": "Validation",
+                                "color": "text-primary",
+                                "competitor": "Continental",
+                                "dataPoint": "70% Third-Party Mentions"
+                            },
+                            {
+                                "strategy": "Balanced Blend",
+                                "color": "text-white",
+                                "competitor": "Magna",
+                                "dataPoint": "Mix of Technical + People focus"
+                            }
+                        ],
+                        "magnaPosition": {
+                            "x": "0",
+                            "name": "Magna",
+                            "y": "0",
+                            "strategy": "Balanced Blend"
+                        },
+                        "kpis": {
+                            "metricsMentions": "23",
+                            "thirdPartyCitations": "3",
+                            "positiveSentiment": "72"
+                        },
+                        "competitorPositioning": [
+                            {
+                                "x": "2.5",
+                                "name": "Continental (Validation)",
+                                "y": "3.5"
+                            },
+                            {
+                                "x": "-2.5",
+                                "name": "Lear: People-First",
+                                "y": "-2"
+                            },
+                            {
+                                "x": "3.5",
+                                "name": "Bosch (Technical)",
+                                "y": "-3.5"
+                            }
+                        ],
+                        "strategicInitiatives": [
+                            {
+                                "name": "Amplify Lightweighting",
+                                "current": "4",
+                                "goal": "0.4% → 5% (90 days)",
+                                "target": "5"
+                            },
+                            {
+                                "name": "Launch SDV Leadership",
+                                "current": "0",
+                                "goal": "3.8% → 20% (now 5.0%)",
+                                "target": "20"
+                            },
+                            {
+                                "name": "ADAS Expansion",
+                                "current": "0",
+                                "goal": "6.5% → 15% (now 8.3%)",
+                                "target": "15"
+                            }
+                        ]
+                    },
+                    "nts": "26",
+                    "audienceSegments": [
+                        {
+                            "share": "45",
+                            "followers": "36000",
+                            "segment": "Facebook",
+                            "posent": "Professional Installers",
+                            "confidence": "H"
+                        },
+                        {
+                            "share": "35",
+                            "segment": "Audio Enthusiasts",
+                            "confidence": "H"
+                        },
+                        {
+                            "share": "20",
+                            "segment": "DIY Car Audio Builders",
+                            "confidence": "M"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "STEM Students/Early Career",
+                            "confidence": "L"
+                        },
+                        {
+                            "share": "0",
+                            "segment": "ESG/Sustainability Advocates",
+                            "confidence": "L"
+                        }
+                    ]
+                }
+            }
+        },
+        "batch_id": "30db7ac9-443d-4099-8a24-59083f246c01",
+        "client_id": "763d503f-9d24-42c4-b6d5-0fa2beba5da9",
+        "brand_id": "1ea9c057-d7dd-45fd-9d12-7ce4b0211474",
+        "strategicRecommendations": {
+            "x": [
+                {
+                    "expectedEffect": "Successful data collection for 30+ posts within 30 days",
+                    "recommendation": "Establish TikTok data collection infrastructure",
+                    "action": "Implement reliable TikTok analytics tools and publish test content weekly",
+                    "audience": "All potential segments",
+                    "driver": "All drivers"
+                },
+                {
+                    "expectedEffect": "Build initial follower base of 500+ with +100 followers/month growth",
+                    "recommendation": "Create baseline content strategy",
+                    "action": "Publish educational audio content 3x weekly with save-for-reference CTAs",
+                    "audience": "Students/Early Career",
+                    "driver": "Innovation"
+                },
+                {
+                    "expectedEffect": "Achieve 1000+ average views per post within 60 days",
+                    "recommendation": "Develop TikTok-native content formats",
+                    "action": "Create short-form demos and tips 2x weekly using trending audio formats",
+                    "audience": "Audio enthusiasts",
+                    "driver": "Technical innovation"
+                },
+                {
+                    "expectedEffect": "90%+ schedule adherence for consistent algorithm visibility",
+                    "recommendation": "Establish consistent posting schedule",
+                    "action": "Maintain 3-5 posts weekly at peak times with notification CTAs",
+                    "audience": "All segments",
+                    "driver": "Brand awareness"
+                },
+                {
+                    "expectedEffect": "100% comment response rate establishing interaction baseline",
+                    "recommendation": "Build community engagement foundation",
+                    "action": "Respond to all comments within 24 hours and publish weekly Q&A content",
+                    "audience": "Early adopters",
+                    "driver": "Community building"
+                }
+            ],
+            "instagram": [
+                {
+                    "expectedEffect": "Baseline follower growth; target 100 followers in 30 days",
+                    "recommendation": "Establish posting cadence",
+                    "action": "Begin posting 3x weekly; publish product showcases/demos; CTA: Follow for audio updates",
+                    "audience": "Audio enthusiasts",
+                    "driver": "Not applicable"
+                },
+                {
+                    "expectedEffect": "Profile visit-to-follower conversion; target 10% conversion",
+                    "recommendation": "Create profile optimization",
+                    "action": "Complete bio with brand value proposition; add website link; CTA: Visit website",
+                    "audience": "Potential customers",
+                    "driver": "Not applicable"
+                },
+                {
+                    "expectedEffect": "Engagement baseline establishment; target 50 engagements/post",
+                    "recommendation": "Develop content pillars",
+                    "action": "Shift 30% of future posts to audio tech innovations; publish case studies weekly; CTA: Learn more",
+                    "audience": "Audio professionals",
+                    "driver": "Electrification"
+                },
+                {
+                    "expectedEffect": "Community growth; target 5 user-generated posts monthly",
+                    "recommendation": "Build community presence",
+                    "action": "Allocate 20% posts to sustainability initiatives; publish ESG updates monthly; CTA: Join our mission",
+                    "audience": "Employees/Partners",
+                    "driver": "Environmental Leadership"
+                },
+                {
+                    "expectedEffect": "Discoverability increase; target 500 impressions per post",
+                    "recommendation": "Activate hashtag strategy",
+                    "action": "Use industry hashtags in 100% of posts; publish ADAS audio solutions biweekly; CTA: Contact for demo",
+                    "audience": "Industry followers",
+                    "driver": "ADAS"
+                }
+            ],
+            "linkedin": [
+                {
+                    "expectedEffect": "+40% engagement on technical posts",
+                    "recommendation": "Amplify technical deep-dives",
+                    "action": "Shift 20% of posts to technical breakdowns; publish installation guide weekly; CTA: Download spec sheet",
+                    "audience": "AV Integrators",
+                    "driver": "Compact Power Innovation"
+                },
+                {
+                    "expectedEffect": "+25% dealer engagement",
+                    "recommendation": "Launch 'Installer Spotlight' series",
+                    "action": "Shift 15% of posts to installer success stories; publish case study bi-weekly; CTA: Submit your install",
+                    "audience": "Integrators/Dealers",
+                    "driver": "Partner Ecosystem"
+                },
+                {
+                    "expectedEffect": "+50% reach via reshares",
+                    "recommendation": "Systematize award momentum",
+                    "action": "Shift 10% of posts to award follow-ups; publish winner insights monthly; CTA: Learn why we won",
+                    "audience": "Industry Peers",
+                    "driver": "Industry Recognition"
+                },
+                {
+                    "expectedEffect": "+60% engagement on Hyperion posts",
+                    "recommendation": "Create Hyperion countdown campaign",
+                    "action": "Shift 25% of posts to Hyperion updates; publish feature spotlight weekly; CTA: Register for launch",
+                    "audience": "Audio Enthusiasts",
+                    "driver": "Product Innovation"
+                },
+                {
+                    "expectedEffect": "+30% time on site from LinkedIn",
+                    "recommendation": "Develop comparison content",
+                    "action": "Shift 10% of posts to competitive comparisons; publish benchmark data monthly; CTA: See the difference",
+                    "audience": "Technical Directors",
+                    "driver": "Compact Power Innovation"
+                }
+            ],
+            "facebook": [
+                {
+                    "expectedEffect": "+400% engagement on launch posts",
+                    "recommendation": "Amplify Product Launch Strategy",
+                    "action": "Shift 25% of monthly posts to pre-launch teasers for new products; publish dealer-exclusive previews weekly",
+                    "audience": "Professional Installers",
+                    "driver": "Product Innovation"
+                },
+                {
+                    "expectedEffect": "+40% comment engagement",
+                    "recommendation": "Expand Technical Education Content",
+                    "action": "Shift 20% of monthly posts to installation tutorials; publish problem-solving guides bi-weekly",
+                    "audience": "DIY Car Audio Builders",
+                    "driver": "System Integration"
+                },
+                {
+                    "expectedEffect": "+150% engagement rate",
+                    "recommendation": "Leverage User-Generated Content",
+                    "action": "Shift 15% of monthly posts to customer showcases; publish Build of the Week features",
+                    "audience": "Audio Enthusiasts",
+                    "driver": "System Integration"
+                },
+                {
+                    "expectedEffect": "+25% dealer inquiries",
+                    "recommendation": "Create Comparison Content Series",
+                    "action": "Shift 10% of monthly posts to product line comparisons; publish Matrix vs LC vs Altitude guides monthly",
+                    "audience": "Professional Installers",
+                    "driver": "Product Innovation"
+                },
+                {
+                    "expectedEffect": "+50% comment resolution rate",
+                    "recommendation": "Implement Response Protocol",
+                    "action": "Dedicate resources to respond to technical comments within 24 hours; publish FAQ posts monthly",
+                    "audience": "DIY Car Audio Builders",
+                    "driver": "System Integration"
+                }
+            ]
+        }
     }
 ];

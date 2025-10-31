@@ -10,6 +10,7 @@ import MandatedDriversTab from "./tabs/MandatedDriversTab";
 import StrategicInsightsTab from "./tabs/StrategicInsightsTab";
 
 export default function SocialMediaDashboard({ data }: any) {
+    console.log(data, `<-> data <->`);
     
     return (
         <Tabs defaultValue="overview" className="w-full ">
@@ -25,13 +26,13 @@ export default function SocialMediaDashboard({ data }: any) {
                 </TabsList>
             </div>
             <div>
-                <TabsContent value="overview"><OverviewTab data={data} /></TabsContent>
-                <TabsContent value="performance"><PerformanceTab data={data} /></TabsContent>
-                <TabsContent value="audience"><AudienceTab data={data} /></TabsContent>
-                <TabsContent value="drivers"><ContentDriversTab data={data} /></TabsContent>
-                <TabsContent value="sentiment"><SentimentAnalysisTab data={data} /></TabsContent>
-                <TabsContent value="mandated"><MandatedDriversTab data={data} /></TabsContent>
-                <TabsContent value="insights"><StrategicInsightsTab data={data} /></TabsContent>
+                <TabsContent value="overview"><OverviewTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="performance"><PerformanceTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="audience"><AudienceTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="drivers"><ContentDriversTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="sentiment"><SentimentAnalysisTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="mandated"><MandatedDriversTab data={data.socialMedia} /></TabsContent>
+                <TabsContent value="insights"><StrategicInsightsTab platforms={data.socialMedia.platforms} strategicRecommendations={data.strategicRecommendations} /></TabsContent>
             </div>
         </Tabs>
     );

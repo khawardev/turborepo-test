@@ -2,19 +2,23 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "./shared/DashboardHeader";
-import RawDataDashboard from "./raw-data/RawDataDashboard";
-import ExtractedDataDashboard from "./extracted-data/ExtractedDataDashboard";
-import SynthesizedReportsDashboard from "./synthesized-reports/SynthesizedReportsDashboard";
-import BrandPerceptionDashboard from "./brand-perception/BrandPerceptionDashboard";
-import { magnaData } from "@/data/brands/magna";
-import SocialMediaDashboard from "./social-media/SocialMediaDashboard";
-import SocialReportDisplay from "../brands/detail/reports/social/SocialReportDisplay";
-import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
-// import { BRAND_SOCIAL_DASHBOARD } from "@/data/BRAND_SOCIAL_DASHBOARD";
+import DashboardSkeleton from './shared/DashboardSkeleton';
+import { Suspense } from "react";
 
-export default function BrandDashboard({ websiteScrapsData, title, extractorReport, synthesizerReport, brandPerceptionReport, socialScrapsData, socialReportsData, socialAnalyticsDashboard }: any) {
-    console.log(socialAnalyticsDashboard, `<-> socialAnalyticsDashboard <->`);
-    
+export default function BrandDashboard({
+    title,
+    rawDataTab,
+    websiteAuditTab,
+    socialAuditTab,
+    analyticsDashboardsTab
+}: {
+    title: string,
+    rawDataTab: React.ReactNode,
+    websiteAuditTab: React.ReactNode,
+    socialAuditTab: React.ReactNode,
+    analyticsDashboardsTab: React.ReactNode
+}) {
+
     return (
         <div>
             <DashboardHeader title={title} subtitle="Website and Social Captured Data, Extracted & Outside-In reports, Brand Perception and Analytics Dashboards." />
@@ -27,63 +31,27 @@ export default function BrandDashboard({ websiteScrapsData, title, extractorRepo
                 </TabsList>
 
                 <TabsContent value="raw_data">
-                    <RawDataDashboard websiteScrapsData={websiteScrapsData} socialScrapsData={socialScrapsData} />
+                    <Suspense fallback={<DashboardSkeleton />}>
+                        {rawDataTab}
+                    </Suspense>
                 </TabsContent>
 
                 <TabsContent value="website_audit">
-                    <Tabs defaultValue="extracted_data">
-                        <TabsList>
-                            <TabsTrigger value="extracted_data">Extracted Data</TabsTrigger>
-                            <TabsTrigger value="synthesized_reports">Synthesized Report</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="extracted_data">
-                            <ExtractedDataDashboard extractorReport={extractorReport} title={title} />
-                        </TabsContent>
-
-                        <TabsContent value="synthesized_reports">
-                            <SynthesizedReportsDashboard synthesizerReport={synthesizerReport} title={title} />
-                        </TabsContent>
-                    </Tabs>
+                    <Suspense fallback={<DashboardSkeleton />}>
+                        {websiteAuditTab}
+                    </Suspense>
                 </TabsContent>
 
-
                 <TabsContent value="social_audit">
-                    {socialReportsData && socialReportsData.length > 0 ? (
-                        <SocialReportDisplay
-                            entityReports={socialReportsData}
-                            selectedEntityName={socialReportsData[0]?.entity_name}
-                        />
-                    ) : (
-                        <div className="flex items-center justify-center h-[70vh]">
-                            <p className="text-muted-foreground text-center">
-                                No reports are present at the moment.
-                            </p>
-                        </div>
-                    )}
+                    <Suspense fallback={<DashboardSkeleton />}>
+                        {socialAuditTab}
+                    </Suspense>
                 </TabsContent>
 
                 <TabsContent value="analytics_dashboards">
-                    <Tabs defaultValue="social_media">
-                        <TabsList>
-                            <TabsTrigger value="social_media">Social Media</TabsTrigger>
-                            {/* <TabsTrigger value="earned_media">Earned Media</TabsTrigger> */}
-                            <TabsTrigger value="brand_perception">Brand Perception Audit</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="social_media" className=" space-y-14">
-                            <SocialMediaDashboard data={magnaData.socialMedia} />
-                            <SocialMediaDashboard data={BRAND_SOCIAL_DASHBOARD[0].brand.socialMedia} />
-                        </TabsContent>
-
-                        {/* <TabsContent value="earned_media">
-                            <EarnedMediaDashboard data={magnaData.earnedMedia} />
-                        </TabsContent> */}
-
-                        <TabsContent value="brand_perception">
-                            <BrandPerceptionDashboard brandPerceptionReport={brandPerceptionReport} />
-                        </TabsContent>
-                    </Tabs>
+                    <Suspense fallback={<DashboardSkeleton />}>
+                        {analyticsDashboardsTab}
+                    </Suspense>
                 </TabsContent>
             </Tabs>
         </div>

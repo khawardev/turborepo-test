@@ -8,7 +8,7 @@ export function BrandDashboardButton({ brand_id, isScrapped }: { brand_id: any; 
             <Tooltip>
                 <TooltipTrigger asChild>
                     {isScrapped ? (
-                        <Button variant="outline" asChild>
+                        <Button  asChild>
                             <Link href={`/dashboard/brand/${brand_id}`}>Dashboard</Link>
                         </Button>
                     ) : (

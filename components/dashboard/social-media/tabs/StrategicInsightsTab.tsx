@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function StrategicInsightsTab({ data }: any) {
-    const { platforms, strategicRecommendations } = data;
+export default function StrategicInsightsTab({ platforms, strategicRecommendations }: any) {
+    // const { platforms, strategicRecommendations } = data;
     const platformKeys = Object.keys(platforms);
 
     return (
