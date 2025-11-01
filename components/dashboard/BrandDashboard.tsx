@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "./shared/DashboardHeader";
 import DashboardSkeleton from './shared/DashboardSkeleton';
 import { Suspense } from "react";
+import { SCRAPED } from "@/lib/constants";
 
 export default function BrandDashboard({
     title,
@@ -24,7 +25,7 @@ export default function BrandDashboard({
             <DashboardHeader title={title} subtitle="Website and Social Captured Data, Extracted & Outside-In reports, Brand Perception and Analytics Dashboards." />
             <Tabs defaultValue="raw_data">
                 <TabsList>
-                    <TabsTrigger value="raw_data">Raw Data</TabsTrigger>
+                    <TabsTrigger value="raw_data">{SCRAPED} Data</TabsTrigger>
                     <TabsTrigger value="website_audit">Website Audit Reports</TabsTrigger>
                     <TabsTrigger value="social_audit">Social Media Audit Reports</TabsTrigger>
                     <TabsTrigger value="analytics_dashboards">Analytics Dashboard</TabsTrigger>

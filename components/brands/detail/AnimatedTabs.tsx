@@ -3,8 +3,14 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from '../../ui/button';
+import { Button } from '@/components/ui/button';
 import { useTabs } from '@/hooks/UseTabs';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@/components/ui/tooltip';
 
 const transition: any = {
     type: 'tween',
@@ -38,7 +44,13 @@ const Tabs = ({
     selectedTabIndex,
     setSelectedTab
 }: {
-    tabs: { label: string; value: string }[];
+    tabs: {
+        label: string;
+        value: string;
+        disabled?: boolean;
+        tooltip?: string;
+        disabledTooltip?: string;
+    }[];
     selectedTabIndex: number;
     setSelectedTab: (input: [number, number]) => void;
 }) => {
@@ -52,6 +64,7 @@ const Tabs = ({
     const navRect = navRef.current?.getBoundingClientRect();
 
     const selectedRect = buttonRefs[selectedTabIndex]?.getBoundingClientRect();
+    const isSelectedTabDisabled = tabs[selectedTabIndex]?.disabled;
 
     const [hoveredTabIndex, setHoveredTabIndex] = React.useState<number | null>(null);
     const hoveredRect = buttonRefs[hoveredTabIndex ?? -1]?.getBoundingClientRect();
@@ -64,24 +77,52 @@ const Tabs = ({
         >
             {tabs.map((item, i) => {
                 const isActive = selectedTabIndex === i;
-                return (
-                    <Button
-                        key={item.value}
-                        ref={(el: any) => {
-                            buttonRefs[i] = el;
-                        }}
-                        variant="ghost"
-                        className={cn(
-                            "z-20",
-                            isActive ? "font-medium" : "text-muted-foreground"
-                        )}
-                        onPointerEnter={() => setHoveredTabIndex(i)}
-                        onFocus={() => setHoveredTabIndex(i)}
-                        onClick={() => setSelectedTab([i, i > selectedTabIndex ? 1 : -1])}
-                    >
-                        {item.label}
-                    </Button>
-                );
+                const isDisabled = !!item.disabled;
+
+                const buttonProps: any = {
+                    ref: (el: HTMLButtonElement | null) => {
+                        buttonRefs[i] = el;
+                    },
+                    variant: 'ghost',
+                    className: cn(
+                        'z-20',
+                        isActive && !isDisabled ? 'font-medium' : 'text-muted-foreground',
+                        isDisabled && 'cursor-not-allowed opacity-50'
+                    ),
+                    onPointerEnter: () => !isDisabled && setHoveredTabIndex(i),
+                    onFocus: () => !isDisabled && setHoveredTabIndex(i),
+                    onClick: (e: React.MouseEvent) => {
+                        if (isDisabled) {
+                            e.preventDefault();
+                            return;
+                        }
+                        setSelectedTab([i, i > selectedTabIndex ? 1 : -1]);
+                    },
+                    onMouseDown: (e: React.MouseEvent) => {
+                        if (isDisabled) {
+                            e.preventDefault();
+                        }
+                    },
+                    'aria-disabled': isDisabled
+                };
+
+                const buttonElement = <Button {...buttonProps}>{item.label}</Button>;
+                const tooltipContent = isDisabled ? item.disabledTooltip : item.tooltip;
+
+                if (tooltipContent) {
+                    return (
+                        <TooltipProvider key={item.value}>
+                            <Tooltip delayDuration={100}>
+                                <TooltipTrigger asChild>{buttonElement}</TooltipTrigger>
+                                <TooltipContent >
+                                    <p>{tooltipContent}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    );
+                }
+
+                return React.cloneElement(buttonElement, { key: item.value });
             })}
 
             <AnimatePresence>
@@ -98,7 +139,7 @@ const Tabs = ({
             </AnimatePresence>
 
             <AnimatePresence>
-                {selectedRect && navRect && (
+                {selectedRect && navRect && !isSelectedTabDisabled && (
                     <motion.div
                         className="absolute -bottom-0.5 left-0 z-30 h-[2px]  bg-primary"
                         initial={false}
@@ -122,11 +163,14 @@ export function AnimatedTabs({
         label: string;
         value: string;
         content: React.ReactNode;
+        disabled?: boolean;
+        tooltip?: string;
+        disabledTooltip?: string;
     }[];
 }) {
     const [hookProps] = React.useState({
-        tabs: tabs.map(({ label, value }) => ({ label, value })),
-        initialTabId: tabs.find((tab) => tab.value === 'brand_profile')?.value || tabs[0].value
+        tabs: tabs,
+        initialTabId: tabs.find((tab) => !tab.disabled)?.value || tabs[0].value
     });
 
     const framer = useTabs(hookProps);

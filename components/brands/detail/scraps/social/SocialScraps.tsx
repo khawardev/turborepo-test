@@ -9,7 +9,13 @@ import SocialDataView from './SocialDataView';
 import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
 import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
 import { SCRAPE } from '@/lib/constants';
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon } from 'lucide-react';
 
 export default function SocialScraps({ allSocialScrapsData, brandName, brand_id }: any) {
     const [isDataTransitioning, startDataTransition] = useTransition();
@@ -110,23 +116,29 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                         social_batch_id={selectedScrapBatchId}
                     />
                     <TooltipProvider>
-                        <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
-                            <SelectTrigger className="w-[140px]">
-                                <SelectValue placeholder={`Select a ${SCRAPE} run`} />
-                            </SelectTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    <span>{selectedScrapBatchId
+                                        ? timeAgo(sortedScraps.find((s: any) => s.batch_id === selectedScrapBatchId)?.scraped_at)
+                                        : `Select a ${SCRAPE} run`}</span>
+                                    <ChevronDownIcon  />
+                                </Button>
+                            </DropdownMenuTrigger>
 
-                            <SelectContent>
+                            <DropdownMenuContent align="start" className="w-[135px]">
                                 {sortedScraps.map((scrap: any) => (
                                     <Tooltip key={scrap.batch_id}>
                                         <TooltipTrigger asChild>
-                                            <SelectItem value={scrap.batch_id}>
+                                            <DropdownMenuItem
+                                                onClick={() => handleScrapSelection(scrap.batch_id)}
+                                            >
                                                 {timeAgo(scrap.scraped_at)}
-                                            </SelectItem>
+                                            </DropdownMenuItem>
                                         </TooltipTrigger>
-
                                         <TooltipContent
                                             side="left"
-                                            className=" px-1 mx-3 mt-2"
+                                            className=" px-1 rounded-full mx-3 mt-2"
                                         >
                                             <DateRangeDisplay
                                                 start_date={scrap?.start_date}
@@ -135,8 +147,8 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                                         </TooltipContent>
                                     </Tooltip>
                                 ))}
-                            </SelectContent>
-                        </Select>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </TooltipProvider>
                 </div>
             </div>

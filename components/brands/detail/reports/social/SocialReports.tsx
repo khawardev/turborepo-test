@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { timeAgo } from '@/lib/date-utils'
 import { TooltipContent, Tooltip, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import SocialReportDisplay from './SocialReportDisplay'
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon } from 'lucide-react'
 export default function SocialMediaReports({ allReportsData, brandName, competitors }: any) {
     const [selectedReportBatchId, setSelectedReportBatchId] = useState<string | null>(null)
     const [selectedEntityName, setSelectedEntityName] = useState<string | null>(null)
@@ -53,7 +58,6 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
         return sources
     }, [selectedReport, brandName, competitors])
 
-
     useEffect(() => {
         if (sortedReports.length > 0 && !selectedReportBatchId) {
             setSelectedReportBatchId(sortedReports[0].report_batch_id)
@@ -62,7 +66,6 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
             setSelectedEntityName(brandName)
         }
     }, [sortedReports, dataSources, brandName, selectedReportBatchId, selectedEntityName])
-
 
     if (sortedReports.length === 0) {
         return (
@@ -112,18 +115,26 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="inline-block">
-                                <Select onValueChange={setSelectedReportBatchId} value={selectedReportBatchId ?? ''}>
-                                    <SelectTrigger className="w-[140px]">
-                                        <SelectValue placeholder="Select Previous reports" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {sortedReports.map((report: any) => (
-                                            <SelectItem key={report.report_batch_id} value={report.report_batch_id}>
-                                                {`${timeAgo(report.created_at)}`}
-                                            </SelectItem>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" >
+                                            {sortedReports.find(r => r.report_batch_id === selectedReportBatchId)?.created_at
+                                                ? timeAgo(sortedReports.find(r => r.report_batch_id === selectedReportBatchId).created_at)
+                                                : "Select Previous reports"}
+                                            <ChevronDownIcon  />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-[135px]">
+                                        {sortedReports.map(report => (
+                                            <DropdownMenuItem
+                                                key={report.report_batch_id}
+                                                onClick={() => setSelectedReportBatchId(report.report_batch_id)}
+                                            >
+                                                {timeAgo(report.created_at)}
+                                            </DropdownMenuItem>
                                         ))}
-                                    </SelectContent>
-                                </Select>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>

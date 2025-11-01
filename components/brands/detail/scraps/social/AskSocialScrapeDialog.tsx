@@ -49,7 +49,7 @@ export function ScrapeSocialDialog({ isLoading, onConfirm, children }: any) {
                 <DialogHeader>
                     <DialogTitle>Social {SCRAPE}</DialogTitle>
                     <DialogDescription>
-                        Select the date range for the Social ${SCRAPING}.
+                        Select the date range for the Social {SCRAPING}.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

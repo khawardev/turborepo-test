@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/cleanMarkdown';
+import { SCRAPED } from '@/lib/constants';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
     const pages = useMemo(() => {
@@ -64,7 +65,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
     return (
         <div className="flex gap-6 min-h-0 ">
             <ScrollArea className="h-[75vh] w-1/3 min-w-0 ">
-                <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">RAW DATA</h5>
+                <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">{SCRAPED} Data</h5>
                 <ul className="space-y-1">
                     {pages.map((page: any, index: number) => (
                         <li key={index}>

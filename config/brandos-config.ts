@@ -5,8 +5,12 @@ export const BrandOSConfig: any = {
             href: "/",
         },
         {
-            title: "Brands",
+            title: "CCBA",
             href: "/brands",
+        },
+        {   
+            title: "BAM",
+            href: "/bam",
         },
     ],
 };

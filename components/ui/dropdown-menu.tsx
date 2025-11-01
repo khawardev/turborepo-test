@@ -233,10 +233,11 @@ function DropdownMenuSubTrigger({
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8",
         "border border-transparent focus:border-muted-foreground/20 data-[state=open]:border-muted-foreground/20",
         "focus:bg-gradient-to-t focus:from-muted focus:to-border focus:dark:from-muted/50",
+        "data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground",
         "data-[state=open]:bg-gradient-to-t data-[state=open]:from-muted data-[state=open]:to-border data-[state=open]:dark:from-muted/50",
         "focus:text-accent-foreground data-[state=open]:text-accent-foreground",
         "hover:cursor-pointer",
-        "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 ",
         className
       )}
       {...props}

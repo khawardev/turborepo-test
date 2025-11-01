@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button"
 import { timeAgo } from '@/lib/date-utils'
 import WebsiteReportDisplay from './WebsiteReportDisplay'
 import { TooltipContent, Tooltip,  TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon } from 'lucide-react'
 export default function WebsiteReports({ allReportsData, brandName, competitors }: any) {
     const [selectedReportBatchId, setSelectedReportBatchId] = useState<string | null>(null)
     const [selectedSource, setSelectedSource] = useState<any>(null)
@@ -111,18 +118,26 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="inline-block">
-                                <Select onValueChange={setSelectedReportBatchId} value={selectedReportBatchId ?? ''}>
-                                    <SelectTrigger className="w-[140px]">
-                                        <SelectValue placeholder="Select report run" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {sortedReports.map((report: any) => (
-                                            <SelectItem key={report.report_batch_id} value={report.report_batch_id}>
-                                                {`${timeAgo(report.created_at)}`}
-                                            </SelectItem>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="justify-between">
+                                            {sortedReports.find(r => r.report_batch_id === selectedReportBatchId)?.created_at
+                                                ? timeAgo(sortedReports.find(r => r.report_batch_id === selectedReportBatchId).created_at)
+                                                : "Select report run"}
+                                            <ChevronDownIcon  />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-[135px]">
+                                        {sortedReports.map(report => (
+                                            <DropdownMenuItem
+                                                key={report.report_batch_id}
+                                                onClick={() => setSelectedReportBatchId(report.report_batch_id)}
+                                            >
+                                                {timeAgo(report.created_at)}
+                                            </DropdownMenuItem>
                                         ))}
-                                    </SelectContent>
-                                </Select>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>

@@ -20,8 +20,17 @@ export function BrandDashboardButton({ brand_id, isScrapped }: { brand_id: any; 
                     )}
                 </TooltipTrigger>
                 <TooltipContent>
-                    {isScrapped ? "Go to Brand Dashboard" : "Please Generate Reports First"}
+                    {!isScrapped ? (
+                        <div className="flex flex-col gap-1 text-xs">
+                            <span className="text-muted-foreground">To view Dashboard:</span>
+                            <span className="text-muted-foreground ml-2">1. Gather Social Data</span>
+                            <span className="text-muted-foreground ml-2">2. Generate Website and Social Reports</span>
+                        </div>
+                    ) : (
+                        "Go to Brand Dashboard"
+                    )}
                 </TooltipContent>
+               
             </Tooltip>
         </TooltipProvider>
     )

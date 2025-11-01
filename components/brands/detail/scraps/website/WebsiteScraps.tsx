@@ -1,14 +1,19 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { timeAgo } from '@/lib/date-utils';
 import WebsiteDataView from '@/components/dashboard/raw-data/website/WebsiteDataView';
 import { ScrapeReportActionButtons } from '@/components/brands/detail/scraps/ScrapeReportActionButtons';
-import { SCRAPE, SCRAPED, SCRAPS } from '@/lib/constants';
-
+import { SCRAPE, SCRAPED } from '@/lib/constants';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon } from 'lucide-react';
 export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: any) {
     const sortedScraps = useMemo(() => {
         if (!allScrapsData || allScrapsData.length === 0) return [];
@@ -114,26 +119,33 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                         website_batch_id={selectedScrapBatchId}
                         social_batch_id={null}
                     />
+                    
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <div className="inline-block">
-                                    <Select onValueChange={handleScrapSelection} value={selectedScrapBatchId ?? ''}>
-                                        <SelectTrigger className="w-[140px]">
-                                            <SelectValue placeholder={`Select a ${SCRAPE} run`} />
-                                        </SelectTrigger>
-                                        <SelectContent>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" >
+                                                {selectedScrapBatchId ? timeAgo(sortedScraps.find((s: any) => s.batch_id === selectedScrapBatchId)?.scraped_at) : `Select a ${SCRAPE} run`}
+                                                <ChevronDownIcon  />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start" className="w-[135px]">
                                             {sortedScraps.map((scrap: any) => (
-                                                <SelectItem key={scrap.batch_id} value={scrap.batch_id}>
+                                                <DropdownMenuItem
+                                                    key={scrap.batch_id}
+                                                    onClick={() => handleScrapSelection(scrap.batch_id)}
+                                                >
                                                     {timeAgo(scrap.scraped_at)}
-                                                </SelectItem>
+                                                </DropdownMenuItem>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                Previous Website {SCRAPS}
+                                Previous Website {SCRAPE}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>

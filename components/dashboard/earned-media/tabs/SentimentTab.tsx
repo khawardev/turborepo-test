@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import CustomChartTooltipContent from '@/components/dashboard/shared/CustomChartTooltipContent';
 import CustomLegend from '../../shared/Legend';
+import { SCRAPED } from '@/lib/constants';
 
 export default function SentimentTab({ data }: any) {
     const { sentiment, colors } = data;
@@ -14,12 +15,12 @@ export default function SentimentTab({ data }: any) {
         <Card>
             <CardHeader>
                 <CardTitle>Sentiment Analysis</CardTitle>
-                <CardDescription>Raw vs Weighted sentiment distribution</CardDescription>
+                <CardDescription>{SCRAPED} vs Weighted sentiment distribution</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h4 className="text-sm font-semibold mb-3">Raw Sentiment</h4>
+                        <h4 className="text-sm font-semibold mb-3">{SCRAPED} Sentiment</h4>
                         <ResponsiveContainer width="100%" height={250}>
                             <PieChart>
                                 <Pie data={sentiment.overall.raw.map((item: any) => ({ name: item.sentiment, value: item.percentage, fill: item.sentiment === 'Positive' ? colors.positive : item.sentiment === 'Neutral' ? colors.neutral : colors.challenging }))} cx="50%" cy="50%" labelLine={false} label={({ name, value }) => `${name}: ${value}%`} outerRadius={80} dataKey="value">

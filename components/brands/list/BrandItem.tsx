@@ -117,23 +117,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     });
   };
 
-  const confirmDelete = () => {
-    toast(`Delete ${brand.name}?`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Confirm",
-        onClick: async () => {
-          const result = await deleteBrand(brand.brand_id);
-          if (result.success) {
-            router.refresh();
-            toast.success(result.message);
-          } else {
-            toast.error(result.message);
-          }
-        },
-      },
-    });
-  };
+  
   return (
     <Card
       className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
@@ -162,7 +146,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               </Button>
             </WebsiteAskLimitDialog>
           )}
-          <BrandCompCrudButtons side={'left'} brand={brand} />
+          <BrandCompCrudButtons side={null} brand={brand} />
           {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
