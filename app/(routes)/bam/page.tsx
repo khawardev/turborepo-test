@@ -9,7 +9,7 @@ import BamList from "@/components/bam/BamList";
 export default function page() {
   return (
     <ContainerMd>
-      <StaticBanner title="Your BAMs" badge={'BAMs Page'} />
+      <StaticBanner title="Your BAMs" badge={'BAM Page'} />
       <BlurDelay className="flex justify-between items-center ">
         <div>
           <h3 className="text-lg font-medium ">Brands Action Models</h3>
