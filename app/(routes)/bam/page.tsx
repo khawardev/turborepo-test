@@ -20,7 +20,7 @@ export default function page() {
         <Button asChild>
           <Link href="/bam/new">
             <Plus />
-            BAM
+            Add BAM
           </Link>
         </Button>
       </BlurDelay>
