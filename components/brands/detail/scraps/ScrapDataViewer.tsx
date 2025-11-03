@@ -20,7 +20,7 @@ export default function ScrapDataViewer({
             <section className=' flex items-center justify-between w-full'>
                 <DashboardHeader
                     title={`Brand ${SCRAPS}`}
-                    subtitle={`View all Website and Social ${SCRAPED} data for Brand and Competitor`}
+                    subtitle={`View all Website and Social Media data for Brand and it's Competitors`}
                 />
             </section>
             <Tabs defaultValue="website" onValueChange={setActiveTab} >

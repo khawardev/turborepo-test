@@ -101,7 +101,7 @@ export default function NewBamForm() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsLoading(false);
     toast.success("BAM has been created successfully 🎉");
-    router.push("/bam/bam-3"); // Redirect to a sample execution page
+    router.push("/bvo/bam-3"); // Redirect to a sample execution page
   }
 
   return (

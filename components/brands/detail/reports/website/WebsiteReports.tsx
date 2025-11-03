@@ -107,7 +107,7 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{index === 0 ? "Select brand Reports" : "Select competitor Reports"}</p>
+                                        <p>{index === 0 ? "Select Brand" : "Select Competitor"}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </div>

@@ -101,7 +101,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{index === 0 ? "Select Brand Social data" : "Select Competitor Social data"}</p>
+                                        <p>{index === 0 ? "Select Brand Social" : "Select Competitor Social"}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </React.Fragment>

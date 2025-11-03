@@ -104,7 +104,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{source.isBrand ? "Select brand Reports" : "Select competitor Reports"}</p>
+                                        <p>{source.isBrand ? "Select Brand" : "Select Competitor"}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </div>

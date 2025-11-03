@@ -7,6 +7,7 @@ import { FullLogo } from "../shared/logo"
 import { ThemeSwitcher } from "../ui/theme-switcher"
 import { usePathname } from "next/navigation"
 import { BrandOSConfig } from "@/config/brandos-config"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function HeaderClient({ user }: any) {
   const pathname = usePathname()
@@ -21,11 +22,23 @@ export function HeaderClient({ user }: any) {
         <ul className="flex flex-1 items-center justify-end gap-2">
           {user &&
             BrandOSConfig.mainNav.map((item: any, index: number) => (
-              <Button variant={pathname === item.href ? "outline" : "ghost"} size="sm" key={index}>
-                <Link href={item.href}>
-                  <span>{item.title}</span>
-                </Link>
-              </Button>
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={pathname === item.href ? "outline" : "ghost"}
+                      size="sm"
+                    >
+                      <Link href={item.href}>
+                        <span>{item.title}</span>
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent sideOffset={12} side="bottom">
+                    <p>{item.desc}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           <div className="md:border-l pl-4 flex items-center gap-2">
             {!user && (

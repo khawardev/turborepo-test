@@ -53,7 +53,7 @@ export default async function BrandDetailPage({
       label: 'Reports',
       value: 'reports',
       disabled: !(socialReportData?.data && socialReportData?.data.length > 0),
-      disabledTooltip: 'Please Genrate Reports for Website and Socials!!',
+      disabledTooltip: 'Please Generate Reports for Website and Socials',
       tooltip: 'View Brand & Competitors Reports details',
       content: (
         <Suspense fallback={<ReportDataViewerSkeleton />}>

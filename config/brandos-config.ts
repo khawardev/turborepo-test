@@ -3,14 +3,28 @@ export const BrandOSConfig: any = {
         {
             title: "Home",
             href: "/",
+            desc: 'Go to Home'
+
         },
         {
             title: "CCBA",
             href: "/brands",
+            desc:'Coherence & Competitor Baseline Audit'
         },
         {   
-            title: "BAM",
-            href: "/bam",
+            title: "BVO",
+            href: "/bvo",
+            desc: 'Brand Validation & Optimization'
+        },
+        {   
+            title: "CGE",
+            href: "/cge",
+            desc: 'Content Generation Engine'
+        },
+        {   
+            title: "CBC",
+            href: "/cbc",
+            desc: 'Continual Brand Coherence'
         },
     ],
 };

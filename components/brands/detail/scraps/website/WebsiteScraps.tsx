@@ -86,7 +86,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Select Brand Website data</p>
+                                <p>Select Brand</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -106,7 +106,7 @@ export default function WebsiteScraps({ allScrapsData, brandName, brand_id }: an
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>Select Competitor Website data</p>
+                                    <p>Select Competitor</p>
                                 </TooltipContent>
                             </Tooltip>
                         ))}

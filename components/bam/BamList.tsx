@@ -35,7 +35,7 @@ export default function BamList() {
                 <CardDescription>{bam.brand}</CardDescription>
               </div>
               <Button asChild variant="outline">
-                <Link href={`/bam/${bam.id}`}>View</Link>
+                <Link href={`/bvo/${bam.id}`}>View</Link>
               </Button>
             </div>
           </CardHeader>

@@ -20,7 +20,7 @@ export default function BamDetailPage({
 
   return (
     <ContainerMd>
-      <StaticBanner title={bamData.name} badge={`BAM Execution`} />
+      <StaticBanner title={bamData.name} badge={`BVO Execution`} />
       <BlurDelay3>
         <BamExecution bam={bamData} />
       </BlurDelay3>

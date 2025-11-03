@@ -9,7 +9,7 @@ import { BlurDelay, BlurDelay3 } from "@/components/shared/MagicBlur";
 export default function page() {
   return (
     <ContainerMd>
-      <StaticBanner title="Your CCBA Audits" badge={'CCBA Page'} />
+      <StaticBanner title="Coherence & Competitor Baseline Audit" badge={'CCBA Audits'} />
       <BlurDelay className="flex justify-between items-center ">
         <div>
           <h3 className="text-lg font-medium ">Brands</h3>
