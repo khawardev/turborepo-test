@@ -178,16 +178,10 @@ uniform float uFade;
 }
 
 void mainImage(out vec4 fc,in vec2 frag){
-    vec2 C = iResolution.xy * 0.5;
-    float invW = 1.0/max(C.x, 1.0);
-
-    vec2 uv = (frag.xy - C) / iResolution.y;
-    uv *= 300.0;
-
-    float uv_space_width = (iResolution.x / iResolution.y) * 300.0;
-    vec2 off = vec2(uBeamXFrac * uv_space_width, uBeamYFrac * 300.0);
+    vec2 C=iResolution.xy*.5; float invW=1.0/max(C.x,1.0);
+    float sc=512.0/iResolution.x*.4;
+    vec2 uv=(frag-C)*sc,off=vec2(uBeamXFrac*iResolution.x*sc,uBeamYFrac*iResolution.y*sc);
     vec2 uvc = uv - off;
-    
     float a=0.0,b=0.0;
     float basePhase=1.5*PI+uDecay*.5; float tauMin=basePhase-uDecay; float tauMax=basePhase;
     float cx=clamp(uvc.x/(R_H*uHLenFactor),-1.0,1.0),tH=clamp(TWO_PI-acos(cx),tauMin,tauMax);
