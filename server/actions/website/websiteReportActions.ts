@@ -2,11 +2,11 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
-import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/prompt";
-import { pollUntilComplete } from "@/lib/pollUntilComplete";
+import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteReportsStatus } from "./websiteStatusAction";
+import { pollUntilComplete } from "@/lib/utils";
 
 export async function batchWebsiteReports({
     brand_id,
@@ -36,9 +36,9 @@ export async function batchWebsiteReports({
 
         await pollUntilComplete(
             async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
-            (res) => res.success && res.data?.status === "Completed"
+            (res:any) => res.success && res.data?.status === "Completed"
         )
-        revalidatePath(`/brands/${brand_id}`);
+        revalidatePath(`/ccba/${brand_id}`);
         return batchReports.task_id
     } catch (error: any) {
         console.error("Error in createBatchWebsiteReports:", error);

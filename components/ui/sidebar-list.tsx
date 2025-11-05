@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FullLogo } from "@/components/shared/logo"
+import { FullLogo } from "@/components/static/shared/Logo"
 import { BreadcrumbSeparator } from "./breadcrumb"
 
 

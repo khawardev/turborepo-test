@@ -11,7 +11,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
   if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password')) {
-    return NextResponse.redirect(new URL('/brands', request.url));
+    return NextResponse.redirect(new URL('/ccba', request.url));
   }
 
   return NextResponse.next();

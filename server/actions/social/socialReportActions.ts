@@ -2,11 +2,11 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
-import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "../authActions";
-import { SOCIAL_SYNTHESIS_PROMPT } from "@/lib/prompt";
+import { SOCIAL_SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { getBatchSocialReportsStatus } from "./socialStatusAction";
+import { pollUntilComplete } from "@/lib/utils";
 
 export async function batchSocialReports({
     brand_id,
@@ -26,7 +26,7 @@ export async function batchSocialReports({
             client_id: user.client_id,
             brand_id: brand_id,
             batch_id: batch_id,
-            batch_name: `${brand_id}_scrape`,
+            batch_name: `${brand_id} - website Report`,
             social_prompt: social_prompt ? social_prompt : SOCIAL_SYNTHESIS_PROMPT,
             model_id: model_id,
         };
@@ -39,7 +39,7 @@ export async function batchSocialReports({
             (res: any) => res.success && res.data?.status === "Completed"
         );
 
-        revalidatePath(`/brands/${brand_id}`);
+        revalidatePath(`/ccba/${brand_id}`);
         return { success: true, data: batchReports.task_id };
     } catch (error: any) {
         console.error("Error in batchSocialReports:", error);

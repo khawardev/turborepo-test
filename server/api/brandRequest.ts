@@ -7,10 +7,9 @@ export async function brandRequest(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     body?: any,
-    cacheOption: RequestCache = "no-store"
+    cache: RequestCache = "no-store"
 ) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+    const token = (await cookies()).get("access_token")?.value;
     if (!token) throw new Error("Unauthorized");
 
     const res = await fetch(`${API_URL}${endpoint}`, {
@@ -19,34 +18,17 @@ export async function brandRequest(
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: prepareRequestBody(body),
-        cache: cacheOption,
+        body: body ? JSON.stringify(body.body ?? body) : undefined,
+        cache,
     });
 
     const text = await res.text();
     const data = text ? JSON.parse(text) : null;
 
     if (!res.ok) {
-        let message = "Request failed";
-        if (data) {
-            const errorContent = data.detail || data.message || data;
-
-            if (typeof errorContent === 'object' && errorContent !== null) {
-                message = JSON.stringify(errorContent, null, 2);
-            } else {
-                message = String(errorContent);
-            }
-        }
-        throw new Error(message);
+        const msg = data?.detail || data?.message || data || "Request failed";
+        throw new Error(typeof msg === "object" ? JSON.stringify(msg, null, 2) : String(msg));
     }
 
     return data;
-}
-
-function prepareRequestBody(body?: any) {
-    if (!body) return undefined;
-    if (typeof body === "string") return body;
-    if (typeof body === "object" && body.body)
-        return typeof body.body === "string" ? body.body : JSON.stringify(body.body);
-    return JSON.stringify(body);
 }

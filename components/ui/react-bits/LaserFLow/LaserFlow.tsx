@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import './LaserFlow.css';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { BlurDelay3, BlurDelay4 } from '@/components/shared/MagicBlur';
+import { BlurDelay3 } from '@/components/static/shared/MagicBlur';
 
 type Props = {
   className?: string;
@@ -41,7 +41,7 @@ const FRAG = `
 #ifdef GL_ES
 #extension GL_OES_standard_derivatives : enable
 #endif
-precision highp float;
+precision mediump float;
 precision mediump int;
 
 uniform float iTime;
@@ -72,7 +72,7 @@ uniform float uFade;
 #define EPS 1e-6
 #define EDGE_SOFT (DT_LOCAL*4.0)
 #define DT_LOCAL 0.0038
-#define TAP_RADIUS 6
+#define TAP_RADIUS 4
 #define R_H 150.0
 #define R_V 150.0
 #define FLARE_HEIGHT 16.0
@@ -100,7 +100,7 @@ uniform float uFade;
 #define FOG_CONTRAST 1.2
 #define FOG_SPEED_U 0.1
 #define FOG_SPEED_V -0.1
-#define FOG_OCTAVES 5
+#define FOG_OCTAVES 4
 #define FOG_BOTTOM_BIAS 0.8
 #define FOG_TILT_TO_MOUSE 0.05
 #define FOG_TILT_DEADZONE 0.01
@@ -135,7 +135,7 @@ uniform float uFade;
         return powr*min(1.0,r);
     }
     float tri01(float x){float f=fract(x);return 1.0-abs(f*2.0-1.0);}
-    float tauWf(float t,float tmin,float tmax){float a=smoothstep(tmin,tmin+EDGE_SOFT,t),b=1.0-smoothstep(tmax-EDGE_SOFT,tmax,t);return max(0.0,a*b);} 
+    float tauWf(float t,float tmin,float tmax){float a=smoothstep(tmin,tmin+EDGE_SOFT,t),b=1.0-smoothstep(tmax-EDGE_SOFT,tmax,t);return max(0.0,a*b);}
     float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+34.123);return fract(p.x*p.y);}
     float vnoise(vec2 p){
         vec2 i=floor(p),f=fract(p);
@@ -178,10 +178,16 @@ uniform float uFade;
 }
 
 void mainImage(out vec4 fc,in vec2 frag){
-    vec2 C=iResolution.xy*.5; float invW=1.0/max(C.x,1.0);
-    float sc=512.0/iResolution.x*.4;
-    vec2 uv=(frag-C)*sc,off=vec2(uBeamXFrac*iResolution.x*sc,uBeamYFrac*iResolution.y*sc);
+    vec2 C = iResolution.xy * 0.5;
+    float invW = 1.0/max(C.x, 1.0);
+
+    vec2 uv = (frag.xy - C) / iResolution.y;
+    uv *= 300.0;
+
+    float uv_space_width = (iResolution.x / iResolution.y) * 300.0;
+    vec2 off = vec2(uBeamXFrac * uv_space_width, uBeamYFrac * 300.0);
     vec2 uvc = uv - off;
+    
     float a=0.0,b=0.0;
     float basePhase=1.5*PI+uDecay*.5; float tauMin=basePhase-uDecay; float tauMax=basePhase;
     float cx=clamp(uvc.x/(R_H*uHLenFactor),-1.0,1.0),tH=clamp(TWO_PI-acos(cx),tauMin,tauMax);
@@ -289,11 +295,6 @@ const LaserFlowComponent: React.FC<Props> = ({
   const uniformsRef = useRef<any>(null);
   const hasFadedRef = useRef(false);
   const rectRef = useRef<DOMRect | null>(null);
-  const baseDprRef = useRef<number>(1);
-  const currentDprRef = useRef<number>(1);
-  const fpsSamplesRef = useRef<number[]>([]);
-  const lastFpsCheckRef = useRef<number>(0);
-  const emaDtRef = useRef<number>(16.7);
   const pausedRef = useRef<boolean>(false);
   const inViewRef = useRef<boolean>(true);
 
@@ -326,10 +327,9 @@ const LaserFlowComponent: React.FC<Props> = ({
     });
     rendererRef.current = renderer;
 
-    baseDprRef.current = Math.min(dpr ?? (window.devicePixelRatio || 1), 2);
-    currentDprRef.current = baseDprRef.current;
+    const currentDpr = Math.min(dpr ?? (window.devicePixelRatio || 1), 1.5);
 
-    renderer.setPixelRatio(currentDprRef.current);
+    renderer.setPixelRatio(currentDpr);
     renderer.shadowMap.enabled = false;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 1);
@@ -394,10 +394,9 @@ const LaserFlowComponent: React.FC<Props> = ({
     const setSizeNow = () => {
       const w = mount.clientWidth || 1;
       const h = mount.clientHeight || 1;
-      const pr = currentDprRef.current;
-      renderer.setPixelRatio(pr);
+      renderer.setPixelRatio(currentDpr);
       renderer.setSize(w, h, false);
-      uniforms.iResolution.value.set(w * pr, h * pr, pr);
+      uniforms.iResolution.value.set(w * currentDpr, h * currentDpr, currentDpr);
       rectRef.current = canvas.getBoundingClientRect();
     };
 
@@ -408,7 +407,6 @@ const LaserFlowComponent: React.FC<Props> = ({
     };
 
     setSizeNow();
-    lastFpsCheckRef.current = performance.now();
 
     const ro = new ResizeObserver(scheduleResize);
     ro.observe(mount);
@@ -431,9 +429,8 @@ const LaserFlowComponent: React.FC<Props> = ({
       if (!rect) return;
       const x = clientX - rect.left;
       const y = clientY - rect.top;
-      const ratio = currentDprRef.current;
-      const hb = rect.height * ratio;
-      mouseTarget.set(x * ratio, hb - y * ratio);
+      const hb = rect.height * currentDpr;
+      mouseTarget.set(x * currentDpr, hb - y * currentDpr);
     };
     const onMove = (ev: PointerEvent) => updateMouse(ev.clientX, ev.clientY);
     const onLeave = () => mouseTarget.set(0, 0);
@@ -455,44 +452,6 @@ const LaserFlowComponent: React.FC<Props> = ({
 
     let raf = 0;
 
-    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-    const dprFloor = 0.6;
-    const lowerThresh = 50;
-    const upperThresh = 58;
-    let lastDprChangeTime = 0;
-    const dprChangeCooldown = 2000;
-
-    // This function causes flickering when FPS is unstable, so it is no longer called in the animation loop.
-    const adjustDprIfNeeded = (now: number) => {
-      const elapsed = now - lastFpsCheckRef.current;
-      if (elapsed < 750) return;
-
-      const samples = fpsSamplesRef.current;
-      if (samples.length === 0) {
-        lastFpsCheckRef.current = now;
-        return;
-      }
-      const avgFps = samples.reduce((a, b) => a + b, 0) / samples.length;
-
-      let next = currentDprRef.current;
-      const base = baseDprRef.current;
-
-      if (avgFps < lowerThresh) {
-        next = clamp(currentDprRef.current * 0.85, dprFloor, base);
-      } else if (avgFps > upperThresh && currentDprRef.current < base) {
-        next = clamp(currentDprRef.current * 1.1, dprFloor, base);
-      }
-
-      if (Math.abs(next - currentDprRef.current) > 0.01 && now - lastDprChangeTime > dprChangeCooldown) {
-        currentDprRef.current = next;
-        lastDprChangeTime = now;
-        scheduleResize();
-      }
-
-      fpsSamplesRef.current = [];
-      lastFpsCheckRef.current = now;
-    };
-
     const animate = () => {
       raf = requestAnimationFrame(animate);
       if (pausedRef.current || !inViewRef.current) return;
@@ -500,11 +459,6 @@ const LaserFlowComponent: React.FC<Props> = ({
       const t = clock.getElapsedTime();
       const dt = Math.max(0, t - prevTime);
       prevTime = t;
-
-      const dtMs = dt * 1000;
-      emaDtRef.current = emaDtRef.current * 0.9 + dtMs * 0.1;
-      const instFps = 1000 / Math.max(1, emaDtRef.current);
-      fpsSamplesRef.current.push(instFps);
 
       uniforms.iTime.value = t;
 
@@ -525,8 +479,6 @@ const LaserFlowComponent: React.FC<Props> = ({
       uniforms.iMouse.value.set(mouseSmooth.x, mouseSmooth.y, 0, 0);
 
       renderer.render(scene, camera);
-
-      // adjustDprIfNeeded(performance.now()); // FIX: This line caused flickering and has been removed.
     };
 
     animate();
@@ -548,7 +500,7 @@ const LaserFlowComponent: React.FC<Props> = ({
       renderer.dispose();
       if (mount.contains(canvas)) mount.removeChild(canvas);
     };
-  }, [dpr, horizontalBeamOffset, horizontalSizing, decay, falloffStart, flowSpeed, flowStrength, fogFallSpeed, fogIntensity, fogScale, mouseSmoothTime, mouseTiltStrength, verticalBeamOffset, verticalSizing, wispDensity, wispIntensity, wispSpeed]);
+  }, [dpr]);
 
   useEffect(() => {
     const uniforms = uniformsRef.current;
@@ -569,6 +521,7 @@ const LaserFlowComponent: React.FC<Props> = ({
     uniforms.uDecay.value = decay;
     uniforms.uFalloffStart.value = falloffStart;
     uniforms.uFogFallSpeed.value = fogFallSpeed;
+    uniforms.uMouseSmoothTime = mouseSmoothTime;
 
     const { r, g, b } = hexToRGB(color);
     uniforms.uColor.value.set(r, g, b);
@@ -590,6 +543,7 @@ const LaserFlowComponent: React.FC<Props> = ({
     fogFallSpeed,
     color,
     hexToRGB,
+    mouseSmoothTime,
   ]);
 
   return <div ref={mountRef} className={`laser-flow-container  ${className || ''}`} style={style} >

@@ -3,10 +3,10 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteScrapeStatus } from "./websiteStatusAction";
-import { SCRAPE, SCRAPING } from "@/lib/constants";
+import { SCRAPE, SCRAPING } from "@/lib/static/constants";
+import { pollUntilComplete } from "@/lib/utils";
 
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
     const cookieStore = await cookies()
@@ -21,7 +21,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
             client_id: user.client_id,
             brand_id: brand_id,
             limit: limit,
-            name: `${brand_id}_scrape`,
+            name: `${brand_id} - website Capture`,
         }
 
         const batchWebsiteScrape = await brandRequest("/batch/website", "POST", scrapePayload)
@@ -31,7 +31,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
             (res) => res.success && res.data?.status === "Completed"
         )
 
-        revalidatePath(`/brands/${brand_id}`)
+        revalidatePath(`/ccba/${brand_id}`)
         return { success: true, message: `${SCRAPING} and report extraction completed successfully 🎉` }
     } catch (error: any) {
         console.error(`Failed batch ${SCRAPE} for brand ${brand_id}:`, error)

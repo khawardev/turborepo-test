@@ -8,7 +8,7 @@ import {
   registerSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
-} from "@/lib/validations";
+} from "@/lib/static/validations";
 import { authRequest } from "@/server/api/authRequest";
 
 export async function login(values: z.infer<typeof loginSchema>) {
@@ -32,7 +32,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
       });
     }
 
-    revalidatePath("/brands");
+    revalidatePath("/ccba");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.detail || "Login failed" };

@@ -2,7 +2,7 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "../authActions";
-import { SCRAPE } from "@/lib/constants";
+import { SCRAPE } from "@/lib/static/constants";
 
 export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
     const user = await getCurrentUser()

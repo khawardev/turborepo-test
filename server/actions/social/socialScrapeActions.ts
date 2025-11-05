@@ -3,10 +3,10 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { pollUntilComplete } from "@/lib/pollUntilComplete";
 import { getCurrentUser } from "../authActions";
 import { getBatchSocialScrapeStatus } from "./socialStatusAction";
-import { SCRAPE, SCRAPING } from "@/lib/constants";
+import { SCRAPE, SCRAPING } from "@/lib/static/constants";
+import { pollUntilComplete } from "@/lib/utils";
 
 export async function scrapeBatchSocial(
     brand_id: any,
@@ -36,7 +36,7 @@ export async function scrapeBatchSocial(
             (res: any) => res.success && res.data?.status === "Completed"
         )
 
-        revalidatePath(`/brands/${brand_id}`)
+        revalidatePath(`/ccba/${brand_id}`)
         return { success: true, message: `Social ${SCRAPING} completed successfully 🎉` }
     } catch (error: any) {
         console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error)

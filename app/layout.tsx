@@ -3,7 +3,7 @@ import { IBM_Plex_Sans, Inter } from "next/font/google";
 import "@/app/(css)/globals.css";
 import { ThemeProvider } from "next-themes";
 import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrapper";
-import HeaderServer from "@/components/header/HeaderServer";
+import HeaderServer from "@/components/static/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/brandos-config";
 const inter = Inter({ subsets: ["latin"], display: 'swap', });
@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className}  relative antialiased`} suppressHydrationWarning>
+      <body className={`${inter.className} ${ibmPlexSans.className}  relative antialiased`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />

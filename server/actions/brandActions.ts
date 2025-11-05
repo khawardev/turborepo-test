@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { brandSchema } from "@/lib/validations";
+import { brandSchema } from "@/lib/static/validations";
 import { Brand, Competitor } from "@/types";
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "./authActions";
@@ -31,7 +31,7 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
       await addCompetitors(brandResult.brand_id, competitors);
     }
 
-    revalidatePath("/brands");
+    revalidatePath("/ccba");
     return { success: true, data: brandResult };
   } catch (error: any) {
     return { success: false, error: error.message || "Something went wrong" };
@@ -86,8 +86,8 @@ export async function updateBrand(brandId: string, values: any) {
       { body: JSON.stringify(brandData) }
     );
 
-    revalidatePath("/brands");
-    revalidatePath(`/brands/${brandId}`);
+    revalidatePath("/ccba");
+    revalidatePath(`/ccba/${brandId}`);
 
     return { success: true, data: brandResult };
   } catch (error: any) {
@@ -135,7 +135,6 @@ export async function updateCompetitorAction(
     };
   }
 }
-
 
 export async function getBrands(): Promise<Brand[]> {
   const cookieStore = await cookies();
@@ -243,7 +242,7 @@ export async function deleteBrand(brand_id: string) {
       "DELETE"
     );
 
-    revalidatePath("/brands");
+    revalidatePath("/ccba");
     return {
       success: true,
       message: "Brand deleted successfully 🎉",

@@ -8,7 +8,7 @@ export const BrandOSConfig: any = {
         },
         {
             title: "CCBA",
-            href: "/brands",
+            href: "/ccba",
             desc:'Coherence & Competitor Baseline Audit'
         },
         {   

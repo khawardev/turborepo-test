@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 export async function createExtractionReport(payload: any, brand_id: any, competitor_id:any) {
     try {
         const data = await brandRequest("/bedrock-extraction-report", "POST", payload);
-        brand_id && revalidatePath(`/dashboard/brand/${brand_id}`);
-        competitor_id && revalidatePath(`/dashboard/brand/${brand_id}/competitor/${competitor_id}`);
+        brand_id && revalidatePath(`/ccba/dashboard/brand/${brand_id}`);
+        competitor_id && revalidatePath(`/ccba/dashboard/brand/${brand_id}/competitor/${competitor_id}`);
         return { success: true, data };
     } catch (error: any) {
         console.error("createExtractionReport error:", error);
