@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "../authActions";
 import { getBatchSocialScrapeStatus } from "./socialStatusAction";
-import { SCRAPE, SCRAPING } from "@/lib/static/constants";
+import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { pollUntilComplete } from "@/lib/utils";
 
 export async function scrapeBatchSocial(

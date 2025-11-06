@@ -2,7 +2,7 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "../authActions";
-import { SCRAPE } from "@/lib/static/constants";
+import { SCRAPE } from "@/lib/constants";
 
 export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
     const user = await getCurrentUser()
@@ -21,14 +21,13 @@ export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
 }
 
 
-
-export async function getBatchSocialReportsStatus(brand_id: string, report_batch_id: string) {
+export async function getBatchSocialReportsStatus(brand_id: string, batch_id: string) {
     const user = await getCurrentUser();
     if (!user) return { success: false, error: "User not found" };
 
     try {
         const response = await brandRequest(
-            `/batch/social-reports-status/${report_batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
+            `/batch/social-reports-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET"
         );
         return { success: true, data: response };

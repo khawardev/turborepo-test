@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CommandDialog, CommandInput, CommandList, CommandItem } from "@/components/ui/command"
-import { MODELS } from "@/lib/static/constants"
+import { MODELS } from "@/lib/constants"
 
 
 

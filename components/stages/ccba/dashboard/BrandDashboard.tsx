@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "./shared/DashboardHeader";
 import DashboardSkeleton from './shared/DashboardSkeleton';
 import { Suspense } from "react";
-import { SCRAPED } from "@/lib/static/constants";
+import { SCRAPED } from "@/lib/constants";
 
 export default function BrandDashboard({
     title,

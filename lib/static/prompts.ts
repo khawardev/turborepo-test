@@ -1,4 +1,4 @@
-import { SCRAPED } from "./constants";
+import { SCRAPED } from "../constants";
 
 export const EXTRACTOR_PROMPT: string = `
 ## SYSTEM MANDATE

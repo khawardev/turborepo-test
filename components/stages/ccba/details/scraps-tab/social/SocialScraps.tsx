@@ -8,7 +8,7 @@ import { timeAgo } from '@/lib/utils';
 import SocialDataView from './SocialDataView';
 import { DateRangeDisplay } from '@/components/static/shared/DateRangeDisplay';
 import { ScrapeReportActionButtons } from '@/components/stages/ccba/details/scraps-tab/ScrapeReportActionButtons';
-import { SCRAPE } from '@/lib/static/constants';
+import { SCRAPE } from '@/lib/constants';
 import {
     DropdownMenu,
     DropdownMenuContent,

@@ -6,13 +6,13 @@ import { AnimatedTabs } from '@/components/stages/ccba/details/AnimatedTabs';
 import StaticBanner from '@/components/static/shared/StaticBanner';
 import { BlurDelay3 } from '@/components/static/shared/MagicBlur';
 import { Suspense } from 'react';
-import BrandProfileTab from './_components/BrandProfileTab';
-import ScrapsTab from './_components/ScrapsTab';
-import ReportsTab from './_components/ReportsTab';
-import { BrandProfileSkeleton } from './_components/_skeleton/BrandProfileSkeleton';
-import ScrapDataViewerSkeleton from './_components/_skeleton/ScrapDataViewerSkeleton';
-import { ReportDataViewerSkeleton } from './_components/_skeleton/ReportDataViewerSkeleton';
-import { SCRAPS } from '@/lib/static/constants';
+import BrandProfileTab from '../../../../../components/stages/ccba/details/_components/BrandProfileTab';
+import ScrapsTab from '../../../../../components/stages/ccba/details/_components/ScrapsTab';
+import ReportsTab from '../../../../../components/stages/ccba/details/_components/ReportsTab';
+import { BrandProfileSkeleton } from '../../../../../components/stages/ccba/details/_components/_skeleton/BrandProfileSkeleton';
+import ScrapDataViewerSkeleton from '../../../../../components/stages/ccba/details/_components/_skeleton/ScrapDataViewerSkeleton';
+import { ReportDataViewerSkeleton } from '../../../../../components/stages/ccba/details/_components/_skeleton/ReportDataViewerSkeleton';
+import { SCRAPS } from '@/lib/constants';
 import { getBatchSocialReports } from '@/server/actions/social/socialReportActions';
 import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions';
 
@@ -42,7 +42,7 @@ export default async function BrandDetailPage({
     },
     {
       label: SCRAPS,
-      value: 'scraps',
+      value: 'brand_scraps',
       tooltip: 'View Brand & Competitors Captured Data',
       content: (
         <Suspense fallback={<ScrapDataViewerSkeleton />}>
@@ -52,7 +52,7 @@ export default async function BrandDetailPage({
     },
     {
       label: 'Reports',
-      value: 'reports',
+      value: 'brand_reports',
       disabled: !(websiteReportData?.data && websiteReportData?.data.length > 0),
       disabledTooltip: 'Please Generate Reports for Website and Socials',
       tooltip: 'View Brand & Competitors Reports',

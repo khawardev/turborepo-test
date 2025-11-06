@@ -6,6 +6,7 @@ import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrap
 import HeaderServer from "@/components/static/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/brandos-config";
+import { JotaiProvider } from "@/components/static/shared/JotaiProvider";
 const inter = Inter({ subsets: ["latin"], display: 'swap', });
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -35,7 +36,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />
-            {children}
+            <JotaiProvider>{children}</JotaiProvider>
             <Toaster />
           </LightRaysWrapper>
         </ThemeProvider>

@@ -18,7 +18,7 @@ import {
 import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader"
 import { DatePickerWithRange } from "./DatePickerwithRange"
 import { Label } from "@/components/ui/label"
-import { SCRAPE, SCRAPING } from "@/lib/static/constants"
+import { SCRAPE, SCRAPING } from "@/lib/constants"
 
 
 export function ScrapeSocialDialog({ isLoading, onConfirm, children }: any) {

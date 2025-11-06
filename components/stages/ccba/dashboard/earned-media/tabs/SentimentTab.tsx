@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import CustomChartTooltipContent from '@/components/stages/ccba/dashboard/shared/CustomChartTooltipContent';
 import CustomLegend from '../../shared/Legend';
-import { SCRAPED } from '@/lib/static/constants';
+import { SCRAPED } from '@/lib/constants';
 
 export default function SentimentTab({ data }: any) {
     const { sentiment, colors } = data;

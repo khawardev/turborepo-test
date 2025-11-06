@@ -26,7 +26,7 @@ import { WebsiteReportButton } from "@/components/stages/ccba/details/reports-ta
 import { MdOutlineWebAsset } from "react-icons/md";
 import { RiGeminiFill } from "react-icons/ri"
 import { ScrapeSocialDialog } from "./social/AskSocialScrapeDialog"
-import { SCRAPE, SCRAPING } from "@/lib/static/constants"
+import { SCRAPE, SCRAPING } from "@/lib/constants"
 
 export function ScrapeReportActionButtons({
   brand_id,

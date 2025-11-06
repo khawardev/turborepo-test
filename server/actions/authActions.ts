@@ -7,7 +7,6 @@ import {
   loginSchema,
   registerSchema,
   forgotPasswordSchema,
-  resetPasswordSchema,
 } from "@/lib/static/validations";
 import { authRequest } from "@/server/api/authRequest";
 

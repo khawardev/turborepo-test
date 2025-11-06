@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { SCRAPE, SCRAPING } from "@/lib/static/constants"
+import { SCRAPE, SCRAPING } from "@/lib/constants"
 
 export function WebsiteAskLimitDialog({
   onConfirm,

@@ -22,11 +22,11 @@ export function HeaderClient({ user }: any) {
   }, [])
   return (
     <header className="z-30 fixed top-5 w-full">
-      <div className="flex flex-row h-12 px-2 items-center mx-auto max-w-6xl justify-between gap-3   ">
+      <div className="flex flex-row h-11 px-2 items-center mx-auto max-w-6xl justify-between gap-3   ">
         <Link href="/">
           <FullLogo />
         </Link>
-        <ul className={`flex px-3 ${user && `bg-outline`} h-12 items-center justify-end gap-2 rounded-full`}>
+        <ul className={`flex px-2 ${user && `bg-outline`} h-11 items-center justify-end gap-2 rounded-full`}>
           {user &&
             BrandOSConfig.mainNav.map((item: any, index: number) => (
               <TooltipProvider key={index}>

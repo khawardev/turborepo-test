@@ -5,7 +5,7 @@ import WebsiteDataView from './website/WebsiteDataView'
 import SocialDataView from '@/components/stages/ccba/details/scraps-tab/social/SocialDataView'
 import { Suspense } from 'react'
 import DashboardSkeleton from '../shared/DashboardSkeleton'
-import ScrapDataViewerSkeleton from '@/app/(routes)/(stages)/ccba/[brandId]/_components/_skeleton/ScrapDataViewerSkeleton'
+import ScrapDataViewerSkeleton from '@/components/stages/ccba/details/_components/_skeleton/ScrapDataViewerSkeleton'
 export default function RawDataDashboard({ websiteScrapsData, socialScrapsData }: any) {
     return (
         <Tabs defaultValue="website">

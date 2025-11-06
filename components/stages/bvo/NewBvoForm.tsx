@@ -38,7 +38,7 @@ import { ReportCard } from "./Report-Card";
 import { getBrandbyIdWithCompetitors } from "@/server/actions/brandActions";
 import { getBatchWebsiteReports } from "@/server/actions/website/websiteReportActions";
 import { getBatchSocialReports } from "@/server/actions/social/socialReportActions";
-import { MODELS } from "@/lib/static/constants";
+import { MODELS, agents, executionModes } from "@/lib/constants";
 
 const defaultValues: any = {
   name: "",
@@ -55,21 +55,9 @@ const defaultValues: any = {
   selectedSocialReport: null,
 };
 
-const agents = [
-  { id: "brandPerception", name: "Brand Perception", description: "Analyzes brand perception from various data sources." },
-  { id: "socialMediaAudit", name: "Social Media Audit", description: "Audits social media presence and performance." },
-  { id: "websiteAudit", name: "Website Audit", description: "Audits website performance, SEO, and user experience." },
-  { id: "earnedMediaAnalysis", name: "Earned Media Analysis", description: "Analyzes earned media coverage and sentiment." },
-  { id: "synthesizedReport", name: "Synthesized Report", description: "Generates a synthesized report from all analyses." },
-];
 
-const executionModes = [
-  { id: "interactive", label: "Interactive", description: "Step-by-step agent execution with your guidance." },
-  { id: "independent", label: "Independent", description: "Run selected agents independently in parallel." },
-  { id: "sequential", label: "Sequential", description: "Run the full pipeline sequentially, one agent after another." },
-];
 
-export default function NewBvoForm({ brands }: any) {
+export default function NewBvoForm({ brands, client_id }: any) {
   const [isPending, startTransition] = useTransition();
   const [selectedBrand, setSelectedBrand] = useState<any | null>(null);
   const [websiteReports, setWebsiteReports] = useState<any[]>([]);
@@ -147,8 +135,10 @@ export default function NewBvoForm({ brands }: any) {
     }
 
     const finalData = {
+      client_id: client_id,
+      brand_id: selectedBrand.brand_id,
       name: data.name,
-      ai_model_id: data.aiModel,
+      model_id: data.aiModel,
       website_report_id: data.selectedWebsiteReport.report_batch_id,
       social_report_id: data.selectedSocialReport.report_batch_id,
       brand_documents_text: data.brand_documents?.parsedText || null,
@@ -261,7 +251,7 @@ export default function NewBvoForm({ brands }: any) {
                   <SelectContent className="capitalize">
                     {brands.map((brand: any) => (
                       <SelectItem key={brand.brand_id} value={brand.brand_id}>
-                        {brand.name}
+                        {brand.name} 
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -426,7 +416,7 @@ export default function NewBvoForm({ brands }: any) {
                 <p className="text-xs text-muted-foreground">
                   Upload Documents containing Stakeholder interviews Insights.
                 </p>
-            </div>
+              </div>
               <FormField
                 control={control}
                 name="stakeholder_interview_files"
@@ -518,7 +508,7 @@ export default function NewBvoForm({ brands }: any) {
                           <Label htmlFor={`${executionModeId}-${mode.id}`}>
                             {mode.label}
                           </Label>
-                          <p id={`${executionModeId}-${mode.id}-description`} className="text-xs">
+                          <p id={`${executionModeId}-${mode.id}-description`} className="text-xs dark:text-muted-foreground">
                             {mode.description}
                           </p>
                         </div>
@@ -559,7 +549,7 @@ export default function NewBvoForm({ brands }: any) {
                           <Label htmlFor={`${agentSelectionId}-${agent.id}`}>
                             {agent.name}
                           </Label>
-                          <p id={`${agentSelectionId}-${agent.id}-description`} className="text-xs">
+                          <p id={`${agentSelectionId}-${agent.id}-description`} className="text-xs dark:text-muted-foreground">
                             {agent.description}
                           </p>
                         </div>
@@ -573,10 +563,12 @@ export default function NewBvoForm({ brands }: any) {
           )}
         </div>
 
-        <Button type="submit" disabled={isSubmitting || isPending} size="lg">
-          {(isSubmitting || isPending) && <Spinner />}
-          Create and Execute BVO
-        </Button>
+        <div className=" w-full  justify-end flex">
+          <Button type="submit" disabled={isSubmitting || isPending} >
+            {(isSubmitting || isPending) && <Spinner />}
+            Execute Audit
+          </Button>
+       </div>
       </form>
     </Form>
   );

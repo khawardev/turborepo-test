@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
-import { SCRAPED } from '@/lib/static/constants';
+import { SCRAPED } from '@/lib/constants';
 
 const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {

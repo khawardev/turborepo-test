@@ -11,7 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/static/cleanMarkdown';
-import { SCRAPED } from '@/lib/static/constants';
+import { SCRAPED } from '@/lib/constants';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
     const pages = useMemo(() => {

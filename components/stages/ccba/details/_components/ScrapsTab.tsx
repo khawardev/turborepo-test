@@ -9,12 +9,12 @@ export default async function ScrapsTab({ brandId }: { brandId: string }) {
   const brandData = await getBrandbyIdWithCompetitors(brandId);
 
   return (
-    <ScrapDataViewer websiteScrapsContent={
+    <ScrapDataViewer websiteScrapsComponent={
         <Suspense fallback={<ScrapDataViewerSkeleton />}>
           <WebsiteScrapsServer brand_id={brandId} brandName={brandData.name} />
         </Suspense>
       }
-      socialScrapsContent={
+      socialScrapsComponent={
         <Suspense fallback={<ScrapDataViewerSkeleton />}>
           <SocialScrapsServer brand_id={brandId} brandName={brandData.name} />
         </Suspense>

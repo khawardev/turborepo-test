@@ -36,7 +36,7 @@ import { WebsiteAskLimitDialog } from "../details/scraps-tab/website/WebsiteAskL
 import { UpdateBrandDialog } from "./crud/UpdateBrandDialog";
 import { AddCompetitorsDialog } from "./crud/AddCompetitorsDialog";
 import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
-import { SCRAPE, SCRAPING } from "@/lib/static/constants";
+import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
 
 function BrandItemSkeleton() {

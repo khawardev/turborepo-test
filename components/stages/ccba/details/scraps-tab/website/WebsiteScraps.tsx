@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import WebsiteDataView from '@/components/stages/ccba/dashboard/raw-data/website/WebsiteDataView';
 import { ScrapeReportActionButtons } from '@/components/stages/ccba/details/scraps-tab/ScrapeReportActionButtons';
-import { SCRAPE, SCRAPED } from '@/lib/static/constants';
+import { SCRAPE, SCRAPED } from '@/lib/constants';
 import {
     DropdownMenu,
     DropdownMenuContent,

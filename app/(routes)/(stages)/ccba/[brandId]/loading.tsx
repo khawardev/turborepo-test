@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { BrandProfileSkeleton } from "./_components/_skeleton/BrandProfileSkeleton";
+import { BrandProfileSkeleton } from "../../../../../components/stages/ccba/details/_components/_skeleton/BrandProfileSkeleton";
 
 export default function BrandsDetailsLoading() {
     return (

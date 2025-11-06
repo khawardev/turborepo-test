@@ -3,15 +3,15 @@
 import DashboardHeader from '@/components/stages/ccba/dashboard/shared/DashboardHeader';
 import { Status, StatusIndicator } from '@/components/ui/shadcn-io/status';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SCRAPED, SCRAPS } from '@/lib/static/constants';
+import { SCRAPS } from '@/lib/constants';
 import React, { useState } from 'react';
 
 export default function ScrapDataViewer({
-    websiteScrapsContent,
-    socialScrapsContent
+    websiteScrapsComponent,
+    socialScrapsComponent
 }: {
-    websiteScrapsContent: React.ReactNode,
-    socialScrapsContent: React.ReactNode
+    websiteScrapsComponent: React.ReactNode,
+    socialScrapsComponent: React.ReactNode
 }) {
     const [activeTab, setActiveTab] = useState("website")
 
@@ -27,18 +27,14 @@ export default function ScrapDataViewer({
                 <div className='flex items-center justify-between'>
                     <TabsList >
                         <TabsTrigger value="website">Website {SCRAPS}</TabsTrigger>
-                        <TabsTrigger disabled={!socialScrapsContent} value="social-media">Social Media {SCRAPS}</TabsTrigger>
+                        <TabsTrigger value="social-media">Social Media {SCRAPS}</TabsTrigger>
                     </TabsList>
-                    {/* <div className=' flex items-center gap-2'>
+                    <div className=' flex items-center gap-2'>
                         {activeTab === "website" ? (
                             <>
                                 <Status status="available" variant="secondary">
                                     <StatusIndicator />
                                     Website Data Capture
-                                </Status>
-                                <Status status="not-available" variant="secondary">
-                                    <StatusIndicator />
-                                    Website Reports
                                 </Status>
                             </>
                         ) : (
@@ -47,19 +43,15 @@ export default function ScrapDataViewer({
                                     <StatusIndicator />
                                     Social Data Capture
                                 </Status>
-                                <Status status="not-available" variant="secondary">
-                                    <StatusIndicator />
-                                    Social Reports
-                                </Status>
                             </>
                         )}
-                    </div> */}
+                    </div>
                 </div>
                 <TabsContent value="website" className="pt-6">
-                    {websiteScrapsContent}
+                    {websiteScrapsComponent}
                 </TabsContent>
                 <TabsContent value="social-media" className="pt-6">
-                    {socialScrapsContent}
+                    {socialScrapsComponent}
                 </TabsContent>
             </Tabs>
         </div>
