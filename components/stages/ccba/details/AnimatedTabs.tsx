@@ -4,13 +4,13 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useTabs } from '@/hooks/useTabs';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
+import { useAnimatedTabs } from '@/hooks/useAnimatedTabs';
 
 const transition: any = {
     type: 'tween',
@@ -173,7 +173,7 @@ export function AnimatedTabs({
         initialTabId: tabs.find((tab) => !tab.disabled)?.value || tabs[0].value
     });
 
-    const framer = useTabs(hookProps);
+    const framer = useAnimatedTabs(hookProps);
     const selectedTabData = tabs.find((tab) => tab.value === framer.selectedTab.value);
 
     return (

@@ -6,7 +6,7 @@ export interface Tab {
     subRoutes?: string[];
 }
 
-export function useTabs({
+export function useAnimatedTabs({
     tabs,
     initialTabId,
     onChange
