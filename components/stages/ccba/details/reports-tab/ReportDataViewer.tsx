@@ -23,7 +23,7 @@ export default function ReportDataViewer({ allwebsiteReportsData, allSocialRepor
                         <TabsTrigger value="social-media">Social Media Reports</TabsTrigger>
                     </TabsList>
 
-                    <div className='flex items-center gap-2'>
+                    {/* <div className='flex items-center gap-2'>
                         {activeTab === "website" ? (
                             <Status status={allwebsiteReportsData[0] ? "available" : "not-available"} variant="secondary">
                                 <StatusIndicator />
@@ -35,7 +35,7 @@ export default function ReportDataViewer({ allwebsiteReportsData, allSocialRepor
                                 Social Reports
                             </Status>
                         )}
-                    </div>
+                    </div> */}
                 </div>
 
                 <TabsContent value="website" className="pt-6">
