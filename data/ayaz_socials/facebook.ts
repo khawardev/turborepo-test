@@ -68,7 +68,7 @@ export const facebookData = {
                 "likes": 232,
                 "client_id": "447b7016-23da-4ae3-9df5-d00a7ed87219",
                 "comments": [
-                    "Congratulations 🎉👏",
+                    "Congratulations 👏",
                     "Congrats MPTSH!",
                     "👏👏👏",
                     "Congratulations to everyone",

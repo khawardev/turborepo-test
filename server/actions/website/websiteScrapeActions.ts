@@ -30,9 +30,9 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
             async () => await getBatchWebsiteScrapeStatus(brand_id, batchWebsiteScrape.task_id),
             (res) => res.success && res.data?.status === "Completed"
         )
-
+        
         revalidatePath(`/ccba/${brand_id}`)
-        return { success: true, message: `${SCRAPING} and report extraction completed successfully 🎉` }
+        return { success: true, message: `${SCRAPING} and report extraction completed successfully ` }
     } catch (error: any) {
         console.error(`Failed batch ${SCRAPE} for brand ${brand_id}:`, error)
         return { success: false, error: error.message || `Batch ${SCRAPING} failed` }

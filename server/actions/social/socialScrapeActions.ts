@@ -37,7 +37,7 @@ export async function scrapeBatchSocial(
         )
 
         revalidatePath(`/ccba/${brand_id}`)
-        return { success: true, message: `Social ${SCRAPING} completed successfully 🎉` }
+        return { success: true, message: `Social ${SCRAPING} completed successfully ` }
     } catch (error: any) {
         console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error)
         return { success: false, error: error.message || `Batch social ${SCRAPING} failed` }

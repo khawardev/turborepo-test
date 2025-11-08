@@ -64,7 +64,7 @@ export function AddCompetitorsDialog({
     try {
       await addCompetitors(brand.brand_id, data.competitors);
       setIsLoading(false);
-      toast.success("Competitors added successfully 🎉");
+      toast.success("Competitors added successfully ");
       setOpen(false);
       router.refresh();
     } catch (error) {

@@ -59,7 +59,7 @@ function EditCompetitorForm({
     });
     setIsLoading(false);
     if (result.success) {
-      toast.success("Competitor updated successfully 🎉");
+      toast.success("Competitor updated successfully ");
       onSave();
       router.refresh();
     } else {

@@ -46,9 +46,11 @@ export function ScrapeReportActionButtons({
     startWebsiteScrapingTransition(async () => {
       toast.info(`Website ${SCRAPING} started...`)
       const result = await scrapeBatchWebsite(brand_id, limit)
+
+      
       if (result?.success) {
         router.refresh()
-        toast.success(`${SCRAPING} completed successfully 🎉`)
+        toast.success(`${SCRAPING} completed successfully `)
       } else {
         toast.error(`${SCRAPING} failed.`)
       }
@@ -70,7 +72,7 @@ export function ScrapeReportActionButtons({
 
       if (result?.success) {
         toast.success(
-          result.message || `Social ${SCRAPING} completed successfully 🎉`
+          result.message || `Social ${SCRAPING} completed successfully `
         )
         router.refresh()
       } else {

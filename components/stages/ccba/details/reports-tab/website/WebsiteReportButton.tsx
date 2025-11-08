@@ -52,7 +52,7 @@ export function WebsiteReportButton({
       setPrompt("")
       router.refresh()
       if (websiteReports.success) {
-        toast.success("Reports has been Generated successfully 🎉")
+        toast.success("Reports has been Generated successfully ")
       } else {
         toast.error(websiteReports.error)
       }

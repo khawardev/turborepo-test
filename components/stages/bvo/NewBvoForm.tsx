@@ -154,7 +154,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
     console.log("---------------------------");
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    toast.success("BVO has been created successfully 🎉");
+    toast.success("BVO has been created successfully ");
   }
 
   const aiModelValue = watch("aiModel");

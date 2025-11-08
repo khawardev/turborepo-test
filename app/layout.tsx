@@ -31,13 +31,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // ${inter.className} 
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} relative antialiased`} suppressHydrationWarning>
+      <body className={`relative victor antialiased`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />
-            <JotaiProvider>{children}</JotaiProvider>
-            <Toaster />
+            <JotaiProvider>
+              {children}
+            </JotaiProvider>
+            <Toaster position='bottom-left' />
           </LightRaysWrapper>
         </ThemeProvider>
       </body>

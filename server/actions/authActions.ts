@@ -15,6 +15,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
     const data = await authRequest("/login", "POST", {
       body: JSON.stringify(values),
     });
+    
 
     const cookieStore = await cookies();
     cookieStore.set("access_token", data.access_token, {
@@ -109,8 +110,13 @@ export async function getCurrentUser(): Promise<any | null> {
   if (!accessToken) {
     return null;
   }
+
   const user = await authRequest("/users/me/", "GET", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+
+  if (!user) {
+    return null;
+  }
   return user;
 }

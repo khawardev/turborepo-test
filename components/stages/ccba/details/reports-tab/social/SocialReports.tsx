@@ -15,7 +15,6 @@ import { ChevronDownIcon } from 'lucide-react'
 export default function SocialMediaReports({ allReportsData, brandName, competitors }: any) {
     const [selectedReportBatchId, setSelectedReportBatchId] = useState<string | null>(null)
     const [selectedEntityName, setSelectedEntityName] = useState<string | null>(null)
-    console.log(allReportsData, `<-> SocialMediaReports <->`);
 
     const sortedReports = useMemo(() => {
         if (!allReportsData || allReportsData.length === 0) return []

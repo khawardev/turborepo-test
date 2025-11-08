@@ -245,7 +245,7 @@ export async function deleteBrand(brand_id: string) {
     revalidatePath("/ccba");
     return {
       success: true,
-      message: "Brand deleted successfully 🎉",
+      message: "Brand deleted successfully ",
       data: brandDelete,
     };
   } catch (error: any) {

@@ -64,7 +64,7 @@ export default function AddBrandPage() {
     const brandResult = await addBrand(data);
     setIsLoading(false);
     if (brandResult.success) {
-      toast.success("Brand has been added successfully 🎉");
+      toast.success("Brand has been added successfully ");
       router.push("/ccba");
     }
   }

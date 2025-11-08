@@ -53,7 +53,7 @@ export function SocialReportButton({
       setPrompt("")
       router.refresh()
       if (socialReports.success) {
-        toast.success("Reports has been Generated successfully 🎉")
+        toast.success("Reports has been Generated successfully ")
       } else {
         toast.error(socialReports.error)
       }

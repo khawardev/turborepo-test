@@ -40,7 +40,7 @@ export function LoginForm({
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     const res = await login(values);
     if (res.success) {
-      toast.success("Logged in successfully 🎉");
+      toast.success("Logged in successfully ");
       router.push("/");
     } else {
       toast.error(res.error);

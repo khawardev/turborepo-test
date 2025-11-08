@@ -110,7 +110,15 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       if (result.success) {
         router.refresh();
         router.push(`/ccba/${brand.brand_id}`);
-        toast.success(`${SCRAPING} completed successfully 🎉`);
+
+
+
+
+
+
+
+        
+        toast.success(`${SCRAPING} completed successfully `);
       } else {
         toast.error(`${SCRAPING} failed.`);
       }

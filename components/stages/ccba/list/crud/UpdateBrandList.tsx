@@ -86,7 +86,7 @@ export function EditBrandList({
         setOpen(false);
 
         if (result.success) {
-            toast.success("Brand has been updated successfully 🎉");
+            toast.success("Brand has been updated successfully ");
             router.refresh();
         } else {
             toast.error(result.error || "Failed to update brand.");

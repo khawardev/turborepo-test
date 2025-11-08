@@ -12,8 +12,7 @@
     "studio": "pnpm drizzle-kit studio",
     "check": "pnpm dlx npm-check",
     "check:interact": "pnpm dlx npm-check -u",
-    "auth:generate": "pnpm better-auth generate",
-    "analyze": "ANALYZE=true npm run build --webpack"
+    "auth:generate": "pnpm better-auth generate"
   },
   "dependencies": {
     "@carrotsearch/foamtree": "^3.5.7",
