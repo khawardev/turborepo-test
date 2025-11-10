@@ -107,6 +107,10 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   const scrapeBrand = (limit: any) => {
     startTransition(async () => {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
+      
+      
+      
+      
       if (result.success) {
         router.refresh();
         router.push(`/ccba/${brand.brand_id}`);
@@ -117,7 +121,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
 
 
 
-        
+
         toast.success(`${SCRAPING} completed successfully `);
       } else {
         toast.error(`${SCRAPING} failed.`);

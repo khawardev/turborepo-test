@@ -20,7 +20,7 @@ export const BrandStages = [
         id: "ccba",
         stage: "Stage 1",
         abbreviation: "CCBA",
-        name: "Coherence & Competitor Baseline Audit",
+        name: "Perception & Competitor Baseline Audit",
         audit: "CCBA Audits",
         previousAbbreviation: null,
         previousName: "No name change"
