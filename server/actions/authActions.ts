@@ -1,21 +1,21 @@
 "use server";
 
-import { z } from "zod";
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import {
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
-  forgotPasswordSchema,
 } from "@/lib/static/validations";
 import { authRequest } from "@/server/api/authRequest";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { cache } from "react";
+import { z } from "zod";
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {
     const data = await authRequest("/login", "POST", {
       body: JSON.stringify(values),
     });
-    
 
     const cookieStore = await cookies();
     cookieStore.set("access_token", data.access_token, {
@@ -32,7 +32,7 @@ export async function login(values: z.infer<typeof loginSchema>) {
       });
     }
 
-    revalidatePath("/ccba");
+    revalidatePath("/");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.detail || "Login failed" };
@@ -103,7 +103,38 @@ export async function logout() {
   return { success: true };
 }
 
-export async function getCurrentUser(): Promise<any | null> {
+export async function refreshTokens(): Promise<{ success: boolean }> {
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refresh_token")?.value;
+
+  if (!refreshToken) {
+    return { success: false };
+  }
+
+  try {
+    const data = await authRequest("/refresh-token", "POST", {
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    cookieStore.set("access_token", data.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+    cookieStore.set("refresh_token", data.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    // If refresh fails, simply return false. The user will be treated as logged out.
+    return { success: false };
+  }
+}
+
+export const getCurrentUser = cache(async (): Promise<any | null> => {
   const cookieStore = await cookies();
   let accessToken = cookieStore.get("access_token")?.value;
 
@@ -111,12 +142,33 @@ export async function getCurrentUser(): Promise<any | null> {
     return null;
   }
 
-  const user = await authRequest("/users/me/", "GET", {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-
-  if (!user) {
+  try {
+    // First, try to get the user with the current access token
+    const user = await authRequest("/users/me/", "GET", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return user;
+  } catch (error: any) {
+    // If it fails because the token is expired, try to refresh it
+    if (error.status === 401) {
+      const refreshResult = await refreshTokens();
+      if (refreshResult.success) {
+        // If refresh was successful, get the new token and retry fetching the user
+        const newAccessToken = cookieStore.get("access_token")?.value;
+        if (newAccessToken) {
+          try {
+            const user = await authRequest("/users/me/", "GET", {
+              headers: { Authorization: `Bearer ${newAccessToken}` },
+            });
+            return user;
+          } catch (retryError) {
+            // If the retry fails, the user is not authenticated
+            return null;
+          }
+        }
+      }
+    }
+    // For any other error, or if refresh fails, the user is not authenticated
     return null;
   }
-  return user;
-}
+});

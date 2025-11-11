@@ -35,7 +35,9 @@
     ".next/types/**/*.ts",
     "components/DarkVeil.tsx",
     "components/GradientBlinds.jsx",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next\\dev/types/**/*.ts",
+    ".next\\dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

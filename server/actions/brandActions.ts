@@ -1,22 +1,25 @@
 "use server";
 
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
 import { brandSchema } from "@/lib/static/validations";
-import { Brand, Competitor } from "@/types";
 import { brandRequest } from "@/server/api/brandRequest";
-import { getCurrentUser } from "./authActions";
+import { Brand, Competitor } from "@/types";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { z } from "zod";
+import { getCurrentUser } from "./authActions";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     return { success: false, error: "Unauthorized" };
   }
 
   const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "User not found" };
+  }
   const { competitors, ...brandData } = values;
 
   try {
@@ -40,14 +43,17 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     console.error("Unauthorized attempt to add competitors.");
     return;
   }
   const user = await getCurrentUser();
-
+  if (!user) {
+    console.error("User not found for adding competitors.");
+    return;
+  }
 
   try {
     await brandRequest("/brands/competitors/", "POST", {
@@ -62,10 +68,9 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
   }
 }
 
-
 export async function updateBrand(brandId: string, values: any) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     return { success: false, error: "Unauthorized" };
@@ -98,12 +103,9 @@ export async function updateBrand(brandId: string, values: any) {
   }
 }
 
-export async function updateCompetitorAction(
-  brandId: string,
-  competitor: any,
-) {
+export async function updateCompetitorAction(brandId: string, competitor: any) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     return { success: false, error: "Unauthorized" };
@@ -138,14 +140,15 @@ export async function updateCompetitorAction(
 
 export async function getBrands(): Promise<Brand[]> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) return [];
   const user = await getCurrentUser();
+  if (!user) return [];
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
-      "GET",
+      "GET"
     );
     return brands;
   } catch (error) {
@@ -154,18 +157,17 @@ export async function getBrands(): Promise<Brand[]> {
   }
 }
 
-export async function getBrandById(
-  brand_id: string
-): Promise<Brand | null> {
-
+export async function getBrandById(brand_id: string): Promise<Brand | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) return null;
   const user = await getCurrentUser();
+  if (!user) return null;
   try {
     const brands = await brandRequest(
-      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"
+      `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
+      "GET"
     );
     return brands[0] || null;
   } catch (error) {
@@ -176,15 +178,22 @@ export async function getBrandById(
 
 export async function getBrandbyIdWithCompetitors(brand_id: string) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
   if (!accessToken) return null;
 
   const user = await getCurrentUser();
+  if (!user) return null;
 
   try {
     const [brandResponse, competitorResponse] = await Promise.all([
-      brandRequest(`/brands/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET"),
-      brandRequest(`/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`, "GET")
+      brandRequest(
+        `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
+        "GET"
+      ),
+      brandRequest(
+        `/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`,
+        "GET"
+      ),
     ]);
 
     const brand = brandResponse?.[0] || null;
@@ -194,10 +203,13 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
 
     return {
       ...brand,
-      competitors
+      competitors,
     };
   } catch (error) {
-    console.error(`Failed to fetch brand or competitors for ${brand_id}:`, error);
+    console.error(
+      `Failed to fetch brand or competitors for ${brand_id}:`,
+      error
+    );
     return null;
   }
 }
@@ -207,10 +219,11 @@ export async function getCompetitors(
 ): Promise<{ brand_id: string; competitors: Competitor[] }> {
   const emptyResult = { brand_id, competitors: [] };
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) return emptyResult;
   const user = await getCurrentUser();
+  if (!user) return emptyResult;
 
   try {
     const result = await brandRequest(
@@ -225,7 +238,6 @@ export async function getCompetitors(
   }
 }
 
-
 export async function deleteBrand(brand_id: string) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
@@ -235,6 +247,9 @@ export async function deleteBrand(brand_id: string) {
   }
 
   const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, message: "User not found", data: null };
+  }
 
   try {
     const brandDelete = await brandRequest(
@@ -261,7 +276,7 @@ export async function deleteBrand(brand_id: string) {
 
 export async function getClientDetails() {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     console.error("Unauthorized attempt to get client details.");
@@ -273,12 +288,19 @@ export async function getClientDetails() {
   }
 
   try {
-    const result = await brandRequest(`/clients/${user.client_id}/details`, "GET");
+    const result = await brandRequest(
+      `/clients/${user.client_id}/details`,
+      "GET"
+    );
     return { success: true, data: result };
   } catch (error: any) {
-    console.error(`Failed to get client details for client ${user.client_id}:`, error);
-    return { success: false, error: error.message || "Failed to fetch client details" };
+    console.error(
+      `Failed to get client details for client ${user.client_id}:`,
+      error
+    );
+    return {
+      success: false,
+      error: error.message || "Failed to fetch client details",
+    };
   }
 }
-
-
