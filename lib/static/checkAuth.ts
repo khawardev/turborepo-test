@@ -7,6 +7,7 @@ export async function checkAuth() {
   console.log("User:::", user);
 
   if (!user) {
+    console.log("No user found");
     redirect("/login");
   }
 

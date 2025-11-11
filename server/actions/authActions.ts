@@ -151,21 +151,26 @@ export const getCurrentUser = cache(async (): Promise<any | null> => {
   } catch (error: any) {
     // If it fails because the token is expired, try to refresh it
     if (error.status === 401) {
-      const refreshResult = await refreshTokens();
-      if (refreshResult.success) {
-        // If refresh was successful, get the new token and retry fetching the user
-        const newAccessToken = cookieStore.get("access_token")?.value;
-        if (newAccessToken) {
-          try {
-            const user = await authRequest("/users/me/", "GET", {
-              headers: { Authorization: `Bearer ${newAccessToken}` },
-            });
-            return user;
-          } catch (retryError) {
-            // If the retry fails, the user is not authenticated
-            return null;
+      try {
+        const refreshResult = await refreshTokens();
+        if (refreshResult.success) {
+          // If refresh was successful, get the new token and retry fetching the user
+          const newAccessToken = cookieStore.get("access_token")?.value;
+          if (newAccessToken) {
+            try {
+              const user = await authRequest("/users/me/", "GET", {
+                headers: { Authorization: `Bearer ${newAccessToken}` },
+              });
+              return user;
+            } catch (retryError) {
+              // If the retry fails, the user is not authenticated
+              return null;
+            }
           }
         }
+      } catch (refreshError) {
+        // If refreshTokens() itself throws an error, the user is not authenticated.
+        return null;
       }
     }
     // For any other error, or if refresh fails, the user is not authenticated
