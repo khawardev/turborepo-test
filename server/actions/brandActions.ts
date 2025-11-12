@@ -6,20 +6,10 @@ import { Brand, Competitor } from "@/types";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { getCurrentUser } from "./authActions";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    return { success: false, error: "Unauthorized" };
-  }
-
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "User not found" };
-  }
+  const user = await getAuthUser();
   const { competitors, ...brandData } = values;
 
   try {
@@ -42,18 +32,7 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
 }
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    console.error("Unauthorized attempt to add competitors.");
-    return;
-  }
-  const user = await getCurrentUser();
-  if (!user) {
-    console.error("User not found for adding competitors.");
-    return;
-  }
+  const user = await getAuthUser();
 
   try {
     await brandRequest("/brands/competitors/", "POST", {
@@ -69,24 +48,13 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
 }
 
 export async function updateBrand(brandId: string, values: any) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    return { success: false, error: "Unauthorized" };
-  }
-
-  const user = await getCurrentUser();
-  if (!user?.client_id) {
-    return { success: false, error: "Client not found for the current user." };
-  }
-  const clientId = user.client_id;
+  const user = await getAuthUser();
 
   const { ...brandData } = values;
 
   try {
     const brandResult = await brandRequest(
-      `/brands?client_id=${clientId}&brand_id=${brandId}`,
+      `/brands?client_id=${user.client_id}&brand_id=${brandId}`,
       "PUT",
       { body: JSON.stringify(brandData) }
     );
@@ -104,18 +72,7 @@ export async function updateBrand(brandId: string, values: any) {
 }
 
 export async function updateCompetitorAction(brandId: string, competitor: any) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    return { success: false, error: "Unauthorized" };
-  }
-
-  const user = await getCurrentUser();
-  if (!user?.client_id) {
-    return { success: false, error: "Client not found for the current user." };
-  }
-  const clientId = user.client_id;
+  const user = await getAuthUser();
 
   if (!competitor.competitor_id) {
     return { success: false, error: "Competitor ID is missing" };
@@ -124,7 +81,7 @@ export async function updateCompetitorAction(brandId: string, competitor: any) {
   const { competitor_id, ...competitorData } = competitor;
   try {
     await brandRequest(
-      `/brands/competitors?client_id=${clientId}&brand_id=${brandId}&competitor_id=${competitor_id}`,
+      `/brands/competitors?client_id=${user.client_id}&brand_id=${brandId}&competitor_id=${competitor_id}`,
       "PUT",
       { body: JSON.stringify(competitorData) }
     );
@@ -139,12 +96,7 @@ export async function updateCompetitorAction(brandId: string, competitor: any) {
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) return [];
-  const user = await getCurrentUser();
-  if (!user) return [];
+  const user = await getAuthUser();
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
@@ -158,12 +110,8 @@ export async function getBrands(): Promise<Brand[]> {
 }
 
 export async function getBrandById(brand_id: string): Promise<Brand | null> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
+  const user = await getAuthUser();
 
-  if (!accessToken) return null;
-  const user = await getCurrentUser();
-  if (!user) return null;
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
@@ -177,12 +125,7 @@ export async function getBrandById(brand_id: string): Promise<Brand | null> {
 }
 
 export async function getBrandbyIdWithCompetitors(brand_id: string) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-  if (!accessToken) return null;
-
-  const user = await getCurrentUser();
-  if (!user) return null;
+  const user = await getAuthUser();
 
   try {
     const [brandResponse, competitorResponse] = await Promise.all([
@@ -218,12 +161,7 @@ export async function getCompetitors(
   brand_id: string
 ): Promise<{ brand_id: string; competitors: Competitor[] }> {
   const emptyResult = { brand_id, competitors: [] };
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) return emptyResult;
-  const user = await getCurrentUser();
-  if (!user) return emptyResult;
+  const user = await getAuthUser();
 
   try {
     const result = await brandRequest(
@@ -239,17 +177,7 @@ export async function getCompetitors(
 }
 
 export async function deleteBrand(brand_id: string) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    return { success: false, message: "Unauthorized", data: null };
-  }
-
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, message: "User not found", data: null };
-  }
+  const user = await getAuthUser();
 
   try {
     const brandDelete = await brandRequest(
@@ -275,17 +203,7 @@ export async function deleteBrand(brand_id: string) {
 }
 
 export async function getClientDetails() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    console.error("Unauthorized attempt to get client details.");
-    return { success: false, error: "Unauthorized" };
-  }
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "User not found" };
-  }
+  const user = await getAuthUser();
 
   try {
     const result = await brandRequest(

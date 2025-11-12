@@ -103,6 +103,7 @@ export async function logout() {
   return { success: true };
 }
 
+
 export async function refreshTokens(): Promise<{ success: boolean }> {
   const cookieStore = await cookies();
   const refreshToken = cookieStore.get("refresh_token")?.value;
@@ -129,7 +130,6 @@ export async function refreshTokens(): Promise<{ success: boolean }> {
 
     return { success: true };
   } catch (error) {
-    // If refresh fails, simply return false. The user will be treated as logged out.
     return { success: false };
   }
 }
@@ -143,18 +143,15 @@ export const getCurrentUser = cache(async (): Promise<any | null> => {
   }
 
   try {
-    // First, try to get the user with the current access token
     const user = await authRequest("/users/me/", "GET", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     return user;
   } catch (error: any) {
-    // If it fails because the token is expired, try to refresh it
     if (error.status === 401) {
       try {
         const refreshResult = await refreshTokens();
         if (refreshResult.success) {
-          // If refresh was successful, get the new token and retry fetching the user
           const newAccessToken = cookieStore.get("access_token")?.value;
           if (newAccessToken) {
             try {
@@ -163,17 +160,14 @@ export const getCurrentUser = cache(async (): Promise<any | null> => {
               });
               return user;
             } catch (retryError) {
-              // If the retry fails, the user is not authenticated
               return null;
             }
           }
         }
       } catch (refreshError) {
-        // If refreshTokens() itself throws an error, the user is not authenticated.
         return null;
       }
     }
-    // For any other error, or if refresh fails, the user is not authenticated
     return null;
   }
 });

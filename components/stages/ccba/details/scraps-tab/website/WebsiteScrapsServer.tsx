@@ -1,12 +1,10 @@
-import { getCurrentUser } from "@/server/actions/authActions";
 import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
-import { notFound } from "next/navigation";
 import WebsiteScraps from "./WebsiteScraps";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export default async function WebsiteScrapsServer({ brandName, brand_id }: { brandName: string, brand_id: string }) {
-    const user = await getCurrentUser();
-    if (!user) notFound();
-
+    const user = await getAuthUser();
+  
     const previousWebsiteScraps = await getpreviousWebsiteScraps(user.client_id, brand_id);
     const websiteScrapeBatchPromises = previousWebsiteScraps.map(
         async (scrape: any) => await getscrapeBatchWebsite(brand_id, scrape.batch_id)

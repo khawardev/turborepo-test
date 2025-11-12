@@ -1,6 +1,6 @@
 import BrandDashboard from '@/components/stages/ccba/dashboard/BrandDashboard'
 import { DashboardInnerLayout } from '@/components/static/shared/DashboardLayout'
-import { checkAuth } from '@/lib/static/checkAuth'
+import { getAuthUser } from '@/lib/static/getAuthUser'
 import DashboardLayout from '@/components/stages/ccba/dashboard/DashboardLayout'
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
 import RawDataTab from '@/components/stages/ccba/dashboard/raw-data/RawDataTab'
@@ -9,10 +9,9 @@ import SocialAuditTab from '@/components/stages/ccba/dashboard/social-audit/Soci
 import AnalyticsDashboardsData from '@/components/stages/ccba/dashboard/analytics-dashboards/AnalyticsDashboardsData'
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
+  await getAuthUser();
   
-  await checkAuth();
   const { brandId } = await params;
-  
   const brandData = await getBrandbyIdWithCompetitors(brandId);
 
   return (

@@ -1,17 +1,18 @@
 import BrandDashboard from '@/components/stages/ccba/dashboard/BrandDashboard'
 import { DashboardInnerLayout } from '@/components/static/shared/DashboardLayout'
-import { checkAuth } from '@/lib/static/checkAuth'
 import DashboardLayout from '@/components/stages/ccba/dashboard/DashboardLayout'
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
 import RawDataTab from '@/components/stages/ccba/dashboard/raw-data/RawDataTab'
 import WebsiteAuditData from '@/components/stages/ccba/dashboard/website-audit/WebsiteAuditData'
 import SocialAuditTab from '@/components/stages/ccba/dashboard/social-audit/SocialAuditTab'
 import AnalyticsDashboardsData from '@/components/stages/ccba/dashboard/analytics-dashboards/AnalyticsDashboardsData'
+import { getAuthUser } from '@/lib/static/getAuthUser'
 
 export default async function CompetitorPage({params}: {params: Promise<{ brandId: string; competitorId: string }>}) {
-    const { brandId, competitorId } = await params
+    await getAuthUser()
 
-    await checkAuth()
+
+    const { brandId, competitorId } = await params
     const brandData = await getBrandbyIdWithCompetitors(brandId)
     const competitor = brandData.competitors.find((c: any) => c.id === competitorId)
     const competitorName = competitor ? competitor.name : 'Competitor';

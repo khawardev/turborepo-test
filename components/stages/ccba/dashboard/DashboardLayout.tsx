@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -12,17 +11,15 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { SidebarList } from '@/components/ui/sidebar-list';
-import { getCurrentUser } from '@/server/actions/authActions';
 import { UserNav } from '@/components/static/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
-import { checkAuth } from '@/lib/static/checkAuth';
 import { generateSidebarHrefTree } from '@/lib/static/generateSidebar';
+import { getAuthUser } from '@/lib/static/getAuthUser';
 
 const DashboardLayout = async ({ children, brandData }: any) => {
-    await checkAuth();
-    const user: any = await getCurrentUser();
+    const user = await getAuthUser();
+  
     const SidebarHrefTree: any = generateSidebarHrefTree(brandData);
-
     return (
         <SidebarProvider>
             <SidebarList SidebarHrefTree={SidebarHrefTree} />

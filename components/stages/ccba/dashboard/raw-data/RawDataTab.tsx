@@ -1,10 +1,10 @@
 import RawDataDashboard from "./RawDataDashboard";
-import { getCurrentUser } from '@/server/actions/authActions'
 import { getWebsiteBatchId, getscrapeBatchWebsite } from '@/server/actions/website/websiteScrapeActions'
 import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/social/socialScrapeActions'
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export default async function RawDataTab({ brandId, competitorId }: { brandId: string, competitorId?: string }) {
-  const user = await getCurrentUser();
+  const user = await getAuthUser();
 
   const website_batch_id = await getWebsiteBatchId(user.client_id, brandId);
   const websiteScrapsData = await getscrapeBatchWebsite(brandId, website_batch_id);

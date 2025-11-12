@@ -7,6 +7,7 @@ import { getCurrentUser } from "../authActions";
 import { SOCIAL_SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { getBatchSocialReportsStatus } from "./socialStatusAction";
 import { pollUntilComplete } from "@/lib/utils";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function batchSocialReports({
     brand_id,
@@ -14,12 +15,7 @@ export async function batchSocialReports({
     model_id,
     social_prompt,
 }: any) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const payload = {
@@ -48,12 +44,7 @@ export async function batchSocialReports({
 }
 
 export async function getBatchSocialReports(brand_id: string) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const response = await brandRequest(

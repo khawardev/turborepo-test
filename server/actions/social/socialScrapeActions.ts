@@ -7,18 +7,14 @@ import { getCurrentUser } from "../authActions";
 import { getBatchSocialScrapeStatus } from "./socialStatusAction";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { pollUntilComplete } from "@/lib/utils";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function scrapeBatchSocial(
     brand_id: any,
     start_date: string,
     end_date: string
 ) {
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get("access_token")?.value
-    if (!accessToken) return { success: false, error: "Unauthorized" }
-
-    const user = await getCurrentUser()
-    if (!user) return { success: false, error: "User not found" }
+    const user = await getAuthUser()
 
     try {
         const scrapePayload = {
@@ -46,18 +42,7 @@ export async function scrapeBatchSocial(
 
 
 export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get("access_token")?.value
-
-    if (!accessToken) {
-        console.error(`Unauthorized attempt to fetch social ${SCRAPE} results.`)
-        return { success: false, error: "Unauthorized" }
-    }
-
-    const user = await getCurrentUser()
-    if (!user) {
-        return { success: false, error: "User not found" }
-    }
+    const user = await getAuthUser()
 
     if (!batch_id) {
         return { success: false, error: "No batch_id provided." }

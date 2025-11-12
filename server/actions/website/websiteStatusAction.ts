@@ -1,22 +1,11 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { cookies } from "next/headers";
-import { getCurrentUser } from "../authActions";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function getBatchWebsiteScrapeStatus(brand_id: string, batch_id: string) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('access_token')?.value;
-
-    if (!accessToken) {
-        console.error("Unauthorized attempt to check batch status.");
-        return { success: false, error: "Unauthorized" };
-    }
-    const user = await getCurrentUser();
-    if (!user) {
-        return { success: false, error: "User not found" };
-    }
-
+    const user = await getAuthUser();
+    
     try {
         const result = await brandRequest(`/batch/website-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`, "GET");
 
@@ -29,12 +18,7 @@ export async function getBatchWebsiteScrapeStatus(brand_id: string, batch_id: st
 
 
 export async function getBatchWebsiteReportsStatus(brand_id: string, batch_id: string) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const endpoint = `/batch/website-reports-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`;

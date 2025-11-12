@@ -1,17 +1,11 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { cookies } from "next/headers";
-import { getCurrentUser } from "../authActions";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 
 export async function getBrandSocialDashboard(brand_id: string) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const response = await brandRequest(

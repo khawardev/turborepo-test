@@ -1,12 +1,11 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { cookies } from "next/headers";
 import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteReportsStatus } from "./websiteStatusAction";
 import { pollUntilComplete } from "@/lib/utils";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function batchWebsiteReports({
     brand_id,
@@ -14,12 +13,7 @@ export async function batchWebsiteReports({
     model_id,
     sythesizerPrompt,
 }: any) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const payload = {
@@ -48,12 +42,7 @@ export async function batchWebsiteReports({
 
 
 export async function getBatchWebsiteReports(brand_id: string) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return { success: false, error: "Unauthorized" };
-
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const response = await brandRequest(

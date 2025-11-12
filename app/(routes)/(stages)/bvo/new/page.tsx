@@ -3,11 +3,12 @@ import StaticBanner from "@/components/static/shared/StaticBanner";
 import { BlurDelay, BlurDelay2 } from "@/components/static/shared/MagicBlur";
 import NewBvoForm from "@/components/stages/bvo/NewBvoForm";
 import { getBrands } from "@/server/actions/brandActions";
-import { getCurrentUser } from "@/server/actions/authActions";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export default async function AddBvoPage() {
   const brands = await getBrands();
-const user = await getCurrentUser()
+  const user = await getAuthUser()
+ 
   return (
     <ContainerMd className="pb-32">
       <StaticBanner title="New BVO Audit" badge={'BVO Audits'} />

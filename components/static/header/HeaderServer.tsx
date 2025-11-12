@@ -1,15 +1,7 @@
-import { getCurrentUser } from "@/server/actions/authActions";
 import { HeaderClient } from "./HeaderClient";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export default async function HeaderServer() {
-  let user = null;
-
-  try {
-    user = await getCurrentUser();
-  } catch (error) {
-    // If authentication fails, user remains null
-    // Header will render in logged-out state
-  }
-
+  const user = await getAuthUser();
   return <HeaderClient user={user} />;
 }

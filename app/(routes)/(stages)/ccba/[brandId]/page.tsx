@@ -1,6 +1,6 @@
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions';
 import { getCurrentUser } from '@/server/actions/authActions';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { ContainerMd } from '@/components/static/shared/Containers';
 import { AnimatedTabs } from '@/components/stages/ccba/details/AnimatedTabs';
 import StaticBanner from '@/components/static/shared/StaticBanner';
@@ -13,8 +13,8 @@ import { BrandProfileSkeleton } from '../../../../../components/stages/ccba/deta
 import ScrapDataViewerSkeleton from '../../../../../components/stages/ccba/details/_components/_skeleton/ScrapDataViewerSkeleton';
 import { ReportDataViewerSkeleton } from '../../../../../components/stages/ccba/details/_components/_skeleton/ReportDataViewerSkeleton';
 import { SCRAPS } from '@/lib/constants';
-import { getBatchSocialReports } from '@/server/actions/social/socialReportActions';
 import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions';
+import { getAuthUser } from '@/lib/static/getAuthUser';
 
 export default async function BrandDetailPage({
   params
@@ -22,9 +22,7 @@ export default async function BrandDetailPage({
   params: Promise<{ brandId: string }>;
 }) {
   const { brandId } = await params;
-
-  const user = await getCurrentUser();
-  if (!user) notFound();
+  await getAuthUser();
 
   const brandData = await getBrandbyIdWithCompetitors(brandId);
   const websiteReportData = await getBatchWebsiteReports(brandId);

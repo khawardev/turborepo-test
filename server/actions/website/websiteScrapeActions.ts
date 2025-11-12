@@ -7,14 +7,10 @@ import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteScrapeStatus } from "./websiteStatusAction";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { pollUntilComplete } from "@/lib/utils";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get("access_token")?.value
-    if (!accessToken) return { success: false, error: "Unauthorized" }
-
-    const user = await getCurrentUser()
-    if (!user) return { success: false, error: "User not found" }
+    const user = await getAuthUser()
 
     try {
         const scrapePayload = {
@@ -42,15 +38,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
 
 
 export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-
-    if (!accessToken) {
-        console.error(`Unauthorized attempt to fetch ${SCRAPE} results.`);
-        return { success: false, error: "Unauthorized" };
-    }
-
-    const user = await getCurrentUser();
+    const user = await getAuthUser();
     if (!batch_id) {
         return { success: false, error: "No batch_id found for this brand." };
     }

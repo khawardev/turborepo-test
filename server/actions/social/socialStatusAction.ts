@@ -1,12 +1,11 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { getCurrentUser } from "../authActions";
 import { SCRAPE } from "@/lib/constants";
+import { getAuthUser } from "@/lib/static/getAuthUser";
 
 export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
-    const user = await getCurrentUser()
-    if (!user) return { success: false, error: "User not found" }
+    const user = await getAuthUser()
 
     try {
         const status = await brandRequest(
@@ -22,8 +21,7 @@ export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
 
 
 export async function getBatchSocialReportsStatus(brand_id: string, batch_id: string) {
-    const user = await getCurrentUser();
-    if (!user) return { success: false, error: "User not found" };
+    const user = await getAuthUser();
 
     try {
         const response = await brandRequest(
