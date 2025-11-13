@@ -137,16 +137,17 @@ export default function NewBvoForm({ brands, client_id }: any) {
     const finalData = {
       client_id: client_id,
       brand_id: selectedBrand.brand_id,
-      name: data.name,
-      model_id: data.aiModel,
-      website_report_id: data.selectedWebsiteReport.report_batch_id,
-      social_report_id: data.selectedSocialReport.report_batch_id,
-      brand_documents_text: data.brand_documents?.parsedText || null,
-      stakeholder_interviews_text: data.stakeholder_interview_files?.parsedText || null,
-      questionnaire_answers_text: data.questionnaire_answers_files?.parsedText || null,
+      social_id: data.selectedSocialReport.report_batch_id,
+      website_id: data.selectedWebsiteReport.report_batch_id,
       custom_instructions: data.custom_instructions || null,
-      execution_mode_id: data.executionMode,
+      stakeholder_interview_insights: data.stakeholder_interview_files?.parsedText || null,
+      stakeholder_questionaire_insights: data.questionnaire_answers_files?.parsedText || null,
       agent_ids: data.executionMode === 'independent' ? data.selectedAgents : [],
+      mode: data.executionMode,
+      rag_name: data.name,
+      fuse_depth: 3,
+      files: data.brand_documents?.parsedText || null,
+      model: data.aiModel,
     };
 
     console.log("--- BVO Form Submission ---");

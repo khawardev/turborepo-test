@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     // ${inter.className} 
     <html lang="en" suppressHydrationWarning>
-      <body className={`relative ${inter.className} antialiased`} suppressHydrationWarning>
+      <body className={`relative ${ibmPlexSans.className} antialiased`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />
