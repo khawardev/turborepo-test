@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { z } from "zod";
+const API_URL = process.env.API_URL;
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {
@@ -18,6 +19,8 @@ export async function login(values: z.infer<typeof loginSchema>) {
     });
 
     const cookieStore = await cookies();
+   
+
     cookieStore.set("access_token", data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -84,90 +87,47 @@ export async function resetPassword(token: string, new_password: string) {
 
 export async function logout() {
   const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
   if (refreshToken) {
     try {
       await authRequest("/logout", "POST", {
+        headers: {
+          Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
-    } catch (error) {
-      console.error("API logout failed, clearing cookies regardless.", error);
+    } catch (error: any) {
+      if (error.status === 401 || error.status === 403) {
+        console.warn("Already logged out or not authenticated.");
+      } else {
+        console.error("API logout failed:", error);
+      }
     }
   }
 
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
-
   revalidatePath("/");
   return { success: true };
 }
 
-
-export async function refreshTokens(): Promise<{ success: boolean }> {
+export async function getCurrentUser() {
   const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!refreshToken) {
-    return { success: false };
-  }
-
-  try {
-    const data = await authRequest("/refresh-token", "POST", {
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
-
-    cookieStore.set("access_token", data.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
-    cookieStore.set("refresh_token", data.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
-
-    return { success: true };
-  } catch (error) {
-    return { success: false };
-  }
-}
-
-export const getCurrentUser = cache(async (): Promise<any | null> => {
-  const cookieStore = await cookies();
-  let accessToken = cookieStore.get("access_token")?.value;
-
-  if (!accessToken) {
-    return null;
-  }
+  if (!accessToken || !refreshToken) return null;
 
   try {
     const user = await authRequest("/users/me/", "GET", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     return user;
-  } catch (error: any) {
-    if (error.status === 401) {
-      try {
-        const refreshResult = await refreshTokens();
-        if (refreshResult.success) {
-          const newAccessToken = cookieStore.get("access_token")?.value;
-          if (newAccessToken) {
-            try {
-              const user = await authRequest("/users/me/", "GET", {
-                headers: { Authorization: `Bearer ${newAccessToken}` },
-              });
-              return user;
-            } catch (retryError) {
-              return null;
-            }
-          }
-        }
-      } catch (refreshError) {
-        return null;
-      }
-    }
+  } catch (error) {
+    console.error("Failed to fetch user in getCurrentUser:", error);
     return null;
   }
-});
+}
+

@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from "next/headers";
+import { getCurrentUser } from "../actions/authActions";
 const API_URL = process.env.API_URL;
 
 export async function brandRequest(
@@ -9,6 +10,8 @@ export async function brandRequest(
     body?: any,
     cache: RequestCache = "no-store"
 ) {
+    await getCurrentUser();
+
     const token = (await cookies()).get("access_token")?.value;
     if (!token) throw new Error("Unauthorized");
 

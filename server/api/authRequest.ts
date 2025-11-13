@@ -1,5 +1,4 @@
 "use server";
-
 const API_URL = process.env.API_URL;
 
 export async function authRequest(
@@ -7,6 +6,7 @@ export async function authRequest(
   method: "GET" | "POST",
   options: RequestInit = {}
 ) {
+
   const res = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers: { "Content-Type": "application/json", ...options.headers },
