@@ -154,7 +154,7 @@ export function ReportCard({
     return (
         <Dialog>
             <Card
-                className={`flex flex-col h-full cursor-pointer transition-colors  ${isSelected ? 'border-primary  bg-primary/20 ring-primary' : 'border-border '}`}
+                className={`flex flex-col h-full cursor-pointer transition-colors  ${isSelected ? 'border-primary  bg-primary/20 border-2 ' : 'border-border '}`}
                 onClick={onSelect}
             >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

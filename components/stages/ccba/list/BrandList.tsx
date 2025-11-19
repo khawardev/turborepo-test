@@ -2,13 +2,13 @@ import { getBrandbyIdWithCompetitors, getBrands } from "@/server/actions/brandAc
 import { Brand } from "@/types";
 import BrandItem from "@/components/stages/ccba/list/BrandItem";
 import { Card } from "@/components/ui/card";
-import { getWebsiteBatchId } from "@/server/actions/website/websiteScrapeActions";
+import { getWebsiteBatchId } from "@/server/actions/ccba/website/websiteScrapeActions";
 import { redirect } from "next/navigation";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 async function BrandList() {
   const brands: Brand[] = await getBrands();
-  const user = await getAuthUser()
+  const user = await getCurrentUser()
 
   if (brands.length === 0) {
     return (

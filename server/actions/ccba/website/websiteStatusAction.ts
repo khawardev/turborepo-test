@@ -1,10 +1,10 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function getBatchWebsiteScrapeStatus(brand_id: string, batch_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
     
     try {
         const result = await brandRequest(`/batch/website-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`, "GET");
@@ -18,7 +18,7 @@ export async function getBatchWebsiteScrapeStatus(brand_id: string, batch_id: st
 
 
 export async function getBatchWebsiteReportsStatus(brand_id: string, batch_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const endpoint = `/batch/website-reports-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`;

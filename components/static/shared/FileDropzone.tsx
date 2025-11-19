@@ -7,23 +7,10 @@ import { IoClose } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { PiFile, PiFilePdfFill, PiFileDocFill, PiFileXlsFill, PiFilePptFill, PiFileCsvFill, PiFileFill } from "react-icons/pi";
-import { LineSpinner } from "./SpinnerLoader";
-
-type FileInfo = {
-    name: string;
-    size: number;
-};
-
-// The data structure passed up to the parent form
-export type FileDropzoneData = {
-    files: File[];
-    parsedText: string;
-    fileInfos: FileInfo[];
-};
 
 type FileDropzoneProps = {
-    onFilesChange: (data: FileDropzoneData | null) => void;
-    initialFileInfos?: FileInfo[] | null;
+    onFilesChange: (files: File[]) => void;
+    initialFiles?: File[] | null;
 };
 
 const fileIcons: { [key: string]: any } = {
@@ -52,52 +39,16 @@ function formatBytes(bytes: number, decimals = 2): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
-export function FileDropzone({ onFilesChange, initialFileInfos }: FileDropzoneProps) {
-    const [fileInfos, setFileInfos] = useState<FileInfo[] | null>(initialFileInfos || null);
-    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+export function FileDropzone({ onFilesChange, initialFiles }: FileDropzoneProps) {
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>(initialFiles || []);
 
     useEffect(() => {
-        setFileInfos(initialFileInfos || null);
-        if (!initialFileInfos || initialFileInfos.length === 0) {
-            setUploadedFiles([]);
-        }
-    }, [initialFileInfos]);
+        setUploadedFiles(initialFiles || []);
+    }, [initialFiles]);
 
-    const processAndPropagateFiles = async (files: File[]) => {
-        if (files.length === 0) {
-            onFilesChange(null);
-            setFileInfos(null);
-            setUploadedFiles([]);
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const formData = new FormData();
-            files.forEach(file => formData.append("files", file));
-
-            // NOTE: Ensure you have an API route at `/api/parse-files` that handles file parsing.
-            const response = await fetch("/api/parse-files", { method: "POST", body: formData });
-
-            if (response.ok) {
-                const { parsedText } = await response.json();
-                const newFileInfos = files.map(f => ({ name: f.name, size: f.size }));
-                onFilesChange({ files, parsedText, fileInfos: newFileInfos });
-                setFileInfos(newFileInfos);
-                setUploadedFiles(files);
-            } else {
-                const errorData = await response.json();
-                toast.error(errorData.message || `Failed to parse files.`);
-                onFilesChange(null);
-            }
-        } catch (error) {
-            console.error("An error occurred while parsing the files.", error);
-            toast.error("An error occurred while parsing the files.");
-            onFilesChange(null);
-        } finally {
-            setIsLoading(false);
-        }
+    const handleFileChange = (files: File[]) => {
+        setUploadedFiles(files);
+        onFilesChange(files);
     };
 
     const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -107,13 +58,13 @@ export function FileDropzone({ onFilesChange, initialFileInfos }: FileDropzonePr
 
         if (acceptedFiles.length > 0) {
             const newFiles = [...uploadedFiles, ...acceptedFiles];
-            processAndPropagateFiles(newFiles);
+            handleFileChange(newFiles);
         }
     }, [uploadedFiles]);
 
     const handleRemoveFile = (fileIndex: number) => {
         const remainingFiles = uploadedFiles.filter((_, index) => index !== fileIndex);
-        processAndPropagateFiles(remainingFiles);
+        handleFileChange(remainingFiles);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -127,28 +78,19 @@ export function FileDropzone({ onFilesChange, initialFileInfos }: FileDropzonePr
             "text/csv": [".csv"],
             "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
         },
-        disabled: isLoading,
     });
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center w-full min-h-[200px] text-sm text-muted-foreground">
-                <LineSpinner>Parsing... Please wait..</LineSpinner>
-            </div>
-        );
-    }
-
-    if (fileInfos && fileInfos.length > 0) {
+    if (uploadedFiles && uploadedFiles.length > 0) {
         return (
             <div className="flex flex-col gap-2 mt-4 w-full">
                 <div className="flex flex-col w-full gap-3">
-                    {fileInfos.map((info, index) => (
+                    {uploadedFiles.map((file, index) => (
                         <div key={index} className="relative flex w-full items-center justify-between p-2 pl-4 border rounded-md bg-border/50">
                             <div className="flex items-center gap-4 flex-grow min-w-0">
-                                {getFileIcon(info.name)}
+                                {getFileIcon(file.name)}
                                 <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-medium text-foreground truncate">{info.name}</span>
-                                    <span className="text-xs text-muted-foreground">{formatBytes(info.size)}</span>
+                                    <span className="text-sm font-medium text-foreground truncate">{file.name}</span>
+                                    <span className="text-xs text-muted-foreground">{formatBytes(file.size)}</span>
                                 </div>
                             </div>
                             <Button type="button" variant="ghost" size="icon" className="ml-2 h-7 w-7 flex-shrink-0" onClick={() => handleRemoveFile(index)}>

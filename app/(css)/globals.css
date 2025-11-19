@@ -166,7 +166,7 @@
   }
 
   .bg-outline {
-    @apply  backdrop-blur-sm bg-linear-to-t from-border/70 dark:from-border to-border/10 dark:border-border border border-zinc-300 shadow-zinc-950/10 duration-200 ;
+    @apply  backdrop-blur bg-linear-to-t from-border/70 dark:from-border to-border/10  border shadow-zinc-950/10 duration-200 ;
   }
 
   .bg-linear {

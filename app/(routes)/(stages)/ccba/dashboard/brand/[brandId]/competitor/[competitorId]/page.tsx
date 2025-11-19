@@ -6,10 +6,10 @@ import RawDataTab from '@/components/stages/ccba/dashboard/raw-data/RawDataTab'
 import WebsiteAuditData from '@/components/stages/ccba/dashboard/website-audit/WebsiteAuditData'
 import SocialAuditTab from '@/components/stages/ccba/dashboard/social-audit/SocialAuditTab'
 import AnalyticsDashboardsData from '@/components/stages/ccba/dashboard/analytics-dashboards/AnalyticsDashboardsData'
-import { getAuthUser } from '@/lib/static/getAuthUser'
+import { getCurrentUser } from '@/server/actions/authActions'
 
 export default async function CompetitorPage({params}: {params: Promise<{ brandId: string; competitorId: string }>}) {
-    await getAuthUser()
+    await getCurrentUser()
 
 
     const { brandId, competitorId } = await params

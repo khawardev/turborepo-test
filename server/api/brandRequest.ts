@@ -15,13 +15,20 @@ export async function brandRequest(
     const token = (await cookies()).get("access_token")?.value;
     if (!token) throw new Error("Unauthorized");
 
+    const isFormData = body instanceof FormData;
+
+    const headers: HeadersInit = {
+        Authorization: `Bearer ${token}`,
+    };
+
+    if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(`${API_URL}${endpoint}`, {
         method,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: body ? JSON.stringify(body.body ?? body) : undefined,
+        headers,
+        body: isFormData ? body : (body ? JSON.stringify(body.body ?? body) : undefined),
         cache,
     });
 

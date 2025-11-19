@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteBrand } from "@/server/actions/brandActions";
-import { scrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
+import { scrapeBatchWebsite } from "@/server/actions/ccba/website/websiteScrapeActions";
 import { WebsiteAskLimitDialog } from "../details/scraps-tab/website/WebsiteAskLimitDialog";
 import { UpdateBrandDialog } from "./crud/UpdateBrandDialog";
 import { AddCompetitorsDialog } from "./crud/AddCompetitorsDialog";

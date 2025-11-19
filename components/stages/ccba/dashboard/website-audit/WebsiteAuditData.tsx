@@ -1,4 +1,4 @@
-import { getBatchWebsiteReports } from '@/server/actions/website/websiteReportActions'
+import { getBatchWebsiteReports } from '@/server/actions/ccba/website/websiteReportActions'
 import { parseJsonFromMarkdown } from '@/lib/static/jsonParser'
 import WebsiteAuditTabs from './WebsiteAuditTabs'
 

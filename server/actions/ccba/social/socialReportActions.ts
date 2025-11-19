@@ -3,11 +3,10 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "../authActions";
 import { SOCIAL_SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { getBatchSocialReportsStatus } from "./socialStatusAction";
 import { pollUntilComplete } from "@/lib/utils";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function batchSocialReports({
     brand_id,
@@ -15,7 +14,7 @@ export async function batchSocialReports({
     model_id,
     social_prompt,
 }: any) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const payload = {
@@ -44,14 +43,12 @@ export async function batchSocialReports({
 }
 
 export async function getBatchSocialReports(brand_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const response = await brandRequest(
             `/batch/social-reports?client_id=${user.client_id}&brand_id=${brand_id}`,
-            "GET",
-            undefined,
-            "force-cache"
+            "GET"
         );
         return { success: true, data: response };
     } catch (error: any) {

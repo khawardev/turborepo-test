@@ -4,7 +4,7 @@ import { useState, useTransition, useId } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Link as LinkIcon } from "lucide-react";
+import { FastForward, Link as LinkIcon, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,31 +31,32 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Spinner } from "@/components/static/shared/SpinnerLoader";
+import { ButtonSpinner, Spinner } from "@/components/static/shared/SpinnerLoader";
 import { FileDropzone } from "@/components/static/shared/FileDropzone";
 import { ReportCard } from "./Report-Card";
 
 import { getBrandbyIdWithCompetitors } from "@/server/actions/brandActions";
-import { getBatchWebsiteReports } from "@/server/actions/website/websiteReportActions";
-import { getBatchSocialReports } from "@/server/actions/social/socialReportActions";
+import { getBatchWebsiteReports } from "@/server/actions/ccba/website/websiteReportActions";
+import { getBatchSocialReports } from "@/server/actions/ccba/social/socialReportActions";
 import { MODELS, agents, executionModes } from "@/lib/constants";
+import { arrangeAgentIds } from "@/lib/utils";
+import { InteractiveExecutionClient } from "./InteractiveExecutionClient";
+import { initiateBvoAgenticProcess } from "@/server/actions/bvo/agenticActions";
 
 const defaultValues: any = {
   name: "",
-  aiModel: "gpt-4",
+  aiModel: "claude-4.5-sonnet",
   brand: {},
   competitors: [],
-  brand_documents: null,
-  stakeholder_interview_files: null,
-  questionnaire_answers_files: null,
+  brand_documents: [],
+  stakeholder_interview_files: [],
+  questionnaire_answers_files: [],
   custom_instructions: "",
   executionMode: "interactive",
   selectedAgents: [],
   selectedWebsiteReport: null,
   selectedSocialReport: null,
 };
-
-
 
 export default function NewBvoForm({ brands, client_id }: any) {
   const [isPending, startTransition] = useTransition();
@@ -64,6 +65,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
   const [socialReports, setSocialReports] = useState<any[]>([]);
   const [isFetchingReports, setIsFetchingReports] = useState(false);
   const [isModelSelectorOpen, setModelSelectorOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const executionModeId = useId();
   const agentSelectionId = useId();
@@ -134,32 +136,62 @@ export default function NewBvoForm({ brands, client_id }: any) {
       return;
     }
 
-    const finalData = {
-      client_id: client_id,
-      brand_id: selectedBrand.brand_id,
-      social_id: data.selectedSocialReport.report_batch_id,
-      website_id: data.selectedWebsiteReport.report_batch_id,
-      custom_instructions: data.custom_instructions || null,
-      stakeholder_interview_insights: data.stakeholder_interview_files?.parsedText || null,
-      stakeholder_questionaire_insights: data.questionnaire_answers_files?.parsedText || null,
-      agent_ids: data.executionMode === 'independent' ? data.selectedAgents : [],
-      mode: data.executionMode,
-      rag_name: data.name,
-      fuse_depth: 3,
-      files: data.brand_documents?.parsedText || null,
-      model: data.aiModel,
-    };
+    startTransition(async () => {
+      const formData = new FormData();
 
-    console.log("--- BVO Form Submission ---");
-    console.log(JSON.stringify(finalData, null, 2));
-    console.log("---------------------------");
+      (data.brand_documents || []).forEach((file: File) => {
+        formData.append('files', file);
+      });
+      (data.stakeholder_interview_files || []).forEach((file: File) => {
+        formData.append('stakeholder_interview_insights', file);
+      });
+      (data.questionnaire_answers_files || []).forEach((file: File) => {
+        formData.append('stakeholder_questionaire_insights', file);
+      });
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    toast.success("BVO has been created successfully ");
+      formData.append('client_id', client_id);
+      formData.append('brand_id', selectedBrand.brand_id);
+      formData.append('social_id', data.selectedSocialReport.report_batch_id);
+      formData.append('website_id', data.selectedWebsiteReport.report_batch_id);
+      formData.append('custom_instructions', data.custom_instructions || "");
+      formData.append('model', data.aiModel);
+      formData.append('mode', data.executionMode);
+      formData.append('rag_name', data.name);
+      formData.append('fuse_depth', '3');
+
+      if (data.executionMode === 'independent' && data.selectedAgents?.length > 0) {
+        const agentIds = arrangeAgentIds(data.selectedAgents);
+        agentIds.forEach((id: string) => {
+          formData.append('agent_ids', id);
+        });
+      }
+
+      try {
+        const result: any = await initiateBvoAgenticProcess(selectedBrand.brand_id, formData);
+        console.log(result, `<-> result initiateBvoAgenticProcess <->`);
+
+        if (result.success) {
+          if (data.executionMode === 'interactive' && result.session_id) {
+            toast.success("Interactive session started.");
+            setSessionId(result.session_id);
+          } else {
+            toast.success("BVO process has been initiated successfully.");
+          }
+        } else {
+          toast.error(result.error || "Failed to initiate BVO process.");
+        }
+      } catch (error: any) {
+        toast.error(`An unexpected error occurred: ${error.message}`);
+      }
+    });
   }
 
   const aiModelValue = watch("aiModel");
   const currentModel = MODELS.find(model => model.id === aiModelValue);
+
+  if (sessionId) {
+    return <InteractiveExecutionClient session_id={sessionId} onSessionEnd={() => setSessionId(null)} />;
+  }
 
   return (
     <Form {...form}>
@@ -252,7 +284,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                   <SelectContent className="capitalize">
                     {brands.map((brand: any) => (
                       <SelectItem key={brand.brand_id} value={brand.brand_id}>
-                        {brand.name} 
+                        {brand.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -405,7 +437,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                 render={({ field }) => (
                   <FileDropzone
                     onFilesChange={field.onChange}
-                    initialFileInfos={field.value?.fileInfos}
+                    initialFiles={field.value}
                   />
                 )}
               />
@@ -424,7 +456,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                 render={({ field }) => (
                   <FileDropzone
                     onFilesChange={field.onChange}
-                    initialFileInfos={field.value?.fileInfos}
+                    initialFiles={field.value}
                   />
                 )}
               />
@@ -444,7 +476,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
               render={({ field }) => (
                 <FileDropzone
                   onFilesChange={field.onChange}
-                  initialFileInfos={field.value?.fileInfos}
+                  initialFiles={field.value}
                 />
               )}
             />
@@ -566,10 +598,16 @@ export default function NewBvoForm({ brands, client_id }: any) {
 
         <div className=" w-full  justify-end flex">
           <Button type="submit" disabled={isSubmitting || isPending} >
-            {(isSubmitting || isPending) && <Spinner />}
-            Execute Audit
+            {isSubmitting || isPending ? (
+              <ButtonSpinner>Executing</ButtonSpinner>
+            ) : (
+              <>
+                <FastForward />
+                Execute Audit
+              </>
+            )}
           </Button>
-       </div>
+        </div>
       </form>
     </Form>
   );

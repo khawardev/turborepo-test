@@ -1,5 +1,5 @@
-import { getBrandPerceptionReport } from '@/server/actions/agent/brandPerceptionDashboardAction'
-import { getBrandSocialDashboard } from '@/server/actions/agent/brandSocialDashboardAction'
+import { getBrandPerceptionReport } from '@/server/actions/ccba/agent/brandPerceptionDashboardAction'
+import { getBrandSocialDashboard } from '@/server/actions/ccba/agent/brandSocialDashboardAction'
 import { prioritizeBrandReport } from '@/lib/static/prioritizeBrandReport'
 import AnalyticsDashboardsTabs from './AnalyticsDashboardsTabs'
 

@@ -3,18 +3,17 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "../authActions";
 import { getBatchSocialScrapeStatus } from "./socialStatusAction";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { pollUntilComplete } from "@/lib/utils";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function scrapeBatchSocial(
     brand_id: any,
     start_date: string,
     end_date: string
 ) {
-    const user = await getAuthUser()
+    const user = await getCurrentUser()
 
     try {
         const scrapePayload = {
@@ -42,7 +41,7 @@ export async function scrapeBatchSocial(
 
 
 export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
-    const user = await getAuthUser()
+    const user = await getCurrentUser()
 
     if (!batch_id) {
         return { success: false, error: "No batch_id provided." }

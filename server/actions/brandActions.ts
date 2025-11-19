@@ -6,10 +6,10 @@ import { Brand, Competitor } from "@/types";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
   const { competitors, ...brandData } = values;
 
   try {
@@ -32,7 +32,7 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
 }
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     await brandRequest("/brands/competitors/", "POST", {
@@ -48,7 +48,7 @@ export async function addCompetitors(brandId: string, competitors: any[]) {
 }
 
 export async function updateBrand(brandId: string, values: any) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   const { ...brandData } = values;
 
@@ -72,7 +72,7 @@ export async function updateBrand(brandId: string, values: any) {
 }
 
 export async function updateCompetitorAction(brandId: string, competitor: any) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   if (!competitor.competitor_id) {
     return { success: false, error: "Competitor ID is missing" };
@@ -96,7 +96,8 @@ export async function updateCompetitorAction(brandId: string, competitor: any) {
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
+  
   try {
     const brands = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
@@ -110,7 +111,7 @@ export async function getBrands(): Promise<Brand[]> {
 }
 
 export async function getBrandById(brand_id: string): Promise<Brand | null> {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     const brands = await brandRequest(
@@ -125,7 +126,7 @@ export async function getBrandById(brand_id: string): Promise<Brand | null> {
 }
 
 export async function getBrandbyIdWithCompetitors(brand_id: string) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     const [brandResponse, competitorResponse] = await Promise.all([
@@ -161,7 +162,7 @@ export async function getCompetitors(
   brand_id: string
 ): Promise<{ brand_id: string; competitors: Competitor[] }> {
   const emptyResult = { brand_id, competitors: [] };
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     const result = await brandRequest(
@@ -177,7 +178,7 @@ export async function getCompetitors(
 }
 
 export async function deleteBrand(brand_id: string) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     const brandDelete = await brandRequest(
@@ -203,7 +204,7 @@ export async function deleteBrand(brand_id: string) {
 }
 
 export async function getClientDetails() {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   try {
     const result = await brandRequest(

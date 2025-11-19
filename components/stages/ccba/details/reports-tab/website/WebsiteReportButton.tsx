@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-import { batchWebsiteReports } from "@/server/actions/website/websiteReportActions"
+import { batchWebsiteReports } from "@/server/actions/ccba/website/websiteReportActions"
 import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader"
 import { Button } from "@/components/ui/button"
 import {

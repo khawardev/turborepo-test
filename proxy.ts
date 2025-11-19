@@ -14,12 +14,12 @@ export async function proxy(request: NextRequest) {
     const accessToken = request.cookies.get("access_token")?.value;
     const refreshToken = request.cookies.get("refresh_token")?.value;
 
-    // If no tokens and route is public → allow access
+    // If no tokens and route is auth → allow access
     if ((!accessToken || !refreshToken) && authPaths.some(p => pathname.startsWith(p))) {
         return NextResponse.next();
     }
 
-    // If no tokens and route is protected → redirect to login
+    // If no tokens and route is auth → redirect to login
     if (!accessToken || !refreshToken) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -27,6 +27,7 @@ export async function proxy(request: NextRequest) {
     let user = null;
     let newAccessToken: string | null = null;
     let newRefreshToken: string | null = null;
+    let response = NextResponse.next();
 
     // Try validating current access token
     try {
@@ -43,6 +44,20 @@ export async function proxy(request: NextRequest) {
             newAccessToken = refreshResponse.access_token;
             newRefreshToken = refreshResponse.refresh_token;
 
+            // Update cookies if refreshed
+            if (newAccessToken && newRefreshToken) {
+                response.cookies.set("access_token", newAccessToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    path: "/",
+                });
+                response.cookies.set("refresh_token", newRefreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    path: "/",
+                });
+            }
+            
             // Retry user fetch with new access token
             user = await authRequest("/users/me/", "GET", {
                 headers: { Authorization: `Bearer ${newAccessToken}` },
@@ -56,25 +71,9 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    // If user is logged in and trying to access public route → redirect to home
+    // If user is logged in and trying to access auth route → redirect to home
     if (user && authPaths.some(p => pathname.startsWith(p))) {
         return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    const response = NextResponse.next();
-
-    // Update cookies if refreshed
-    if (newAccessToken && newRefreshToken) {
-        response.cookies.set("access_token", newAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-        });
-        response.cookies.set("refresh_token", newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-        });
     }
     return response;
 }

@@ -3,14 +3,13 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "../authActions";
 import { getBatchWebsiteScrapeStatus } from "./websiteStatusAction";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { pollUntilComplete } from "@/lib/utils";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
-    const user = await getAuthUser()
+    const user = await getCurrentUser()
 
     try {
         const scrapePayload = {
@@ -38,7 +37,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
 
 
 export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
     if (!batch_id) {
         return { success: false, error: "No batch_id found for this brand." };
     }
@@ -47,7 +46,6 @@ export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
         const result = await brandRequest(
             `/batch/website-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
             "GET"
-            , undefined, 'force-cache'
         );
         return result;
     } catch (error: any) {

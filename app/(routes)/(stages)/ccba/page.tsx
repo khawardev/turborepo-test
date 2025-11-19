@@ -3,12 +3,12 @@ import { ContainerMd } from "@/components/static/shared/Containers";
 import { BlurDelay, BlurDelay3 } from "@/components/static/shared/MagicBlur";
 import StaticBanner from "@/components/static/shared/StaticBanner";
 import { Button } from "@/components/ui/button";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function page() {
-  await getAuthUser();
+  await getCurrentUser();
   return (
     <ContainerMd>
       <StaticBanner

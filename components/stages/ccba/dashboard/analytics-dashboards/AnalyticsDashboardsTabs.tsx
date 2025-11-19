@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SocialMediaDashboard from "../social-media/SocialMediaDashboard";
 import EarnedMediaDashboard from "../earned-media/EarnedMediaDashboard";
 import BrandPerceptionDashboard from "../brand-perception/BrandPerceptionDashboard";
-import { magnaData } from "@/data/brands/magna";
+import { magnaData } from "@/data/other/brands/magna";
 
 export default function AnalyticsDashboardsTabs({ brandPerceptionReport, socialAnalyticsDashboard }: any) {
 

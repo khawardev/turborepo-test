@@ -1,60 +1,51 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { getBrands } from "@/server/actions/brandActions";
+import { getBvoHistory, getBvoAgentResults } from "@/server/actions/bvo/agenticActions";
+import BvoItem from "./BvoItem";
+import { Card } from "@/components/ui/card";
 
-const sampleBvos = [
-  {
-    id: "bvo-1",
-    name: "Brand",
-    brand: "Acme Inc.",
-    competitors: ["Vercel", "Netlify"],
-    agents: ["Brand Perception", "Social Media Audit"],
-    status: "Completed",
-    executionMode: "interactive",
-  },
-  {
-    id: "bvo-2",
-    name: "Brand",
-    brand: "Innovate Co.",
-    competitors: ["StartupX", "FutureTech"],
-    agents: ["Website Audit", "Brand Perception", "Social Media Audit", "Earned Media Analysis", "Synthesized Report"],
-    status: "In Progress",
-    executionMode: "interactive",
-  },
-];
+export default async function BvoList() {
+  const brands = await getBrands();
 
-export default function BvoList() {
+  if (!brands || brands.length === 0) {
+    return (
+      <Card className="flex flex-col gap-3 items-center justify-center text-center h-64 border-dashed border-2">
+        <p className="text-sm text-muted-foreground mb-2">
+          No brands found. Please add a brand first.
+        </p>
+      </Card>
+    );
+  }
+
+  const brandsWithHistory = await Promise.all(
+    brands.map(async (brand) => {
+      const historyRes = await getBvoHistory(brand.brand_id)
+
+      if (!historyRes.success || historyRes.data.history.length === 0) return null
+
+      const items = await Promise.all(
+        historyRes.data.history.map(async (bvo:any) => {
+          const results = await getBvoAgentResults(bvo.session_id, brand.brand_id)
+          return { bvo, brand, results }
+        })
+      )
+
+      return { brand, items }
+    })
+  )
   return (
     <div className="space-y-4">
-      {sampleBvos.map((bvo) => (
-        <Card key={bvo.id}>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle>{bvo.name}</CardTitle>
-                <CardDescription>{bvo.brand}</CardDescription>
-              </div>
-              <Button asChild variant="outline">
-                <Link href={`/bvo/${bvo.id}`}>View</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <h4 className="font-medium">Competitors:</h4>
-              <p className="text-sm text-muted-foreground">{bvo.competitors.join(", ")}</p>
-            </div>
-            <div className="mt-4">
-              <h4 className="font-medium">Agents:</h4>
-              <p className="text-sm text-muted-foreground">{bvo.agents.join(", ")}</p>
-            </div>
-            <div className="mt-4">
-              <h4 className="font-medium">Status:</h4>
-              <p className="text-sm text-muted-foreground">{bvo.status}</p>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+      {brandsWithHistory.map((entry) => {
+        if (!entry) return null
+
+        return entry.items.map((item) => (
+          <BvoItem
+            key={item.bvo.session_id}
+            bvo={item.bvo}
+            brand={item.brand}
+            results={item.results}
+          />
+        ))
+      })}
     </div>
   );
 }

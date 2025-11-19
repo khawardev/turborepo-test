@@ -2,10 +2,10 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { SCRAPE } from "@/lib/constants";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
-    const user = await getAuthUser()
+    const user = await getCurrentUser()
 
     try {
         const status = await brandRequest(
@@ -21,7 +21,7 @@ export async function getBatchSocialScrapeStatus(brand_id: any, batch_id: any) {
 
 
 export async function getBatchSocialReportsStatus(brand_id: string, batch_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const response = await brandRequest(

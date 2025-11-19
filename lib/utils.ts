@@ -83,3 +83,28 @@ export async function pollUntilComplete<T>(
 
   throw new Error("Polling timed out")
 }
+
+export const extractFilePaths = (files?: File[]) =>
+  (files || []).map((file: File & { path?: string; relativePath?: string }) =>
+    file.path || file.relativePath || file.name
+  );
+
+export function arrangeAgentIds(ids:any) {
+  const withMeta = ids.map((id: any) => {
+    const [num, suffix] = id.split("-");
+    return {
+      raw: id,
+      num: parseInt(num, 10),
+      suffix: suffix || null
+    };
+  });
+
+  withMeta.sort((a:any, b: any) => {
+    if (a.num !== b.num) return a.num - b.num;
+    if (a.suffix === null && b.suffix !== null) return -1;
+    if (a.suffix !== null && b.suffix === null) return 1;
+    return (a.suffix || "").localeCompare(b.suffix || "");
+  });
+
+  return withMeta.map((x:any) => x.raw);
+}

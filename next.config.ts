@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   transpilePackages: ['jotai-devtools'],
   experimental: {
     viewTransition: true,
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
   },
   images: {
     remotePatterns: [

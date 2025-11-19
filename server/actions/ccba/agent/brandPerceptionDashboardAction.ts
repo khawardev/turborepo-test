@@ -1,11 +1,11 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 
 export async function getBrandPerceptionReport(brand_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const response = await brandRequest(

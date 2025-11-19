@@ -1,9 +1,9 @@
-import { getPreviousSocialScrapes, getScrapeBatchSocial } from "@/server/actions/social/socialScrapeActions";
+import { getPreviousSocialScrapes, getScrapeBatchSocial } from "@/server/actions/ccba/social/socialScrapeActions";
 import SocialScraps from "./SocialScraps";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export default async function SocialScrapsServer({ brandName, brand_id }: { brandName: string, brand_id: string }) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     const previousSocialScrapes = await getPreviousSocialScrapes(user.client_id, brand_id);
     const socialScrapeBatchPromises = previousSocialScrapes.map(

@@ -19,7 +19,6 @@ export async function login(values: z.infer<typeof loginSchema>) {
     });
 
     const cookieStore = await cookies();
-   
 
     cookieStore.set("access_token", data.access_token, {
       httpOnly: true,
@@ -119,7 +118,7 @@ export async function getCurrentUser() {
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
   if (!accessToken || !refreshToken) return null;
-
+  
   try {
     const user = await authRequest("/users/me/", "GET", {
       headers: { Authorization: `Bearer ${accessToken}` },

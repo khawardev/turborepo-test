@@ -1,9 +1,9 @@
-import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/website/websiteScrapeActions";
+import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from "@/server/actions/ccba/website/websiteScrapeActions";
 import WebsiteScraps from "./WebsiteScraps";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export default async function WebsiteScrapsServer({ brandName, brand_id }: { brandName: string, brand_id: string }) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
   
     const previousWebsiteScraps = await getpreviousWebsiteScraps(user.client_id, brand_id);
     const websiteScrapeBatchPromises = previousWebsiteScraps.map(

@@ -5,7 +5,7 @@ import { EXTRACTOR_PROMPT, SYNTHESIS_PROMPT } from "@/lib/static/prompts";
 import { revalidatePath } from "next/cache";
 import { getBatchWebsiteReportsStatus } from "./websiteStatusAction";
 import { pollUntilComplete } from "@/lib/utils";
-import { getAuthUser } from "@/lib/static/getAuthUser";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function batchWebsiteReports({
     brand_id,
@@ -13,7 +13,7 @@ export async function batchWebsiteReports({
     model_id,
     sythesizerPrompt,
 }: any) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const payload = {
@@ -42,14 +42,12 @@ export async function batchWebsiteReports({
 
 
 export async function getBatchWebsiteReports(brand_id: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
 
     try {
         const response = await brandRequest(
             `/batch/website-reports?client_id=${user.client_id}&brand_id=${brand_id}`,
-            "GET",
-            undefined,
-            "force-cache"
+            "GET"
         );
         return { success: true, data: response };
     } catch (error: any) {

@@ -6,7 +6,6 @@ import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrap
 import HeaderServer from "@/components/static/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/brandos-config";
-import { JotaiProvider } from "@/components/static/shared/JotaiProvider";
 const inter = Inter({ subsets: ["latin"], display: 'swap', });
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -33,7 +32,7 @@ export default function RootLayout({
   return (
     // ${inter.className} 
     <html lang="en" suppressHydrationWarning>
-      <body className={`relative ${ibmPlexSans.className} antialiased`} suppressHydrationWarning>
+      <body className={`relative ${inter.className} antialiased`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />

@@ -14,10 +14,10 @@ import { SidebarList } from '@/components/ui/sidebar-list';
 import { UserNav } from '@/components/static/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { generateSidebarHrefTree } from '@/lib/static/generateSidebar';
-import { getAuthUser } from '@/lib/static/getAuthUser';
+import { getCurrentUser } from "@/server/actions/authActions";
 
 const DashboardLayout = async ({ children, brandData }: any) => {
-    const user = await getAuthUser();
+    const user = await getCurrentUser();
   
     const SidebarHrefTree: any = generateSidebarHrefTree(brandData);
     return (

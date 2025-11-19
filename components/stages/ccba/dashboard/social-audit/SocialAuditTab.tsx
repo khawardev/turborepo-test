@@ -1,4 +1,4 @@
-import { getBatchSocialReports } from '@/server/actions/social/socialReportActions'
+import { getBatchSocialReports } from '@/server/actions/ccba/social/socialReportActions'
 import SocialReportDisplay from "@/components/stages/ccba/details/reports-tab/social/SocialReportDisplay";
 
 export default async function SocialAuditTab({ brandId, competitorId }: { brandId: string, competitorId?: string }) {
