@@ -156,7 +156,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
       formData.append('custom_instructions', data.custom_instructions || "");
       formData.append('model', data.aiModel);
       formData.append('mode', data.executionMode);
-      formData.append('rag_name', data.name);
+      // formData.append('rag_name', data.name);
       formData.append('fuse_depth', '3');
 
       if (data.executionMode === 'independent' && data.selectedAgents?.length > 0) {
@@ -167,6 +167,8 @@ export default function NewBvoForm({ brands, client_id }: any) {
       }
 
       try {
+        console.log(console.log(Object.fromEntries(formData.entries())), `<-> console.log(Object.fromEntries(formData.entries())) <->`);
+        
         const result: any = await initiateBvoAgenticProcess(selectedBrand.brand_id, formData);
         console.log(result, `<-> result initiateBvoAgenticProcess <->`);
 

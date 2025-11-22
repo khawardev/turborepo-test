@@ -27,12 +27,12 @@ export async function batchSocialReports({
         };
 
         const batchReports = await brandRequest("/batch/social-reports", "POST", payload);
+        console.log(batchReports.task_id, `<-> batchSocialReports.task_id <->`);
 
-
-        await pollUntilComplete(
-            async () => await getBatchSocialReportsStatus(brand_id, batchReports.task_id),
-            (res: any) => res.success && res.data?.status === "Completed"
-        );
+        // await pollUntilComplete(
+        //     async () => await getBatchSocialReportsStatus(brand_id, batchReports.task_id),
+        //     (res: any) => res.success && res.data?.status === "Completed"
+        // );
 
         revalidatePath(`/ccba/${brand_id}`);
         return { success: true, data: batchReports.task_id };

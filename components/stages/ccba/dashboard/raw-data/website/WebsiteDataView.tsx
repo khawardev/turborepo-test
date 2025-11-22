@@ -14,6 +14,7 @@ import { cleanAndFlattenBullets } from '@/lib/static/cleanMarkdown';
 import { SCRAPED } from '@/lib/constants';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
+    
     const pages = useMemo(() => {
         const originalPages = websiteScrapsData?.pages || [];
         const uniquePagesMap = new Map();

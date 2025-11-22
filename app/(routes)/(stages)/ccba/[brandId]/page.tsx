@@ -13,6 +13,7 @@ import ScrapDataViewerSkeleton from '../../../../../components/stages/ccba/detai
 import { ReportDataViewerSkeleton } from '../../../../../components/stages/ccba/details/_components/_skeleton/ReportDataViewerSkeleton';
 import { SCRAPS } from '@/lib/constants';
 import { getBatchWebsiteReports } from '@/server/actions/ccba/website/websiteReportActions';
+import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 
 export default async function BrandDetailPage({
   params
@@ -23,6 +24,7 @@ export default async function BrandDetailPage({
 
   const brandData = await getBrandbyIdWithCompetitors(brandId);
   const websiteReportData = await getBatchWebsiteReports(brandId);
+  const taskStatusData = await getCcbaTaskStatus(brandId);
 
   const tabs = [
     {
@@ -63,7 +65,7 @@ export default async function BrandDetailPage({
     <ContainerMd>
       <StaticBanner title={`${brandData.name} - Brand Details`} badge="CCBA Audits" />
       <BlurDelay3>
-        <AnimatedTabs tabs={tabs} />
+        <AnimatedTabs tabs={tabs} status={taskStatusData} />
       </BlurDelay3>
     </ContainerMd>
   );

@@ -21,6 +21,10 @@ function BvoResults({ results }: { results: any }) {
 }
 
 export default function BvoItem({ bvo, brand, results }: { bvo: any; brand: any; results: any }) {
+  console.log(bvo, 'bvo bvo')
+  console.log(results, 'results results')
+  
+  
   return (
     <Card>
       <CardHeader>

@@ -64,7 +64,6 @@ export function BrandCompCrudButtons({ brand, side }: any) {
                                 <span>Edit</span>
                             </DropdownMenuItem>
                         </UpdateBrandDialog>
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={confirmBrandDelete} variant="destructive">
                             <Trash2Icon  />
                             <span>Delete</span>

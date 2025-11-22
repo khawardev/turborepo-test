@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/static/shared/SpinnerLoader";
 import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
 export function InteractiveExecutionClient({ session_id, onSessionEnd }: { session_id: string, onSessionEnd: () => void }) {
     const [status, setStatus] = useState<any>(null);
@@ -35,7 +36,7 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
                     toast.error(err.message || "An error occurred while fetching status.");
                     setIsPolling(false);
                 });
-        }, 5000); // Poll every 5 seconds
+        }, 15000); // Poll every 5 seconds
 
         return () => clearInterval(intervalId);
     }, [session_id, isPolling]);
@@ -48,6 +49,7 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
                 toast.success("Interactive session has been ended.");
                 setStatus(res.data);
                 onSessionEnd();
+                redirect('/bvo')
             } else {
                 toast.error(res.error || "Failed to end the session.");
                 // Optionally restart polling if ending fails
@@ -67,8 +69,8 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
                 {isPolling && <Spinner />}
             </div>
             <div className="mt-4">
-                <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-sm">
-                    {JSON.stringify(status, null, 2)}
+                <pre className="bg-border/50 p-4 rounded-md text-sm whitespace-pre-wrap">
+                    {status?.output || JSON.stringify(status, null, 2)}
                 </pre>
             </div>
             <div className="flex justify-end mt-6">

@@ -10,28 +10,30 @@ import Link from "next/link";
 export default async function page() {
   await getCurrentUser();
   return (
-    <ContainerMd>
-      <StaticBanner
-        title="Perception & Competitor Baseline Audit"
-        badge={"CCBA Audits"}
-      />
-      <BlurDelay className="flex justify-between items-center ">
-        <div>
-          <h3 className="text-lg font-medium ">Brands</h3>
-          <p className="text-sm text-muted-foreground">
-            View and manage your brands and competitors.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/ccba/new">
-            <Plus />
-            Brand
-          </Link>
-        </Button>
-      </BlurDelay>
-      <BlurDelay3>
-        <BrandList />
-      </BlurDelay3>
-    </ContainerMd>
+    <div>
+      <ContainerMd>
+        <StaticBanner
+          title="Perception & Competitor Baseline Audit"
+          badge={"CCBA Audits"}
+        />
+        <BlurDelay className="flex justify-between items-center ">
+          <div>
+            <h3 className="text-lg font-semibold ">Brands</h3>
+            <p className=" text-muted-foreground">
+              View and manage your brands and competitors.
+            </p>
+          </div>
+          <Button  asChild>
+            <Link href="/ccba/new">
+              <Plus />
+              Brand
+            </Link>
+          </Button>
+        </BlurDelay>
+      </ContainerMd>
+        <BlurDelay3>
+          <BrandList />
+        </BlurDelay3>
+    </div>
   );
 }

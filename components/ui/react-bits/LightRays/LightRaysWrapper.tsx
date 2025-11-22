@@ -10,11 +10,11 @@ export default function LightRaysWrapper({
     children,
     className,
     raysOrigin = "top-center",
-    raysSpeed = 1.5,
+    raysSpeed = 0.2,
     lightSpread = 1.4,
-    rayLength = 10,
+    rayLength = 15,
     followMouse = false,
-    mouseInfluence = 0.1,
+    mouseInfluence = 0,
     noiseAmount = 0.3,
     distortion = 0.05,
 }: any) {
@@ -29,7 +29,7 @@ export default function LightRaysWrapper({
             {/* <DarkVeil/> */}
             {/* <DarkVeil raysColor={raysColor} warpAmount={0.3} speed={1} /> */}
            <LightRays
-                raysOrigin={'top-center'}
+                raysOrigin={'top-left'}
                 raysColor={raysColor}
                 raysSpeed={raysSpeed}
                 lightSpread={lightSpread}

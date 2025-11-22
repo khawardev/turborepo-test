@@ -9,32 +9,28 @@ export async function initiateBvoAgenticProcess(brand_id: any, bvoPayload: FormD
     await getCurrentUser();
 
     const mode = bvoPayload.get("mode");
-    console.log(mode, `<-> mode mode <->`);
 
     try {
         if (mode === "interactive") {
-            console.log(mode, `<-> mode <->`);
 
             const initialResponse = await brandRequest(
                 `/bam/agentic`,
                 "POST",
                 bvoPayload,
             );
-            console.log(initialResponse, `<-> initialResponse <->`);
+            console.log(initialResponse, `<-> /bam/agentic <->`);
 
-            const sessionId = initialResponse.task_id;
             const customInstructions = bvoPayload.get("custom_instructions") as string | null;
 
             const runPayload: RunInteractiveAgentPayload = {
                 agent_id: "1",
                 custom_instructions: customInstructions ?? undefined,
             };
-            console.log(runPayload, `<-> runPayload <->`);
 
-            const runResponse = await runInteractiveAgent(sessionId, runPayload);
-            console.log(runResponse, `<-> runResponse runInteractiveAgent <->`);
+            const runResponse = await runInteractiveAgent(initialResponse.session_id, runPayload);
+            console.log(runResponse, `<-> /bam/interactive/run <->`);
 
-            return { ...runResponse, session_id: sessionId };
+            return { ...runResponse, session_id: initialResponse.session_id };
 
         } else {
             console.log(`<-> else mode <->`);

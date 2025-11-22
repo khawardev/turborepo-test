@@ -392,7 +392,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col py-2", className)}
       {...props}
     />
   )
@@ -489,10 +489,10 @@ const sidebarMenuButtonVariants = cva(
         ghost:
           "hover:bg-linear-to-t border-none border hover:to-border/50 hover:from-muted dark:hover:from-muted/50 dark:hover:border-border hover:border hover:border-zinc-300 hover:shadow-zinc-950/10 hover:duration-200 hover:to-border",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "backdrop-blur bg-linear-to-t from-border/70 dark:from-border to-border/10  border shadow-zinc-950/10 duration-200",
       },
       size: {
-        default: "h-7 text-sm",
+        default: "h-8 text-sm",
         sm: "h-7 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
       },

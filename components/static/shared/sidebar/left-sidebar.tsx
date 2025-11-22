@@ -16,11 +16,10 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FullLogo } from "@/components/static/shared/Logo"
-import { BreadcrumbSeparator } from "./breadcrumb"
+import { BreadcrumbSeparator } from "../../../ui/breadcrumb"
+import { SidebarUser } from "./sidebar-user"
 
-
-
-export function SidebarList({
+export function LeftSidebar({
     SidebarHrefTree,
     ...props
 }: React.ComponentProps<typeof Sidebar> & { SidebarHrefTree: any }) {
@@ -38,6 +37,7 @@ export function SidebarList({
             </SidebarHeader>
 
             <SidebarContent>
+                {/* <SidebarList /> */}
                 {SidebarHrefTree.navMain.map((item:any) => (
                     <SidebarGroup key={item.title}>
                         <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
@@ -56,9 +56,11 @@ export function SidebarList({
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
-                ))}
+                ))} 
             </SidebarContent>
-
+            <SidebarFooter>
+                <SidebarUser />
+            </SidebarFooter>
             <SidebarRail />
         </Sidebar>
     )

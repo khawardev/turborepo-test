@@ -38,10 +38,11 @@ import { AddCompetitorsDialog } from "./crud/AddCompetitorsDialog";
 import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
+import { ContainerMd } from "@/components/static/shared/Containers";
 
 function BrandItemSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="mt-6">
       <div>
         <Skeleton className="h-5 w-1/4" />
         <div className="flex flex-wrap gap-2 mt-2">
@@ -107,22 +108,10 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   const scrapeBrand = (limit: any) => {
     startTransition(async () => {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
-      
-      
-      
-      
       if (result.success) {
         router.refresh();
         router.push(`/ccba/${brand.brand_id}`);
-
-
-
-
-
-
-
-
-        toast.success(`${SCRAPING} completed successfully `);
+        toast.success(`${SCRAPING} started successfully `);
       } else {
         toast.error(`${SCRAPING} failed.`);
       }
@@ -132,206 +121,180 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   
   return (
     <Card
-      className={`w-full relative transition-all ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
+      className={`w-full rounded-none relative transition-all mt-1 ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
       onClick={isScrapped ? handleCardClick : undefined}
     >
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>{brand.name}</CardTitle>
-          <CardDescription>
-            <Link
-              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
-              href={brand.url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {brand.url}
-              <LinkIcon className="size-3" />
-            </Link>
-          </CardDescription>
-        </div>
-        <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-          {!isScrapped && (
-            <WebsiteAskLimitDialog onConfirm={scrapeBrand}>
-              <Button disabled={isPending}>
-                {isPending ? <ButtonSpinner>{SCRAPING}</ButtonSpinner> : SCRAPE}
-              </Button>
-            </WebsiteAskLimitDialog>
-          )}
-          <BrandCompCrudButtons side={null} brand={brand} />
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Actions <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-52" align="end">
-              <UpdateBrandDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Update Brand
-                </DropdownMenuItem>
-              </UpdateBrandDialog>
-              <UpdateCompetitorsDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Update Competitors
-                </DropdownMenuItem>
-              </UpdateCompetitorsDialog>
-              <AddCompetitorsDialog brand={brand}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Add Competitors
-                </DropdownMenuItem>
-              </AddCompetitorsDialog>
-              <DropdownMenuItem onClick={confirmDelete} variant="destructive">
-                Delete Brand
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isPending ? (
-          <BrandItemSkeleton />
-        ) : (
-          <div className="space-y-4 ">
-            <div>
-              <h4 className="text-md font-medium mb-2">Social Links</h4>
-              <div className="flex flex-wrap gap-2">
-                {brand.facebook_url && (
-                  <Badge asChild variant="secondary">
-                    <Link href={brand.facebook_url} target="_blank">
-                      Facebook
-                    </Link>
-                  </Badge>
-                )}
-                {brand.instagram_url && (
-                  <Badge asChild variant="secondary">
-                    <Link href={brand.instagram_url} target="_blank">
-                      Instagram
-                    </Link>
-                  </Badge>
-                )}
-                {brand.linkedin_url && (
-                  <Badge asChild variant="secondary">
-                    <Link href={brand.linkedin_url} target="_blank">
-                      LinkedIn
-                    </Link>
-                  </Badge>
-                )}
-                {brand.x_url && (
-                  <Badge asChild variant="secondary">
-                    <Link href={brand.x_url} target="_blank">
-                      X
-                    </Link>
-                </Badge>
-                )}
-                {brand.youtube_url && (
-                  <Badge asChild variant="secondary">
-                    <Link href={brand.youtube_url} target="_blank">
-                      YouTube
-                    </Link>
-                  </Badge>
+      <div className=" mx-auto w-full space-y-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>{brand.name}</CardTitle>
+            <CardDescription>
+              <Link
+                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                href={brand.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {brand.url}
+                <LinkIcon className="size-3" />
+              </Link>
+            </CardDescription>
+          </div>
+          <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+            {!isScrapped && (
+              <WebsiteAskLimitDialog onConfirm={scrapeBrand}>
+                <Button disabled={isPending}>
+                  {isPending ? <ButtonSpinner>{SCRAPING}</ButtonSpinner> : SCRAPE}
+                </Button>
+              </WebsiteAskLimitDialog>
+            )}
+            <BrandCompCrudButtons side={null} brand={brand} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isPending ? (
+            <BrandItemSkeleton />
+          ) : (
+            <div className="space-y-4 ">
+              <div>
+                <h4 className="text-md font-medium mb-2">Social Links</h4>
+                <div className="flex flex-wrap gap-2">
+                  {brand.facebook_url && (
+                    <Badge asChild variant="secondary">
+                      <Link href={brand.facebook_url} target="_blank">
+                        Facebook
+                      </Link>
+                    </Badge>
+                  )}
+                  {brand.instagram_url && (
+                    <Badge asChild variant="secondary">
+                      <Link href={brand.instagram_url} target="_blank">
+                        Instagram
+                      </Link>
+                    </Badge>
+                  )}
+                  {brand.linkedin_url && (
+                    <Badge asChild variant="secondary">
+                      <Link href={brand.linkedin_url} target="_blank">
+                        LinkedIn
+                      </Link>
+                    </Badge>
+                  )}
+                  {brand.x_url && (
+                    <Badge asChild variant="secondary">
+                      <Link href={brand.x_url} target="_blank">
+                        X
+                      </Link>
+                    </Badge>
+                  )}
+                  {brand.youtube_url && (
+                    <Badge asChild variant="secondary">
+                      <Link href={brand.youtube_url} target="_blank">
+                        YouTube
+                      </Link>
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-md font-medium mb-2">Competitors</h4>
+                {brand.competitors.length > 0 ? (
+                  <div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Website</TableHead>
+                          <TableHead>Socials</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {brand.competitors.map((competitor: any) => {
+                          return (
+                            <TableRow key={competitor.competitor_id}>
+                              <TableCell className="font-medium">
+                                {competitor.name}
+                              </TableCell>
+                              <TableCell>
+                                <Link
+                                  href={competitor.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center gap-1 hover:underline"
+                                >
+                                  {competitor.url}
+                                  <LinkIcon className="size-3" />
+                                </Link>
+                              </TableCell>
+                              <TableCell className="flex flex-wrap gap-1">
+                                {competitor.facebook_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link
+                                      href={competitor.facebook_url}
+                                      target="_blank"
+                                    >
+                                      Facebook
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.instagram_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link
+                                      href={competitor.instagram_url}
+                                      target="_blank"
+                                    >
+                                      Instagram
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.linkedin_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link
+                                      href={competitor.linkedin_url}
+                                      target="_blank"
+                                    >
+                                      LinkedIn
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.x_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link href={competitor.x_url} target="_blank">
+                                      X
+                                    </Link>
+                                  </Badge>
+                                )}
+                                {competitor.youtube_url && (
+                                  <Badge asChild variant="secondary">
+                                    <Link
+                                      href={competitor.youtube_url}
+                                      target="_blank"
+                                    >
+                                      YouTube
+                                    </Link>
+                                  </Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground p-4 border rounded-md text-center">
+                    No competitors found for this brand.
+                  </div>
                 )}
               </div>
             </div>
-
-            <div>
-              <h4 className="text-md font-medium mb-2">Competitors</h4>
-              {brand.competitors.length > 0 ? (
-                <div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Website</TableHead>
-                        <TableHead>Socials</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {brand.competitors.map((competitor: any) => {
-                        return (
-                          <TableRow key={competitor.competitor_id}>
-                            <TableCell className="font-medium">
-                              {competitor.name}
-                            </TableCell>
-                            <TableCell>
-                              <Link
-                                href={competitor.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 hover:underline"
-                              >
-                                {competitor.url}
-                                <LinkIcon className="size-3" />
-                              </Link>
-                            </TableCell>
-                            <TableCell className="flex flex-wrap gap-1">
-                              {competitor.facebook_url && (
-                                <Badge asChild variant="secondary">
-                                  <Link
-                                    href={competitor.facebook_url}
-                                    target="_blank"
-                                  >
-                                    Facebook
-                                  </Link>
-                                </Badge>
-                              )}
-                              {competitor.instagram_url && (
-                                <Badge asChild variant="secondary">
-                                  <Link
-                                    href={competitor.instagram_url}
-                                    target="_blank"
-                                  >
-                                    Instagram
-                                  </Link>
-                                </Badge>
-                              )}
-                              {competitor.linkedin_url && (
-                                <Badge asChild variant="secondary">
-                                  <Link
-                                    href={competitor.linkedin_url}
-                                    target="_blank"
-                                  >
-                                    LinkedIn
-                                  </Link>
-                                </Badge>
-                              )}
-                              {competitor.x_url && (
-                                <Badge asChild variant="secondary">
-                                  <Link href={competitor.x_url} target="_blank">
-                                    X
-                                  </Link>
-                                </Badge>
-                              )}
-                              {competitor.youtube_url && (
-                                <Badge asChild variant="secondary">
-                                  <Link
-                                    href={competitor.youtube_url}
-                                    target="_blank"
-                                  >
-                                    YouTube
-                                  </Link>
-                                </Badge>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground p-4 border rounded-md text-center">
-                  No competitors found for this brand.
-                </div>
-              )}
-            </div>
-
-            <span className="absolute flex top-10  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold dark:text-primary/5 text-primary/10  select-none">
-              B{index + 1}
-            </span>
-          </div>
-        )}
-      </CardContent>
+          )}
+          <span className="absolute flex  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold  dark:text-primary/5 text-primary/10  select-none">
+            B{index + 1}
+          </span>
+        </CardContent>
+      </div>
     </Card>
   );
 }

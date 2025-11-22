@@ -75,13 +75,13 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
         )
     }
 
-    if (!selectedReport || !selectedEntityName) {
-        return (
-            <div className="flex h-[60vh] items-center justify-center p-8 text-center text-muted-foreground">
-                Loading report data...
-            </div>
-        )
-    }
+    // if (!selectedReport || !selectedEntityName) {
+    //     return (
+    //         <div className="flex h-[60vh] items-center justify-center p-8 text-center text-muted-foreground">
+    //             Loading report data...
+    //         </div>
+    //     )
+    // }
 
     const selectedEntity = dataSources.find(ds => ds.name === selectedEntityName)
 

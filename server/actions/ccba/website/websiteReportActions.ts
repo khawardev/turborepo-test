@@ -27,11 +27,12 @@ export async function batchWebsiteReports({
         };
 
         const batchReports = await brandRequest("/batch/website-reports", "POST", payload);
+        console.log(batchReports.task_id, `<-> batchReports.task_id <->`);
 
-        await pollUntilComplete(
-            async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
-            (res:any) => res.success && res.data?.status === "Completed"
-        )
+        // await pollUntilComplete(
+        //     async () => await getBatchWebsiteReportsStatus(brand_id, batchReports.task_id),
+        //     (res: any) => res.success && res.data?.status === "Completed"
+        // )
         revalidatePath(`/ccba/${brand_id}`);
         return batchReports.task_id
     } catch (error: any) {

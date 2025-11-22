@@ -11,6 +11,8 @@ import {
     TooltipTrigger
 } from '@/components/ui/tooltip';
 import { useAnimatedTabs } from '@/hooks/useAnimatedTabs';
+import { CcbaStatusResponse } from '@/types/status';
+import { TaskStatus } from './TaskStatus';
 
 const transition: any = {
     type: 'tween',
@@ -157,7 +159,8 @@ const Tabs = ({
 };
 
 export function AnimatedTabs({
-    tabs
+    tabs,
+    status
 }: {
     tabs: {
         label: string;
@@ -167,6 +170,7 @@ export function AnimatedTabs({
         tooltip?: string;
         disabledTooltip?: string;
     }[];
+    status: CcbaStatusResponse | null;
 }) {
     const [hookProps] = React.useState({
         tabs: tabs,
@@ -180,7 +184,10 @@ export function AnimatedTabs({
         <div className="w-full">
             <div className="relative flex w-full items-center  justify-between  border-b-2 dark:border-border border-border/40">
                 <Tabs {...framer.tabProps} />
-                d
+                
+                
+                <TaskStatus initialStatusData={status} />
+
             </div>
             <AnimatePresence mode="wait">
                 {selectedTabData && (

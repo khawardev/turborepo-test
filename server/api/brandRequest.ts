@@ -32,6 +32,7 @@ export async function brandRequest(
         cache,
     });
 
+
     const text = await res.text();
     const data = text ? JSON.parse(text) : null;
 
