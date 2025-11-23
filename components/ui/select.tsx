@@ -2,9 +2,61 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+
+// --- Hover Tracker Logic ---
+
+interface HoverTrackerContextType {
+  onHover: (element: HTMLElement) => void
+  onLeave: () => void
+}
+
+const HoverTrackerContext = React.createContext<HoverTrackerContextType | null>(null)
+
+function useHoverTracker() {
+  const [hoverStyle, setHoverStyle] = React.useState({
+    top: 0,
+    left: 0,
+    height: 0,
+    width: 0,
+    opacity: 0,
+  })
+
+  const onHover = React.useCallback((element: HTMLElement) => {
+    setHoverStyle({
+      top: element.offsetTop,
+      left: element.offsetLeft,
+      height: element.offsetHeight,
+      width: element.offsetWidth,
+      opacity: 1,
+    })
+  }, [])
+
+  const onLeave = React.useCallback(() => {
+    setHoverStyle((prev) => ({ ...prev, opacity: 0 }))
+  }, [])
+
+  return { hoverStyle, onHover, onLeave }
+}
+
+function HoverTrackerBackground({ hoverStyle }: { hoverStyle: any }) {
+  return (
+    <div
+      className="absolute z-0 rounded-lg bg-accent transition-all duration-300 ease-out pointer-events-none"
+      style={{
+        top: hoverStyle.top,
+        left: hoverStyle.left,
+        width: hoverStyle.width,
+        height: hoverStyle.height,
+        opacity: hoverStyle.opacity,
+      }}
+    />
+  )
+}
+
+// --- Components ---
 
 function Select({
   ...props
@@ -26,25 +78,21 @@ function SelectValue({
 
 function SelectTrigger({
   className,
-  size = "default",
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: "sm" | "default"
-}) {
+}: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      data-size={size}
       className={cn(
-        "border-input bg-outline border rounded-lg  backdrop-blur data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground  aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2    px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         className
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
+        <ChevronDown className="size-4 shrink-0 opacity-50 transition-transform duration-200" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
@@ -56,12 +104,14 @@ function SelectContent({
   position = "popper",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const { hoverStyle, onHover, onLeave } = useHoverTracker()
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "relative z-50 max-h-[var(--radix-select-content-available-height)] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-xl bg-outline p-1 shadow-md duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border/50 bg-popover text-popover-foreground shadow-xl shadow-black/5 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
@@ -71,12 +121,17 @@ function SelectContent({
       >
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
+          onMouseLeave={onLeave}
           className={cn(
+            "relative p-1",
             position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
           )}
         >
-          {children}
+          <HoverTrackerBackground hoverStyle={hoverStyle} />
+          <HoverTrackerContext.Provider value={{ onHover, onLeave }}>
+            {children}
+          </HoverTrackerContext.Provider>
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
@@ -91,7 +146,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("px-2 py-1.5 text-sm font-medium", className)}
+      className={cn("px-2 py-1.5 text-xs font-semibold text-muted-foreground", className)}
       {...props}
     />
   )
@@ -102,22 +157,28 @@ function SelectItem({
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Item>) {
+  const context = React.useContext(HoverTrackerContext)
+
+  const handleInteraction = (e: React.SyntheticEvent<HTMLElement>) => {
+    context?.onHover(e.currentTarget)
+  }
+
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
+      onMouseEnter={handleInteraction}
+      onFocus={handleInteraction}
       className={cn(
-        "relative flex w-full cursor-default select-none items-center gap-2 rounded-lg border border-transparent py-1.5 pl-2 pr-8 text-sm outline-hidden",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "focus:border-muted-foreground/20 focus:bg-gradient-to-t focus:from-muted focus:to-border focus:dark:from-muted/50",
-        "focus:text-accent-foreground focus:shadow-zinc-950/10 hover:cursor-pointer hover:duration-200",
-        "[&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 flex w-full cursor-pointer select-none items-center rounded-lg py-1.5 pl-2 pr-8 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        // Disable default hover/focus backgrounds so the tracker is visible
+        "focus:bg-transparent hover:bg-transparent",
         className
       )}
       {...props}
     >
       <span className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
+          <Check className="size-4 text-primary" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -132,7 +193,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("bg-border/60 -mx-1 my-1 h-px", className)}
+      className={cn("-mx-1 my-1 h-px bg-muted", className)}
       {...props}
     />
   )
@@ -146,12 +207,12 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        "flex cursor-default items-center justify-center py-1",
+        "flex cursor-default items-center justify-center py-1 opacity-50 hover:opacity-100",
         className
       )}
       {...props}
     >
-      <ChevronUpIcon className="size-4" />
+      <ChevronUp className="size-4" />
     </SelectPrimitive.ScrollUpButton>
   )
 }
@@ -164,12 +225,12 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        "flex cursor-default items-center justify-center py-1",
+        "flex cursor-default items-center justify-center py-1 opacity-50 hover:opacity-100",
         className
       )}
       {...props}
     >
-      <ChevronDownIcon className="size-4" />
+      <ChevronDown className="size-4" />
     </SelectPrimitive.ScrollDownButton>
   )
 }

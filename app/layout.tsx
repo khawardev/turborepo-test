@@ -32,12 +32,12 @@ export default function RootLayout({
       <body className={`relative  victor antialiased `} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {/* <LightRaysWrapper> */}
-            {/* <HeaderServer /> */}
+            <HeaderServer />
             {/* <HeroHeader/> */}
             {/* <JotaiProvider> */}
               {children}
             {/* </JotaiProvider> */}
-            <Toaster position='bottom-left' />
+            <Toaster position='bottom-center' />
           {/* </LightRaysWrapper> */}
         </ThemeProvider>
       </body>

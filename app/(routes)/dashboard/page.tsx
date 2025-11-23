@@ -13,8 +13,26 @@ import {
 import DashboardHeader from "@/components/stages/ccba/dashboard/shared/DashboardHeader"
 import { PatternedSeparator } from "@/components/static/shared/chandai/SepratorChandai"
 import { Separator } from "@/components/ui/separator"
+import { Clipboard } from "lucide-react"
+import { toast } from "sonner"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 
 export default function Page() {
+    function CopyButton({ text }:any) {
+        const handleCopy = async () => {
+            await navigator.clipboard.writeText(text)
+            toast.success("Manage your team, billing")
+        }
+
+        return (
+            <div>
+                <Button variant={'ghost'} onClick={handleCopy} className="flex items-center gap-2">
+                    <Clipboard className="size-4" />
+                    Copy
+                </Button>
+            </div>
+        )
+    }
     return (
         <>
             <div className="relative flex flex-1 flex-col gap-8 p-8 max-w-4xl">
@@ -23,8 +41,8 @@ export default function Page() {
                     title="Settings"
                     subtitle="Manage your team, billing, and account preferences"
                 />
-
-
+              <ThemeSwitcher/>
+                <CopyButton text="Hello world" />
                 <div className="grid grid-cols-12 gap-8">
                     <div className="col-span-9 space-y-8 rounded-xl p-0.5">
 

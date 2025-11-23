@@ -57,7 +57,7 @@ export default async function CgePage() {
       <div className="space-y-8">
         <CreateCgeSessionForm brands={brands} />
         <div>
-            <h2 className="text-2xl font-bold mb-4">Existing CGE Sessions</h2>
+            <h2 className="text-2xl  mb-4">Existing CGE Sessions</h2>
             <CgeSessionsList brands={brands} />
         </div>
       </div>

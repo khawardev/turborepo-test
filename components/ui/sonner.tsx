@@ -1,25 +1,38 @@
-"use client"
+"use client";
 
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, ToasterProps } from "sonner"
+import { useTheme } from "next-themes";
+import type { ToasterProps } from "sonner";
+import { Toaster as Sonner } from "sonner";
 
-const Toaster = (props: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+import { cn } from "@/lib/utils";
 
-  const style: React.CSSProperties = {
-    "--normal-bg": "var(--accent)",
-    "--normal-text": "var(--accent-foreground)",
-    "--normal-border": "var(--border)",
-  } as React.CSSProperties
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="toaster group rounded-xl text-lg shadow-xs text-muted-foreground font-medium"
-      style={style}
+      className="toaster group"
+      toastOptions={{
+        classNames: {
+          toast: cn(
+            "group-[.toaster]:border-none! victor group-[.toaster]:shadow-md!",
+            "group-[.toaster]:backdrop-blur-md supports-backdrop-filter:group-[.toaster]:bg-popover/90!",
+            "group-[.toaster]:ring-1! group-[.toaster]:ring-black/10! dark:group-[.toaster]:ring-white/15!"
+          ),
+        },
+      }}
+      style={
+        {
+          "--normal-bg": "var(--cd-popover)",
+          "--normal-text": "var(--cd-popover-foreground)",
+          "--normal-border": "var(--cd-border)",
+          "--border-radius": "var(--radius-xl)",
+        } as React.CSSProperties
+      }
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };
