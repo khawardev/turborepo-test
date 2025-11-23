@@ -13,12 +13,8 @@ const ibmPlexSans = IBM_Plex_Sans({
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
-export const viewport: Viewport = {
-  initialScale: 1,
-  width: "device-width",
-  maximumScale: 1,
-  viewportFit: "cover",
-};
+
+
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -33,16 +29,16 @@ export default function RootLayout({
   return (
     // ${inter.className} 
     <html lang="en" suppressHydrationWarning>
-      <body className={`relative ${inter.className} antialiased`} suppressHydrationWarning>
+      <body className={`relative  victor antialiased `} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <LightRaysWrapper>
-            <HeaderServer />
+          {/* <LightRaysWrapper> */}
+            {/* <HeaderServer /> */}
             {/* <HeroHeader/> */}
             {/* <JotaiProvider> */}
               {children}
             {/* </JotaiProvider> */}
             <Toaster position='bottom-left' />
-          </LightRaysWrapper>
+          {/* </LightRaysWrapper> */}
         </ThemeProvider>
       </body>
     </html>

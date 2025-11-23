@@ -19,7 +19,7 @@ export default function ExtractedDataDashboard({ extractorReport, title }: any) 
 
     return (
         <div className="space-y-6 w-full ">
-            <h2 className="text-xl tracking-tighter font-semibold">
+            <h2 className="text-xl  font-semibold">
                 {title.charAt(0).toUpperCase() + title.slice(1)} Extractor Report
             </h2>
             <AuditAndCorpusSummary

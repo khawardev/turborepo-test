@@ -16,10 +16,9 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FullLogo } from "@/components/static/shared/Logo"
-import { BreadcrumbSeparator } from "../../../ui/breadcrumb"
-// import { SidebarUser } from "./sidebar-user"
+import { BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
-export function LeftSidebar({
+export function LeftSidebarv2({
     SidebarHrefTree,
     ...props
 }: React.ComponentProps<typeof Sidebar> & { SidebarHrefTree: any }) {
@@ -27,18 +26,18 @@ export function LeftSidebar({
     return (
         <Sidebar {...props} variant='inset'>
             <SidebarHeader>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton className="hover:bg-none focus:bg-none" asChild>
-                                <FullLogo />
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton className="hover:bg-none focus:bg-none" asChild>
+                            <FullLogo />
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarHeader>
 
             <SidebarContent>
                 {/* <SidebarList /> */}
-                {SidebarHrefTree.navMain.map((item:any) => (
+                {SidebarHrefTree.navMain.map((item: any) => (
                     <SidebarGroup key={item.title}>
                         <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                         <SidebarGroupContent>
@@ -56,7 +55,7 @@ export function LeftSidebar({
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
-                ))} 
+                ))}
             </SidebarContent>
             {/* <SidebarFooter>
                 <SidebarUser />

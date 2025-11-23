@@ -9,7 +9,7 @@ export function DashboardInnerLayout({ children }: any) {
 export function DashboardLayoutHeading({ children }: any) {
   return (
     <section className=' flex flex-col gap-6'>
-      <span className="text-2xl tracking-tighter select-none font-bold">
+      <span className="text-3xl  select-none font-bold">
         {children}
       </span>
     </section>

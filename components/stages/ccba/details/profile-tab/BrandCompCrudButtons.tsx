@@ -54,7 +54,7 @@ export function BrandCompCrudButtons({ brand, side }: any) {
             <DropdownMenuContent align="end" className="w-34">
                 {/* Brand Sub Menu */}
                 <DropdownMenuSub >
-                    <DropdownMenuSubTrigger side={side}>
+                    <DropdownMenuSubTrigger >
                         <span>Brand</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent sideOffset={10} >
@@ -73,7 +73,7 @@ export function BrandCompCrudButtons({ brand, side }: any) {
                 <DropdownMenuSeparator />
                 {/* Competitors Sub Menu */}
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger side={side}>
+                    <DropdownMenuSubTrigger >
                         <span>Competitors</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent sideOffset={10} >
