@@ -36,11 +36,11 @@ function TooltipTrigger({
 }
 
 const tooltipVariants = cva(
-  "bg-border/40 backdrop-blur font-medium mb-2 animate-in fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-lg border px-2.5 py-1.5 text-xs select-none max-w-sm",
+  "bg-background backdrop-blur shadow-sm font-medium mb-2 animate-in fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-lg border px-2.5 py-1.5 text-xs select-none max-w-sm",
   {
     variants: {
       variant: {
-        default: "bg-border text-foreground",
+        default: "bg-background text-foreground",
         success: "bg-green-600 text-white border-green-700",
         warning: "bg-yellow-500 text-black border-yellow-600",
         error: "bg-red-600 text-white border-red-700",

@@ -26,6 +26,8 @@ import {
 import { FullLogo, HalfLogo } from "../Logo"
 import SidebarUserV2 from "./sidebar-user-v2"
 import { SidebarListV2 } from "./sidebar-list-v2"
+import WhatsNew from "./whats-new"
+import SidebarCollapsable from "./sidebar-collpasable"
 
 const data = {
     user: {
@@ -91,7 +93,6 @@ const data = {
 }
 
 export function LeftSidebarV2({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { toggleSidebar, state } = useSidebar()
 
     return (
         <Sidebar collapsible="icon" variant='inset' {...props}>
@@ -116,44 +117,10 @@ export function LeftSidebarV2({ ...props }: React.ComponentProps<typeof Sidebar>
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup>
-                    <SidebarMenu>
-                        {data.navMain.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
-                                    <a href={item.url}>
-                                        <item.icon />
-                                        <span>{item.title}</span>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-
-                        {data.navSecondary.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive} className={item.isActive ? "text-orange-600 hover:text-orange-600 bg-orange-50 hover:bg-orange-100" : ""}>
-                                    <a href={item.url}>
-                                        <item.icon className={item.isActive ? "text-orange-600" : ""} />
-                                        <span>{item.title}</span>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
+                <SidebarListV2 data={data} />
             </SidebarContent>
-            {/* <SidebarListV2 /> */}
             <SidebarFooter>
-                <div className="p-1 group-data-[collapsible=icon]:hidden">
-                    <div className="bg-accent border  rounded-lg p-3 text-xs space-y-2">
-                        <div className="flex items-center gap-2  font-medium">
-                            <div className="size-2 rounded-full  bg-foreground " />
-                            <span>What's New</span>
-                            <span className="ml-auto text-[10px] bg-border px-1 rounded-sm ">11</span>
-                        </div>
-                        <p className="text-muted-foreground line-clamp-2">View our latest update</p>
-                    </div>
-                </div>
+                <WhatsNew/>
 
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -163,16 +130,7 @@ export function LeftSidebarV2({ ...props }: React.ComponentProps<typeof Sidebar>
 
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton onClick={toggleSidebar} className="justify-center text-muted-foreground hover:text-foreground">
-                            {state === "expanded" ? (
-                                <>
-                                    <PanelLeftClose className="mr-2 size-4" />
-                                    <span>Collapse</span>
-                                </>
-                            ) : (
-                                <PanelLeft className="size-4" />
-                            )}
-                        </SidebarMenuButton>
+                        <SidebarCollapsable/>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
