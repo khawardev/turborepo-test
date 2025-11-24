@@ -58,9 +58,6 @@ export function LeftSidebar({
                     </SidebarGroup>
                 ))} 
             </SidebarContent>
-            {/* <SidebarFooter>
-                <SidebarUser />
-            </SidebarFooter> */}
             <SidebarRail />
         </Sidebar>
     )

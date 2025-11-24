@@ -11,7 +11,6 @@ import { getCurrentUser } from '@/server/actions/authActions'
 export default async function CompetitorPage({params}: {params: Promise<{ brandId: string; competitorId: string }>}) {
     await getCurrentUser()
 
-
     const { brandId, competitorId } = await params
     const brandData = await getBrandbyIdWithCompetitors(brandId)
     const competitor = brandData.competitors.find((c: any) => c.id === competitorId)
