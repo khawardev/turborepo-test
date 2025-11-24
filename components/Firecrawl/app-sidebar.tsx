@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
     Book,
@@ -59,6 +57,7 @@ import { cn } from "@/lib/utils"
 import { HoverTracker } from "../ui/hover-tracker"
 import { FullLogo, HalfLogo } from "../static/shared/Logo"
 import { RiUserSmileLine } from "react-icons/ri"
+import SidebarUserV2 from "../static/shared/sidebarV2/sidebar-user-v2"
 
 // Mock Data
 const data = {
@@ -126,11 +125,9 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { toggleSidebar, state } = useSidebar()
-    const [open, setOpen] = React.useState(false)
-    // Mock Team State
 
     return (
-        <Sidebar collapsible="icon" {...props}>
+        <Sidebar collapsible="icon" variant='inset' {...props}>
             <SidebarHeader>
                 <div className="mt-2">
                     <div className="hidden group-data-[collapsible=icon]:block">
@@ -180,62 +177,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
-                {/* <div className="p-1 group-data-[collapsible=icon]:hidden">
+             <div className="p-1 group-data-[collapsible=icon]:hidden">
                     <div className="bg-accent border  rounded-lg p-3 text-xs space-y-2">
                         <div className="flex items-center gap-2  font-medium">
-                            <Sparkles className="size-3.5 " />
+                            <div className="size-2 rounded-full  bg-foreground " />
                             <span>What's New</span>
                             <span className="ml-auto text-[10px] bg-border px-1 rounded-sm ">11</span>
                         </div>
                         <p className="text-muted-foreground line-clamp-2">View our latest update</p>
                     </div>
-                </div> */}
+                </div>  
 
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <DropdownMenu open={open} onOpenChange={setOpen}>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground" >
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-orange-100 text-orange-600 font-bold border border-orange-200">
-                                        KS
-                                    </div>
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-medium">{data.user.name}</span>
-                                        <span className="truncate text-xs text-muted-foreground">{data.user.email}</span>
-                                    </div>
-                                    <ChevronsUpDown className="ml-auto size-4" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-60"
-                                side="top"
-                                align="start"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel
-                                    label="Account"
-                                    rootOpenSetter={setOpen} 
-                                />
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem><Book />Blog</DropdownMenuItem>
-                                    <DropdownMenuItem><FileText />Documentation</DropdownMenuItem>
-                                    <DropdownMenuItem><RiUserSmileLine />Join Discord community</DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem><Globe />Domain checker</DropdownMenuItem>
-                                    <DropdownMenuItem><Settings />Account Settings</DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem><Settings />Team Settings</DropdownMenuItem>
-                                    <DropdownMenuItem><CreditCard />Manage Subscriptions</DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem variant="destructive"> <LogOut />Sign out</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <SidebarUserV2 /> 
                     </SidebarMenuItem>
                 </SidebarMenu>
 

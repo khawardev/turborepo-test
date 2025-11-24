@@ -1,6 +1,7 @@
 'use client'
 import { Separator } from "@/components/ui/separator"
 import {
+    SidebarHeader,
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/collapsible"
 import { useState } from "react"
 import { RiUserSmileLine } from "react-icons/ri"
+import { LeftSidebarV2 } from "@/components/static/shared/sidebarV2/left-sidebar-v2"
 
 export default function DashboardLayout({
     children,
@@ -34,9 +36,9 @@ export default function DashboardLayout({
 
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <LeftSidebarV2 />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-background">
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear  bg-accent/30">
                     <div className="flex items-center gap-2 mr-auto">
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="mr-2 h-4" />
@@ -56,9 +58,9 @@ export default function DashboardLayout({
                                     <DropdownMenuSeparator />
 
                                     <DropdownMenuItem
-                                        className="bg-accent text-primary "
+                                        className="bg-accent "
                                     >
-                                        <div className="flex items-center justify-center size-6 rounded-md bg-primary text-white text-xs font-bold">P</div>
+                                        <div className="flex items-center justify-center size-6 rounded-md bg-primary text-background text-xs font-bold">P</div>
                                         <span className="font-medium">Personal</span>
                                         <div className="ml-auto size-2 rounded-full bg-primary" />
                                     </DropdownMenuItem>
@@ -101,7 +103,7 @@ export default function DashboardLayout({
                         </Button>
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                <div>
                     {children}
                 </div>
             </SidebarInset>

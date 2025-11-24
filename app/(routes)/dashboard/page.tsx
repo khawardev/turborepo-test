@@ -18,7 +18,7 @@ import { toast } from "sonner"
 import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 
 export default function Page() {
-    function CopyButton({ text }:any) {
+    function CopyButton({ text }: any) {
         const handleCopy = async () => {
             await navigator.clipboard.writeText(text)
             toast.success("Manage your team, billing")
@@ -35,13 +35,12 @@ export default function Page() {
     }
     return (
         <>
+            <DashboardHeader
+                title="Settings"
+                subtitle="Manage your team, billing, and account preferences"
+            />
             <div className="relative flex flex-1 flex-col gap-8 p-8 max-w-4xl">
-
-                <DashboardHeader
-                    title="Settings"
-                    subtitle="Manage your team, billing, and account preferences"
-                />
-              <ThemeSwitcher/>
+                <ThemeSwitcher />
                 <CopyButton text="Hello world" />
                 <div className="grid grid-cols-12 gap-8">
                     <div className="col-span-9 space-y-8 rounded-xl p-0.5">

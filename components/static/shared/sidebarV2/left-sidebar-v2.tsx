@@ -1,65 +1,181 @@
-'use client'
 import * as React from "react"
+import {
+    FileText,
+    Home,
+    Key,
+    PieChart,
+    Settings,
+    SquareTerminal,
+    Command,
+    PanelLeftClose,
+    PanelLeft,
+} from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarHeader,
+    SidebarInput,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FullLogo } from "@/components/static/shared/Logo"
-import { BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+    useSidebar,
+} from "@/components/Firecrawl/sidebar"
+import { FullLogo, HalfLogo } from "../Logo"
+import SidebarUserV2 from "./sidebar-user-v2"
+import { SidebarListV2 } from "./sidebar-list-v2"
 
-export function LeftSidebarv2({
-    SidebarHrefTree,
-    ...props
-}: React.ComponentProps<typeof Sidebar> & { SidebarHrefTree: any }) {
-    const pathname = usePathname()
+const data = {
+    user: {
+        name: "Khawar Sultan",
+        email: "khawarsultan.developer@gmail.com",
+        avatar: "/avatars/shadcn.jpg",
+    },
+    navMain: [
+        {
+            title: "Overview",
+            url: "#",
+            icon: Home,
+            isActive: false,
+        },
+        {
+            title: "Playground",
+            url: "/dashboard/playground",
+            icon: SquareTerminal,
+            isActive: false,
+        },
+    ],
+    navExtract: [
+        {
+            title: "Extract",
+            url: "#",
+            icon: FileText,
+            isActive: true,
+            items: [
+                {
+                    title: "Overview",
+                    url: "#",
+                },
+                {
+                    title: "Playground",
+                    url: "#",
+                },
+            ],
+        },
+    ],
+    navSecondary: [
+        {
+            title: "Activity Logs",
+            url: "#",
+            icon: FileText,
+        },
+        {
+            title: "Usage",
+            url: "#",
+            icon: PieChart,
+        },
+        {
+            title: "API Keys",
+            url: "#",
+            icon: Key,
+        },
+        {
+            title: "Settings",
+            url: "#",
+            icon: Settings,
+            isActive: true,
+        },
+    ],
+}
+
+export function LeftSidebarV2({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { toggleSidebar, state } = useSidebar()
+
     return (
-        <Sidebar {...props} variant='inset'>
+        <Sidebar collapsible="icon" variant='inset' {...props}>
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton className="hover:bg-none focus:bg-none" asChild>
-                            <FullLogo />
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <div className="mt-2">
+                    <div className="hidden group-data-[collapsible=icon]:block">
+                        <HalfLogo />
+                    </div>
+                    <div className="block group-data-[collapsible=icon]:hidden">
+                        <FullLogo />
+                    </div>
+                </div>
+                <div className="px-1 mt-2 relative group-data-[collapsible=icon]:hidden text-base">
+                    <div className="relative">
+                        <Command className="absolute left-2 top-2.5 size-3.5 text-muted-foreground" />
+                        <SidebarInput placeholder="Search" className="pl-8 bg-background border-input" />
+                        <div className="absolute right-2 top-2 hidden items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                            <span className="text-xs">⌘</span>K
+                        </div>
+                    </div>
+                </div>
             </SidebarHeader>
 
             <SidebarContent>
-                {/* <SidebarList /> */}
-                {SidebarHrefTree.navMain.map((item: any) => (
-                    <SidebarGroup key={item.title}>
-                        <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {item.items.map((item: any) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton variant={pathname !== item.url ? "ghost" : "primary"} asChild >
-                                            <Link href={item.url} className="flex justify-between w-full">
-                                                <span className="flex items-center gap-2">{item.title.charAt(0).toUpperCase() + item.title.slice(1)}</span>
-                                                {pathname === item.url && <p><BreadcrumbSeparator /></p>}
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                ))}
+                <SidebarGroup>
+                    <SidebarMenu>
+                        {data.navMain.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
+                                    <a href={item.url}>
+                                        <item.icon />
+                                        <span>{item.title}</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+
+                        {data.navSecondary.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive} className={item.isActive ? "text-orange-600 hover:text-orange-600 bg-orange-50 hover:bg-orange-100" : ""}>
+                                    <a href={item.url}>
+                                        <item.icon className={item.isActive ? "text-orange-600" : ""} />
+                                        <span>{item.title}</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroup>
             </SidebarContent>
-            {/* <SidebarFooter>
-                <SidebarUser />
-            </SidebarFooter> */}
+            {/* <SidebarListV2 /> */}
+            <SidebarFooter>
+                <div className="p-1 group-data-[collapsible=icon]:hidden">
+                    <div className="bg-accent border  rounded-lg p-3 text-xs space-y-2">
+                        <div className="flex items-center gap-2  font-medium">
+                            <div className="size-2 rounded-full  bg-foreground " />
+                            <span>What's New</span>
+                            <span className="ml-auto text-[10px] bg-border px-1 rounded-sm ">11</span>
+                        </div>
+                        <p className="text-muted-foreground line-clamp-2">View our latest update</p>
+                    </div>
+                </div>
+
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarUserV2 />
+                    </SidebarMenuItem>
+                </SidebarMenu>
+
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton onClick={toggleSidebar} className="justify-center text-muted-foreground hover:text-foreground">
+                            {state === "expanded" ? (
+                                <>
+                                    <PanelLeftClose className="mr-2 size-4" />
+                                    <span>Collapse</span>
+                                </>
+                            ) : (
+                                <PanelLeft className="size-4" />
+                            )}
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
             <SidebarRail />
         </Sidebar>
     )
