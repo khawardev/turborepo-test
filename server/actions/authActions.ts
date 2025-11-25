@@ -4,7 +4,7 @@ import {
   forgotPasswordSchema,
   loginSchema,
   registerSchema,
-} from "@/lib/static/validations";
+} from "@/lib/validations";
 import { authRequest } from "@/server/api/authRequest";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";

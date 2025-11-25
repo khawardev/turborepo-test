@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader";
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader";
 import { chat } from "@/server/actions/cge/chatActions";
 
 const formSchema = z.object({

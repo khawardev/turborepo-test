@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { brandSchema } from "@/lib/static/validations";
+import { brandSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -27,7 +27,7 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
-import { Spinner } from "@/components/static/shared/SpinnerLoader";
+import { Spinner } from "@/components/shared/SpinnerLoader";
 import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { updateBrand } from "@/server/actions/brandActions";
@@ -96,7 +96,7 @@ export function EditBrandList({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-[80%] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Brand</DialogTitle>
                     <DialogDescription>

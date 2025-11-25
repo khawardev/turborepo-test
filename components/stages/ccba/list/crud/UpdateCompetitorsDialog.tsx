@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { brandSchema } from "@/lib/static/validations";
+import { brandSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { updateCompetitorAction } from "@/server/actions/brandActions";
-import { Spinner } from "@/components/static/shared/SpinnerLoader";
+import { Spinner } from "@/components/shared/SpinnerLoader";
 import { Card, CardContent } from "@/components/ui/card";
 
 const competitorSchema = brandSchema.shape.competitors.unwrap().element;
@@ -218,7 +218,7 @@ export function UpdateCompetitorsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Update Competitors</DialogTitle>
           <DialogDescription>

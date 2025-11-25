@@ -1,6 +1,6 @@
 "use server";
 
-import { brandSchema } from "@/lib/static/validations";
+import { brandSchema } from "@/lib/validations";
 import { brandRequest } from "@/server/api/brandRequest";
 import { Brand, Competitor } from "@/types";
 import { revalidatePath } from "next/cache";

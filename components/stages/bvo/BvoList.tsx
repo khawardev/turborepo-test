@@ -33,7 +33,7 @@ export default async function BvoList() {
     })
   )
   return (
-    <div className="space-y-4">
+    <div className="px-1 mb-2">
       {brandsWithHistory.map((entry) => {
         if (!entry) return null
 

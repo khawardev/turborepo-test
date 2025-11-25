@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrapper";
 import HeaderServer from "@/components/static/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
-import { siteConfig } from "@/config/brandos-config";
+import { siteConfig } from "@/config/brandos-sidebar-config";
 import { HeroHeader } from "@/components/static/header/HeroHeader";
 const inter = Inter({ subsets: ["latin"], display: 'swap', });
 const ibmPlexSans = IBM_Plex_Sans({

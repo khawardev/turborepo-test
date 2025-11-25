@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { loginSchema } from "@/lib/static/validations";
+import { loginSchema } from "@/lib/validations";
 import { login } from "@/server/actions/authActions";
 
 export function LoginForm({

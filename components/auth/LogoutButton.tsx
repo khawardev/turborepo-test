@@ -14,9 +14,10 @@ export function LogoutButton() {
 
   return (
     <Button
+      variant={'destructive'}
       onClick={handleLogout}
     >
-      Logout
+      Sign out
     </Button>
   );
 }

@@ -15,7 +15,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader"
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader"
 import { DatePickerWithRange } from "./DatePickerwithRange"
 import { Label } from "@/components/ui/label"
 import { SCRAPE, SCRAPING } from "@/lib/constants"

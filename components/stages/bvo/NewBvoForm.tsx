@@ -31,8 +31,8 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ButtonSpinner, Spinner } from "@/components/static/shared/SpinnerLoader";
-import { FileDropzone } from "@/components/static/shared/FileDropzone";
+import { ButtonSpinner, Spinner } from "@/components/shared/SpinnerLoader";
+import { FileDropzone } from "@/components/shared/FileDropzone";
 import { ReportCard } from "./Report-Card";
 
 import { getBrandbyIdWithCompetitors } from "@/server/actions/brandActions";

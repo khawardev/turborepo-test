@@ -4,10 +4,10 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "./UserNav"
 import { UserNavSkeleton } from "./UserNavSkeleton"
-import { FullLogo } from "../shared/Logo"
+import { FullLogo } from "../../shared/Logo"
 import { ThemeSwitcher } from "../../ui/theme-switcher"
 import { usePathname } from "next/navigation"
-import { BrandOSConfig } from "@/config/brandos-config"
+import { BrandOSConfig } from "@/config/brandos-sidebar-config"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function HeaderClient({user}:any) {

@@ -30,17 +30,17 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
                     <Link href="#" aria-label={`Read more ${post.title} article`} className="absolute inset-0">
                     </Link>
 
-                    <h2 className="text-xl font-bold text-white group-hover:underline">{post.title}</h2>
-                    <p className="text-gray-300">{post.description}</p>
+                    <h2 className="text-xl  group-hover:underline">{post.title}</h2>
+                    <p className="text-muted-foreground">{post.description}</p>
 
-                    <div className="flex items-center text-sm text-gray-300">
+                    <div className="flex items-center text-sm text-muted-foreground">
                         <div className="flex items-center">
                             {post.authors.length > 1 ? (
                                 <div className="flex -space-x-2">
                                     {post.authors.map((author: any, index: any) => (
                                         <Image
                                             key={index}
-                                            className="h-8 w-8 rounded-full border-2 border-white"
+                                            className="h-8 w-8 rounded-full border-2 border"
                                             width={32}
                                             height={32}
                                             alt={author.name}
@@ -57,7 +57,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
                                         alt={post.authors[0].name}
                                         src={post.authors[0].avatarUrl}
                                     />
-                                    <span className="ml-2 hidden text-white sm:inline">{post.authors[0].name}</span>
+                                    <span className="ml-2 hidden  sm:inline">{post.authors[0].name}</span>
                                 </div>
                             )}
                         </div>

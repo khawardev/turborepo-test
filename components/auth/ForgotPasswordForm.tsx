@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { forgotPasswordSchema } from "@/lib/static/validations";
+import { forgotPasswordSchema } from "@/lib/validations";
 import { forgotPassword } from "@/server/actions/authActions";
 import { useState, useTransition } from "react";
 

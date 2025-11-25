@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader";
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader";
 import { reviseContent } from "@/server/actions/cge/contentActions";
 
 const formSchema = z.object({

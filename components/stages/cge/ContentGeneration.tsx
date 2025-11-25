@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader";
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader";
 import { generateContent } from "@/server/actions/cge/contentActions";
 
 const formSchema = z.object({

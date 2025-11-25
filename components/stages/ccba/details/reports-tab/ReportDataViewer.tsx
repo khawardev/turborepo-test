@@ -1,11 +1,11 @@
 'use client'
 
-import DashboardHeader from '@/components/stages/ccba/dashboard/shared/DashboardHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import WebsiteReports from './website/WebsiteReports'
 import SocialMediaReports from './social/SocialReports'
 import { useState } from 'react'
 import { Status, StatusIndicator } from '@/components/ui/shadcn-io/status'
+import { DashboardHeader } from "../../dashboard/shared/DashboardComponents"
 
 export default function ReportDataViewer({ allwebsiteReportsData, allSocialReportsData, brandName, competitors }: any) {
     const [activeTab, setActiveTab] = useState("website")
@@ -16,7 +16,7 @@ export default function ReportDataViewer({ allwebsiteReportsData, allSocialRepor
             <DashboardHeader
                 title="Brand Reports"
                 subtitle="View all generated reports and competitor insights"
-            />
+            /> 
             <Tabs defaultValue="website" onValueChange={setActiveTab}>
                 <div className='flex items-center justify-between'>
                     <TabsList>

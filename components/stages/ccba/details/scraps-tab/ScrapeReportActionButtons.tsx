@@ -7,7 +7,7 @@ import { useTransition } from "react"
 
 import { scrapeBatchSocial } from "@/server/actions/ccba/social/socialScrapeActions"
 import { scrapeBatchWebsite } from "@/server/actions/ccba/website/websiteScrapeActions"
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader"
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader"
 import { WebsiteAskLimitDialog } from "@/components/stages/ccba/details/scraps-tab/website/WebsiteAskLimitDialog"
 import { Button } from "@/components/ui/button"
 import {

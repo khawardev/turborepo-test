@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useTheme } from "next-themes";
-import { Icons } from "../static/shared/Icons";
+import { Icons } from "../shared/Icons";
 
 const ThemeSwitcher = React.forwardRef<
     HTMLButtonElement,
@@ -20,7 +20,7 @@ const ThemeSwitcher = React.forwardRef<
             ref={ref}
             {...rest}
             className={cn(
-                "  hover:bg-border hover:cursor-pointer  hover:text-accent-foreground relative flex size-[32px] items-center justify-center rounded-lg p-2 transition-colors ",
+                "  hover:bg-border hover:cursor-pointer text-muted-foreground  hover:text-accent-foreground relative flex size-[33px] items-center justify-center rounded-md p-[9px] transition-colors ",
                 className,
             )}
             onClick={toggleTheme}

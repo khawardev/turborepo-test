@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { timeAgo } from '@/lib/utils';
 import SocialDataView from './SocialDataView';
-import { DateRangeDisplay } from '@/components/static/shared/DateRangeDisplay';
+import { DateRangeDisplay } from '@/components/shared/DateRangeDisplay';
 import { ScrapeReportActionButtons } from '@/components/stages/ccba/details/scraps-tab/ScrapeReportActionButtons';
 import { SCRAPE } from '@/lib/constants';
 import {

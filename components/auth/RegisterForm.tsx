@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { registerSchema } from "@/lib/static/validations";
+import { registerSchema } from "@/lib/validations";
 import { register } from "@/server/actions/authActions";
 
 export function RegisterForm({

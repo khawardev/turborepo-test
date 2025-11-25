@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { brandSchema } from "@/lib/static/validations";
+import { brandSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { updateBrand } from "@/server/actions/brandActions";
-import { Spinner } from "@/components/static/shared/SpinnerLoader";
+import { Spinner } from "@/components/shared/SpinnerLoader";
 
 const updateBrandSchema = brandSchema.omit({ competitors: true });
 type BrandFormValues = z.infer<typeof updateBrandSchema>;
@@ -72,7 +72,7 @@ export function UpdateBrandDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[725px]">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Update Brand</DialogTitle>
           <DialogDescription>

@@ -52,7 +52,7 @@ export function WebsiteAskLimitDialog({
             Please specify the number of pages to {SCRAPE}.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 ">
           <Input
             type="number"
             placeholder="e.g. 10"

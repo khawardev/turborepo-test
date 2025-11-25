@@ -16,6 +16,7 @@ import {
 import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
 import { BrandCompCrudButtons } from "@/components/stages/ccba/details/profile-tab/BrandCompCrudButtons";
+import { DashboardHeader } from "../../dashboard/shared/DashboardComponents";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();
@@ -40,10 +41,10 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
 
   return (
     <div className="flex flex-col space-y-8">
-      {/* <DashboardHeader
+     <DashboardHeader
         title="Brand Profile"
         subtitle="View detailed information about Brand and its Competitors"
-      />  */}
+      />
 
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>

@@ -1,10 +1,10 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DashboardHeader from "./shared/DashboardHeader";
 import DashboardSkeleton from './shared/DashboardSkeleton';
 import { Suspense } from "react";
 import { SCRAPED } from "@/lib/constants";
+import { DashboardHeader } from "./shared/DashboardComponents";
 
 export default function BrandDashboard({
     title,

@@ -13,7 +13,10 @@ function BvoResults({ results }: { results: any }) {
       {results.data.results.map((result: any) => (
         <div key={result.agent_number}>
           <h4 className="font-medium">Agent: {result.agent_number}</h4>
-          <p className="text-sm text-muted-foreground truncate">{result.agent_output}</p>
+          <div className=" w-full line-clamp-1">
+
+          {/* <p className="text-sm text-muted-foreground truncate">{result.agent_output}</p> */}
+          </div>
         </div>
       ))}
     </div>
@@ -26,7 +29,7 @@ export default function BvoItem({ bvo, brand, results }: { bvo: any; brand: any;
   
   
   return (
-    <Card>
+    <Card className="w-full border-none shadow-none rounded-none border-x-0  relative transition-all mt-1" >
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
@@ -36,7 +39,7 @@ export default function BvoItem({ bvo, brand, results }: { bvo: any; brand: any;
             <CardDescription>Date: {new Date(bvo.date).toLocaleString()}</CardDescription>
           </div>
           <Button asChild variant="outline">
-            <Link href={`/bvo/${bvo.session_id}?brand_id=${brand.brand_id}`}>View</Link>
+            <Link href={`/dashboard/bvo/${bvo.session_id}?brand_id=${brand.brand_id}`}>View</Link>
           </Button>
         </div>
       </CardHeader>

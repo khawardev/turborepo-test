@@ -21,7 +21,7 @@ import { ChevronDown, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "../../../ui/badge";
-import { ButtonSpinner } from "../../../static/shared/SpinnerLoader";
+import { ButtonSpinner } from "../../../shared/SpinnerLoader";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -38,7 +38,7 @@ import { AddCompetitorsDialog } from "./crud/AddCompetitorsDialog";
 import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
-import { ContainerMd } from "@/components/static/shared/Containers";
+import { ContainerMd } from "@/components/shared/Containers";
 
 function BrandItemSkeleton() {
   return (
@@ -102,7 +102,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
     ) {
       return;
     }
-    router.push(`/ccba/${brand.brand_id}`);
+    router.push(`/dashboard/ccba/${brand.brand_id}`);
   };
 
   const scrapeBrand = (limit: any) => {
@@ -110,7 +110,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
         router.refresh();
-        router.push(`/ccba/${brand.brand_id}`);
+        router.push(`/dashboard/ccba/${brand.brand_id}`);
         toast.success(`${SCRAPING} started successfully `);
       } else {
         toast.error(`${SCRAPING} failed.`);
@@ -121,7 +121,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   
   return (
     <Card
-      className={`w-full rounded-none relative transition-all mt-1 ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
+      className={`w-full border-none shadow-none rounded-none border-x-0  relative transition-all mt-1 ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
       onClick={isScrapped ? handleCardClick : undefined}
     >
       <div className=" mx-auto w-full space-y-6">
@@ -290,7 +290,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
               </div>
             </div>
           )}
-          <span className="absolute flex  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold  dark:text-primary/5 text-primary/10  select-none">
+          <span className="absolute flex  inset-0 justify-end flex-row w-full -z-10 text-[220px] font-bold  dark:text-accent text-primary/10  select-none">
             B{index + 1}
           </span>
         </CardContent>

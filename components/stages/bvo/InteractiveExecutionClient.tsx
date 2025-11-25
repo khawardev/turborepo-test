@@ -6,7 +6,7 @@ import {
     endInteractiveSession,
 } from "@/server/actions/bvo/agenticActions";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/static/shared/SpinnerLoader";
+import { Spinner } from "@/components/shared/SpinnerLoader";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
 

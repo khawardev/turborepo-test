@@ -5,7 +5,7 @@ import React from 'react'
 import { useScroll } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { ThemeSwitcher } from '@/components/ui/theme-switcher'
-import { FullLogo } from '../shared/Logo'
+import { FullLogo } from '../../shared/Logo'
 
 export const HeroHeader = () => {
     const [scrolled, setScrolled] = React.useState(false)

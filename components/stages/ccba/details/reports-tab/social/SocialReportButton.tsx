@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { batchSocialReports } from "@/server/actions/ccba/social/socialReportActions"
-import { ButtonSpinner } from "@/components/static/shared/SpinnerLoader"
+import { ButtonSpinner } from "@/components/shared/SpinnerLoader"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,

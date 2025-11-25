@@ -1,10 +1,10 @@
 'use client'
 
-import DashboardHeader from '@/components/stages/ccba/dashboard/shared/DashboardHeader';
 import { Status, StatusIndicator } from '@/components/ui/shadcn-io/status';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SCRAPS } from '@/lib/constants';
 import React, { useState } from 'react';
+import { DashboardHeader } from '../../dashboard/shared/DashboardComponents';
 
 export default function ScrapDataViewer({
     websiteScrapsComponent,

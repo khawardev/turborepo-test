@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { resetPasswordSchema } from "@/lib/static/validations";
+import { resetPasswordSchema } from "@/lib/validations";
 import { resetPassword } from "@/server/actions/authActions";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
