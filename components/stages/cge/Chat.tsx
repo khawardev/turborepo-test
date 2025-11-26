@@ -20,8 +20,8 @@ const formSchema = z.object({
 });
 
 interface Message {
-    type: 'user' | 'bot';
-    text: string;
+  type: 'user' | 'bot';
+  text: string;
 }
 
 export default function Chat({ camSessionId, brandId }: { camSessionId: string, brandId: string }) {
@@ -47,19 +47,21 @@ export default function Chat({ camSessionId, brandId }: { camSessionId: string, 
     setMessages(prev => [...prev, userMessage]);
     form.reset();
 
-    startTransition(async () => {
-      const result = await chat({
-        cam_session_id: camSessionId,
-        brand_id: brandId,
-        question: values.question,
-      });
-      if (result.success) {
-        const botMessage: Message = { type: 'bot', text: result.data.answer };
+    startTransition(() => {
+      (async () => {
+        const { success, message, data } = await chat({
+          cam_session_id: camSessionId,
+          brand_id: brandId,
+          question: values.question,
+        });
+        if (!success) {
+          toast.error(message);
+          setMessages(prev => prev.slice(0, -1));
+          return;
+        }
+        const botMessage: Message = { type: 'bot', text: data.answer };
         setMessages(prev => [...prev, botMessage]);
-      } else {
-        toast.error(result.error);
-        setMessages(prev => prev.slice(0, -1));
-      }
+      })();
     });
   };
 
@@ -70,20 +72,20 @@ export default function Chat({ camSessionId, brandId }: { camSessionId: string, 
       </CardHeader>
       <CardContent ref={chatContainerRef} className="flex-grow overflow-y-auto">
         <div className="space-y-4">
-            {messages.map((message, index) => (
-                <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`p-3 rounded-lg max-w-lg ${message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                        <Markdown>{message.text}</Markdown>
-                    </div>
-                </div>
-            ))}
-            {isPending && (
-                <div className="flex justify-start">
-                    <div className="p-3 rounded-lg bg-muted">
-                        <ButtonSpinner>Thinking...</ButtonSpinner>
-                    </div>
-                </div>
-            )}
+          {messages.map((message, index) => (
+            <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`p-3 rounded-lg max-w-lg ${message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                <Markdown>{message.text}</Markdown>
+              </div>
+            </div>
+          ))}
+          {isPending && (
+            <div className="flex justify-start">
+              <div className="p-3 rounded-lg bg-muted">
+                <ButtonSpinner>Thinking...</ButtonSpinner>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
       <div className="p-4 border-t">
@@ -96,15 +98,15 @@ export default function Chat({ camSessionId, brandId }: { camSessionId: string, 
                 rows={2}
                 className="pr-16"
                 onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        form.handleSubmit(onSubmit)();
-                    }
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.handleSubmit(onSubmit)();
+                  }
                 }}
               />
             </FormControl>
             <Button type="submit" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" disabled={isPending}>
-                <CornerDownLeft className="h-4 w-4" />
+              <CornerDownLeft className="h-4 w-4" />
             </Button>
           </form>
         </Form>

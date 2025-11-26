@@ -11,6 +11,8 @@ package-lock.json
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.next
+.gemini
 
 # testing
 /coverage

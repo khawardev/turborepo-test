@@ -15,6 +15,7 @@ import { SCRAPS } from '@/lib/constants';
 import { getBatchWebsiteReports } from '@/server/actions/ccba/website/websiteReportActions';
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
+import { toast } from 'sonner';
 
 export default async function BrandDetailPage({
   params
@@ -23,7 +24,13 @@ export default async function BrandDetailPage({
 }) {
   const { brandId } = await params;
 
-  const brandData = await getBrandbyIdWithCompetitors(brandId);
+  const brandResponse = await getBrandbyIdWithCompetitors(brandId);
+  if (!brandResponse.success || !brandResponse.data) {
+    toast.error(brandResponse.toast);
+    return <div>Error loading brand data.</div>;
+  }
+  const brandData = brandResponse.data;
+
   const websiteReportData = await getBatchWebsiteReports(brandId);
   const taskStatusData = await getCcbaTaskStatus(brandId);
 

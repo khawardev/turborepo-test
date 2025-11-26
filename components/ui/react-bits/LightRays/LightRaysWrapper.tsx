@@ -27,8 +27,8 @@ export default function LightRaysWrapper({
             </div>
 
             {/* <DarkVeil/> */}
-            <DarkVeil  warpAmount={0.3} speed={1} />
-           {/* <LightRays
+            {/* <DarkVeil  warpAmount={0.3} speed={1} /> */}
+            <LightRays
                 raysOrigin={'top-left'}
                 raysColor={raysColor}
                 raysSpeed={raysSpeed}
@@ -39,7 +39,7 @@ export default function LightRaysWrapper({
                 noiseAmount={noiseAmount}
                 distortion={distortion}
                 className="absolute inset-0 -z-10 h-full w-full"
-            /> */}
+            /> 
         </div>
     )
 }

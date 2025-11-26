@@ -7,10 +7,22 @@ import { SidebarMenuButton } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RiUserSmileLine } from "react-icons/ri"
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { logout } from '@/server/actions/authActions'
 
 export default function SidebarUser({ user }: { user: any }) {
   const [open, setOpen] = useState(false)
+  const router = useRouter();
 
+  const handleLogout = async () => {
+    const { success, message } = await logout();
+    if (!success) return toast.error(message);
+
+    router.push("/login");
+    toast.success(message);
+  };
+  
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
@@ -35,7 +47,7 @@ export default function SidebarUser({ user }: { user: any }) {
         </SidebarMenuButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-58 ml-3" side="top" align="end" sideOffset={4}>
+      <DropdownMenuContent className="w-60 ml-3" side="top" align="end" sideOffset={4}>
         <DropdownMenuLabel label="Account" rootOpenSetter={setOpen} />
         <DropdownMenuSeparator />
 
@@ -90,7 +102,7 @@ export default function SidebarUser({ user }: { user: any }) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onClick={handleLogout}>
           <LogOut /> Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -2,134 +2,175 @@
 
 import { brandSchema } from "@/lib/validations";
 import { brandRequest } from "@/server/api/brandRequest";
-import { Brand, Competitor } from "@/types";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { z } from "zod";
 import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
-  const user = await getCurrentUser();
-  const { competitors, ...brandData } = values;
-
   try {
-    const brandResult = await brandRequest("/brands/", "POST", {
-      body: JSON.stringify({
-        client_id: user.client_id,
-        ...brandData,
-      }),
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    const { competitors, ...brandData } = values;
+
+    const { success, data, error } = await brandRequest("/brands/", "POST", {
+      client_id: user.client_id,
+      ...brandData,
     });
 
+    if (!success) return { success: false, message: error };
+
     if (competitors && competitors.length > 0) {
-      await addCompetitors(brandResult.brand_id, competitors);
+      const competitorsResult = await addCompetitors(data.brand_id, competitors);
+      if (!competitorsResult.success) {
+        return competitorsResult;
+      }
     }
 
     revalidatePath("/ccba");
-    return { success: true, data: brandResult };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Something went wrong" };
+    return {
+      success: true,
+      message: "Brand added successfully",
+      data,
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: "Something went wrong",
+    };
   }
 }
 
 export async function addCompetitors(brandId: string, competitors: any[]) {
-  const user = await getCurrentUser();
-
   try {
-    await brandRequest("/brands/competitors/", "POST", {
-      body: JSON.stringify({
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    const { success, data, error } = await brandRequest(
+      "/brands/competitors/",
+      "POST",
+      {
         brand_id: brandId,
         client_id: user.client_id,
         competitors,
-      }),
-    });
-  } catch (error) {
-    console.error("Failed to add competitors:", error);
+      }
+    );
+
+    if (!success) return { success: false, message: error };
+
+    return { success: true, message: "Competitors added successfully", data };
+  } catch (e) {
+    return {
+      success: false,
+      message: "Failed to add competitors",
+    };
   }
 }
 
 export async function updateBrand(brandId: string, values: any) {
-  const user = await getCurrentUser();
-
-  const { ...brandData } = values;
-
   try {
-    const brandResult = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    const { ...brandData } = values;
+
+    const { success, data, error } = await brandRequest(
       `/brands?client_id=${user.client_id}&brand_id=${brandId}`,
       "PUT",
-      { body: JSON.stringify(brandData) }
+      brandData
     );
+
+    if (!success) return { success: false, message: error };
 
     revalidatePath("/ccba");
     revalidatePath(`/ccba/${brandId}`);
 
-    return { success: true, data: brandResult };
-  } catch (error: any) {
+    return {
+      success: true,
+      message: "Brand updated successfully",
+      data,
+    };
+  } catch (e) {
     return {
       success: false,
-      error: error.message || "Something went wrong during the update process.",
+      message: "Something went wrong during the update process.",
     };
   }
 }
 
-export async function updateCompetitorAction(brandId: string, competitor: any) {
-  const user = await getCurrentUser();
-
-  if (!competitor.competitor_id) {
-    return { success: false, error: "Competitor ID is missing" };
-  }
-
-  const { competitor_id, ...competitorData } = competitor;
+export async function updateCompetitorAction(
+  brandId: string,
+  competitor: any
+) {
   try {
-    await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    if (!competitor.competitor_id) {
+      return { success: false, message: "Competitor ID is missing" };
+    }
+
+    const { competitor_id, ...competitorData } = competitor;
+    const { success, data, error } = await brandRequest(
       `/brands/competitors?client_id=${user.client_id}&brand_id=${brandId}&competitor_id=${competitor_id}`,
       "PUT",
-      { body: JSON.stringify(competitorData) }
+      competitorData
     );
+
+    if (!success) return { success: false, message: error };
+
     revalidatePath("/brands");
-    return { success: true };
-  } catch (error: any) {
+    return { success: true, message: "Competitor updated successfully", data };
+  } catch (e) {
     return {
       success: false,
-      error: error.message || "Something went wrong during competitor update.",
+      message: "Something went wrong during competitor update.",
     };
   }
 }
 
-export async function getBrands(): Promise<Brand[]> {
-  const user = await getCurrentUser();
-  
+export async function getBrands() {
   try {
-    const brands = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return [];
+
+    const { success, data, error } = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
       "GET"
     );
-    return brands;
+
+    if (!success) return null;
+
+    return data;
   } catch (error) {
-    console.error("Failed to fetch brands:", error);
-    return [];
+    return null;
   }
 }
 
-export async function getBrandById(brand_id: string): Promise<Brand | null> {
-  const user = await getCurrentUser();
-
+export async function getBrandById(brand_id: string) {
   try {
-    const brands = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const { success, data, error } = await brandRequest(
       `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
       "GET"
     );
-    return brands[0] || null;
+
+    if (!success) return null;
+
+    return data;
   } catch (error) {
-    console.error(`Failed to fetch brand ${brand_id}:`, error);
     return null;
   }
 }
 
 export async function getBrandbyIdWithCompetitors(brand_id: string) {
-  const user = await getCurrentUser();
-
   try {
-    const [brandResponse, competitorResponse] = await Promise.all([
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const [brandRes, competitorRes] = await Promise.all([
       brandRequest(
         `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
         "GET"
@@ -140,86 +181,84 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
       ),
     ]);
 
-    const brand = brandResponse?.[0] || null;
-    const competitors = competitorResponse?.competitors || [];
+    const { success: brandSuccess, data: brandData, error: brandError } = brandRes;
+    const { success: compSuccess, data: compData, error: compError } = competitorRes;
 
+    if (!brandSuccess) return null;
+    if (!compSuccess) return null;
+
+    const brand = Array.isArray(brandData) ? brandData[0] : null;
     if (!brand) return null;
+
+    const competitors = compData?.competitors || [];
 
     return {
       ...brand,
       competitors,
     };
-  } catch (error) {
-    console.error(
-      `Failed to fetch brand or competitors for ${brand_id}:`,
-      error
-    );
+  } catch {
     return null;
   }
 }
 
-export async function getCompetitors(
-  brand_id: string
-): Promise<{ brand_id: string; competitors: Competitor[] }> {
-  const emptyResult = { brand_id, competitors: [] };
-  const user = await getCurrentUser();
-
+export async function getCompetitors(brand_id: string) {
   try {
-    const result = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const { success, data, error } = await brandRequest(
       `/brands/competitors/?client_id=${user.client_id}&brand_id=${brand_id}`,
       "GET"
     );
 
-    return result;
+    if (!success) return null;
+
+    return data;
   } catch (error) {
-    console.error(`Failed to fetch competitors for brand ${brand_id}:`, error);
-    return emptyResult;
+    return null;
   }
 }
 
 export async function deleteBrand(brand_id: string) {
-  const user = await getCurrentUser();
-
   try {
-    const brandDelete = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    const { success, data, error } = await brandRequest(
       `/brands/?client_id=${user.client_id}&brand_id=${brand_id}`,
       "DELETE"
     );
 
+    if (!success) return { success: false, message: error };
+
     revalidatePath("/ccba");
     return {
       success: true,
-      message: "Brand deleted successfully ",
-      data: brandDelete,
+      message: "Brand deleted successfully",
+      data,
     };
-  } catch (error: any) {
-    console.error(`Failed to delete brand ${brand_id}:`, error);
+  } catch (e) {
     return {
       success: false,
       message: "Failed to delete brand. Please try again.",
-      console: error?.message,
-      data: null,
     };
   }
 }
 
 export async function getClientDetails() {
-  const user = await getCurrentUser();
-
   try {
-    const result = await brandRequest(
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const { success, data, error } = await brandRequest(
       `/clients/${user.client_id}/details`,
       "GET"
     );
-    return { success: true, data: result };
-  } catch (error: any) {
-    console.error(
-      `Failed to get client details for client ${user.client_id}:`,
-      error
-    );
-    return {
-      success: false,
-      error: error.message || "Failed to fetch client details",
-    };
+
+    if (!success) return null;
+
+    return data;
+  } catch (error) {
+    return null;
   }
 }

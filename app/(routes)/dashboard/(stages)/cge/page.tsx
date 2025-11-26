@@ -1,9 +1,7 @@
 import { getBrands } from "@/server/actions/brandActions";
 import { getCamSessions } from "@/server/actions/cge/sessionActions";
-import { ContainerMd } from "@/components/shared/Containers";
-import StaticBanner from "@/components/shared/StaticBanner";
 import CreateCgeSessionForm from "@/components/stages/cge/CreateCgeSessionForm";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DashboardInnerLayout, DashboardLayoutHeading } from "@/components/stages/ccba/dashboard/shared/DashboardComponents";
@@ -60,9 +58,11 @@ export default async function CgePage() {
                 subtitle={BrandOSConfig.mainNav[3].desc}
             />
             <DashboardInnerLayout>
-                <CreateCgeSessionForm brands={brands} />
-                <h2 className="text-2xl">Existing CGE Sessions</h2>
-                <CgeSessionsList brands={brands} />
+                <div className=" space-y-10">
+                    <CreateCgeSessionForm brands={brands} />
+                    <h2 className="text-2xl">Existing CGE Sessions</h2>
+                    <CgeSessionsList brands={brands} />
+               </div>
             </DashboardInnerLayout>
         </>
     );

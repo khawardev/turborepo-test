@@ -7,12 +7,19 @@ import SocialAuditTab from '@/components/stages/ccba/dashboard/social-audit/Soci
 import AnalyticsDashboardsData from '@/components/stages/ccba/dashboard/analytics-dashboards/AnalyticsDashboardsData'
 import { getCurrentUser } from '@/server/actions/authActions'
 import { DashboardInnerLayout } from '@/components/stages/ccba/dashboard/shared/DashboardComponents'
+import { toast } from 'sonner'
 
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   await getCurrentUser();
   
   const { brandId } = await params;
-  const brandData = await getBrandbyIdWithCompetitors(brandId);
+  const brandResponse = await getBrandbyIdWithCompetitors(brandId);
+
+  if (!brandResponse.success || !brandResponse.data) {
+    toast.error(brandResponse.toast);
+    return <div>Error loading brand data.</div>;
+  }
+  const brandData = brandResponse.data;
 
   return (
     <DashboardLayout brandData={brandData}>

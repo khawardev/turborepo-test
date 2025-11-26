@@ -31,13 +31,11 @@ export function BrandCompCrudButtons({ brand, side }: any) {
             action: {
                 label: "Confirm",
                 onClick: async () => {
-                    const result = await deleteBrand(brand.brand_id)
-                    if (result.success) {
-                        router.refresh()
-                        toast.success(result.message)
-                    } else {
-                        toast.error(result.message)
-                    }
+                    const {success, message} = await deleteBrand(brand.brand_id)
+                   
+                    if (!success) return toast.error(message);
+                    router.refresh()
+                    toast.success(message);
                 },
             },
         })

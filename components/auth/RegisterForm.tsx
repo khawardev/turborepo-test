@@ -36,13 +36,11 @@ export function RegisterForm({
   });
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
-    const res = await register(values);
-    if (res.success) {
-      toast.success("Account created successfully ");
-      router.push("/login");
-    } else {
-      toast.error(res.error);
-    }
+    const { success, message } =  await register(values);
+    if (!success) return toast.error(message);
+
+    router.push("/login");
+    toast.success(message);
   }
 
   return (

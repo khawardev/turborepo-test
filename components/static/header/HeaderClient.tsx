@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export function HeaderClient({user}:any) {
   const pathname = usePathname()
-  if (pathname.startsWith("/ccba/dashboard")) return null
+  if (pathname.startsWith("/dashboard")) return null
 
   return (
     <header className="z-30 fixed top-5 w-full">

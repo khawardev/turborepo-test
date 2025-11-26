@@ -61,12 +61,15 @@ export default function AddBrandPage() {
   });
 
   async function onSubmit(data: BrandFormValues) {
-    setIsLoading(true);
-    const brandResult = await addBrand(data);
-    setIsLoading(false);
-    if (brandResult.success) {
-      toast.success("Brand has been added successfully ");
-      router.push("/ccba");
+    try {
+      setIsLoading(true);
+      const { success, message } = await addBrand(data);
+      if (!success) return toast.error(message)
+
+      router.push("/dashboard/ccba");
+      toast.success(message);
+    } finally {
+      setIsLoading(false);
     }
   }
 

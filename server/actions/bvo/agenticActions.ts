@@ -6,126 +6,130 @@ import { pollUntilComplete } from "@/lib/utils";
 import { getBvoAgentStatus } from "./agenticStatusActions";
 
 export async function initiateBvoAgenticProcess(brand_id: any, bvoPayload: FormData) {
-    await getCurrentUser();
-
-    const mode = bvoPayload.get("mode");
-
     try {
-        if (mode === "interactive") {
+        await getCurrentUser();
 
-            const initialResponse = await brandRequest(
+        const mode = bvoPayload.get("mode");
+
+        if (mode === "interactive") {
+            const { success, data, error } = await brandRequest(
                 `/bam/agentic`,
                 "POST",
                 bvoPayload,
             );
-            console.log(initialResponse, `<-> /bam/agentic <->`);
 
-            const customInstructions = bvoPayload.get("custom_instructions") as string | null;
+            if (!success) return { success: false, message: error };
 
-            const runPayload: RunInteractiveAgentPayload = {
+            const runPayload: any = {
                 agent_id: "1",
-                custom_instructions: customInstructions ?? undefined,
+                custom_instructions: bvoPayload.get("custom_instructions") as string | null ?? undefined,
             };
 
-            const runResponse = await runInteractiveAgent(initialResponse.session_id, runPayload);
-            console.log(runResponse, `<-> /bam/interactive/run <->`);
+            const runResponse = await runInteractiveAgent(data.session_id, runPayload);
+            return { ...runResponse, session_id: data.session_id };
 
-            return { ...runResponse, session_id: initialResponse.session_id };
 
         } else {
-            console.log(`<-> else mode <->`);
-
-            const response = await brandRequest(
+            const { success, data, error } = await brandRequest(
                 `/bam/agentic`,
                 "POST",
                 bvoPayload,
             );
 
+            if (!success) return { success: false, message: error };
+
             await pollUntilComplete(
-                async () => await getBvoAgentStatus(brand_id, response.task_id),
+                async () => await getBvoAgentStatus(brand_id, data.task_id),
                 (res: any) => res.success && res.data?.status === "Completed"
             );
 
-            return { success: true, data: response };
+            return { success: true, message: "Agentic process initiated successfully.", data };
         }
     } catch (error: any) {
-        return { success: false, error: error.message };
+        return { success: false, message: "Failed to initiate BVO agentic process" };
     }
 }
 
 export async function getBvoHistory(brand_id: string) {
-    const user = await getCurrentUser();
-
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/bam/agentic?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET",
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in getBvoHistory:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return null;
+        return data;
+    } catch (error) {
+        return null;
     }
 }
-
 
 
 export async function getBvoAgentResults(task_id: string, brand_id: string) {
-    const user = await getCurrentUser();
-
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/bam/agentic/${task_id}/results?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET",
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in getBvoAgentResults:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return null;
+        return data;
+    } catch (error) {
+        return null;
     }
 }
 
-interface RunInteractiveAgentPayload {
-    agent_id: string;
-    custom_instructions?: string;
-}
-
-export async function runInteractiveAgent(session_id: string, payload: RunInteractiveAgentPayload) {
+export async function runInteractiveAgent(session_id: string, payload: any) {
     try {
-        const response = await brandRequest(
+        await getCurrentUser();
+        
+        const { success, data, error } = await brandRequest(
             `/bam/interactive/${session_id}/run`,
             "POST",
             payload,
         );
-        return { success: true, data: response };
+
+        if (!success) return { success: false, message: error };
+        return { success: true, message: "Interactive agent ran successfully.", data };
     } catch (error: any) {
         console.error("Error in runInteractiveAgent:", error);
-        return { success: false, error: error.message };
+        return { success: false, message: "Failed to run interactive agent" };
     }
 }
 
 export async function getInteractiveSessionStatus(session_id: string) {
     try {
-        const response = await brandRequest(
+        await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/bam/interactive/${session_id}/status`,
             "GET",
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in getInteractiveSessionStatus:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return null;
+        return data;
+    } catch (error) {
+        return null;
     }
 }
 
 export async function endInteractiveSession(session_id: string) {
     try {
-        const response = await brandRequest(
+        await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/bam/interactive/${session_id}/end`,
             "POST",
         );
-        return { success: true, data: response };
+
+        if (!success) return { success: false, message: error };
+        return { success: true, message: "Interactive session ended successfully.", data };
     } catch (error: any) {
         console.error("Error in endInteractiveSession:", error);
-        return { success: false, error: error.message };
+        return { success: false, message: "Failed to end interactive session" };
     }
 }

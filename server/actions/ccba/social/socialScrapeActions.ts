@@ -1,11 +1,8 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getBatchSocialScrapeStatus } from "./socialStatusAction";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
-import { pollUntilComplete } from "@/lib/utils";
 import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function scrapeBatchSocial(
@@ -13,9 +10,9 @@ export async function scrapeBatchSocial(
     start_date: string,
     end_date: string
 ) {
-    const user = await getCurrentUser()
-
     try {
+        const user = await getCurrentUser();
+
         const scrapePayload = {
             client_id: user.client_id,
             brand_id: brand_id,
@@ -24,57 +21,55 @@ export async function scrapeBatchSocial(
             end_date: end_date,
         }
 
-        const initialResponse = await brandRequest("/batch/social", "POST", scrapePayload)
-        console.log(initialResponse.batch_id, `<-> scrapeBatchSocial.batch_id <->`);
-        
-        // await pollUntilComplete(
-        //     async () => await getBatchSocialScrapeStatus(brand_id, initialResponse.batch_id),
-        //     (res: any) => res.success && res.data?.status === "Completed"
-        // )
+        const { success, data, error } = await brandRequest("/batch/social", "POST", scrapePayload);
 
-        revalidatePath(`/ccba/${brand_id}`)
-        return { success: true, message: `Social ${SCRAPING} started successfully ` }
+        if (!success) return { success: false, message: error };
+
+        revalidatePath(`/ccba/${brand_id}`);
+        return { success: true, message: `Social ${SCRAPING} started successfully`, data };
     } catch (error: any) {
-        console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error)
-        return { success: false, error: error.message || `Batch social ${SCRAPING} failed` }
+        console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error);
+        return { success: false, message: `Batch social ${SCRAPING} failed` };
     }
 }
 
 
 export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
-    const user = await getCurrentUser()
-
-    if (!batch_id) {
-        return { success: false, error: "No batch_id provided." }
-    }
-
     try {
-        const result = await brandRequest(
+        const user = await getCurrentUser();
+
+        if (!batch_id) {
+            return { success: false, message: "No batch_id found for this brand." };
+        }
+
+        const { success, data, error } = await brandRequest(
             `/batch/social-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
-            "GET",
-        )
-        
-        return result
-    } catch (error: any) {
-        console.error(`Failed to fetch social ${SCRAPE} results for batch_id ${batch_id}:`, error)
-        return { success: false, error: error.message || `Failed to fetch social ${SCRAPE} results` }
+            "GET"
+        );
+
+        if (!success) return null;
+
+        return data;
+    } catch (error) {
+        return null;
     }
 }
 
 
 
-export async function getPreviousSocialScrapes(client_id: string, brand_id: string) {
+export async function getPreviousSocialScrapes(brand_id: string) {
     try {
-        const response = await brandRequest(
-            `/batch/social-scrapes?client_id=${client_id}&brand_id=${brand_id}`,
-            "GET",
-        )
+        const user = await getCurrentUser();
 
-        if (!Array.isArray(response) || response.length === 0) {
-            return []
-        }
+        const { success, data, error } = await brandRequest(
+            `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`,
+            "GET"
+        );
 
-        const filtered = response.map((item: any) => ({
+        if (!success) return null;
+        if (!Array.isArray(data) || data.length === 0) return [];
+
+        const filtered = data.map((item: any) => ({
             brand_id: item.brand_id,
             client_id: item.client_id,
             created_at: item.created_at,
@@ -82,26 +77,32 @@ export async function getPreviousSocialScrapes(client_id: string, brand_id: stri
             batch_id: item.batch_id,
             start_date: item.start_date,
             end_date: item.end_date,
-        }))
+        }));
 
-        return filtered
+        return filtered;
     } catch (error) {
-        console.error("Error fetching previous social scrapes:", error)
-        return []
+        console.error("Error fetching previous social scrapes:", error);
+        return null;
     }
 }
 
 
 
-export async function getSocialBatchId(client_id: string, brand_id: string) {
+export async function getSocialBatchId(brand_id: string) {
     try {
-        const response = await brandRequest(`/batch/social-scrapes?client_id=${client_id}&brand_id=${brand_id}`, "GET")
-        if (!Array.isArray(response) || response.length === 0) return null
-        const latest = response.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+        const user = await getCurrentUser();
 
-        return latest?.batch_id || null
+
+        const { success, data, error } = await brandRequest(`/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, "GET");
+
+        if (!success) return null;
+        if (!Array.isArray(data) || data.length === 0) return null;
+
+        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+
+        return latest?.batch_id || null;
     } catch (error) {
-        console.error("Error fetching batch_id:", error)
-        return null
+        console.error("Error fetching batch_id:", error);
+        return null;
     }
 }

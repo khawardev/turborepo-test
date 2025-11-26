@@ -106,7 +106,8 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   };
 
   const scrapeBrand = (limit: any) => {
-    startTransition(async () => {
+    startTransition(() => {
+      (async () => {
       const result = await scrapeBatchWebsite(brand.brand_id, limit);
       if (result.success) {
         router.refresh();
@@ -115,7 +116,8 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
       } else {
         toast.error(`${SCRAPING} failed.`);
       }
-    });
+    })();
+  });
   };
 
   

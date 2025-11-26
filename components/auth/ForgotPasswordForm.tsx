@@ -36,16 +36,14 @@ export function ForgotPasswordForm({
   });
 
   async function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
-    startTransition(async () => {
-      const res = await forgotPassword(values);
-      if (res.success) {
-        toast.success(
-          "Password reset link has been sent"
-        );
+    startTransition(() => {
+      (async () => {
+        const { success, message } = await forgotPassword(values);
+        if (!success) return toast.error(message)
+
+        toast.success(message);
         setIsSubmitted(true);
-      } else {
-        toast.error(res.error);
-      }
+      })();
     });
   }
 

@@ -7,12 +7,18 @@ import SocialAuditTab from '@/components/stages/ccba/dashboard/social-audit/Soci
 import AnalyticsDashboardsData from '@/components/stages/ccba/dashboard/analytics-dashboards/AnalyticsDashboardsData'
 import { getCurrentUser } from '@/server/actions/authActions'
 import { DashboardInnerLayout } from '@/components/stages/ccba/dashboard/shared/DashboardComponents'
+import { toast } from 'sonner'
 
 export default async function CompetitorPage({params}: {params: Promise<{ brandId: string; competitorId: string }>}) {
     await getCurrentUser()
 
     const { brandId, competitorId } = await params
-    const brandData = await getBrandbyIdWithCompetitors(brandId)
+    const brandResponse = await getBrandbyIdWithCompetitors(brandId)
+    if (!brandResponse.success || !brandResponse.data) {
+        toast.error(brandResponse.toast);
+        return <div>Error loading brand data.</div>;
+    }
+    const brandData = brandResponse.data;
     const competitor = brandData.competitors.find((c: any) => c.id === competitorId)
     const competitorName = competitor ? competitor.name : 'Competitor';
 

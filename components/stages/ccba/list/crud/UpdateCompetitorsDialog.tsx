@@ -53,18 +53,17 @@ function EditCompetitorForm({
 
   async function onSubmit(data: CompetitorFormValues) {
     setIsLoading(true);
-    const result = await updateCompetitorAction(brandId, {
+    const { success, message } = await updateCompetitorAction(brandId, {
       competitor_id: competitor.competitor_id,
       ...data,
     });
     setIsLoading(false);
-    if (result.success) {
-      toast.success("Competitor updated successfully ");
-      onSave();
-      router.refresh();
-    } else {
-      toast.error(result.error || "Failed to update competitor.");
-    }
+    if (!success)
+      return toast.error(message || "Failed to update competitor.");
+
+    toast.success(message);
+    onSave();
+    router.refresh();
   }
 
   return (

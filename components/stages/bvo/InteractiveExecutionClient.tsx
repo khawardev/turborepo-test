@@ -21,14 +21,14 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
         const intervalId = setInterval(() => {
             getInteractiveSessionStatus(session_id)
                 .then((res) => {
-                    if (res.success) {
-                        setStatus(res.data);
-                        if (res.data?.status === "Completed" || res.data?.status === "Failed") {
+                    if (res) { // res is directly the data or null
+                        setStatus(res);
+                        if (res.status === "Completed" || res.status === "Failed") {
                             setIsPolling(false);
-                            toast.success(`Session ${res.data.status.toLowerCase()}.`);
+                            toast.success(`Session ${res.status.toLowerCase()}.`);
                         }
                     } else {
-                        toast.error(res.error || "Failed to get session status.");
+                        toast.error("Failed to get session status.");
                         setIsPolling(false);
                     }
                 })
@@ -36,25 +36,24 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
                     toast.error(err.message || "An error occurred while fetching status.");
                     setIsPolling(false);
                 });
-        }, 15000); // Poll every 5 seconds
+        }, 15000); // Poll every 15 seconds
 
         return () => clearInterval(intervalId);
     }, [session_id, isPolling]);
 
     const handleEndSession = () => {
-        startEndingTransition(async () => {
+        startEndingTransition(() => {
+            (async () => {
             setIsPolling(false);
-            const res = await endInteractiveSession(session_id);
-            if (res.success) {
-                toast.success("Interactive session has been ended.");
-                setStatus(res.data);
-                onSessionEnd();
-                redirect('/bvo')
-            } else {
-                toast.error(res.error || "Failed to end the session.");
-                // Optionally restart polling if ending fails
-                // setIsPolling(true);
+            const { success, message, data } = await endInteractiveSession(session_id);
+            if (!success) {
+                return toast.error(message || "Failed to end the session.");
             }
+            toast.success(message);
+            setStatus(data);
+            onSessionEnd();
+            redirect('/bvo');
+            })();
         });
     };
 

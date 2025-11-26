@@ -2,43 +2,58 @@
 
 import { brandRequest } from "@/server/api/brandRequest";
 import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function createExtractionReport(payload: any, brand_id: any, competitor_id:any) {
     try {
-        const data = await brandRequest("/bedrock-extraction-report", "POST", payload);
+        await getCurrentUser();
+
+        const { success, data, error } = await brandRequest("/bedrock-extraction-report", "POST", payload);
+        
+        if (!success) return { success: false, message: error };
+
         brand_id && revalidatePath(`/ccba/dashboard/brand/${brand_id}`);
         competitor_id && revalidatePath(`/ccba/dashboard/brand/${brand_id}/competitor/${competitor_id}`);
-        return { success: true, data };
+        
+        return { success: true, message: "Extraction report created successfully", data };
     } catch (error: any) {
         console.error("createExtractionReport error:", error);
-        return { success: false, error: error.message || "Failed to create extraction report" };
+        return { success: false, message: "Failed to create extraction report" };
     }
 }
 
-export async function getBrandExtractionReport(client_id: any,brand_id:any) {
+export async function getBrandExtractionReport(brand_id:any) {
     try {
-        const data = await brandRequest(
-            `/bedrock-extraction-report?client_id=${client_id}&brand_id=${brand_id}`,
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
+            `/bedrock-extraction-report?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET"
         );
-        return { success: true, data };
+
+        if (!success) return null;
+
+        return data;
     } catch (error: any) {
         console.error("getExtractionReport error:", error);
-        return { success: false, error: error.message || "Failed to fetch extraction report" };
+        return null;
     }
 }
 
-export async function getCompetitorExtractionReport(client_id: any, brand_id: any, competitor_id:any) {
+export async function getCompetitorExtractionReport(brand_id: any, competitor_id:any) {
     try {
-        const data = await brandRequest(
-            `/bedrock-extraction-report?client_id=${client_id}&brand_id=${brand_id}&competitor_id=${competitor_id}`,
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
+            `/bedrock-extraction-report?client_id=${user.client_id}&brand_id=${brand_id}&competitor_id=${competitor_id}`,
             "GET"
         );
-        return { success: true, data };
+
+        if (!success) return null;
+
+        return data;
     } catch (error: any) {
         console.error("getExtractionReport error:", error);
-        return { success: false, error: error.message || "Failed to fetch extraction report" };
+        return null;
     }
 }
-
-

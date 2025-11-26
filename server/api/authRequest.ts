@@ -1,4 +1,5 @@
 "use server";
+
 const API_URL = process.env.API_URL;
 
 export async function authRequest(
@@ -6,7 +7,6 @@ export async function authRequest(
   method: "GET" | "POST",
   options: RequestInit = {}
 ) {
-
   const res = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers: { "Content-Type": "application/json", ...options.headers },
@@ -14,17 +14,12 @@ export async function authRequest(
     cache: "no-store",
   });
 
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data;
+  try { data = await res.json(); } catch { data = null }
 
-  if (!res.ok) {
-    const msg = data?.detail || data?.message || "API request failed";
-    const error = new Error(
-      typeof msg === "object" ? JSON.stringify(msg, null, 2) : String(msg)
-    );
-    (error as any).status = res.status;
-    throw error;
+  if (res.ok) {
+    return { success: true, data };
   }
 
-  return data;
+  return { success: false, error: data?.message || data?.detail || "Request failed" };
 }

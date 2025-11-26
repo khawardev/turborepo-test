@@ -1,11 +1,8 @@
 "use server";
 
 import { brandRequest } from "@/server/api/brandRequest";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { SOCIAL_SYNTHESIS_PROMPT } from "@/lib/static/prompts";
-import { getBatchSocialReportsStatus } from "./socialStatusAction";
-import { pollUntilComplete } from "@/lib/utils";
 import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function batchSocialReports({
@@ -14,9 +11,9 @@ export async function batchSocialReports({
     model_id,
     social_prompt,
 }: any) {
-    const user = await getCurrentUser();
-
     try {
+        const user = await getCurrentUser();
+
         const payload = {
             client_id: user.client_id,
             brand_id: brand_id,
@@ -26,33 +23,31 @@ export async function batchSocialReports({
             model_id: model_id,
         };
 
-        const batchReports = await brandRequest("/batch/social-reports", "POST", payload);
-        console.log(batchReports.task_id, `<-> batchSocialReports.task_id <->`);
+        const { success, data, error } = await brandRequest("/batch/social-reports", "POST", payload);
 
-        // await pollUntilComplete(
-        //     async () => await getBatchSocialReportsStatus(brand_id, batchReports.task_id),
-        //     (res: any) => res.success && res.data?.status === "Completed"
-        // );
+        if (!success) return { success: false, message: error };
 
         revalidatePath(`/ccba/${brand_id}`);
-        return { success: true, data: batchReports.task_id };
+        return { success: true, message: "Batch social reports started successfully", data: data.task_id };
     } catch (error: any) {
         console.error("Error in batchSocialReports:", error);
-        return { success: false, error: error.message };
+        return { success: false, message: "Failed to start batch social reports" };
     }
 }
 
 export async function getBatchSocialReports(brand_id: string) {
-    const user = await getCurrentUser();
-
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/batch/social-reports?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET"
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in getBatchSocialReports:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return null;
+
+        return data;
+    } catch (error) {
+        return null;
     }
 }

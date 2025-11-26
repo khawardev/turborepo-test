@@ -81,16 +81,14 @@ export function EditBrandList({
 
     async function onSubmit(data: any) {
         setIsLoading(true);
-        const result = await updateBrand(brand.brand_id, data);
+        const { success, message } = await updateBrand(brand.brand_id, data);
         setIsLoading(false);
         setOpen(false);
 
-        if (result.success) {
-            toast.success("Brand has been updated successfully ");
-            router.refresh();
-        } else {
-            toast.error(result.error || "Failed to update brand.");
-        }
+        if (!success) return toast.error(message || "Failed to update brand.");
+        
+        toast.success(message);
+        router.refresh();
     }
 
     return (

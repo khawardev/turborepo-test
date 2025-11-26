@@ -41,23 +41,24 @@ export function SocialReportButton({
     toast.info("Generation may take 20–25 min to complete")
 
     setOpen(false)
-    startTransition(async () => {
-      const socialReports = await batchSocialReports({
-        brand_id,
-        batch_id,
-        model_id: selectedModels[0],
-        social_prompt: prompt || null,
-      })
+    startTransition(() => {
+      (async () => {
+        const { success, message } = await batchSocialReports({
+          brand_id,
+          batch_id,
+          model_id: selectedModels[0],
+          social_prompt: prompt || null,
+        });
 
-      setSelectedModels([])
-      setPrompt("")
-      router.refresh()
-      if (socialReports.success) {
-        toast.success("Reports has been Generated successfully ")
-      } else {
-        toast.error(socialReports.error)
-      }
-    })
+        setSelectedModels([]);
+        setPrompt("");
+        router.refresh();
+        if (!success) {
+          return toast.error(message);
+        }
+        toast.success(message);
+      })();
+    });
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -54,14 +54,14 @@ export default function CreateCgeSessionForm({ brands }: { brands: any[] }) {
   };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    startTransition(async () => {
-      const result = await createCamKnowledgeBase(values.brand_id, values.bam_session_id);
-      if (result.success) {
-        toast.success(result.data.message);
-        router.push(`/cge/${result.data.cam_session_id}?brand_id=${values.brand_id}`);
-      } else {
-        toast.error(result.error);
-      }
+    startTransition(() => {
+      (async () => {
+        const { success, message, data } = await createCamKnowledgeBase(values.brand_id, values.bam_session_id);
+        if (!success) return toast.error(message);
+        
+        toast.success(message);
+        router.push(`/cge/${data.cam_session_id}?brand_id=${values.brand_id}`);
+      })();
     });
   };
 

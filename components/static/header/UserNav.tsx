@@ -30,9 +30,11 @@ export function UserNav({ user }: UserNavProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await logout();
-    toast.success("Logged out successfully ");
-    router.refresh();
+    const { success, message } = await logout();
+    if (!success) return toast.error(message);
+
+    router.push("/login");
+    toast.success(message);
   };
 
   return (

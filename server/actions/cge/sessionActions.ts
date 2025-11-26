@@ -4,9 +4,10 @@ import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "@/server/actions/authActions";
 
 export async function createCamKnowledgeBase(brand_id: string, bam_session_id: string) {
-    const user = await getCurrentUser();
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+        
+        const { success, data, error } = await brandRequest(
             `/cam/knowledge-base/`,
             "POST",
             {
@@ -15,23 +16,28 @@ export async function createCamKnowledgeBase(brand_id: string, bam_session_id: s
                 bam_session_id,
             },
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in createCamKnowledgeBase:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return { success: false, message: error };
+
+        return { success: true, message: "Knowledge base created successfully", data };
+    } catch {
+        return { success: false, message: "Failed to create knowledge base" };
     }
 }
 
 export async function getCamSessions(brand_id: string) {
-    const user = await getCurrentUser();
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+
+        const { success, data, error } = await brandRequest(
             `/cam/sessions?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET",
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in getCamSessions:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return null;
+
+        return data;
+    } catch (error) {
+        return null;
     }
 }

@@ -41,22 +41,23 @@ export function WebsiteReportButton({
     toast.info("Generation may take 20–25 min to complete")
 
     setOpen(false)
-    startTransition(async () => {
-      const websiteReports = await batchWebsiteReports({
+    startTransition(() => {
+      (async () => {
+      const { success, message } = await batchWebsiteReports({
         brand_id,
         batch_id,
         model_id: selectedModels[0],
         sythesizerPrompt: prompt || null,
-      })
-      setSelectedModels([])
-      setPrompt("")
-      router.refresh()
-      if (websiteReports.success) {
-        toast.success("Reports has been Generated successfully ")
-      } else {
-        toast.error(websiteReports.error)
+      });
+      setSelectedModels([]);
+      setPrompt("");
+      router.refresh();
+      if (!success) {
+        return toast.error(message);
       }
-    })
+      toast.success(message);
+      })();
+    });
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>

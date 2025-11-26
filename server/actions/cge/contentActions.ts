@@ -3,18 +3,13 @@
 import { brandRequest } from "@/server/api/brandRequest";
 import { getCurrentUser } from "@/server/actions/authActions";
 
-interface ContentGenerationPayload {
-    brand_id: string;
-    cam_session_id: string;
-    additional_instructions: string;
-    uploaded_docs?: string[];
-    model_id?: string;
-}
 
-export async function generateContent(payload: ContentGenerationPayload) {
-    const user = await getCurrentUser();
+export async function generateContent(payload: any) {
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+        
+
+        const { success, data, error } = await brandRequest(
             `/cam/content/`,
             "POST",
             {
@@ -22,25 +17,22 @@ export async function generateContent(payload: ContentGenerationPayload) {
                 ...payload,
             },
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in generateContent:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return { success: false, message: error };
+
+        return { success: true, message: "Content generated successfully", data };
+    } catch {
+        return { success: false, message: "Failed to generate content" };
     }
 }
 
-interface ContentRevisionPayload {
-    brand_id: string;
-    cam_session_id: string;
-    original_content: string;
-    user_feedback: string;
-    model_id?: string;
-}
 
-export async function reviseContent(payload: ContentRevisionPayload) {
-    const user = await getCurrentUser();
+export async function reviseContent(payload: any) {
     try {
-        const response = await brandRequest(
+        const user = await getCurrentUser();
+        
+
+        const { success, data, error } = await brandRequest(
             `/cam/revise/`,
             "POST",
             {
@@ -48,9 +40,11 @@ export async function reviseContent(payload: ContentRevisionPayload) {
                 ...payload,
             },
         );
-        return { success: true, data: response };
-    } catch (error: any) {
-        console.error("Error in reviseContent:", error);
-        return { success: false, error: error.message };
+
+        if (!success) return { success: false, message: error };
+
+        return { success: true, message: "Content revised successfully", data };
+    } catch {
+        return { success: false, message: "Failed to revise content" };
     }
 }

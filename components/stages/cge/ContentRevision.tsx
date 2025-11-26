@@ -30,20 +30,21 @@ export default function ContentRevision({ camSessionId, brandId, originalContent
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setRevisedContent("");
-    startTransition(async () => {
-      const result = await reviseContent({
+    startTransition(() => {
+      (async () => {
+      const { success, message, data } = await reviseContent({
         cam_session_id: camSessionId,
         brand_id: brandId,
         original_content: originalContent,
         ...values,
       });
-      if (result.success) {
-        toast.success("Content revised successfully.");
-        setRevisedContent(result.data.revised_content);
-      } else {
-        toast.error(result.error);
-      }
-    });
+
+      if (!success) return toast.error(message);
+
+      setRevisedContent(data.revised_content);
+      toast.success(message);
+    })();
+  });
   };
 
   return (

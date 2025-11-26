@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/server/actions/authActions";
 export default async function WebsiteScrapsServer({ brandName, brand_id }: { brandName: string, brand_id: string }) {
     const user = await getCurrentUser();
   
-    const previousWebsiteScraps = await getpreviousWebsiteScraps(user.client_id, brand_id);
+    const previousWebsiteScraps:any = await getpreviousWebsiteScraps(brand_id);
     const websiteScrapeBatchPromises = previousWebsiteScraps.map(
         async (scrape: any) => await getscrapeBatchWebsite(brand_id, scrape.batch_id)
     );

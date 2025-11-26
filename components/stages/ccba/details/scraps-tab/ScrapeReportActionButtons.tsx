@@ -43,18 +43,18 @@ export function ScrapeReportActionButtons({
 
   // Website Scraping Logic from WebsiteScraps.tsx
   const scrapeWebsite = async (limit: number) => {
-    startWebsiteScrapingTransition(async () => {
-      toast.info(`Website ${SCRAPING} started...`)
-      const result = await scrapeBatchWebsite(brand_id, limit)
+    startWebsiteScrapingTransition(() => {
+      (async () => {
+        toast.info(`Website ${SCRAPING} started...`)
+        const { success, message } = await scrapeBatchWebsite(brand_id, limit);
 
-      
-      if (result?.success) {
-        router.refresh()
-        toast.success(`${SCRAPING} completed successfully `)
-      } else {
-        toast.error(`${SCRAPING} failed.`)
-      }
-    })
+        if (!success) {
+          return toast.error(message || `${SCRAPING} failed.`);
+        }
+        router.refresh();
+        toast.success(message || `${SCRAPING} completed successfully`);
+      })();
+    });
   }
 
   // Social Scraping Logic from SocialScraps.tsx
@@ -62,23 +62,22 @@ export function ScrapeReportActionButtons({
     startDate: string
     endDate: string
   }) => {
-    startSocialScrapingTransition(async () => {
-      toast.info(`Social ${SCRAPING} started...`)
-      const result = await scrapeBatchSocial(
-        brand_id,
-        details.startDate,
-        details.endDate
-      )
+    startSocialScrapingTransition(() => {
+      (async () => {
+        toast.info(`Social ${SCRAPING} started...`)
+        const { success, message } = await scrapeBatchSocial(
+          brand_id,
+          details.startDate,
+          details.endDate
+        );
 
-      if (result?.success) {
-        toast.success(
-          result.message || `Social ${SCRAPING} completed successfully `
-        )
-        router.refresh()
-      } else {
-        toast.error(result?.error || `Social ${SCRAPING} failed.`)
-      }
-    })
+        if (!success) {
+          return toast.error(message || `Social ${SCRAPING} failed.`);
+        }
+        toast.success(message || `Social ${SCRAPING} completed successfully`);
+        router.refresh();
+      })();
+    });
   }
 
   return (
@@ -86,7 +85,7 @@ export function ScrapeReportActionButtons({
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           Actions
-          <MoreHorizontalIcon  />
+          <MoreHorizontalIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-34">
@@ -95,7 +94,7 @@ export function ScrapeReportActionButtons({
           <DropdownMenuSubTrigger disabled={!website_batch_id}>
             <span>Website</span>
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent  sideOffset={10}>
+          <DropdownMenuSubContent sideOffset={10}>
             <WebsiteAskLimitDialog onConfirm={scrapeWebsite}>
               <DropdownMenuItem
                 onSelect={(e) => e.preventDefault()}
@@ -104,7 +103,7 @@ export function ScrapeReportActionButtons({
                 {isWebsiteScrapingPending ? (
                   <ButtonSpinner>{SCRAPING}</ButtonSpinner>
                 ) : (
-                    <MdOutlineWebAsset  />
+                  <MdOutlineWebAsset />
                 )}
                 <span>{SCRAPE}</span>
               </DropdownMenuItem>
@@ -118,7 +117,7 @@ export function ScrapeReportActionButtons({
                 onSelect={(e) => e.preventDefault()}
                 disabled={!website_batch_id}
               >
-                <RiGeminiFill  />
+                <RiGeminiFill />
                 <span>Create Report</span>
               </DropdownMenuItem>
             </WebsiteReportButton>
@@ -132,7 +131,7 @@ export function ScrapeReportActionButtons({
           <DropdownMenuSubTrigger >
             <span>Social Media</span>
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent   sideOffset={10}>
+          <DropdownMenuSubContent sideOffset={10}>
             <ScrapeSocialDialog
               isLoading={isSocialScrapingPending}
               onConfirm={handleScrapeSocial}
@@ -144,7 +143,7 @@ export function ScrapeReportActionButtons({
                 {isSocialScrapingPending ? (
                   <ButtonSpinner>{SCRAPING}</ButtonSpinner>
                 ) : (
-                    <MdOutlineWebAsset  />
+                  <MdOutlineWebAsset />
                 )}
                 {!isSocialScrapingPending && <span>{SCRAPE}</span>}
               </DropdownMenuItem>
@@ -158,7 +157,7 @@ export function ScrapeReportActionButtons({
                 onSelect={(e) => e.preventDefault()}
                 disabled={!social_batch_id}
               >
-                <RiGeminiFill  />
+                <RiGeminiFill />
                 <span>Create Report</span>
               </DropdownMenuItem>
             </SocialReportButton>

@@ -61,16 +61,16 @@ export function AddCompetitorsDialog({
 
   async function onSubmit(data: any) {
     setIsLoading(true);
-    try {
-      await addCompetitors(brand.brand_id, data.competitors);
-      setIsLoading(false);
-      toast.success("Competitors added successfully ");
-      setOpen(false);
-      router.refresh();
-    } catch (error) {
-      setIsLoading(false);
-      toast.error("Failed to add competitors.");
-    }
+    const { success, message } = await addCompetitors(
+      brand.brand_id,
+      data.competitors
+    );
+    setIsLoading(false);
+    if (!success) return toast.error(message);
+    
+    toast.success(message);
+    setOpen(false);
+    router.refresh();
   }
 
   return (

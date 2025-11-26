@@ -17,13 +17,11 @@ export default async function BvoList() {
   }
 
   const brandsWithHistory = await Promise.all(
-    brands.map(async (brand) => {
+    brands.map(async (brand:any) => {
       const historyRes = await getBvoHistory(brand.brand_id)
 
-      if (!historyRes.success || historyRes.data.history.length === 0) return null
-
       const items = await Promise.all(
-        historyRes.data.history.map(async (bvo:any) => {
+        historyRes.history.map(async (bvo:any) => {
           const results = await getBvoAgentResults(bvo.session_id, brand.brand_id)
           return { bvo, brand, results }
         })
@@ -37,7 +35,7 @@ export default async function BvoList() {
       {brandsWithHistory.map((entry) => {
         if (!entry) return null
 
-        return entry.items.map((item) => (
+        return entry.items.map((item: any) => (
           <BvoItem
             key={item.bvo.session_id}
             bvo={item.bvo}

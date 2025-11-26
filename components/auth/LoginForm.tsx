@@ -38,13 +38,11 @@ export function LoginForm({
   });
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    const res = await login(values);
-    if (res.success) {
-      toast.success("Logged in successfully ");
-      router.push("/");
-    } else {
-      toast.error(res.error);
-    }
+    const { success, message } = await login(values);
+    if (!success) return toast.error(message);
+
+    router.push("/dashboard/ccba");
+    toast.success(message);
   }
 
   return (
@@ -106,7 +104,7 @@ export function LoginForm({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute top-1 right-1"
+                      className="absolute top-0 right-0"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (

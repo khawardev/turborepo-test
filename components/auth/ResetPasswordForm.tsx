@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { success, z } from "zod";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -46,13 +46,12 @@ export function ResetPasswordForm({
       toast.error("Invalid or missing reset token.");
       return;
     }
-    const res = await resetPassword(token, values.password);
-    if (res.success) {
-      toast.success("Password has been reset successfully.");
-      router.push("/login");
-    } else {
-      toast.error(res.error);
-    }
+    
+    const { success, message } = await resetPassword(token, values.password);
+    if (!success) return toast.error(message);
+
+    router.push("/login");
+    toast.success(message);
   }
 
   return (

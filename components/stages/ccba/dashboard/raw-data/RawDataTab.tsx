@@ -4,12 +4,11 @@ import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/ccba/so
 import { getCurrentUser } from "@/server/actions/authActions";
 
 export default async function RawDataTab({ brandId, competitorId }: { brandId: string, competitorId?: string }) {
-  const user = await getCurrentUser();
 
-  const website_batch_id = await getWebsiteBatchId(user.client_id, brandId);
+  const website_batch_id = await getWebsiteBatchId(brandId);
   const websiteScrapsData = await getscrapeBatchWebsite(brandId, website_batch_id);
 
-  const social_batch_id = await getSocialBatchId(user.client_id, brandId);
+  const social_batch_id = await getSocialBatchId(brandId);
   const socialScrapsData = await getScrapeBatchSocial(brandId, social_batch_id);
 
   if (competitorId) {

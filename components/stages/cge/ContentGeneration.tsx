@@ -33,19 +33,20 @@ export default function ContentGeneration({ camSessionId, brandId, generatedCont
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setGeneratedContent("");
-    startTransition(async () => {
-      const result = await generateContent({
+    startTransition(() => {
+      (async () => {
+      const { success, message, data } = await generateContent({
         cam_session_id: camSessionId,
         brand_id: brandId,
         ...values,
       });
-      if (result.success) {
-        toast.success("Content generated successfully.");
-        setGeneratedContent(result.data.generated_content);
-      } else {
-        toast.error(result.error);
-      }
-    });
+
+      if (!success) return toast.error(message);
+  
+      setGeneratedContent(data.generated_content);
+      toast.success(message);
+    })();
+  });
   };
 
   return (

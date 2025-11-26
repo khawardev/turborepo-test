@@ -8,15 +8,15 @@ import {
 import { authRequest } from "@/server/api/authRequest";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { cache } from "react";
 import { z } from "zod";
-const API_URL = process.env.API_URL;
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {
-    const data = await authRequest("/login", "POST", {
+    const { success, data, error } = await authRequest("/login", "POST", {
       body: JSON.stringify(values),
     });
+
+    if (!success) return { success: false, message: error };
 
     const cookieStore = await cookies();
 
@@ -26,61 +26,78 @@ export async function login(values: z.infer<typeof loginSchema>) {
       path: "/",
     });
 
-    if (data.refresh_token) {
-      cookieStore.set("refresh_token", data.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-    }
+    cookieStore.set("refresh_token", data.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
 
     revalidatePath("/");
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.detail || "Login failed" };
+    return { success: true, message: "Login successful", data };
+  } catch {
+    return { success: false, message: "Login failed" };
   }
 }
 
-export async function register(values: z.infer<typeof registerSchema>) {
+
+export async function register(values: any) {
   try {
-    const data = await authRequest("/register", "POST", {
+    const { success, data, error } = await authRequest("/register", "POST", {
       body: JSON.stringify(values),
     });
-    return { success: true, data };
-  } catch (error: any) {
-    return { success: false, error: error.detail || "Registration failed" };
+
+    if (!success) return { success: false, message: error };
+
+    return { success: true, message: "Registration successful", data };
+  } catch {
+    return { success: false, message: "Registration failed" };
   }
 }
 
-export async function forgotPassword(
-  values: z.infer<typeof forgotPasswordSchema>
-) {
+export async function forgotPassword(values: any) {
   try {
-    const data = await authRequest("/forgot-password", "POST", {
-      body: JSON.stringify(values),
-    });
-    return { success: true, data };
-  } catch (error: any) {
+    const { success, data, error } = await authRequest(
+      "/forgot-password",
+      "POST",
+      {
+        body: JSON.stringify(values),
+      }
+    );
+
+    if (!success) {
+      return {
+        success: false,
+        message:
+          error ||
+          "If an account with that email exists, a password reset link has been sent.",
+      };
+    }
+
     return {
-      success: false,
-      error:
-        error.detail ||
-        "If an account with that email exists, a password reset link has been sent.",
+      success: true,
+      message: "Password reset link sent",
+      data,
     };
+  } catch {
+    return { success: false, message: "Failed to send reset link" };
   }
 }
 
 export async function resetPassword(token: string, new_password: string) {
   try {
-    const data = await authRequest("/reset-password", "POST", {
-      body: JSON.stringify({ token, new_password }),
-    });
-    return { success: true, data };
-  } catch (error: any) {
-    return {
-      success: false,
-      error: error.detail || "Invalid or expired token",
-    };
+    const { success, data, error } = await authRequest(
+      "/reset-password",
+      "POST",
+      {
+        body: JSON.stringify({ token, new_password }),
+      }
+    );
+
+    if (!success) return { success: false, message: error };
+
+    return { success: true, message: "Password reset successfully", data };
+  } catch {
+    return { success: false, message: "Password reset failed" };
   }
 }
 
@@ -91,25 +108,25 @@ export async function logout() {
 
   if (refreshToken) {
     try {
-      await authRequest("/logout", "POST", {
+      const { success, error } = await authRequest("/logout", "POST", {
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : "",
         },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
-    } catch (error: any) {
-      if (error.status === 401 || error.status === 403) {
-        console.warn("Already logged out or not authenticated.");
-      } else {
-        console.error("API logout failed:", error);
+
+      if (!success) {
+        console.warn("Logout API warning:", error);
       }
+    } catch (error) {
+      console.error("Logout unexpected error:", error);
     }
   }
 
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
   revalidatePath("/");
-  return { success: true };
+  return { success: true, message: "Logged out successfully" };
 }
 
 export async function getCurrentUser() {
@@ -118,15 +135,16 @@ export async function getCurrentUser() {
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
   if (!accessToken || !refreshToken) return null;
-  
+
   try {
-    const user = await authRequest("/users/me/", "GET", {
+    const { success, data, error } = await authRequest("/users/me/", "GET", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    return user;
+    
+    if (!success) return null;
+
+    return data;
   } catch (error) {
-    console.error("Failed to fetch user in getCurrentUser:", error);
     return null;
   }
 }
-

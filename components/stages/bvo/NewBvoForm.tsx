@@ -91,36 +91,45 @@ export default function NewBvoForm({ brands, client_id }: any) {
 
     const brand = brands.find((b: any) => b.brand_id === brandId);
     if (brand) {
-      startTransition(async () => {
-        try {
-          setIsFetchingReports(true);
-          const brandWithCompetitors = await getBrandbyIdWithCompetitors(brandId);
-          setSelectedBrand(brandWithCompetitors);
-          setValue("brand", { id: brand.brand_id, name: brand.name });
+      startTransition(() => {
+        (async () => {
+          try {
+            setIsFetchingReports(true);
+            const brandResponse = await getBrandbyIdWithCompetitors(brandId);
+            if (!brandResponse.success || !brandResponse.data) {
+              toast.error(brandResponse.toast || "Failed to fetch brand details.");
+              setSelectedBrand(null);
+              return;
+            }
+            const brandWithCompetitors = brandResponse.data;
 
-          if (brandWithCompetitors?.competitors) {
-            const competitorData = brandWithCompetitors.competitors.map((c: any) => ({ id: c.competitor_id, name: c.name }));
-            setValue("competitors", competitorData);
+            setSelectedBrand(brandWithCompetitors);
+            setValue("brand", { id: brand.brand_id, name: brand.name });
+
+            if (brandWithCompetitors?.competitors) {
+              const competitorData = brandWithCompetitors.competitors.map((c: any) => ({ id: c.competitor_id, name: c.name }));
+              setValue("competitors", competitorData);
+            }
+
+            const [{ data: websiteReportData }, { data: socialReportData }]: any = await Promise.all([
+              getBatchWebsiteReports(brandId),
+              getBatchSocialReports(brandId)
+            ]);
+
+            setWebsiteReports(websiteReportData || []);
+            setSocialReports(socialReportData || []);
+
+          } catch (error) {
+            console.error("Failed to fetch brand details and reports:", error);
+            toast.error("Failed to load brand details. Please try again.");
+            setSelectedBrand(null);
+          } finally {
+            setIsFetchingReports(false);
           }
-
-          const [{ data: websiteReportData }, { data: socialReportData }]: any = await Promise.all([
-            getBatchWebsiteReports(brandId),
-            getBatchSocialReports(brandId)
-          ]);
-
-          setWebsiteReports(websiteReportData || []);
-          setSocialReports(socialReportData || []);
-
-        } catch (error) {
-          console.error("Failed to fetch brand details and reports:", error);
-          toast.error("Failed to load brand details. Please try again.");
-          setSelectedBrand(null);
-        } finally {
-          setIsFetchingReports(false);
-        }
+        })();
       });
-    }
-  };
+    };
+  }
 
   async function onSubmit(data: any) {
     if (!data.brand?.id) {
@@ -136,55 +145,56 @@ export default function NewBvoForm({ brands, client_id }: any) {
       return;
     }
 
-    startTransition(async () => {
-      const formData = new FormData();
+    startTransition(() => {
+      (async () => {
+        const formData = new FormData();
 
-      (data.brand_documents || []).forEach((file: File) => {
-        formData.append('files', file);
-      });
-      (data.stakeholder_interview_files || []).forEach((file: File) => {
-        formData.append('stakeholder_interview_insights', file);
-      });
-      (data.questionnaire_answers_files || []).forEach((file: File) => {
-        formData.append('stakeholder_questionaire_insights', file);
-      });
-
-      formData.append('client_id', client_id);
-      formData.append('brand_id', selectedBrand.brand_id);
-      formData.append('social_id', data.selectedSocialReport.report_batch_id);
-      formData.append('website_id', data.selectedWebsiteReport.report_batch_id);
-      formData.append('custom_instructions', data.custom_instructions || "");
-      formData.append('model', data.aiModel);
-      formData.append('mode', data.executionMode);
-      // formData.append('rag_name', data.name);
-      formData.append('fuse_depth', '3');
-
-      if (data.executionMode === 'independent' && data.selectedAgents?.length > 0) {
-        const agentIds = arrangeAgentIds(data.selectedAgents);
-        agentIds.forEach((id: string) => {
-          formData.append('agent_ids', id);
+        (data.brand_documents || []).forEach((file: File) => {
+          formData.append('files', file);
         });
-      }
+        (data.stakeholder_interview_files || []).forEach((file: File) => {
+          formData.append('stakeholder_interview_insights', file);
+        });
+        (data.questionnaire_answers_files || []).forEach((file: File) => {
+          formData.append('stakeholder_questionaire_insights', file);
+        });
 
-      try {
-        console.log(console.log(Object.fromEntries(formData.entries())), `<-> console.log(Object.fromEntries(formData.entries())) <->`);
-        
-        const result: any = await initiateBvoAgenticProcess(selectedBrand.brand_id, formData);
-        console.log(result, `<-> result initiateBvoAgenticProcess <->`);
+        formData.append('client_id', client_id);
+        formData.append('brand_id', selectedBrand.brand_id);
+        formData.append('social_id', data.selectedSocialReport.report_batch_id);
+        formData.append('website_id', data.selectedWebsiteReport.report_batch_id);
+        formData.append('custom_instructions', data.custom_instructions || "");
+        formData.append('model', data.aiModel);
+        formData.append('mode', data.executionMode);
+        // formData.append('rag_name', data.name);
+        formData.append('fuse_depth', '3');
 
-        if (result.success) {
-          if (data.executionMode === 'interactive' && result.session_id) {
-            toast.success("Interactive session started.");
-            setSessionId(result.session_id);
-          } else {
-            toast.success("BVO process has been initiated successfully.");
-          }
-        } else {
-          toast.error(result.error || "Failed to initiate BVO process.");
+        if (data.executionMode === 'independent' && data.selectedAgents?.length > 0) {
+          const agentIds = arrangeAgentIds(data.selectedAgents);
+          agentIds.forEach((id: string) => {
+            formData.append('agent_ids', id);
+          });
         }
-      } catch (error: any) {
-        toast.error(`An unexpected error occurred: ${error.message}`);
-      }
+
+        try {
+          console.log(console.log(Object.fromEntries(formData.entries())), `<-> console.log(Object.fromEntries(formData.entries())) <->`);
+
+          const { success, message, data } = await initiateBvoAgenticProcess(selectedBrand.brand_id, formData);
+
+          if (!success) {
+            return toast.error(message || "Failed to initiate BVO process.");
+          }
+
+          if (data.executionMode === 'interactive' && data.session_id) {
+            toast.success(message || "Interactive session started.");
+            setSessionId(data.session_id);
+          } else {
+            toast.success(message || "BVO process has been initiated successfully.");
+          }
+        } catch (error: any) {
+          toast.error(`An unexpected error occurred: ${error.message}`);
+        }
+      })();
     });
   }
 
