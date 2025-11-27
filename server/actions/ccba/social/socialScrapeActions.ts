@@ -25,7 +25,7 @@ export async function scrapeBatchSocial(
 
         if (!success) return { success: false, message: error };
 
-        revalidatePath(`/ccba/${brand_id}`);
+        revalidatePath(`/dashboard/ccba/${brand_id}`);
         return { success: true, message: `Social ${SCRAPING} started successfully`, data };
     } catch (error: any) {
         console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error);

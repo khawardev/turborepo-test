@@ -32,15 +32,15 @@ export default function SidebarUser({ user }: { user: any }) {
         >
           <Avatar>
             <AvatarImage
-              src={`https://avatar.vercel.sh/${user.email}.png`}
-              alt={user.name || ""}
+              src={`https://avatar.vercel.sh/${user?.email}.png`}
+              alt={user?.name || ""}
             />
-            <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
 
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{user.name}</span>
-            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+            <span className="truncate font-medium">{user?.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
           </div>
 
           <ChevronsUpDown className="ml-auto size-4" />
@@ -54,13 +54,13 @@ export default function SidebarUser({ user }: { user: any }) {
         <DropdownMenuItem className="bg-accent">
           <div className="flex items-center gap-2 text-left text-sm">
             <Avatar>
-              <AvatarImage src={`https://avatar.vercel.sh/${user.email}.png`} alt={user.name || ""} />
-              <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.name || ""} />
+              <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
 
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+              <span className="truncate font-medium">{user?.name}</span>
+              <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
             </div>
           </div>
 

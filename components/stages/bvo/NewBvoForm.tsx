@@ -95,13 +95,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
         (async () => {
           try {
             setIsFetchingReports(true);
-            const brandResponse = await getBrandbyIdWithCompetitors(brandId);
-            if (!brandResponse.success || !brandResponse.data) {
-              toast.error(brandResponse.toast || "Failed to fetch brand details.");
-              setSelectedBrand(null);
-              return;
-            }
-            const brandWithCompetitors = brandResponse.data;
+            const brandWithCompetitors = await getBrandbyIdWithCompetitors(brandId);
 
             setSelectedBrand(brandWithCompetitors);
             setValue("brand", { id: brand.brand_id, name: brand.name });

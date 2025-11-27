@@ -6,14 +6,13 @@ import LightRaysWrapper from "@/components/ui/react-bits/LightRays/LightRaysWrap
 import HeaderServer from "@/components/static/header/HeaderServer";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/brandos-sidebar-config";
-import { HeroHeader } from "@/components/static/header/HeroHeader";
+
 const inter = Inter({ subsets: ["latin"], display: 'swap', });
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
-
 
 
 export const metadata: Metadata = {
@@ -34,9 +33,7 @@ export default function RootLayout({
           <LightRaysWrapper>
             <HeaderServer />
             {/* <HeroHeader/> */}
-            {/* <JotaiProvider> */}
               {children}
-            {/* </JotaiProvider> */}
             <Toaster position='bottom-center' />
           </LightRaysWrapper>
         </ThemeProvider>

@@ -5,12 +5,7 @@ import { getBatchWebsiteReports } from "@/server/actions/ccba/website/websiteRep
 import { toast } from "sonner";
 
 export default async function ReportsTab({ brandId }: { brandId: string }) {
-  const brandResponse = await getBrandbyIdWithCompetitors(brandId);
-  if (!brandResponse.success || !brandResponse.data) {
-    toast.error(brandResponse.toast);
-    return <div>Error loading brand data.</div>;
-  }
-  const brandData = brandResponse.data;
+  const brandData = await getBrandbyIdWithCompetitors(brandId);
   
   const websiteReportData = await getBatchWebsiteReports(brandId);
   const allSocialReportsData = await getBatchSocialReports(brandId);

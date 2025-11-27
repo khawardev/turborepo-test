@@ -27,7 +27,7 @@ export async function addBrand(values: z.infer<typeof brandSchema>) {
       }
     }
 
-    revalidatePath("/ccba");
+    revalidatePath("/dashboard/ccba");
     return {
       success: true,
       message: "Brand added successfully",
@@ -82,8 +82,8 @@ export async function updateBrand(brandId: string, values: any) {
 
     if (!success) return { success: false, message: error };
 
-    revalidatePath("/ccba");
-    revalidatePath(`/ccba/${brandId}`);
+    revalidatePath("/dashboard/ccba");
+    revalidatePath(`/dashboard/ccba/${brandId}`);
 
     return {
       success: true,
@@ -119,7 +119,7 @@ export async function updateCompetitorAction(
 
     if (!success) return { success: false, message: error };
 
-    revalidatePath("/brands");
+    revalidatePath("/dashboard/ccba");
     return { success: true, message: "Competitor updated successfully", data };
   } catch (e) {
     return {
@@ -231,7 +231,7 @@ export async function deleteBrand(brand_id: string) {
 
     if (!success) return { success: false, message: error };
 
-    revalidatePath("/ccba");
+    revalidatePath("/dashboard/ccba");
     return {
       success: true,
       message: "Brand deleted successfully",

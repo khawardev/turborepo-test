@@ -60,7 +60,7 @@ export default function CreateCgeSessionForm({ brands }: { brands: any[] }) {
         if (!success) return toast.error(message);
         
         toast.success(message);
-        router.push(`/cge/${data.cam_session_id}?brand_id=${values.brand_id}`);
+        router.push(`/dashboard/cge/${data.cam_session_id}?brand_id=${values.brand_id}`);
       })();
     });
   };

@@ -23,7 +23,7 @@ export async function batchWebsiteReports({ brand_id, batch_id, model_id, sythes
 
         if (!success) return { success: false, message: error };
 
-        revalidatePath(`/ccba/${brand_id}`);
+        revalidatePath(`/dashboard/ccba/${brand_id}`);
         return { success: true, message: "Batch website reports started successfully", data: data.task_id };
     } catch {
         return { success: false, message: "Failed to start batch website reports" };

@@ -13,13 +13,8 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   await getCurrentUser();
   
   const { brandId } = await params;
-  const brandResponse = await getBrandbyIdWithCompetitors(brandId);
+  const brandData = await getBrandbyIdWithCompetitors(brandId);
 
-  if (!brandResponse.success || !brandResponse.data) {
-    toast.error(brandResponse.toast);
-    return <div>Error loading brand data.</div>;
-  }
-  const brandData = brandResponse.data;
 
   return (
     <DashboardLayout brandData={brandData}>

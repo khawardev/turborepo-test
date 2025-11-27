@@ -14,6 +14,7 @@ import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
+console.log(user, `<-> user <->`);
 
     return (
         <SidebarProvider>

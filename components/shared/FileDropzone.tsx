@@ -14,20 +14,20 @@ type FileDropzoneProps = {
 };
 
 const fileIcons: { [key: string]: any } = {
-    pdf: <PiFilePdfFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    doc: <PiFileDocFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    docx: <PiFileDocFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    xls: <PiFileXlsFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    xlsx: <PiFileXlsFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    ppt: <PiFilePptFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    pptx: <PiFilePptFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    csv: <PiFileCsvFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
-    txt: <PiFileFill className="h-6 w-6 text-muted-foreground flex-shrink-0" />,
+    pdf: <PiFilePdfFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    doc: <PiFileDocFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    docx: <PiFileDocFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    xls: <PiFileXlsFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    xlsx: <PiFileXlsFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    ppt: <PiFilePptFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    pptx: <PiFilePptFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    csv: <PiFileCsvFill className="h-6 w-6 text-muted-foreground shrink-0" />,
+    txt: <PiFileFill className="h-6 w-6 text-muted-foreground shrink-0" />,
 };
 
 const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase() || '';
-    return fileIcons[extension] || <PiFile className="h-6 w-6 text-muted-foreground flex-shrink-0" />;
+    return fileIcons[extension] || <PiFile className="h-6 w-6 text-muted-foreground shrink-0" />;
 };
 
 function formatBytes(bytes: number, decimals = 2): string {
@@ -93,7 +93,7 @@ export function FileDropzone({ onFilesChange, initialFiles }: FileDropzoneProps)
                                     <span className="text-xs text-muted-foreground">{formatBytes(file.size)}</span>
                                 </div>
                             </div>
-                            <Button type="button" variant="ghost" size="icon" className="ml-2 h-7 w-7 flex-shrink-0" onClick={() => handleRemoveFile(index)}>
+                            <Button type="button" variant="ghost" size="icon" className="ml-2 h-7 w-7 shrink-0" onClick={() => handleRemoveFile(index)}>
                                 <IoClose className="h-4 w-4" />
                             </Button>
                         </div>

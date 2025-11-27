@@ -54,8 +54,8 @@ export default async function CgePage() {
     return (
         <>
             <DashboardLayoutHeading
-                title={BrandOSConfig.mainNav[3].title}
-                subtitle={BrandOSConfig.mainNav[3].desc}
+                title={BrandOSConfig.mainNav[2].title}
+                subtitle={BrandOSConfig.mainNav[2].desc}
             />
             <DashboardInnerLayout>
                 <div className=" space-y-10">

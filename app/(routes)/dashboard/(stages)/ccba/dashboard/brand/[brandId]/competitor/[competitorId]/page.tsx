@@ -13,12 +13,8 @@ export default async function CompetitorPage({params}: {params: Promise<{ brandI
     await getCurrentUser()
 
     const { brandId, competitorId } = await params
-    const brandResponse = await getBrandbyIdWithCompetitors(brandId)
-    if (!brandResponse.success || !brandResponse.data) {
-        toast.error(brandResponse.toast);
-        return <div>Error loading brand data.</div>;
-    }
-    const brandData = brandResponse.data;
+    const brandData = await getBrandbyIdWithCompetitors(brandId)
+
     const competitor = brandData.competitors.find((c: any) => c.id === competitorId)
     const competitorName = competitor ? competitor.name : 'Competitor';
 

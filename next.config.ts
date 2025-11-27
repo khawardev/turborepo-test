@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['jotai-devtools'],
   experimental: {
     viewTransition: true,
     serverActions: {
