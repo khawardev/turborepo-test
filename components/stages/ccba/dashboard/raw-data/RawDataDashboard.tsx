@@ -7,6 +7,7 @@ import { Suspense } from 'react'
 import DashboardSkeleton from '../shared/DashboardSkeleton'
 import ScrapDataViewerSkeleton from '@/components/stages/ccba/details/_components/_skeleton/ScrapDataViewerSkeleton'
 export default function RawDataDashboard({ websiteScrapsData, socialScrapsData }: any) {
+    
     return (
         <Tabs defaultValue="website">
             <TabsList>

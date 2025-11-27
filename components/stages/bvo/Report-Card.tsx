@@ -27,21 +27,13 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FileText, Users } from "lucide-react";
-import remarkGfm from "remark-gfm";
-import ReactMarkdown from "react-markdown";
+
 import ExtractedDataDashboard from "../ccba/dashboard/extracted-data/ExtractedDataDashboard";
 import { parseJsonFromMarkdown } from "@/lib/static/jsonParser";
 import { EmptyStateCard } from "@/components/shared/CardsUI";
+import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 
-const MarkdownViewer = ({ content }: { content: string }) => {
-    return (
-        <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-            </ReactMarkdown>
-        </div>
-    );
-};
+
 
 interface ReportCardProps {
     report: any;

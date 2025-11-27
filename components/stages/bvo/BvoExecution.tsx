@@ -71,7 +71,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
                 <CardContent>
                     <p className="mb-4">Current mode: <strong>{mode}</strong></p>
                     {/* <Button asChild variant="outline">
-                        <Link href="/bam/new">
+                        <Link href="/dashboard/bam/new">
                             <Plus className="h-4 w-4 mr-2" />
                             Create New BAM
                         </Link>

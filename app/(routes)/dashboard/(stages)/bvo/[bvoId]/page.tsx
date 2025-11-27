@@ -3,11 +3,10 @@ import { ContainerMd } from "@/components/shared/Containers";
 import StaticBanner from "@/components/shared/StaticBanner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Markdown from 'react-markdown';
 import { Separator } from "@/components/ui/separator";
 import { DashboardInnerLayout, DashboardLayoutHeading } from "@/components/stages/ccba/dashboard/shared/DashboardComponents";
-import { BrandOSConfig } from "@/config/brandos-sidebar-config";
 import { EmptyStateCard } from "@/components/shared/CardsUI";
+import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 
 
 export default async function BvoDetailPage({ params, searchParams }: any) {
@@ -75,7 +74,7 @@ export default async function BvoDetailPage({ params, searchParams }: any) {
               <CardContent>
                 <h3 className="text-lg font-semibold mb-2">Agent Output</h3>
                 <div className="prose dark:prose-invert max-w-none p-4 border rounded-md bg-muted/20">
-                  <Markdown>{result.agent_output}</Markdown>
+                  <MarkdownViewer content={result.agent_output} />
                 </div>
                 <Separator className="my-6" />
                 <h3 className="text-lg font-semibold mb-4">Additional Details</h3>

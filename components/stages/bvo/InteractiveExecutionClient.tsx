@@ -44,15 +44,15 @@ export function InteractiveExecutionClient({ session_id, onSessionEnd }: { sessi
     const handleEndSession = () => {
         startEndingTransition(() => {
             (async () => {
-            setIsPolling(false);
-            const { success, message, data } = await endInteractiveSession(session_id);
-            if (!success) {
-                return toast.error(message || "Failed to end the session.");
-            }
-            toast.success(message);
-            setStatus(data);
-            onSessionEnd();
-            redirect('/bvo');
+                setIsPolling(false);
+                const { success, message, data } = await endInteractiveSession(session_id);
+                if (!success) {
+                    return toast.error(message || "Failed to end the session.");
+                }
+                toast.success(message);
+                setStatus(data);
+                onSessionEnd();
+                redirect('/dashboard/bvo');
             })();
         });
     };

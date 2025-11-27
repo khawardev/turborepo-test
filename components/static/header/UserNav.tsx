@@ -63,7 +63,7 @@ export function UserNav({ user }: UserNavProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={'/profile'}>
+          <Link href={'/dashboard/profile'}>
             <span ><RiUserSmileLine /></span>
             <span>Profile</span>
           </Link>

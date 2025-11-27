@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/static/cleanMarkdown';
 import { SCRAPED } from '@/lib/constants';
 import { EmptyStateCard } from '@/components/shared/CardsUI';
+import { MarkdownViewer } from '@/components/shared/MarkdownViewer';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
     
@@ -93,7 +94,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                 <Separator />
 
                 <ScrollArea className="h-[70vh] w-full ">
-                    <div className="prose prose-neutral  whitespace-normal max-w-none markdown-body dark:prose-invert ">
+                    {/* <div className="prose prose-neutral  whitespace-normal max-w-none markdown-body dark:prose-invert ">
                             <ReactMarkdown components={{
                                 img: ({ node, ...props }) => {
                                     if (!props.src) return null
@@ -102,7 +103,8 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                             }} remarkPlugins={[remarkGfm]}>
                                 {cleanAndFlattenBullets(selectedPage?.content)}
                             </ReactMarkdown>
-                        </div>
+                    </div> */}
+                    <MarkdownViewer content={selectedPage?.content} />
                 </ScrollArea>
             </CardContent>
         </div>

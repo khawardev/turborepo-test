@@ -18,7 +18,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/Previous_Components/sidebar'
+} from '@/components/previous-components/sidebar'
 import { getCurrentUser } from '@/server/actions/authActions';
 import { SignoutButton } from '@/components/shared/AuthButtons';
 

@@ -1,5 +1,5 @@
 import BrandDashboard from '@/components/stages/ccba/dashboard/BrandDashboard'
-import DashboardLayout from '@/Previous_Components/DashboardLayout'
+import DashboardLayout from '@/components/previous-components/DashboardLayout'
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions'
 import RawDataTab from '@/components/stages/ccba/dashboard/raw-data/RawDataTab'
 import WebsiteAuditData from '@/components/stages/ccba/dashboard/website-audit/WebsiteAuditData'

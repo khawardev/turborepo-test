@@ -110,7 +110,7 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
                                             {sortedReports.find(r => r.report_batch_id === selectedReportBatchId)?.created_at
                                                 ? timeAgo(sortedReports.find(r => r.report_batch_id === selectedReportBatchId).created_at)
                                                 : "Select Previous reports"}
-                                            <ChevronDownIcon  />
+                                            <ChevronDownIcon />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="w-[135px]">

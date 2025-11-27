@@ -31,17 +31,17 @@ export default function RelationshipMatrix({ data, themes }: any) {
                             <TableRow>
                                 <TableHead className="font-semibold">Product Group</TableHead>
                                 {themeNames.map((theme: string) => (
-                                    <TableHead key={theme} className="text-center">{theme}</TableHead>
+                                    <TableHead key={theme} className="text-center whitespace-pre-wrap">{theme}</TableHead>
                                 ))}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {productGroups.map((group: string) => (
                                 <TableRow key={group}>
-                                    <TableCell className="font-medium">{group}</TableCell>
+                                    <TableCell className="font-medium  whitespace-pre-wrap">{group}</TableCell>
                                     {themeNames.map((theme: string) => (
                                         <TableCell key={theme} className="text-center">
-                                            <div className={cn("rounded-md p-2 w-full", getColor(data[group][theme]))}>
+                                            <div className={cn("rounded-md p-2  w-full", getColor(data[group][theme]))}>
                                                 {data[group][theme]}
                                             </div>
                                         </TableCell>

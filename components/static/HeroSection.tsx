@@ -15,7 +15,7 @@ export default function HeroSection() {
             </BlurDelay>
             <BlurDelay2 className=" flex items-center gap-2">
                 <Button asChild size={'lg'}>
-                    <Link href="/ccba">
+                    <Link href="/login">
                         Get Started
                     </Link>
                 </Button>

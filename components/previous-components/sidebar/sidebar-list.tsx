@@ -6,7 +6,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/Previous_Components/sidebar"
+} from "@/components/previous-components/sidebar"
 import {
     Accordion,
     AccordionContent,

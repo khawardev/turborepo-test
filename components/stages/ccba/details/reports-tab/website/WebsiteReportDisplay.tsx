@@ -1,5 +1,3 @@
-// components/brands/detail/reports/Report-Display.tsx
-
 'use client'
 
 import ExtractedDataDashboard from "@/components/stages/ccba/dashboard/extracted-data/ExtractedDataDashboard";
@@ -9,10 +7,11 @@ import { parseJsonFromMarkdown } from "@/lib/static/jsonParser";
 import { useMemo } from "react";
 
 export default function WebsiteReportDisplay({ standardizedReportData, title }: any) {
+console.log(standardizedReportData, `<-> standardizedReportData <->`);
 
     const { extractorReport, synthesizerReport } = useMemo(() => {
-        const rawExtractionResponse = standardizedReportData?.extraction?.response;
-        const rawSynthesisResponse = standardizedReportData?.synthesis?.response;
+        const rawExtractionResponse = standardizedReportData?.data?.extraction?.response;
+        const rawSynthesisResponse = standardizedReportData?.data?.synthesis?.response;
 
         return {
             extractorReport: parseJsonFromMarkdown(rawExtractionResponse),

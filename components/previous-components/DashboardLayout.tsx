@@ -9,7 +9,7 @@ import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/Previous_Components/sidebar"
+} from "@/components/previous-components/sidebar"
 import { UserNav } from '@/components/static/header/UserNav';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { generateSidebarHrefTree } from '@/lib/static/generateSidebar';
@@ -41,7 +41,7 @@ const DashboardLayout = async ({ children, brandData }: any) => {
                         <ThemeSwitcher />
                     </div>
                 </header>
-                <div className='relative'>
+                <div className='relative min-w-0'>
                     {children}
                 </div>
             </SidebarInset>

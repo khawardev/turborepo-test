@@ -26,7 +26,7 @@ export default async function BvoList() {
     })
   )
   return (
-    <div className="px-1 mb-2">
+    <div >
       {brandsWithHistory.map((entry) => {
         if (!entry) return null
 

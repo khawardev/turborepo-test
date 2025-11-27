@@ -29,23 +29,23 @@ export default function ScrapDataViewer({
                         <TabsTrigger value="website">Website {SCRAPS}</TabsTrigger>
                         <TabsTrigger value="social-media">Social Media {SCRAPS}</TabsTrigger>
                     </TabsList>
-                    {/* <div className=' flex items-center gap-2'>
-                        {activeTab === "website" ? (
+                    <div className=' flex items-center gap-2'>
+                        {/* {activeTab === "website" ? (
                             <>
-                                <Status status="available" variant="secondary">
+                                <Status status="available" >
                                     <StatusIndicator />
                                     Website Data Capture
                                 </Status>
                             </>
                         ) : (
                             <>
-                                <Status status="pending" variant="secondary">
+                                <Status status="pending" >
                                     <StatusIndicator />
                                     Social Data Capture
                                 </Status>
                             </>
-                        )}
-                    </div> */}
+                        )} */}
+                    </div>
                 </div>
                 <TabsContent value="website" className="pt-6">
                     {websiteScrapsComponent}

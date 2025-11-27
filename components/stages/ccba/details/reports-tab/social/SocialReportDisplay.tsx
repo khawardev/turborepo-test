@@ -34,7 +34,7 @@ export default function SocialReportDisplay({ entityReports, selectedEntityName 
     }, [activeTab, entityReports])
 
     if (availablePlatforms.length === 0) {
-        return <EmptyStateCard message={`No platforms with reports found for ${selectedEntityName}.`} /> 
+        return <EmptyStateCard message={`No platforms with reports found for ${selectedEntityName}.`} />
     }
 
     return (

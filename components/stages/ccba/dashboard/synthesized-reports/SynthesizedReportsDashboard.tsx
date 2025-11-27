@@ -4,12 +4,9 @@ import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Copy, DownloadCloud } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
-import { cleanAndFlattenBullets } from "@/lib/static/cleanMarkdown";
-import { Card, CardContent } from "@/components/ui/card";
 import { EmptyStateCard } from "@/components/shared/CardsUI";
+import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 export default function SynthesizedReportsDashboard({ synthesizerReport, title }: any) {
     const [copied, setCopied] = useState(false);
 
@@ -72,12 +69,8 @@ export default function SynthesizedReportsDashboard({ synthesizerReport, title }
                 </div>
             </div>
 
-            <ScrollArea className="h-[70vh] bg-linear">
-                <div className="prose prose-neutral max-w-none markdown-body  dark:prose-invert">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {cleanAndFlattenBullets(synthesizerReport)}
-                    </ReactMarkdown>
-                </div>
+            <ScrollArea className="h-[70vh] bg-outline ">
+                <MarkdownViewer content={synthesizerReport} />
             </ScrollArea>
         </div>
     );

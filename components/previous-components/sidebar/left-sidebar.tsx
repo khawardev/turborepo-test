@@ -12,7 +12,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
-} from "@/Previous_Components/sidebar"
+} from "@/components/previous-components/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FullLogo } from "@/components/shared/Logo"

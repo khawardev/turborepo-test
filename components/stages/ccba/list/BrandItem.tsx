@@ -95,17 +95,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (
-      (e.target as HTMLElement).closest("a") ||
-      (e.target as HTMLElement).closest("button") ||
-      (e.target as HTMLElement).closest('[role="menuitem"]')
-    ) {
-      return;
-    }
-    router.push(`/dashboard/ccba/${brand.brand_id}`);
-  };
-
   const scrapeBrand = (limit: any) => {
     startTransition(() => {
       (async () => {
@@ -122,7 +111,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   return (
     <ClickableListCard
       isActive={isScrapped}
-      onClick={handleCardClick}
+      href={`/dashboard/ccba/${brand.brand_id}`}
     >
       <div className=" mx-auto w-full space-y-6">
         <CardHeader className="flex flex-row items-center justify-between">

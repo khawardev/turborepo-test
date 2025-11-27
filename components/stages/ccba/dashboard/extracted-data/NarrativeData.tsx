@@ -30,7 +30,7 @@ export default function NarrativeData({ data }: any) {
                                     {data.action_verbs.map((item: any, index: number) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{item.verb}</TableCell>
-                                            <TableCell className="text-muted-foreground text-sm italic">"{item.quotes[0]}"</TableCell>
+                                            <TableCell className="text-muted-foreground  whitespace-pre-wrap text-sm italic">"{item.quotes[0]}"</TableCell>
                                             <TableCell className="text-right">{item.count}</TableCell>
                                         </TableRow>
                                     ))}
@@ -40,7 +40,7 @@ export default function NarrativeData({ data }: any) {
                         <TabsContent value="statements">
                             <div className="space-y-4 p-1">
                                 {data.future_statements.map((item: any, index: number) => (
-                                    <blockquote key={index} className="border-l-2 pl-4 italic text-sm text-muted-foreground">
+                                    <blockquote key={index} className="border-l-2  whitespace-pre-wrap pl-4 wrap-break-word italic text-sm text-muted-foreground">
                                         "{item.quote}"
                                     </blockquote>
                                 ))}

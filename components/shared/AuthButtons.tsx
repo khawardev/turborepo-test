@@ -1,20 +1,18 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from "sonner"
 
 export function AuthButtons() {
     return (
-        <>
-            <li className="md:inline-block hidden">
-                <Link href="/signin">
-                    <Button size={'sm'}>
-                        Sign In
-                    </Button>
-                </Link>
-            </li>
-        </>
+        <li className="md:inline-block hidden">
+            <Link href="/signin">
+                <Button size={'sm'}>
+                    Sign In
+                </Button>
+            </Link>
+        </li>
 
     )
 }

@@ -314,7 +314,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
       className={cn(
         // "bg-linear-to-t to-background from-muted dark:from-muted/50 dark:border-border border border-zinc-300  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
         // "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
-        "bg-linear-to-t to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300/10 shadow-zinc-950/10  text-card-foreground  ring-border dark:ring-offset-background ring-offset-background/10 ring-1 ring-offset-2  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
+        "bg-linear-to-t  to-background/20 from-muted dark:from-border/50 dark:border-border border border-zinc-300/10 shadow-zinc-950/10  text-card-foreground  ring-border dark:ring-offset-background ring-offset-background/10 ring-1 ring-offset-2  relative flex min-w-0 overflow-hidden w-full flex-1 flex-col   ",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}

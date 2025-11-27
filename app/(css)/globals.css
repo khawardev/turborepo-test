@@ -172,11 +172,11 @@
   }
 
   .bg-outline {
-    @apply  backdrop-blur bg-linear-to-t from-border/70 dark:from-border to-border/10  border shadow-zinc-950/10 duration-200 ;
+    @apply  bg-linear-to-t dark:from-border/50  from-background/70 to-background/10   shadow-zinc-950/10  text-card-foreground flex flex-col gap-6 rounded-xl  p-6  border border-border ring-border/70 ring-offset-background ring-1 ring-offset-3 ;
   }
 
   .bg-linear {
-    @apply bg-linear-to-t from-background to-background/50 dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 rounded-xl p-6 ring-border ring-offset-border/5 ring-1 ring-offset-2;
+    @apply bg-linear-to-t  from-background to-background/50 dark:from-border/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 rounded-xl p-6 ring-border ring-offset-border/5 ring-1 ring-offset-2;
   }
 
   .victor {

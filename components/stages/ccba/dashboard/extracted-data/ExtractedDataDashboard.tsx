@@ -10,6 +10,7 @@ import AudienceAndSignals from "./AudienceAndSignals";
 import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 export default function ExtractedDataDashboard({ extractorReport, title }: any) {
+
     if (!extractorReport) {
         return <EmptyStateCard message="No valid extracted data to display." />
     }

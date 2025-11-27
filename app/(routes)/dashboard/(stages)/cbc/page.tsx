@@ -10,6 +10,7 @@ const page = () => {
       />
       <DashboardInnerLayout>
         <div className="flex justify-center  h-[60vh] items-center">
+          <p className="text-muted-foreground text-lg">Evolution Loop -  Coming Soon!</p>
         </div>
       </DashboardInnerLayout >
     </>
