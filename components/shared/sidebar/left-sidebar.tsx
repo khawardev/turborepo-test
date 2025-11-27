@@ -1,11 +1,5 @@
 'use client'
 import {
-    FileText,
-    Home,
-    Key,
-    PieChart,
-    Settings,
-    SquareTerminal,
     Command,
 } from "lucide-react"
 import {
@@ -25,9 +19,7 @@ import { SidebarList } from "./sidebar-list"
 import SidebarUser from "./sidebar-user"
 import { BrandOSConfig } from "@/config/brandos-sidebar-config"
 
-
-
-export function LeftSidebar({user, ...props}: any) {
+export function LeftSidebar({ user, brands, ...props}: any) {
 
     return (
         <Sidebar collapsible="icon" variant='inset' {...props}>
@@ -52,7 +44,7 @@ export function LeftSidebar({user, ...props}: any) {
             </SidebarHeader>
             
             <SidebarContent>
-                <SidebarList data={BrandOSConfig} />
+                <SidebarList brands={brands} data={BrandOSConfig} />
             </SidebarContent>
 
             <SidebarFooter>

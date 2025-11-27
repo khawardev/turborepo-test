@@ -1,7 +1,6 @@
 import RawDataDashboard from "./RawDataDashboard";
 import { getWebsiteBatchId, getscrapeBatchWebsite } from '@/server/actions/ccba/website/websiteScrapeActions'
 import { getScrapeBatchSocial, getSocialBatchId } from '@/server/actions/ccba/social/socialScrapeActions'
-import { getCurrentUser } from "@/server/actions/authActions";
 
 export default async function RawDataTab({ brandId, competitorId }: { brandId: string, competitorId?: string }) {
 

@@ -64,7 +64,7 @@ export default async function BrandDetailPage({
   return (
     <>
       <DashboardLayoutHeading
-        title={`${brandData.name} - Brand Details`}
+        title={`${brandData?.name} - Brand Details`}
         subtitle="See how the brand and competitors truly show up."
       />
       <DashboardInnerLayout>

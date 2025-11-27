@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { SidebarBrands } from "./sidebar-brands"
 
-export const SidebarList = ({ data }: any) => {
+export const SidebarList = ({ data, brands }: any) => {
     const pathname = usePathname()
 
     return (
@@ -57,6 +58,8 @@ export const SidebarList = ({ data }: any) => {
                     )
                 })}
             </SidebarMenu>
+            <SidebarSeparator className="my-3" />
+           <SidebarBrands brands={brands} />
         </SidebarGroup>
     )
 }

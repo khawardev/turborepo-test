@@ -17,17 +17,17 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   return (
     <>
       <DashboardLayoutHeading
-        title={brandData.name}
+        title={brandData?.name}
         subtitle={'Website and Social Captured Data, Extracted & Outside-In reports, Brand Perception and Analytics Dashboards.'}
       />
 
       <DashboardInnerLayout>
         <BrandDashboard
-          title={brandData.name}
+          title={brandData?.name}
           rawDataTab={<RawDataTab brandId={brandId} />}
-          websiteAuditTab={<WebsiteAuditData brandId={brandId} title={brandData.name} />}
+          websiteAuditTab={<WebsiteAuditData brandId={brandId} title={brandData?.name} />}
           socialAuditTab={<SocialAuditTab brandId={brandId} />}
-          analyticsDashboardsTab={<AnalyticsDashboardsData brandId={brandId} brandName={brandData.name} />}
+          analyticsDashboardsTab={<AnalyticsDashboardsData brandId={brandId} brandName={brandData?.name} />}
         />
       </DashboardInnerLayout>
     </>

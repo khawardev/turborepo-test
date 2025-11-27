@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/server/actions/authActions'
 
-export default function SidebarUser({ user }: { user: any }) {
+export default function SidebarUser({ user }: any ) {
   const [open, setOpen] = useState(false)
   const router = useRouter();
 

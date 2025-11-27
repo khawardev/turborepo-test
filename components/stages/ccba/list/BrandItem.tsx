@@ -24,21 +24,10 @@ import { Badge } from "../../../ui/badge";
 import { ButtonSpinner } from "../../../shared/SpinnerLoader";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { deleteBrand } from "@/server/actions/brandActions";
 import { scrapeBatchWebsite } from "@/server/actions/ccba/website/websiteScrapeActions";
 import { WebsiteAskLimitDialog } from "../details/scraps-tab/website/WebsiteAskLimitDialog";
-import { UpdateBrandDialog } from "./crud/UpdateBrandDialog";
-import { AddCompetitorsDialog } from "./crud/AddCompetitorsDialog";
-import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
-import { ContainerMd } from "@/components/shared/Containers";
 import { ClickableListCard, EmptyStateCard } from "@/components/shared/CardsUI";
 
 function BrandItemSkeleton() {
