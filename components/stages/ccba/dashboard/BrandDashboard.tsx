@@ -22,7 +22,6 @@ export default function BrandDashboard({
 
     return (
         <div>
-            <DashboardHeader title={title} subtitle="Website and Social Captured Data, Extracted & Outside-In reports, Brand Perception and Analytics Dashboards." />
             <Tabs defaultValue="raw_data">
                 <TabsList>
                     <TabsTrigger value="raw_data">{SCRAPED} Data</TabsTrigger>

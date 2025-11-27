@@ -7,7 +7,6 @@ import { parseJsonFromMarkdown } from "@/lib/static/jsonParser";
 import { useMemo } from "react";
 
 export default function WebsiteReportDisplay({ standardizedReportData, title }: any) {
-console.log(standardizedReportData, `<-> standardizedReportData <->`);
 
     const { extractorReport, synthesizerReport } = useMemo(() => {
         const rawExtractionResponse = standardizedReportData?.data?.extraction?.response;

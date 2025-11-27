@@ -9,7 +9,6 @@ import { DashboardHeader } from "../../dashboard/shared/DashboardComponents"
 
 export default function ReportDataViewer({ allwebsiteReportsData, allSocialReportsData, brandName, competitors }: any) {
     const [activeTab, setActiveTab] = useState("website")
-   console.log(allSocialReportsData, `<-> allSocialReportsData <->`);
    
     return (
         <div className="flex flex-col space-y-4">

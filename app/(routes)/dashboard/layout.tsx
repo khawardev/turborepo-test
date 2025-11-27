@@ -35,10 +35,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                             <CircleHelp className="size-4" />
                             Help
                         </Button>
-                        <Button variant="ghost" >
+                        {/*  <Button variant="ghost" >
                             <Book className="size-4" />
                             Docs
-                        </Button>
+                        </Button> */}
                         <Button  >
                             <Plus />
                             Upgrade

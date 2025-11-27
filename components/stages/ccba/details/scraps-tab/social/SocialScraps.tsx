@@ -51,7 +51,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
         return sources;
     }, [selectedScrap, brandName]);
 
-    const selectedDataSource = useMemo(() => {
+    const selectedDataSource:any = useMemo(() => {
         if (!selectedSourceName || dataSources.length === 0) return null;
         return dataSources.find(source => source.name === selectedSourceName) ?? null;
     }, [selectedSourceName, dataSources]);
@@ -81,6 +81,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
             </div>
         );
     }
+    
 
     return (
         <div className="flex flex-col space-y-6">
@@ -152,7 +153,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
                     </TooltipProvider>
                 </div>
             </div>
-            <SocialDataView socialScrapedData={selectedDataSource} />
+            <SocialDataView socialScrapedData={selectedDataSource && selectedDataSource.data} />
         </div>
     );
 }

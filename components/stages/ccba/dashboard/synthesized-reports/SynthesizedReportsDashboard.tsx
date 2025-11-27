@@ -7,6 +7,7 @@ import { Copy, DownloadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyStateCard } from "@/components/shared/CardsUI";
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
+
 export default function SynthesizedReportsDashboard({ synthesizerReport, title }: any) {
     const [copied, setCopied] = useState(false);
 

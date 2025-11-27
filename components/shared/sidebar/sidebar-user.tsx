@@ -22,7 +22,7 @@ export default function SidebarUser({ user }: { user: any }) {
     router.push("/login");
     toast.success(message);
   };
-  
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
@@ -63,7 +63,6 @@ export default function SidebarUser({ user }: { user: any }) {
               <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
             </div>
           </div>
-
           <div className="ml-auto size-2 rounded-full bg-primary" />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -74,11 +73,11 @@ export default function SidebarUser({ user }: { user: any }) {
           <DropdownMenuItem asChild>
             <Link href='/dashboard/blog'><Book /> Blog</Link>
           </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href='/dashboard/settings'><Settings />  Settings</Link>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-
         {/* <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
@@ -91,16 +90,16 @@ export default function SidebarUser({ user }: { user: any }) {
         </DropdownMenuGroup> */}
 
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {/* <DropdownMenuItem>
+        {/* <DropdownMenuGroup>
+         <DropdownMenuItem>
             <FileText /> Documentation
-          </DropdownMenuItem> */}
+          </DropdownMenuItem> 
           <DropdownMenuItem>
             <CreditCard /> Manage Subscriptions
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator /> */}
 
         <DropdownMenuItem variant="destructive" onClick={handleLogout}>
           <LogOut /> Sign out
