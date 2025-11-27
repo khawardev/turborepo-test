@@ -38,7 +38,7 @@ export function LoginForm({
   });
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    const { success, message } = await login(values);
+    const { success, message, data } = await login(values);
     if (!success) return toast.error(message);
 
     router.push("/dashboard/ccba");

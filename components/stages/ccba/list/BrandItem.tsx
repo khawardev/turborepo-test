@@ -39,6 +39,7 @@ import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
 import { ContainerMd } from "@/components/shared/Containers";
+import { ClickableListCard } from "@/components/shared/CardsUI";
 
 function BrandItemSkeleton() {
   return (
@@ -108,23 +109,20 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
   const scrapeBrand = (limit: any) => {
     startTransition(() => {
       (async () => {
-      const result = await scrapeBatchWebsite(brand.brand_id, limit);
-      if (result.success) {
-        router.refresh();
+        const {success, message} = await scrapeBatchWebsite(brand.brand_id, limit);
+
+        if (!success) return toast.error(message);
         router.push(`/dashboard/ccba/${brand.brand_id}`);
-        toast.success(`${SCRAPING} started successfully `);
-      } else {
-        toast.error(`${SCRAPING} failed.`);
-      }
-    })();
-  });
+        toast.success(message);
+      })();
+    });
   };
 
-  
+
   return (
-    <Card
-      className={`w-full border-none shadow-none rounded-none border-x-0  relative transition-all mt-1 ${isScrapped && `hover:bg-border/40 cursor-pointer` }`}
-      onClick={isScrapped ? handleCardClick : undefined}
+    <ClickableListCard
+      isActive={isScrapped}
+      onClick={handleCardClick}
     >
       <div className=" mx-auto w-full space-y-6">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -297,6 +295,6 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
           </span>
         </CardContent>
       </div>
-    </Card>
+    </ClickableListCard>
   );
 }

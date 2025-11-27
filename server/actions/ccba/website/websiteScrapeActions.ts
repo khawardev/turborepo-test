@@ -9,7 +9,6 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
     try {
         const user = await getCurrentUser();
 
-
         const scrapePayload = {
             client_id: user.client_id,
             brand_id: brand_id,
@@ -22,7 +21,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
         if (!success) return { success: false, message: error };
 
         revalidatePath(`/dashboard/ccba/${brand_id}`);
-        return { success: true, message: `${SCRAPING} and report extraction started successfully`, data };
+        return { success: true, message: `${SCRAPING} and report extraction  successfully`, data };
     } catch {
         return { success: false, message: `Batch ${SCRAPING} failed` };
     }

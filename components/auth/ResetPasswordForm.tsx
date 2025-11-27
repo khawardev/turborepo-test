@@ -86,7 +86,7 @@ export function ResetPasswordForm({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute top-1 right-1"
+                      className="absolute top-0 right-0"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -119,7 +119,7 @@ export function ResetPasswordForm({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute top-1 right-1"
+                      className="absolute top-0 right-0"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (

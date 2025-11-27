@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { getWebsiteBatchId } from "@/server/actions/ccba/website/websiteScrapeActions";
 import { getCurrentUser } from "@/server/actions/authActions";
 import { toast } from "sonner";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 async function BrandList() {
   const user = await getCurrentUser();
@@ -11,11 +12,7 @@ async function BrandList() {
 
   if (!brands || brands.length === 0) {
     return (
-      <Card className="flex flex-col gap-3 items-center justify-center text-center h-64 border-dashed border-2">
-        <p className="text-sm text-muted-foreground mb-2">
-          Get started by adding your first brand.
-        </p>
-      </Card>
+      <EmptyStateCard message="Get started by adding your first brand."/>
     );
   }
 
@@ -37,7 +34,7 @@ async function BrandList() {
   const filteredBrandItemsData = brandItemsData.filter(Boolean);
 
   return (
-    <div className="px-1 mb-2">
+    <div >
       {filteredBrandItemsData.map((item: any, index: any) => (
         <BrandItem
           key={item.brand.brand_id}

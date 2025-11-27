@@ -5,7 +5,7 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Bell, Book, CircleHelp, Plus, Settings,  } from "lucide-react"
+import { Bell, Book, CircleHelp, Plus, Settings, } from "lucide-react"
 
 import { LeftSidebar } from "@/components/shared/sidebar/left-sidebar"
 import TeamDropdown from "@/components/shared/TeamDropdown"
@@ -14,7 +14,7 @@ import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
-console.log(user, `<-> user <->`);
+    console.log(user, `<-> user <->`);
 
     return (
         <SidebarProvider>
@@ -24,7 +24,7 @@ console.log(user, `<-> user <->`);
                     <div className="flex items-center gap-2 mr-auto">
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="h-7" />
-                        <TeamDropdown/>
+                        <TeamDropdown />
                     </div>
                     <div className="flex items-center gap-2">
                         <ThemeSwitcher />
