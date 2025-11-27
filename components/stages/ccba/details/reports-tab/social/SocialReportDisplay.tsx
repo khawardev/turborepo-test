@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SynthesizedReportsDashboard from '@/components/stages/ccba/dashboard/synthesized-reports/SynthesizedReportsDashboard'
+import { EmptyStateCard } from '@/components/shared/CardsUI'
 
 export default function SocialReportDisplay({ entityReports, selectedEntityName }: any) {
     const [activeTab, setActiveTab] = useState<string>('')
@@ -33,11 +34,7 @@ export default function SocialReportDisplay({ entityReports, selectedEntityName 
     }, [activeTab, entityReports])
 
     if (availablePlatforms.length === 0) {
-        return (
-            <div className="flex mt-4 h-[40vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
-                <p>No platforms with reports found for {selectedEntityName}.</p>
-            </div>
-        )
+        return <EmptyStateCard message={`No platforms with reports found for ${selectedEntityName}.`} /> 
     }
 
     return (

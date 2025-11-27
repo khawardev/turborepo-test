@@ -3,7 +3,7 @@ import { RiErrorWarningLine } from "react-icons/ri";
 
 export function EmptyStateCard({ message }: { message: string }) {
     return (
-        <div className="w-full border-x-0 mt-1 h-[40vh] bg-linear-to-t dark:from-border/50  from-background/70 to-background/10 shadow-zinc-950/10  text-card-foreground border-border ring-border/70 flex items-center justify-center text-center  border-dashed border-2">
+        <div className="w-full border-x-0 mt-1 h-[40vh]   text-card-foreground border-border ring-border/70 flex items-center justify-center text-center  border-dashed border-2">
             <p className="text-sm text-muted-foreground  flex gap-2 items-center"><RiErrorWarningLine /> {message}</p>
         </div>
     )
