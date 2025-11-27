@@ -14,6 +14,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDownIcon } from 'lucide-react'
+import { EmptyStateCard } from '@/components/shared/CardsUI'
 export default function WebsiteReports({ allReportsData, brandName, competitors }: any) {
     const [selectedReportBatchId, setSelectedReportBatchId] = useState<string | null>(null)
     const [selectedSource, setSelectedSource] = useState<any>(null)
@@ -73,11 +74,7 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
     }, [dataSources, sortedReports, selectedReportBatchId, selectedSource?.name])
 
     if (sortedReports.length === 0) {
-        return (
-            <div className="flex h-[60vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
-                No website report data available.
-            </div>
-        )
+        return <EmptyStateCard message="No website report data available." /> 
     }
 
     if (!selectedSource) {
@@ -147,7 +144,7 @@ export default function WebsiteReports({ allReportsData, brandName, competitors 
                 </TooltipProvider>
             </div>
 
-            <WebsiteReportDisplay standardizedReportData={selectedSource.data} title={selectedSource.name} />
+            <WebsiteReportDisplay standardizedReportData={selectedSource} title={selectedSource.name} />
         </div>
     )
 }

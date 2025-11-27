@@ -2,18 +2,13 @@ import { getBrands } from "@/server/actions/brandActions";
 import { getBvoHistory, getBvoAgentResults } from "@/server/actions/bvo/agenticActions";
 import BvoItem from "./BvoItem";
 import { Card } from "@/components/ui/card";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 export default async function BvoList() {
   const brands = await getBrands();
 
   if (!brands || brands.length === 0) {
-    return (
-      <Card className="flex flex-col gap-3 items-center justify-center text-center h-64 border-dashed border-2">
-        <p className="text-sm text-muted-foreground mb-2">
-          No brands found. Please add a brand first.
-        </p>
-      </Card>
-    );
+    return <EmptyStateCard message="No brands found. Please add a brand first." />
   }
 
   const brandsWithHistory = await Promise.all(

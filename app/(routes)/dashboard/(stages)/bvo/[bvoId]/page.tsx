@@ -7,6 +7,7 @@ import Markdown from 'react-markdown';
 import { Separator } from "@/components/ui/separator";
 import { DashboardInnerLayout, DashboardLayoutHeading } from "@/components/stages/ccba/dashboard/shared/DashboardComponents";
 import { BrandOSConfig } from "@/config/brandos-sidebar-config";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 
 export default async function BvoDetailPage({ params, searchParams }: any) {
@@ -28,20 +29,16 @@ export default async function BvoDetailPage({ params, searchParams }: any) {
 
   const resultsResponse = await getBvoAgentResults(sessionId, brandId);
 
-  if (!resultsResponse.success || !resultsResponse.data) {
+  if (!resultsResponse) {
     return (
       <ContainerMd>
         <StaticBanner title={`BVO Session: ${sessionId}`} badge="BVO Execution" />
-        <Card>
-          <CardContent className="pt-6">
-            <p>No results found for this BVO session.</p>
-          </CardContent>
-        </Card>
+        <EmptyStateCard message="No results found for this BVO session." />
       </ContainerMd>
     );
   }
 
-  const { results, brand_id, client_id, task_id } = resultsResponse.data;
+  const { results, brand_id, client_id, task_id } = resultsResponse;
 
   return (
     <>

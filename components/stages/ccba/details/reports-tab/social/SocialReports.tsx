@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDownIcon } from 'lucide-react'
+import { EmptyStateCard } from '@/components/shared/CardsUI'
 export default function SocialMediaReports({ allReportsData, brandName, competitors }: any) {
     const [selectedReportBatchId, setSelectedReportBatchId] = useState<string | null>(null)
     const [selectedEntityName, setSelectedEntityName] = useState<string | null>(null)
@@ -68,20 +69,8 @@ export default function SocialMediaReports({ allReportsData, brandName, competit
     }, [sortedReports, dataSources, brandName, selectedReportBatchId, selectedEntityName])
 
     if (sortedReports.length === 0) {
-        return (
-            <div className="flex h-[60vh] items-center justify-center rounded-lg  p-8 text-center text-muted-foreground">
-                No social media report data available.
-            </div>
-        )
+        return <EmptyStateCard message="No social media report data available." />
     }
-
-    // if (!selectedReport || !selectedEntityName) {
-    //     return (
-    //         <div className="flex h-[60vh] items-center justify-center p-8 text-center text-muted-foreground">
-    //             Loading report data...
-    //         </div>
-    //     )
-    // }
 
     const selectedEntity = dataSources.find(ds => ds.name === selectedEntityName)
 

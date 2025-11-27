@@ -53,7 +53,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
 
     const selectedDataSource = useMemo(() => {
         if (!selectedSourceName || dataSources.length === 0) return null;
-        return dataSources.find(source => source.name === selectedSourceName)?.data ?? null;
+        return dataSources.find(source => source.name === selectedSourceName) ?? null;
     }, [selectedSourceName, dataSources]);
 
     const handleScrapSelection = (batchId: string) => {

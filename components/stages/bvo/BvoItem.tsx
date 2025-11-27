@@ -2,15 +2,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 function BvoResults({ results }: { results: any }) {
-  if (!results.success || !results.data || results.data.results.length === 0) {
-    return <p className="text-sm text-muted-foreground">No results found for this session.</p>;
+  if (!results) {
+    return <EmptyStateCard message="No results found for this session." />;
   }
 
   return (
     <div className="space-y-4">
-      {results.data.results.map((result: any) => (
+      {results.results.map((result: any) => (
         <div key={result.agent_number}>
           <h4 className="font-medium">Agent: {result.agent_number}</h4>
           <div className=" w-full line-clamp-1">
@@ -24,9 +25,6 @@ function BvoResults({ results }: { results: any }) {
 }
 
 export default function BvoItem({ bvo, brand, results }: { bvo: any; brand: any; results: any }) {
-  console.log(bvo, 'bvo bvo')
-  console.log(results, 'results results')
-  
   
   return (
     <Card className="w-full border-none shadow-none rounded-none border-x-0  relative transition-all mt-1" >

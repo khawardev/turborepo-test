@@ -42,6 +42,7 @@ import { MODELS, agents, executionModes } from "@/lib/constants";
 import { arrangeAgentIds } from "@/lib/utils";
 import { InteractiveExecutionClient } from "./InteractiveExecutionClient";
 import { initiateBvoAgenticProcess } from "@/server/actions/bvo/agenticActions";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 const defaultValues: any = {
   name: "",
@@ -350,7 +351,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                               />
                             ))}
                           </div>
-                        ) : <p className="text-sm text-muted-foreground mt-2 text-center p-4 border rounded-md">No website reports found.</p>}
+                        ) : <EmptyStateCard message="No website reports found." />}
                       </FormItem>
                     )}
                   />
@@ -374,7 +375,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                               />
                             ))}
                           </div>
-                        ) : <p className="text-sm text-muted-foreground mt-2 text-center p-4 border rounded-md">No social media reports found.</p>}
+                        ) : <EmptyStateCard message="No social media reports found." />}
                       </FormItem>
                     )}
                   />
@@ -412,9 +413,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                       ))}
                     </TableBody>
                   </Table>
-                ) : (
-                  <p className="text-sm text-muted-foreground mt-2 text-center p-4 border rounded-md">No competitors found for this brand.</p>
-                )}
+                ) : <EmptyStateCard message="No competitors found for this brand." />}
               </div>
             </>
           )}
@@ -547,7 +546,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                           <Label htmlFor={`${executionModeId}-${mode.id}`}>
                             {mode.label}
                           </Label>
-                          <p id={`${executionModeId}-${mode.id}-description`} className="text-xs dark:text-muted-foreground">
+                          <p id={`${executionModeId}-${mode.id}-description`} className="text-xs text-muted-foreground">
                             {mode.description}
                           </p>
                         </div>
@@ -588,7 +587,7 @@ export default function NewBvoForm({ brands, client_id }: any) {
                           <Label htmlFor={`${agentSelectionId}-${agent.id}`}>
                             {agent.name}
                           </Label>
-                          <p id={`${agentSelectionId}-${agent.id}-description`} className="text-xs dark:text-muted-foreground">
+                          <p id={`${agentSelectionId}-${agent.id}-description`} className="text-xs text-muted-foreground">
                             {agent.description}
                           </p>
                         </div>

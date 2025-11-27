@@ -11,8 +11,8 @@ export default function page() {
         subtitle={BrandOSConfig.mainNav[1].desc}
       />
       <DashboardHeaderBlock
-        title="Brands"
-        subtitle="View and manage your brands and competitors"
+        title="Brand Intention Intelligence"
+        subtitle="View and Add Brands Report in Intention Intelligence"
         buttonLabel="Brand"
         buttonHref="/dashboard/bvo/new"
       />

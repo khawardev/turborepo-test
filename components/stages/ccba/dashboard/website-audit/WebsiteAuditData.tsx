@@ -9,12 +9,12 @@ export default async function WebsiteAuditData({ brandId, competitorId, title }:
   let synthesizerReport = null;
 
   if (competitorId) {
-    const latestWebsiteReports = websiteReportsData?.data? [...websiteReportsData.data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()): []
+    const latestWebsiteReports = websiteReportsData? [...websiteReportsData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()): []
     const latestCompetitorWebsiteReport = latestWebsiteReports?.[0]?.competitor_reports?.find((report: any) => report.competitor_id === competitorId)
     extractorReport = latestCompetitorWebsiteReport?.extraction_report?.response? parseJsonFromMarkdown(latestCompetitorWebsiteReport.extraction_report.response): null;
     synthesizerReport = latestCompetitorWebsiteReport?.synthesizer_report?.response ?? null;
   } else {
-    const latestWebsiteReports = websiteReportsData?.data ? [...websiteReportsData.data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()): []
+    const latestWebsiteReports = websiteReportsData ? [...websiteReportsData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()): []
     extractorReport = latestWebsiteReports?.[0]?.brand_extraction?.response ? parseJsonFromMarkdown(latestWebsiteReports?.[0]?.brand_extraction?.response): null;
     synthesizerReport = latestWebsiteReports?.[0]?.brand_synthesizer?.response ?? null;
   }

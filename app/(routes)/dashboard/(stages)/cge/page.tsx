@@ -12,14 +12,14 @@ async function CgeSessionsList({ brands }: { brands: any[] }) {
         <div className="space-y-4">
             {brands.map(async (brand) => {
                 const camSessionsResponse = await getCamSessions(brand.brand_id);
-                if (camSessionsResponse.success && camSessionsResponse.data.sessions.length > 0) {
+                if (camSessionsResponse) {
                     return (
                         <Card key={brand.brand_id}>
                             <CardHeader>
                                 <CardTitle>{brand.name}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                {camSessionsResponse.data.sessions.map((session: any) => (
+                                {camSessionsResponse.sessions.map((session: any) => (
                                     <div key={session.cam_session_id} className="flex justify-between items-center p-2 border rounded-md">
                                         <div>
                                             <p className="font-medium">{session.cam_session_id}</p>

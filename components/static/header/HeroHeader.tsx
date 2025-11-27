@@ -14,7 +14,6 @@ export const HeroHeader = () => {
     React.useEffect(() => {
         const unsubscribe = scrollYProgress.on('change', (latest) => {
             setScrolled(latest > 0.1)
-            console.log(latest, `<-> scrollYProgress <->`);
         })
         return () => unsubscribe()
     }, [scrollYProgress])

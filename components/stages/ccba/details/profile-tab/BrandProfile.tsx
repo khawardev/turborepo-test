@@ -17,6 +17,7 @@ import { deleteBrand } from "@/server/actions/brandActions";
 import { BrandDashboardButton } from "./BrandDashboardButton";
 import { BrandCompCrudButtons } from "@/components/stages/ccba/details/profile-tab/BrandCompCrudButtons";
 import { DashboardHeader } from "../../dashboard/shared/DashboardComponents";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 const BrandProfile = ({ brand, isScrapped }: any) => {
   const router = useRouter();
@@ -187,11 +188,7 @@ const BrandProfile = ({ brand, isScrapped }: any) => {
               </TableBody>
             </Table>
           </div>
-        ) : (
-          <div className="text-sm text-muted-foreground text-center p-4 border rounded-md">
-            No competitors found for this brand.
-          </div>
-        )}
+        ) : <EmptyStateCard message="No competitors found for this brand." />}
       </div>
     </div>
   )

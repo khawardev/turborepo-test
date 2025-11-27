@@ -9,15 +9,12 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { cleanAndFlattenBullets } from "@/lib/static/cleanMarkdown";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 export default function SynthesizedReportsDashboard({ synthesizerReport, title }: any) {
     const [copied, setCopied] = useState(false);
 
     if (!synthesizerReport) {
-        return (
-            <div className="mt-4 p-6  h-[70vh] flex items-center justify-center">
-                <p className="text-muted-foreground">No synthesized reports available.</p>
-            </div>
-        );
+        return <EmptyStateCard message="No synthesized reports available." />
     }
 
 

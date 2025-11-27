@@ -40,7 +40,7 @@ export async function initiateBvoAgenticProcess(brand_id: any, bvoPayload: FormD
 
             await pollUntilComplete(
                 async () => await getBvoAgentStatus(brand_id, data.task_id),
-                (res: any) => res.success && res.data?.status === "Completed"
+                (res: any) => res.success && res?.status === "Completed"
             );
 
             return { success: true, message: "Agentic process initiated successfully.", data };

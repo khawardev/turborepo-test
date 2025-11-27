@@ -44,8 +44,8 @@ export default function CreateCgeSessionForm({ brands }: { brands: any[] }) {
     form.setValue("bam_session_id", "");
     setIsFetchingSessions(true);
     const response = await getBvoHistory(brandId);
-    if (response.success) {
-      setBvoSessions(response.data.history);
+    if (response) {
+      setBvoSessions(response.history);
     } else {
       toast.error("Failed to fetch BVO sessions for this brand.");
       setBvoSessions([]);

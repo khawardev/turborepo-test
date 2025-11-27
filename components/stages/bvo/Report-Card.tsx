@@ -31,6 +31,7 @@ import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import ExtractedDataDashboard from "../ccba/dashboard/extracted-data/ExtractedDataDashboard";
 import { parseJsonFromMarkdown } from "@/lib/static/jsonParser";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 const MarkdownViewer = ({ content }: { content: string }) => {
     return (
@@ -98,7 +99,7 @@ export function ReportCard({
         const reports = isCompetitor ? data.reports : data.brand_reports;
 
         if (!reports || reports.length === 0) {
-            return <p>No social media analysis available.</p>;
+            return <EmptyStateCard message="No social media analysis available." />;
         }
 
         return (

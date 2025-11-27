@@ -11,8 +11,8 @@ export default async function page() {
         subtitle={BrandOSConfig.mainNav[0].desc}
       />
       <DashboardHeaderBlock
-        title="Brands"
-        subtitle="View and manage your brands and competitors."
+        title="Brand Perception Intelligence"
+        subtitle="View and Add Brands and competitors in Perception Intelligence"
         buttonLabel="Brand"
         buttonHref="/dashboard/ccba/new"
       />

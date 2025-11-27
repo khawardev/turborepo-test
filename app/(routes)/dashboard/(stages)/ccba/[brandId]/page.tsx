@@ -1,8 +1,5 @@
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions';
-import { getCurrentUser } from '@/server/actions/authActions';
-import { ContainerMd } from '@/components/shared/Containers';
 import { AnimatedTabs } from '@/components/stages/ccba/details/AnimatedTabs';
-import StaticBanner from '@/components/shared/StaticBanner';
 import { BlurDelay3 } from '@/components/shared/MagicBlur';
 import { Suspense } from 'react';
 import BrandProfileTab from '../../../../../../components/stages/ccba/details/_components/BrandProfileTab';
@@ -15,7 +12,6 @@ import { SCRAPS } from '@/lib/constants';
 import { getBatchWebsiteReports } from '@/server/actions/ccba/website/websiteReportActions';
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
-import { toast } from 'sonner';
 
 export default async function BrandDetailPage({
   params
@@ -27,6 +23,7 @@ export default async function BrandDetailPage({
   const brandData = await getBrandbyIdWithCompetitors(brandId);
   const websiteReportData = await getBatchWebsiteReports(brandId);
   const taskStatusData = await getCcbaTaskStatus(brandId);
+
 
   const tabs = [
     {
@@ -52,7 +49,7 @@ export default async function BrandDetailPage({
     {
       label: 'Reports',
       value: 'brand_reports',
-      disabled: !(websiteReportData?.data && websiteReportData?.data.length > 0),
+      disabled: !(websiteReportData && websiteReportData.length > 0),
       disabledTooltip: 'Please Generate Reports for Website and Socials',
       tooltip: 'View Brand & Competitors Reports',
       content: (

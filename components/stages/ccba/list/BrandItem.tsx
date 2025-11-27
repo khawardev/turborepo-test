@@ -39,7 +39,7 @@ import { UpdateCompetitorsDialog } from "./crud/UpdateCompetitorsDialog";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { BrandCompCrudButtons } from "../details/profile-tab/BrandCompCrudButtons";
 import { ContainerMd } from "@/components/shared/Containers";
-import { ClickableListCard } from "@/components/shared/CardsUI";
+import { ClickableListCard, EmptyStateCard } from "@/components/shared/CardsUI";
 
 function BrandItemSkeleton() {
   return (
@@ -282,11 +282,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
                       </TableBody>
                     </Table>
                   </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground p-4 border rounded-md text-center">
-                    No competitors found for this brand.
-                  </div>
-                )}
+                  ) : <EmptyStateCard message="No competitors found for this brand." /> }
               </div>
             </div>
           )}

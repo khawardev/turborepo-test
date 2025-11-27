@@ -9,7 +9,7 @@ export default async function BrandProfileTab({ brandId }: { brandId: string }) 
   return (
     <BrandProfile
       brand={brandData}
-      isScrapped={socialReportData?.data && socialReportData?.data.length > 0}
+      isScrapped={socialReportData && socialReportData.length > 0}
     />
   );
 }

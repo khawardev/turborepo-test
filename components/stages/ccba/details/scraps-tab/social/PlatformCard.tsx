@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
 import { SCRAPED } from '@/lib/constants';
+import { EmptyStateCard } from '@/components/shared/CardsUI';
 
 const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -47,14 +48,7 @@ export default function PlatformCard({ platformData }: any) {
                     <ScrollArea className={hasError ? "" : "h-[750px]"}>
                         <PostList posts={uniquePosts} />
                     </ScrollArea>
-                ) : (
-                    <div className="p-4 border rounded-lg bg-border/50 space-y-2">
-                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <AlertTriangle className="h-4 w-4 mt-0.5 " />
-                                <p>No posts were {SCRAPED} for this platform during the specified period.</p>
-                        </div>
-                    </div>
-                )}
+                ) : <EmptyStateCard message={`No posts were ${SCRAPED} for this platform during the specified period.`} />}
             </CardContent>
         </div>
     );

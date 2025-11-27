@@ -2,7 +2,6 @@ import ReportDataViewer from "@/components/stages/ccba/details/reports-tab/Repor
 import { getBrandbyIdWithCompetitors } from "@/server/actions/brandActions";
 import { getBatchSocialReports } from "@/server/actions/ccba/social/socialReportActions";
 import { getBatchWebsiteReports } from "@/server/actions/ccba/website/websiteReportActions";
-import { toast } from "sonner";
 
 export default async function ReportsTab({ brandId }: { brandId: string }) {
   const brandData = await getBrandbyIdWithCompetitors(brandId);
@@ -13,8 +12,8 @@ export default async function ReportsTab({ brandId }: { brandId: string }) {
   return (
     <ReportDataViewer
       competitors={brandData.competitors}
-      allSocialReportsData={allSocialReportsData?.data}
-      allwebsiteReportsData={websiteReportData?.data}
+      allSocialReportsData={allSocialReportsData}
+      allwebsiteReportsData={websiteReportData}
       brandName={brandData.name}
     />
   );

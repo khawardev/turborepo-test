@@ -6,6 +6,7 @@ import MainNav from "./navigation/main-nav";
 import SubNav from "./navigation/sub-nav";
 import PlatformsView from "./brand-platforms/platforms-view";
 import ImplicationsView from "./strategic-implications/implications-view";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 
 
@@ -16,7 +17,7 @@ export default function BrandPerceptionDashboard({ brandPerceptionReport }: any)
     const [allExpanded, setAllExpanded] = useState(false);
 
     if (!brandPerceptionReport || Object.keys(brandPerceptionReport).length === 0) {
-        return <div>Loading report data or no data available.</div>;
+        return <EmptyStateCard message="Loading report data or no data available." />;
     }
 
     const primaryBrandName = Object.keys(brandPerceptionReport)[0] || 'Brand';

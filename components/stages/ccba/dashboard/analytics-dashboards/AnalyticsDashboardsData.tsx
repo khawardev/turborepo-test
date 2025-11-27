@@ -5,15 +5,15 @@ import AnalyticsDashboardsTabs from './AnalyticsDashboardsTabs'
 
 export default async function AnalyticsDashboardsData({ brandId, brandName, competitorId }: { brandId: string, brandName: string, competitorId?: string }) {
   const brandPerceptionReportData = await getBrandPerceptionReport(brandId);
-  const brandPerceptionReport = prioritizeBrandReport(brandPerceptionReportData.data, brandName);
+  const brandPerceptionReport = prioritizeBrandReport(brandPerceptionReportData, brandName);
 
   let socialAnalyticsDashboard = null;
   const socialAnalytics = await getBrandSocialDashboard(brandId)
 
   if (!competitorId) {
-    socialAnalyticsDashboard = socialAnalytics.data.brand
+    socialAnalyticsDashboard = socialAnalytics.brand
   } else {
-    socialAnalyticsDashboard = socialAnalytics.data.competitors.find(
+    socialAnalyticsDashboard = socialAnalytics.competitors.find(
       (item: any) => item.competitor_id === competitorId
     )
   }

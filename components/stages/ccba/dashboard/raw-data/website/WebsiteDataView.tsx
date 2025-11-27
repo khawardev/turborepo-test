@@ -12,6 +12,7 @@ import remarkGfm from "remark-gfm";
 import { toast } from 'sonner';
 import { cleanAndFlattenBullets } from '@/lib/static/cleanMarkdown';
 import { SCRAPED } from '@/lib/constants';
+import { EmptyStateCard } from '@/components/shared/CardsUI';
 
 export default function WebsiteDataView({ websiteScrapsData }: any) {
     
@@ -38,11 +39,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
     }, [pages]);
 
     if (pages.length === 0) {
-        return (
-            <Card className=" text-center p-8 text-muted-foreground h-[70vh] flex items-center justify-center">
-                No website data available.
-            </Card>
-        );
+        return <EmptyStateCard message="No website data available." /> 
     }
 
     const handleCopy = () => {

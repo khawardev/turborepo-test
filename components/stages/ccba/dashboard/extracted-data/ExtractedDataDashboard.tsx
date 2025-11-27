@@ -7,14 +7,11 @@ import NarrativeData from "./NarrativeData";
 import BusinessStructures from "./BusinessStructures";
 import RelationshipMatrix from "./RelationshipMatrix";
 import AudienceAndSignals from "./AudienceAndSignals";
+import { EmptyStateCard } from "@/components/shared/CardsUI";
 
 export default function ExtractedDataDashboard({ extractorReport, title }: any) {
     if (!extractorReport) {
-        return (
-            <div className="mt-4 p-6  text-center text-muted-foreground">
-                No valid extracted data to display.
-            </div>
-        );
+        return <EmptyStateCard message="No valid extracted data to display." />
     }
 
     return (
