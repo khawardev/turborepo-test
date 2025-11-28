@@ -126,12 +126,12 @@ export function LoginForm({
           <div className="flex items-center justify-center gap-2">
             <span className="flex-1 border-t" />
             <span className="text-xs uppercase text-muted-foreground">
-              Or continue with
+              Or
             </span>
             <span className="flex-1 border-t" />
           </div>
           <Button variant="outline" type="button" className="w-full" onClick={() => googleLogin()}>
-            <FcGoogle /> Sign in with Google
+            <FcGoogle /> Continue with Google
           </Button>
         </div>
         <div className="text-center text-sm">
