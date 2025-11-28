@@ -9,6 +9,7 @@ import { authRequest } from "@/server/api/authRequest";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {
@@ -147,4 +148,14 @@ export async function getCurrentUser() {
   } catch (error) {
     return null;
   }
+}
+
+export async function googleLogin() {
+  redirect(`${process.env.API_URL}/login/google`);
+}
+
+export async function storeTokens(access: string, refresh: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("access_token", access, { httpOnly: true, secure: true, path: "/" });
+  cookieStore.set("refresh_token", refresh, { httpOnly: true, secure: true, path: "/" });
 }

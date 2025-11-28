@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/lib/validations";
-import { login } from "@/server/actions/authActions";
+import { login, googleLogin } from "@/server/actions/authActions";
+import { FcGoogle } from "react-icons/fc";
 
 export function LoginForm({
   className,
@@ -104,7 +105,7 @@ export function LoginForm({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute top-0 right-0"
+                      className="absolute top-[1px] right-0"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -121,6 +122,16 @@ export function LoginForm({
           />
           <Button type="submit" className="w-full">
             Login
+          </Button>
+          <div className="flex items-center justify-center gap-2">
+            <span className="flex-1 border-t" />
+            <span className="text-xs uppercase text-muted-foreground">
+              Or continue with
+            </span>
+            <span className="flex-1 border-t" />
+          </div>
+          <Button variant="outline" type="button" className="w-full" onClick={() => googleLogin()}>
+            <FcGoogle /> Sign in with Google
           </Button>
         </div>
         <div className="text-center text-sm">
