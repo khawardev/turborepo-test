@@ -51,7 +51,7 @@ export default function SidebarUser({ user }: any ) {
         <DropdownMenuLabel label="Account" rootOpenSetter={setOpen} />
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="bg-accent">
+        <DropdownMenuItem className="dark:bg-border bg-accent">
           <div className="flex items-center gap-2 text-left text-sm">
             <Avatar>
               <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.name || ""} />

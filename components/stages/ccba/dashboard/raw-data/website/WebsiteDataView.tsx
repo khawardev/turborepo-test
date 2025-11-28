@@ -62,9 +62,9 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
     }
 
     return (
-        <div className="flex gap-6 min-h-0 ">
-            <ScrollArea className="h-[75vh] w-1/3 min-w-0 ">
-                <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground tracking-tight">{SCRAPED} Data</h5>
+        <div className=" gap-6 min-h-0 grid grid-cols-4 ">
+            <ScrollArea className="h-[75vh] col-span-1 min-w-0 ">
+                <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground ">{SCRAPED} Data</h5>
                 <ul className="space-y-1">
                     {pages.map((page: any, index: number) => (
                         <li key={index}>
@@ -80,7 +80,7 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                 </ul>
             </ScrollArea>
 
-            <CardContent className="px-0 space-y-4 w-full min-w-0 ">
+            <CardContent className="col-span-3 px-0 space-y-4 w-full min-w-0 ">
                 <div className='w-full flex items-center justify-between'>
                     <Link href={selectedPage?.url} target='_blank' className="text-sm text-muted-foreground truncate max-w-[500px]">
                         {selectedPage?.url ? selectedPage.url : 'No URL available'}
@@ -90,20 +90,8 @@ export default function WebsiteDataView({ websiteScrapsData }: any) {
                         {isCopied ? "Copied!" : "Copy"}
                     </Button>
                 </div>
-
                 <Separator />
-
                 <ScrollArea className="h-[70vh] w-full ">
-                    {/* <div className="prose prose-neutral  whitespace-normal max-w-none markdown-body dark:prose-invert ">
-                            <ReactMarkdown components={{
-                                img: ({ node, ...props }) => {
-                                    if (!props.src) return null
-                                    return <img {...props} alt={props.alt || ""} />
-                                },
-                            }} remarkPlugins={[remarkGfm]}>
-                                {cleanAndFlattenBullets(selectedPage?.content)}
-                            </ReactMarkdown>
-                    </div> */}
                     <MarkdownViewer content={selectedPage?.content} />
                 </ScrollArea>
             </CardContent>

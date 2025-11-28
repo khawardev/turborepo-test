@@ -10,13 +10,14 @@ export default async function SocialAuditTab({ brandId, competitorId }: { brandI
   if (competitorId) {
     const latestSocialReports = socialReportsData?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     const latestCompetitorSocialReport = latestSocialReports?.[0]?.competitor_reports?.find((report: any) => report.competitor_id === competitorId)
-    reports = latestCompetitorSocialReport.reports;
+    reports = latestCompetitorSocialReport?.reports;
   } else {
     const latestSocialReport = socialReportsData?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
     reports = latestSocialReport?.brand_reports;
   }
+console.log(reports, `<-> reports <->`);
 
-  if (!reports && reports.length !> 0) {
+  if (!reports || reports?.length !> 0) {
     return <EmptyStateCard message="No reports are present at the moment." /> 
   }
 

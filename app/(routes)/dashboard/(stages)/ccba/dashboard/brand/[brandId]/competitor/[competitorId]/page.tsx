@@ -13,7 +13,7 @@ export default async function CompetitorPage({ params }: { params: Promise<{ bra
     const { brandId, competitorId } = await params
     const brandData = await getBrandbyIdWithCompetitors(brandId)
 
-    const competitor = brandData.competitors.find((c: any) => c.id === competitorId)
+    const competitor = brandData.competitors.find((c: any) => c.competitor_id === competitorId)
     const competitorName = competitor ? competitor.name : 'Competitor';
 
     return (

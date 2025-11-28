@@ -12,6 +12,7 @@ import TeamDropdown from "@/components/shared/TeamDropdown"
 import { getCurrentUser } from "@/server/actions/authActions"
 import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 import { getBrandbyIdWithCompetitors, getBrands } from "@/server/actions/brandActions"
+import { getBatchSocialReports } from "@/server/actions/ccba/social/socialReportActions";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
@@ -21,7 +22,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     if (brandsData && brandsData.length > 0) {
         brandsWithCompetitors = await Promise.all(
             brandsData.map(async (brand: any) => {
-                return await getBrandbyIdWithCompetitors(brand.brand_id);
+                const brandDetails = await getBrandbyIdWithCompetitors(brand.brand_id);
+                if (!brandDetails) return null;
+
+                const socialReportData = await getBatchSocialReports(brand.brand_id);
+                return {
+                    ...brandDetails,
+                    isScrapped: socialReportData && socialReportData.length > 0
+                };
             })
         );
     }
@@ -32,7 +40,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <SidebarProvider>
             <LeftSidebar user={user} brands={filteredBrands} />
             <SidebarInset>
-                <header className="flex w-full h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear  bg-accent/30">
+                <header className="flex w-full h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear  bg-accent/30 rounded-tl-xl rounded-tr-xl  ">
                     <div className="flex items-center gap-2 mr-auto">
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="h-7" />

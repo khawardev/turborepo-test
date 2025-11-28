@@ -23,7 +23,7 @@ export default function TeamDropdown() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="bg-accent">
+                <DropdownMenuItem className="dark:bg-border bg-accent">
                     <div className="flex items-center justify-center size-6 rounded-md bg-primary text-background text-xs font-bold">P</div>
                     <span className="font-medium">Personal</span>
                     <div className="ml-auto size-2 rounded-full bg-primary" />

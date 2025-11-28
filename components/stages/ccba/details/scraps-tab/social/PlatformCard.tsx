@@ -6,7 +6,7 @@ import { BsLinkedin } from "react-icons/bs";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Instagram, Youtube } from 'lucide-react';
+import {  Instagram, Youtube } from 'lucide-react';
 import { SCRAPED } from '@/lib/constants';
 import { EmptyStateCard } from '@/components/shared/CardsUI';
 
@@ -48,7 +48,7 @@ export default function PlatformCard({ platformData }: any) {
                     <ScrollArea className={hasError ? "" : "h-[750px]"}>
                         <PostList posts={uniquePosts} />
                     </ScrollArea>
-                ) : <EmptyStateCard message={`No posts were ${SCRAPED} for this platform during the specified period.`} />}
+                ) : <EmptyStateCard message={`No posts were ${SCRAPED} for this platform fo specified period.`} />}
             </CardContent>
         </div>
     );

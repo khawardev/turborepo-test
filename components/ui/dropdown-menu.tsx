@@ -38,7 +38,7 @@ function useHoverTracker() {
 function HoverTrackerBackground({ hoverStyle }: { hoverStyle: any }) {
   return (
     <div
-      className="absolute rounded-lg bg-accent z-0 transition-all duration-300 ease-out pointer-events-none"
+      className="absolute rounded-lg dark:bg-border bg-accent z-0 transition-all duration-300 ease-out pointer-events-none"
       style={{
         top: hoverStyle.top,
         left: hoverStyle.left,
@@ -94,7 +94,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         onMouseLeave={onLeave}
         className={cn(
-          "relative z-50 min-w-[8rem] overflow-hidden rounded-2xl border  bg-popover p-2 text-popover-foreground shadow-xl shadow-black/5",
+          "relative z-50 min-w-[8rem] overflow-hidden rounded-2xl border  dark:bg-accent  bg-popover p-2 text-popover-foreground shadow-xl shadow-black/5",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className
         )}
@@ -151,8 +151,8 @@ function DropdownMenuItem({
         "relative z-10 flex cursor-pointer select-none items-center gap-3 rounded-lg px-2 py-2 text-sm outline-none transition-colors",
         // Disabled default focus background to let HoverTracker handle it
         "focus:bg-transparent focus:text-accent-foreground",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "data-[inset]:pl-8",
+        "data-disabled:pointer-events-none data-disabled:opacity-50",
+        "data-inset:pl-8",
         // Default Icon Styling
         "[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground",
         // Destructive Variant Styling
@@ -352,7 +352,7 @@ function DropdownMenuSubTrigger({
         handleInteraction(e)
       }}
       className={cn(
-        "relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg px-2 py-2.5 text-sm outline-none focus:bg-transparent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground",
+        "relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg px-2 py-2.5 text-sm outline-none focus:bg-transparent  [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground",
         "data-[inset]:pl-8",
         className
       )}
@@ -376,7 +376,7 @@ function DropdownMenuSubContent({
       data-slot="dropdown-menu-sub-content"
       onMouseLeave={onLeave}
       className={cn(
-        "relative z-50 min-w-[8rem] mx-2 overflow-hidden rounded-2xl border dark:border-border border-zinc-200 bg-popover p-2 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-50 min-w-[8rem] mx-2 overflow-hidden rounded-2xl border dark:border-border border-zinc-200 dark:bg-accent bg-popover p-2 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
       {...props}

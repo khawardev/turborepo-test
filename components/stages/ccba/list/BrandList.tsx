@@ -19,10 +19,6 @@ async function BrandList() {
   const brandItemsData = await Promise.all(
     brands.map(async (brand: any) => {
       const brandData = await getBrandbyIdWithCompetitors(brand?.brand_id);
-      if (!brandData) {
-        toast.error("Failed to fetch brand details.");
-        return null;
-      }
       const batch_id = await getWebsiteBatchId(brandData?.brand_id);
       return {
         brand: brandData,
