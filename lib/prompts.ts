@@ -517,8 +517,12 @@ GOALS
 - NO EMOJIS.
 - Use plain text equivalents for scoring (e.g., "9/10").
 - Maintain a professional, executive-level tone.
+- **CRITICAL:** Avoid using em dashes (—). Use standard hyphens (-) or colons (:) instead.
 
 STRUCTURE
+
+# Competitive Positioning Audit
+## By Humanbrand AI for ${params.brand_url}
 
 ### 1. Market Context & Competitive Set
 Provide a 250-word synthesis of the current market state as seen through these digital windows. Categorize each player (e.g., The Established incumbent, The Lean Challenger, The Creative Outlier).

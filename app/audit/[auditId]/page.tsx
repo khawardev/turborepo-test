@@ -1,5 +1,5 @@
-import { getAuditById, generateAndSaveQuestionnaire } from "@/actions/auditActions";
-import { getCurrentUser } from "@/actions/userActions";
+import { getAuditById, generateAndSaveQuestionnaire } from "@/db/actions/auditActions";
+import { getCurrentUser } from "@/db/actions/userActions";
 import AuditResults from "@/components/audit/AuditResults";
 import { notFound } from "next/navigation";
 
@@ -12,7 +12,7 @@ const page = async ({ params }: any) => {
     if (!auditData) {
         notFound();
     }
-    
+
     return <AuditResults audit={auditData} user={userData} generateQuestionnaire={generateAndSaveQuestionnaire} />;
 };
 

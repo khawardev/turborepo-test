@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/actions/userActions";
+import { getCurrentUser } from "@/db/actions/userActions";
 import { appConfig } from "@/config/site";
 import ConfigTrayClient from "./ConfigTrayClient";
 

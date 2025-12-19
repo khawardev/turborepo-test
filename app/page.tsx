@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/actions/userActions";
+import { getCurrentUser } from "@/db/actions/userActions";
 import HeroSection from "@/components/home/HeroSection";
 
 export default async function Home() {

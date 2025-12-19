@@ -37,6 +37,21 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
     const [activeTab, setActiveTab] = useState(audit.comparisonReport ? "comparison" : "report");
     const currentDate = new Date().toISOString().split("T")[0];
 
+    const getDisplayName = (url: string) => {
+        try {
+            // Ensure there's a protocol for the URL constructor
+            const validUrl = url.startsWith('http') ? url : `https://${url}`;
+            const hostname = new URL(validUrl).hostname;
+            // Only strip 'www.' if it's at the start
+            return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+        } catch {
+            // Fallback: strip common prefixes manually if URL parsing fails
+            return url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+        }
+    };
+
+    const brandDisplayName = getDisplayName(audit.url);
+
     if (audit.status === 'failed') {
         return (
             <div className="container max-w-4xl mx-auto md:py-30 py-28 px-4">
@@ -117,7 +132,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
 
         setIsDownloadingQuestionnairePdf(true);
         try {
-            const fileName = `${audit.url}_humanbrandai_questionnaire_${currentDate}.pdf`;
+            const fileName = `${brandDisplayName} Questionaires.pdf`;
             await generateQuestionnairePdf({ markdownContent: questionnaire }, fileName);
             toast.success("Questionnaire PDF Generated");
         } catch (error) {
@@ -135,7 +150,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
         }
         setIsDownloadingQuestionnaireDocx(true);
         try {
-            const fileName = `${audit.url}_humanbrandai_questionnaire_${currentDate}.docx`;
+            const fileName = `${brandDisplayName} Questionaires.docx`;
             await generateQuestionnaireDocx(questionnaire, fileName);
             toast.success("Questionnaire DOCX Generated");
         } catch (error) {
@@ -214,7 +229,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                     <ContentActions
                                         content={audit.auditGenratedContent}
                                         auditURL={audit.url}
-                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_brand_audit_${currentDate}.pdf`)}
+                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${brandDisplayName} Brand Report.pdf`)}
                                         isDownloadingPdf={isDownloadingReport}
                                         notdocx={false}
                                     />
@@ -236,7 +251,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                     <ContentActions
                                         content={audit.comparisonReport}
                                         auditURL={audit.url}
-                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.comparisonReport, `${audit.url}_competition_audit_${currentDate}.pdf`)}
+                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.comparisonReport, `${brandDisplayName} Comparison Report.pdf`)}
                                         isDownloadingPdf={isDownloadingReport}
                                         notdocx={false}
                                     />

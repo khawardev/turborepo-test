@@ -1,4 +1,4 @@
-import { getUserWithAudits } from "@/actions/userActions";
+import { getUserWithAudits } from "@/db/actions/userActions";
 import AuditCard from "@/components/audit/AuditCard";
 import PaginationControls from "@/components/audit/PaginationControls";
 import { Button } from "@/components/ui/button";

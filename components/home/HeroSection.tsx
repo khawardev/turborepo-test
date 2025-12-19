@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import UrlSubmissionForm from './UrlSubmissionForm';
 import AuthModal from '../auth/AuthModal';
 import { useRouter } from 'next/navigation';
-import { createAudit } from '@/actions/auditActions';
+import { createAudit } from '@/db/actions/auditActions';
 import { toast } from 'sonner';
 import WorldMap from '../ui/world-map';
 import AuditProgress from '../layout/AuditProgress';
@@ -33,10 +33,10 @@ export default function HeroSection({ user }: { user: any }) {
         ];
 
         if (competitorsCount > 0) {
-            stages.push({ 
-                title: `Capturing Data for ${competitorsCount} Competitor${competitorsCount > 1 ? 's' : ''}...`, 
-                progress: 40, 
-                duration: 15000 * competitorsCount 
+            stages.push({
+                title: `Capturing Data for ${competitorsCount} Competitor${competitorsCount > 1 ? 's' : ''}...`,
+                progress: 40,
+                duration: 15000 * competitorsCount
             });
         }
 
@@ -83,7 +83,7 @@ export default function HeroSection({ user }: { user: any }) {
         }
     };
 
-    const startAudit:any = async (url: string, competitors: string[]) => {
+    const startAudit: any = async (url: string, competitors: string[]) => {
         runProgressSimulation(competitors.length);
         try {
             toast.info('Starting your free audit, this will take a moment...');
@@ -116,7 +116,7 @@ export default function HeroSection({ user }: { user: any }) {
     };
 
 
-    
+
     return (
         <main className=' flex flex-col justify-between space-y-4'>
             <div className="relative">
