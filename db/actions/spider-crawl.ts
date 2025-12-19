@@ -24,30 +24,20 @@ export async function spiderCrawlWebsite(url: any, limit:any) {
             throw new Error("Crawl failed or returned no data.");
         }
 
+        const urls = crawlData.map((page: any) => page.url);
         const allPagesDataString = crawlData.map((page: any) => {
-            let pageContent = `\n\n--- Page Data Start ---\n\n`;
-            pageContent += `Content for page: ${page.url || 'N/A'}\n\n`;
-            pageContent += `${page.content || 'No content.'}\n\n`;
-
-            pageContent += `Metadata for page: ${page.url || 'N/A'}\n\n`;
-            if (page.metadata) {
-                for (const key in page.metadata) {
-                    if (Object.prototype.hasOwnProperty.call(page.metadata, key)) {
-                        const value = page.metadata[key];
-                        pageContent += `${key}: ${JSON.stringify(value)}\n`;
-                    }
-                }
-            } else {
-                pageContent += 'No metadata available for this page.\n';
+            const cleanContent = (page.content || '').replace(/\s+/g, ' ').trim();
+            let pageContent = `\n[PAGE]: ${page.url}\n`;
+            pageContent += `[CONTENT]: ${cleanContent}\n`;
+            
+            if (page.metadata && Object.keys(page.metadata).length > 0) {
+                pageContent += `[META]: ${JSON.stringify(page.metadata)}\n`;
             }
-
-            pageContent += `\n--- Page Data End ---\n`;
             return pageContent;
-        }).join('');
+        }).join('---\n');
 
-        logger.info("Spider crawl successful, all page content combined.", { url });
-        return { content: allPagesDataString };
-
+        logger.info("Spider crawl successful, all page content combined.", { url, pageCount: crawlData.length });
+        return { content: allPagesDataString, urls };
     } catch (error: any) {
         logger.error("Spider crawl API call failed.", { functionName, url, errorMessage: error.message, errorDetails: error });
         return {

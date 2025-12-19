@@ -7,10 +7,10 @@ import { revalidatePath } from "next/cache";
 import { user as userSchema, audit as auditSchema } from "@/db/schema";
 import { COMPARISON_AUDIT_PROMPT, INITIAL_AUDIT_PROMPT, companyReportQuestionnairePrompt, extractCompanyNamePrompt } from "@/lib/prompts";
 import { spiderCrawlWebsite } from "./spider-crawl";
-import { analyzeToken } from "@/lib/tokenizer";
+import { analyzeToken, splitContentByTokens } from "@/lib/tokenizer";
 import { generateNewContent } from "./generateContent";
 
-const MAX_TOKENS = 1850000;
+const MAX_TOKENS = 900000;
 
 export async function generateAndSaveQuestionnaire(auditId: string, auditContent: string) {
     const session = await getSession();
@@ -93,14 +93,13 @@ export async function createAudit(url: string, competitorUrls: string[] = []) {
         }
 
         // 3. Generate Brand Audit Report
-        const brandPrompt = INITIAL_AUDIT_PROMPT({
-            website_url: url,
-            crawledContent: brandContent,
-            pagelimit: crawlLimit,
-            actualPageCount: brandPageCount
+        const brandAuditResult = await generateSmartAudit({
+            url: url,
+            content: brandContent,
+            limit: crawlLimit,
+            pageCount: brandPageCount
         });
 
-        const brandAuditResult = await generateNewContent(brandPrompt);
         if (!brandAuditResult || brandAuditResult.errorReason)
             throw new Error(brandAuditResult?.errorReason || "Failed to generate brand audit.");
 
@@ -109,16 +108,11 @@ export async function createAudit(url: string, competitorUrls: string[] = []) {
         // 4. Generate Comparison Report (if competitors exist)
         let comparisonReport = null;
         if (competitorsData.length > 0) {
-            const comparisonPrompt = COMPARISON_AUDIT_PROMPT({
-                brand_url: url,
-                brand_content: brandContent,
-                competitors: competitorsData
+            comparisonReport = await generateSmartComparison({
+                url,
+                brandContent,
+                competitorsData
             });
-
-            const comparisonResult = await generateNewContent(comparisonPrompt);
-            if (comparisonResult && !comparisonResult.errorReason) {
-                comparisonReport = comparisonResult.generatedText;
-            }
         }
 
         // 5. Update Database
@@ -128,7 +122,7 @@ export async function createAudit(url: string, competitorUrls: string[] = []) {
                 .set({
                     status: "completed",
                     results: null,
-                    crawledContent: brandContent,
+                    crawledContent: brandContent.slice(0, 2000000),
                     auditGenratedContent: finalBrandAuditContent,
                     competitorsCrawledContent: competitorsCrawledContent,
                     comparisonReport: comparisonReport,
@@ -140,10 +134,11 @@ export async function createAudit(url: string, competitorUrls: string[] = []) {
                 .update(userSchema)
                 .set({ auditCredits: sql`${userSchema.auditCredits} - 1` })
                 .where(and(eq(userSchema.id, session.user.id), sql`${userSchema.auditCredits} > 0`));
-        });
-
+        }); 
+        
         revalidatePath(`/audit/${newAudit.id}`);
         revalidatePath("/");
+
         return { auditId: newAudit.id };
 
     } catch (error: any) {
@@ -160,127 +155,130 @@ export async function createAudit(url: string, competitorUrls: string[] = []) {
 
 export async function getAuditById(auditId: string) {
     const session = await getSession();
-    if (!session?.user?.id) {
-        return null;
+    if (!session?.user?.id) return null;
+    
+    // Retry logic for DB connection issues
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            const result = await db.query.audit.findFirst({
+                where: and(eq(auditSchema.id, auditId), eq(auditSchema.userId, session.user.id)),
+            });
+            return result ?? null;
+        } catch (error: any) {
+            retries--;
+            if (retries === 0) {
+                console.error("Error fetching audit after retries:", error);
+                return null;
+            }
+            console.warn(`Database connection failed, retrying... (${3 - retries})`, error.message);
+            await new Promise(res => setTimeout(res, 1000)); // Wait 1s before retry
+        }
     }
-    try {
-        const result = await db.query.audit.findFirst({
-            where: and(eq(auditSchema.id, auditId), eq(auditSchema.userId, session.user.id)),
-        });
-        return result ?? null;
-    } catch (error) {
-        console.error("Error fetching audit:", error);
-        return null;
-    }
+    return null;
 }
 
+/**
+ * Summarizes content for a specific model context
+ */
+async function summarizeForContext(content: string, contextDescription: string) {
+    const summaryPrompt = `
+        SYSTEM: You are an expert Brand Analyst. 
+        TASK: Summarize the following ${contextDescription} into key "Brand Genetic Markers" for a comprehensive audit.
+        Focus on:
+        1. Narrative & Tone (Keywords, voice, complexity)
+        2. Audience Signals (Who is being addressed?)
+        3. Product/Service DNA (What is being sold and how?)
+        4. Proof Points (Case studies, numbers, logos)
+        
+        Keep the summary factual and dense. Do NOT lose the "Essence" of the brand.
+        
+        ${contextDescription.toUpperCase()} TO SUMMARIZE:
+        ${content}
+    `;
+    const result = await generateNewContent(summaryPrompt, "gemini-3-pro-preview");
+    return result.generatedText || "Summary unavailable.";
+}
 
+/**
+ * Handles generating an audit for potentially large content by using a Map-Reduce style summarization
+ * if the content exceeds the safe token threshold.
+ */
+async function generateSmartAudit({ url, content, limit, pageCount }: { url: string; content: string; limit: number; pageCount: number }) {
+    const tokenCount = analyzeToken(content);
+    
+    // If it's within a comfortable context window for Gemini
+    if (tokenCount <= MAX_TOKENS) {
+        const prompt = INITIAL_AUDIT_PROMPT({
+            website_url: url,
+            crawledContent: content,
+            pagelimit: limit,
+            actualPageCount: pageCount
+        });
+        return generateNewContent(prompt);
+    }
 
-// export async function createAudit(url: string) {
-//     const session = await getSession();
-//     if (!session?.user?.id) return { error: "You must be logged in to start an audit." };
+    // --- LARGE CONTENT STRATEGY ---
+    console.log(`[SmartAudit] Content too large (${tokenCount} tokens). Switching to chunked strategy.`);
+    
+    // Split into chunks that are about half of MAX_TOKENS to be safe for summary generation
+    const chunks = splitContentByTokens(content, Math.floor(MAX_TOKENS / 2)); 
+    const chunkSummaries: string[] = [];
 
-//     const currentUser = await db.query.user.findFirst({
-//         where: eq(userSchema.id, session.user.id),
-//         columns: { auditCredits: true },
-//     });
+    for (let i = 0; i < chunks.length; i++) {
+        console.log(`[SmartAudit] Summarizing chunk ${i+1}/${chunks.length}...`);
+        const summary = await summarizeForContext(chunks[i], "website chunk");
+        chunkSummaries.push(summary);
+    }
 
-//     if (!currentUser) return { error: "User not found." };
-//     if (currentUser.auditCredits <= 0) return { error: "You have no free reports remaining." };
+    // Combine summaries into the final report
+    const combinedInsights = chunkSummaries.join("\n\n---\n\n");
+    const finalPrompt = INITIAL_AUDIT_PROMPT({
+        website_url: url,
+        crawledContent: `[SUMMARY OF FULL CRAWL]:\n${combinedInsights}`,
+        pagelimit: limit,
+        actualPageCount: pageCount
+    });
 
-//     const [newAudit] = await db
-//         .insert(auditSchema)
-//         .values({
-//             userId: session.user.id,
-//             url,
-//         })
-//         .returning({ id: auditSchema.id });
+    console.log(`[SmartAudit] Generating final report...`);
+    return generateNewContent(finalPrompt);
+}
 
-//     if (!newAudit?.id) return { error: "Failed to create audit record." };
+/**
+ * Handles comparison reports for potentially large datasets
+ */
+async function generateSmartComparison({ url, brandContent, competitorsData }: { url: string; brandContent: string; competitorsData: { url: string; content: string }[] }) {
+    // Check if total projected prompt size exceeds limit
+    let totalEstimatedTokens = analyzeToken(brandContent);
+    for (const comp of competitorsData) {
+        totalEstimatedTokens += analyzeToken(comp.content);
+    }
 
-//     const crawlResult: any = await spiderCrawlWebsite(url);
-//     if (crawlResult.error) return { error: crawlResult.error };
+    // If total exceeds limit, we summarize each player first
+    if (totalEstimatedTokens > MAX_TOKENS) {
+        console.log(`[SmartComparison] Total content too large (${totalEstimatedTokens} tokens). Summarizing players...`);
+        
+        const summarizedBrand = await summarizeForContext(brandContent, `Primary Brand (${url})`);
+        const summarizedCompetitors = await Promise.all(competitorsData.map(async (comp) => ({
+            url: comp.url,
+            content: await summarizeForContext(comp.content, `Competitor (${comp.url})`)
+        })));
 
-//     const tokenCount = analyzeToken(crawlResult.content);
-//     console.log(tokenCount, `<-> crawlResult tokenCount <->`);
+        const prompt = COMPARISON_AUDIT_PROMPT({
+            brand_url: url,
+            brand_content: summarizedBrand,
+            competitors: summarizedCompetitors
+        });
+        const result = await generateNewContent(prompt);
+        return result.generatedText;
+    }
 
-//     let finalGeneratedContent = "";
-//     const processedContent = crawlResult.content;
-
-//     if (tokenCount > MAX_TOKENS) {
-//         const contentChunks = splitContentByTokens(processedContent, MAX_TOKENS - 10000);
-//         const partialResults: string[] = [];
-
-//         for (let i = 0; i < contentChunks.length; i++) {
-//             const partPrompt = INITIAL_AUDIT_PROMPT({
-//                 website_url: url,
-//                 crawledContent: contentChunks[i],
-//             });
-
-//             const result = await generateNewContent(partPrompt);
-//             if (!result || result.errorReason)
-//                 return { error: result?.errorReason || "Failed to generate partial audit." };
-
-//             partialResults.push(result.generatedText);
-//         }
-
-//         const combinedPrompt = `
-//             Combine the following partial audit analyses into one cohesive, detailed, and logically structured final audit report.
-
-//             ${partialResults.map((r, i) => `--- PART ${i + 1} ---\n${r}`).join("\n\n")}
-
-//             Make sure the final version avoids repetition and flows naturally as one complete analysis.
-//         `;
-
-//         const combinedResult = await generateNewContent(combinedPrompt);
-//         if (!combinedResult || combinedResult.errorReason)
-//             return { error: combinedResult?.errorReason || "Failed to combine partial audits." };
-
-//         finalGeneratedContent = combinedResult.generatedText;
-//     } else {
-//         const prompt = INITIAL_AUDIT_PROMPT({
-//             website_url: url,
-//             crawledContent: processedContent,
-//         });
-
-//         const generatedResult = await generateNewContent(prompt);
-//         if (!generatedResult || generatedResult.errorReason)
-//             return { error: generatedResult?.errorReason || "Failed to generate audit." };
-
-//         finalGeneratedContent = generatedResult.generatedText;
-//     }
-
-//     console.log(finalGeneratedContent, `<-> finalGeneratedContent <->`);
-
-//     try {
-//         await db.transaction(async (tx) => {
-//             await tx
-//                 .update(auditSchema)
-//                 .set({
-//                     status: "completed",
-//                     results: null,
-//                     crawledContent: processedContent,
-//                     auditGenratedContent: finalGeneratedContent,
-//                     updatedAt: new Date(),
-//                 })
-//                 .where(eq(auditSchema.id, newAudit.id));
-
-//             await tx
-//                 .update(userSchema)
-//                 .set({ auditCredits: sql`${userSchema.auditCredits} - 1` })
-//                 .where(and(eq(userSchema.id, session.user.id), sql`${userSchema.auditCredits} > 0`));
-//         });
-
-//         revalidatePath(`/audit/${newAudit.id}`);
-//         revalidatePath("/");
-//         return { auditId: newAudit.id };
-//     } catch (error) {
-//         await db
-//             .update(auditSchema)
-//             .set({ status: "failed", updatedAt: new Date() })
-//             .where(eq(auditSchema.id, newAudit.id));
-
-//         revalidatePath(`/audit/${newAudit.id}`);
-//         return { error: "An error occurred, please try again." };
-//     }
-// }
+    // Otherwise generate normally
+    const prompt = COMPARISON_AUDIT_PROMPT({
+        brand_url: url,
+        brand_content: brandContent,
+        competitors: competitorsData
+    });
+    const result = await generateNewContent(prompt);
+    return result.generatedText;
+}

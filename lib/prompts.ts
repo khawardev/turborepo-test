@@ -521,13 +521,13 @@ GOALS
 
 STRUCTURE
 
-# Competitive Positioning Audit
+\#\#\# Competitive Positioning Audit
 ## By Humanbrand AI for ${params.brand_url}
 
-### 1. Market Context & Competitive Set
+\#\#\# 1. Market Context & Competitive Set
 Provide a 250-word synthesis of the current market state as seen through these digital windows. Categorize each player (e.g., The Established incumbent, The Lean Challenger, The Creative Outlier).
 
-### 2. Narrative & Messaging DNA (Comparative View)
+\#\#\# 2. Narrative & Messaging DNA (Comparative View)
 | Brand Component | Primary Brand (${params.brand_url}) | ${params.competitors.map(c => `Competitor (${c.url})`).join(' | ')} |
 | :--- | :--- | ${params.competitors.map(() => ':---').join(' | ')} |
 | **Hero Hook** | [Primary tagline/header] | ${params.competitors.map(() => '[Competitor tagline]').join(' | ')} |
@@ -536,7 +536,7 @@ Provide a 250-word synthesis of the current market state as seen through these d
 | **Emotional Maturity** | [e.g., High connection/Low proof] | ${params.competitors.map(() => '[Competitor maturity]').join(' | ')} |
 | **Target Archetype** | [Who they clearly talk to] | ${params.competitors.map(() => '[Competitor target]').join(' | ')} |
 
-### 3. Visual & Functional Authority
+\#\#\# 3. Visual & Functional Authority
 | Authority Signal | Primary Brand | ${params.competitors.map((_, i) => `Comp ${i + 1}`).join(' | ')} |
 | :--- | :--- | ${params.competitors.map(() => ':---').join(' | ')} |
 | **Trust Elements** | [Client logos, awards, years] | ${params.competitors.map(() => '[Logos/Awards]').join(' | ')} |
@@ -544,13 +544,13 @@ Provide a 250-word synthesis of the current market state as seen through these d
 | **CTA Maturity** | [Direct sale vs. Education] | ${params.competitors.map(() => '[CTA style]').join(' | ')} |
 | **Unique Differentiator** | [What ONLY they have] | ${params.competitors.map(() => '[Unique trait]').join(' | ')} |
 
-### 4. The White Space Analysis (Unclaimed Territory)
+\#\#\# 4. The White Space Analysis (Unclaimed Territory)
 Identify 3 strategic "White Spaces" currently ignored by the entire competitive set.
 1. **[Space Name]**: [Detailed description & why the Primary Brand should claim it].
 2. **[Space Name]**: [Detailed description].
 3. **[Space Name]**: [Detailed description].
 
-### 5. Competitive Health Scorecard
+\#\#\# 5. Competitive Health Scorecard
 | Metric (1-10) | Primary Brand | ${params.competitors.map((_, i) => `Comp ${i + 1}`).join(' | ')} | Rationale |
 | :--- | :---: | ${params.competitors.map(() => ':---:').join(' | ')} | :--- |
 | **Clarity** | [Score] | ${params.competitors.map(() => '[Score]').join(' | ')} | [Brief comparison of message clarity] |
@@ -558,7 +558,7 @@ Identify 3 strategic "White Spaces" currently ignored by the entire competitive 
 | **Conviction** | [Score] | ${params.competitors.map(() => '[Score]').join(' | ')} | [Strength of brand voice] |
 | **Audience Fit** | [Score] | ${params.competitors.map(() => '[Score]').join(' | ')} | [Precision of audience targeting] |
 
-### 6. Strategic Recommendations (The Edge)
+\#\#\# 6. Strategic Recommendations (The Edge)
 Provide 5 prioritized actions for ${params.brand_url} to outpace this competition in the next 90 days. Focus on narrative pivots and positioning shifts.
 
 ---
