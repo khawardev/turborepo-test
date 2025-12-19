@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import UrlSubmissionForm from './UrlSubmissionForm';
 import AuthModal from '../auth/AuthModal';
 import { useRouter } from 'next/navigation';
-import { createAudit } from '@/db/actions/auditActions';
+import { createMiniAudit } from '@/db/actions/miniAuditActions';
 import { toast } from 'sonner';
 import WorldMap from '../ui/world-map';
 import AuditProgress from '../layout/AuditProgress';
@@ -12,6 +12,7 @@ import AuditProgress from '../layout/AuditProgress';
 export default function HeroSection({ user }: { user: any }) {
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [submittedUrl, setSubmittedUrl] = useState('');
+    const [activeCompetitors, setActiveCompetitors] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [progress, setProgress] = useState(0);
@@ -73,9 +74,7 @@ export default function HeroSection({ user }: { user: any }) {
     const handleUrlSubmit = async (url: string, competitors: string[]) => {
         if (!user) {
             setSubmittedUrl(url);
-            // We'll just store the main URL for now, or we could extend this to store competitors too
-            // For simplicity in this demo, let's assume if they login we just start the main audit
-            // But ideally we'd store the full state.
+            setActiveCompetitors(competitors);
             setAuthModalOpen(true);
             setIsLoading(false);
         } else {
@@ -86,8 +85,8 @@ export default function HeroSection({ user }: { user: any }) {
     const startAudit: any = async (url: string, competitors: string[]) => {
         runProgressSimulation(competitors.length);
         try {
-            toast.info('Starting your free audit, this will take a moment...');
-            const result = await createAudit(url, competitors);
+            toast.info('Starting your Outside-In Mini Audit, this will take a moment...');
+            const result = await createMiniAudit(url, competitors);
             stopProgress();
 
             if (result.error) {
@@ -100,6 +99,7 @@ export default function HeroSection({ user }: { user: any }) {
             }
         } catch (error) {
             stopProgress();
+            console.error(error);
             toast.error('Something went wrong while starting audit.');
         } finally {
             setIsLoading(false);
@@ -111,7 +111,7 @@ export default function HeroSection({ user }: { user: any }) {
 
         if (submittedUrl) {
             setIsLoading(true);
-            startAudit(submittedUrl);
+            startAudit(submittedUrl, activeCompetitors);
         }
     };
 

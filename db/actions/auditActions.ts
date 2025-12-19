@@ -10,7 +10,7 @@ import { spiderCrawlWebsite } from "./spider-crawl";
 import { analyzeToken, splitContentByTokens } from "@/lib/tokenizer";
 import { generateNewContent } from "./generateContent";
 
-const MAX_TOKENS = 900000;
+const MAX_TOKENS = 150000;
 
 export async function generateAndSaveQuestionnaire(auditId: string, auditContent: string) {
     const session = await getSession();
@@ -227,6 +227,9 @@ async function generateSmartAudit({ url, content, limit, pageCount }: { url: str
 
     for (let i = 0; i < chunks.length; i++) {
         console.log(`[SmartAudit] Summarizing chunk ${i+1}/${chunks.length}...`);
+        // Add artificial delay to respect rate limits
+        if (i > 0) await new Promise(r => setTimeout(r, 2000));
+        
         const summary = await summarizeForContext(chunks[i], "website chunk");
         chunkSummaries.push(summary);
     }
@@ -259,10 +262,16 @@ async function generateSmartComparison({ url, brandContent, competitorsData }: {
         console.log(`[SmartComparison] Total content too large (${totalEstimatedTokens} tokens). Summarizing players...`);
         
         const summarizedBrand = await summarizeForContext(brandContent, `Primary Brand (${url})`);
-        const summarizedCompetitors = await Promise.all(competitorsData.map(async (comp) => ({
-            url: comp.url,
-            content: await summarizeForContext(comp.content, `Competitor (${comp.url})`)
-        })));
+        
+        const summarizedCompetitors: { url: string; content: string }[] = [];
+        for (const [index, comp] of competitorsData.entries()) {
+            console.log(`[SmartComparison] Summarizing competitor (${comp.url})...`);
+            // Add delay between competitor summaries
+            if (index > 0) await new Promise(r => setTimeout(r, 2000));
+            
+            const summary = await summarizeForContext(comp.content, `Competitor (${comp.url})`);
+            summarizedCompetitors.push({ url: comp.url, content: summary });
+        }
 
         const prompt = COMPARISON_AUDIT_PROMPT({
             brand_url: url,

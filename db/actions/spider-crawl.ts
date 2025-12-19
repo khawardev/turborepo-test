@@ -46,3 +46,66 @@ export async function spiderCrawlWebsite(url: any, limit:any) {
         };
     }
 }
+
+/**
+ * Specialized crawler for Mini Audit V4.
+ * Requests metadata: true and ensures detailed capture for "Site Ledger" analysis.
+ * Strict separation from legacy spiderCrawlWebsite.
+ */
+export async function spiderCrawlForMiniAudit(url: string, limit: number, options?: { crawlRules?: any }) {
+    const functionName = "spiderCrawlForMiniAudit";
+    logger.info("Mini Audit Spider crawl initiated.", { url, limit });
+
+    if (!url || typeof url !== 'string') {
+        return { error: 'A valid URL must be provided.' };
+    }
+
+    try {
+        const app = new Spider({ apiKey: process.env.SPIDER_API_KEY! });
+        
+        // V4 requires robust metadata
+        const crawlParams = {
+            limit: limit,
+            metadata: true, // Key difference: we need title, desc, etc.
+            return_format: "markdown", // or 'html' if we prefer raw DOM, but MD is usually token-efficient for LLMs
+            ...options?.crawlRules // Allow passing specific rules if needed
+        };
+
+        const crawlData = await app.crawlUrl(url, crawlParams);
+
+        if (!crawlData || crawlData.length === 0) {
+            throw new Error("Crawl failed or returned no data.");
+        }
+
+        const urls = crawlData.map((page: any) => page.url);
+        
+        // Format content specifically for the SITE_LEDGER prompt
+        const allPagesDataString = crawlData.map((page: any, index: number) => {
+            const cleanContent = (page.content || '').trim();
+            
+            // Construct a rich page block
+            let pageBlock = `--- PAGE ${index + 1} START ---\n`;
+            pageBlock += `URL: ${page.url}\n`;
+            
+            if (page.metadata) {
+                pageBlock += `TITLE: ${page.metadata.title || 'N/A'}\n`;
+                pageBlock += `DESC: ${page.metadata.description || 'N/A'}\n`;
+            }
+            
+            pageBlock += `CONTENT:\n${cleanContent}\n`;
+            pageBlock += `--- PAGE ${index + 1} END ---\n`;
+            
+            return pageBlock;
+        }).join('\n\n');
+
+        logger.info("Mini Audit crawl successful.", { url, pageCount: crawlData.length });
+        return { content: allPagesDataString, urls, rawData: crawlData };
+
+    } catch (error: any) {
+        logger.error("Mini Audit spider crawl failed.", { functionName, url, error: error.message });
+        return {
+            error: error.message || 'An unknown error occurred during the mini audit crawl.',
+            details: error.cause || null
+        };
+    }
+}
