@@ -4,16 +4,49 @@ import { db } from "@/db";
 import { getSession } from "@/lib/auth/getSession";
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { user as userSchema } from "@/db/schema/users";
-import { audit as auditSchema } from "@/db/schema/audits";
-import { generateNewContent } from "./generateContent";
-import { INITIAL_AUDIT_PROMPT } from "@/lib/prompts";
+import { user as userSchema, audit as auditSchema } from "@/db/schema";
+import { COMPARISON_AUDIT_PROMPT, INITIAL_AUDIT_PROMPT, companyReportQuestionnairePrompt, extractCompanyNamePrompt } from "@/lib/prompts";
 import { spiderCrawlWebsite } from "./spider-crawl";
-import { analyzeToken, splitContentByTokens } from "@/lib/tokenizer";
+import { analyzeToken } from "@/lib/tokenizer";
+import { generateNewContent } from "./generateContent";
 
 const MAX_TOKENS = 1850000;
 
-export async function createAudit(url: string) {
+export async function generateAndSaveQuestionnaire(auditId: string, auditContent: string) {
+    const session = await getSession();
+    if (!session?.user?.id) return { error: "You must be logged in." };
+
+    try {
+        const companyNamePrompt = extractCompanyNamePrompt({ company_report: auditContent });
+        const companyNameResult = await generateNewContent(companyNamePrompt);
+        const companyName = companyNameResult.generatedText || "Company";
+
+        const questionnairePrompt = companyReportQuestionnairePrompt({ 
+            company_report: auditContent, 
+            company_name: companyName 
+        });
+        
+        const result = await generateNewContent(questionnairePrompt);
+        
+        if (result.generatedText) {
+            await db.update(auditSchema)
+                .set({ 
+                    questionnaireContent: result.generatedText,
+                    updatedAt: new Date() 
+                })
+                .where(and(eq(auditSchema.id, auditId), eq(auditSchema.userId, session.user.id)));
+            
+            revalidatePath(`/audit/${auditId}`);
+        }
+        
+        return result;
+    } catch (error: any) {
+        console.error("Error generating questionnaire:", error);
+        return { generatedText: null, errorReason: error.message || "Failed to generate questionnaire." };
+    }
+}
+
+export async function createAudit(url: string, competitorUrls: string[] = []) {
     const session = await getSession();
     if (!session?.user?.id) return { error: "You must be logged in to start an audit." };
 
@@ -30,55 +63,75 @@ export async function createAudit(url: string) {
         .values({
             userId: session.user.id,
             url,
+            competitorUrls: competitorUrls,
         })
         .returning({ id: auditSchema.id });
 
     if (!newAudit?.id) return { error: "Failed to create audit record." };
 
-    let crawlLimit = 10;
-    let crawlResult: any = await spiderCrawlWebsite(url, crawlLimit);
-    if (crawlResult.error) return { error: crawlResult.error };
-
-    let tokenCount = analyzeToken(crawlResult.content);
-    // console.log(tokenCount, `<-> crawlResult tokenCount <->`);
-
-    if (tokenCount > MAX_TOKENS) {
-        const avgTokensPerPage = Math.ceil(tokenCount / crawlLimit);
-        const safePageCount = Math.floor(MAX_TOKENS / avgTokensPerPage);
-        crawlLimit = Math.max(1, safePageCount);
-
-        // console.log(`Token overflow detected! Avg per page: ${avgTokensPerPage}, safe pages: ${crawlLimit}`);
-
-        crawlResult = await spiderCrawlWebsite(url, crawlLimit);
-        if (crawlResult.error) return { error: crawlResult.error };
-
-        tokenCount = analyzeToken(crawlResult.content);
-        // console.log(tokenCount, `<-> new crawlResult tokenCount after reducing limit <->`);
-    }
-
-    const processedContent = crawlResult.content;
-
-    const prompt = INITIAL_AUDIT_PROMPT({
-        website_url: url,
-        crawledContent: processedContent,
-        pagelimit: crawlLimit
-    });
-
-    const generatedResult = await generateNewContent(prompt);
-    if (!generatedResult || generatedResult.errorReason)
-        return { error: generatedResult?.errorReason || "Failed to generate audit." };
-
-    const finalGeneratedContent = generatedResult.generatedText;
-
     try {
+        // 1. Capture Brand Data
+        let crawlLimit = 10;
+        let brandCrawl: any = await spiderCrawlWebsite(url, crawlLimit);
+        if (brandCrawl.error) throw new Error(brandCrawl.error);
+
+        let brandContent = brandCrawl.content;
+        const brandPageCount = brandCrawl.urls?.length || 0;
+
+        // 2. Capture Competitor Data
+        const competitorsData: { url: string; content: string }[] = [];
+        const competitorsCrawledContent: Record<string, string> = {};
+
+        if (competitorUrls.length > 0) {
+            for (const compUrl of competitorUrls) {
+                const compCrawl: any = await spiderCrawlWebsite(compUrl, 5); // Use 5 pages for competitors
+                if (!compCrawl.error) {
+                    competitorsData.push({ url: compUrl, content: compCrawl.content });
+                    competitorsCrawledContent[compUrl] = compCrawl.content;
+                }
+            }
+        }
+
+        // 3. Generate Brand Audit Report
+        const brandPrompt = INITIAL_AUDIT_PROMPT({
+            website_url: url,
+            crawledContent: brandContent,
+            pagelimit: crawlLimit,
+            actualPageCount: brandPageCount
+        });
+
+        const brandAuditResult = await generateNewContent(brandPrompt);
+        if (!brandAuditResult || brandAuditResult.errorReason)
+            throw new Error(brandAuditResult?.errorReason || "Failed to generate brand audit.");
+
+        const finalBrandAuditContent = brandAuditResult.generatedText;
+
+        // 4. Generate Comparison Report (if competitors exist)
+        let comparisonReport = null;
+        if (competitorsData.length > 0) {
+            const comparisonPrompt = COMPARISON_AUDIT_PROMPT({
+                brand_url: url,
+                brand_content: brandContent,
+                competitors: competitorsData
+            });
+
+            const comparisonResult = await generateNewContent(comparisonPrompt);
+            if (comparisonResult && !comparisonResult.errorReason) {
+                comparisonReport = comparisonResult.generatedText;
+            }
+        }
+
+        // 5. Update Database
         await db.transaction(async (tx) => {
             await tx
                 .update(auditSchema)
                 .set({
                     status: "completed",
                     results: null,
-                    crawledContent: processedContent,
-                    auditGenratedContent: finalGeneratedContent,
+                    crawledContent: brandContent,
+                    auditGenratedContent: finalBrandAuditContent,
+                    competitorsCrawledContent: competitorsCrawledContent,
+                    comparisonReport: comparisonReport,
                     updatedAt: new Date(),
                 })
                 .where(eq(auditSchema.id, newAudit.id));
@@ -92,14 +145,16 @@ export async function createAudit(url: string) {
         revalidatePath(`/audit/${newAudit.id}`);
         revalidatePath("/");
         return { auditId: newAudit.id };
-    } catch (error) {
+
+    } catch (error: any) {
+        console.error("Audit creation failed:", error);
         await db
             .update(auditSchema)
             .set({ status: "failed", updatedAt: new Date() })
             .where(eq(auditSchema.id, newAudit.id));
 
         revalidatePath(`/audit/${newAudit.id}`);
-        return { error: "An error occurred, please try again." };
+        return { error: error.message || "An error occurred, please try again." };
     }
 }
 

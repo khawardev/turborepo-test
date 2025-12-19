@@ -26,13 +26,30 @@ export default function HeroSection({ user }: { user: any }) {
         }
     };
 
-    const runProgressSimulation = () => {
-        const stages = [
-            { title: 'Initializing Audit...', progress: 10, duration: 20000 },
-            { title: 'Analysing Website...', progress: 40, duration: 20000 },
-            { title: 'Analyzing Content with AI...', progress: 80, duration: 20000 },
-            { title: 'Finalizing Report...', progress: 95, duration: 3000 },
+    const runProgressSimulation = (competitorsCount: number) => {
+        const stages: { title: string; progress: number; duration: number }[] = [
+            { title: 'Initializing Audit...', progress: 5, duration: 5000 },
+            { title: 'Capturing Brand Data...', progress: 15, duration: 15000 },
         ];
+
+        if (competitorsCount > 0) {
+            stages.push({ 
+                title: `Capturing Data for ${competitorsCount} Competitor${competitorsCount > 1 ? 's' : ''}...`, 
+                progress: 40, 
+                duration: 15000 * competitorsCount 
+            });
+        }
+
+        stages.push(
+            { title: 'Analyzing Brand Strategy...', progress: 70, duration: 15000 },
+            { title: 'Generating Audit Report...', progress: 85, duration: 10000 }
+        );
+
+        if (competitorsCount > 0) {
+            stages.push({ title: 'Performing Competitive Analysis...', progress: 92, duration: 10000 });
+        }
+
+        stages.push({ title: 'Finalizing Reports...', progress: 98, duration: 5000 });
 
         let stageIndex = 0;
 
@@ -53,21 +70,24 @@ export default function HeroSection({ user }: { user: any }) {
         nextStage();
     };
 
-    const handleUrlSubmit = async (url: string) => {
+    const handleUrlSubmit = async (url: string, competitors: string[]) => {
         if (!user) {
             setSubmittedUrl(url);
+            // We'll just store the main URL for now, or we could extend this to store competitors too
+            // For simplicity in this demo, let's assume if they login we just start the main audit
+            // But ideally we'd store the full state.
             setAuthModalOpen(true);
             setIsLoading(false);
         } else {
-            startAudit(url);
+            startAudit(url, competitors);
         }
     };
 
-    const startAudit = async (url: string) => {
-        runProgressSimulation();
+    const startAudit:any = async (url: string, competitors: string[]) => {
+        runProgressSimulation(competitors.length);
         try {
-            toast.info('Starting your free audit, this take a moment..');
-            const result = await createAudit(url);
+            toast.info('Starting your free audit, this will take a moment...');
+            const result = await createAudit(url, competitors);
             stopProgress();
 
             if (result.error) {
@@ -75,7 +95,7 @@ export default function HeroSection({ user }: { user: any }) {
             } else if (result.auditId) {
                 setProgress(100);
                 setProgressTitle('Analysis Finished!');
-                toast.success('Analysis finsihed! Redirecting to results...');
+                toast.success('Analysis finished! Redirecting to results...');
                 router.push(`/audit/${result.auditId}`);
             }
         } catch (error) {

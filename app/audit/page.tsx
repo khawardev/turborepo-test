@@ -12,9 +12,10 @@ interface AuditsListPageProps {
     };
 }
 
-export default async function AuditsListPage({ searchParams }: any) {
+export default async function AuditsListPage(props: { searchParams: Promise<{ page?: string }> }) {
+    const searchParams = await props.searchParams;
     const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
-    const pageSize = 9;
+    const pageSize = 10;
 
     const data = await getUserWithAudits({ page, pageSize });
 

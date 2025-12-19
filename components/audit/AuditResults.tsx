@@ -22,7 +22,7 @@ import { generateQuestionnaireDocx } from "@/lib/genrate-pdfs/questionnaire-docx
 interface AuditResultsProps {
     audit: any;
     user: any;
-    generateQuestionnaire: (auditContent: string) => Promise<{ generatedText: string | null; errorReason: string | null; }>;
+    generateQuestionnaire: (auditId: string, auditContent: string) => Promise<{ generatedText: string | null; errorReason?: string | null; error?: string }>;
 }
 
 export default function AuditResults({ audit, user, generateQuestionnaire }: AuditResultsProps) {
@@ -32,9 +32,9 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
     const [isDownloadingQuestionnairePdf, setIsDownloadingQuestionnairePdf] = useState(false);
     const [isDownloadingQuestionnaireDocx, setIsDownloadingQuestionnaireDocx] = useState(false);
     const [isGeneratingQuestionnaire, setIsGeneratingQuestionnaire] = useState(false);
-    const [questionnaire, setQuestionnaire] = useState<string | null>(null);
+    const [questionnaire, setQuestionnaire] = useState<string | null>(audit.questionnaireContent || null);
     const [questionnaireError, setQuestionnaireError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState("report");
+    const [activeTab, setActiveTab] = useState(audit.comparisonReport ? "comparison" : "report");
     const currentDate = new Date().toISOString().split("T")[0];
 
     if (audit.status === 'failed') {
@@ -90,14 +90,15 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
         setQuestionnaireError(null);
         try {
             toast.info("Generating your questionnaire...");
-            const result = await generateQuestionnaire(audit.auditGenratedContent);
+            const result = await generateQuestionnaire(audit.id, audit.auditGenratedContent);
             if (result.generatedText) {
                 setQuestionnaire(result.generatedText);
-                toast.success("Questionnaire generated successfully.");
+                toast.success("Questionnaire generated and saved.");
                 setActiveTab("questionnaire");
             } else {
-                setQuestionnaireError(result.errorReason || "An unknown error occurred.");
-                toast.error(result.errorReason || "Failed to generate questionnaire.");
+                const errorMsg = result.errorReason || result.error || "An unknown error occurred.";
+                setQuestionnaireError(errorMsg);
+                toast.error(errorMsg);
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
@@ -168,51 +169,100 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                 <Link href="/audit"><IoArrowBackOutline /> back</Link>
             </Button>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">Website <span className=" text-primary">Brand Health Audit </span> is ready</h1>
-                    <Link href={audit.url} target='_blank' className="text-muted-foreground break-all">{audit.url}</Link>
+                <div className="flex-1">
+                    <h1 className="text-3xl mb-2 tracking-tight font-bold font-heading">
+                        Website <span className=" text-primary">Brand Health Audit </span> is ready
+                    </h1>
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-primary/10 text-primary">Brand</span>
+                            <Link href={audit.url} target='_blank' className="text-sm text-muted-foreground hover:underline break-all">
+                                {audit.url}
+                            </Link>
+                        </div>
+                        {audit.competitorUrls && audit.competitorUrls.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {audit.competitorUrls.map((comp: string, idx: number) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <span className="text-[10px] font-semibold py-0.5 px-2 rounded-full bg-muted text-muted-foreground">Comp {idx + 1}</span>
+                                        <Link href={comp} target='_blank' className="text-xs text-muted-foreground hover:underline">
+                                            {comp}
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
+                <Button size={'sm'} onClick={handleGenerateQuestionnaire} disabled={isGeneratingQuestionnaire} className="shrink-0" >
+                    {isGeneratingQuestionnaire ? (<><Loader2 className="size-3 animate-spin mr-2" /> Generating...</>) : ('Generate Questionnaire')}
+                </Button>
             </div>
-            <Button size={'sm'} onClick={handleGenerateQuestionnaire} disabled={isGeneratingQuestionnaire} >
-                {isGeneratingQuestionnaire ? (<><Loader2 className="size-3 animate-spin" /> Generating...</>) : ('Generate Questionnaire')}
-            </Button>
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="report">Audit Report</TabsTrigger>
-                    <TabsTrigger className=" col-span-2" value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
+                <TabsList className={`grid w-full ${audit.comparisonReport ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <TabsTrigger value="report">Brand Report</TabsTrigger>
+                    {audit.comparisonReport && <TabsTrigger value="comparison">Comparison Report</TabsTrigger>}
+                    <TabsTrigger value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="report">
-                    {audit.crawledContent &&
-                        <section>
+                    {audit.auditGenratedContent &&
+                        <section className="mt-6">
                             <div className={"flex flex-col md:flex-row md:items-center items-end justify-between mb-4 gap-4"}>
                                 <div className="flex justify-end w-full gap-3 mt-1">
                                     <ContentActions
                                         content={audit.auditGenratedContent}
                                         auditURL={audit.url}
-                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_humanbrandai_report_${currentDate}.pdf`)}
+                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.auditGenratedContent, `${audit.url}_brand_audit_${currentDate}.pdf`)}
                                         isDownloadingPdf={isDownloadingReport}
                                         notdocx={false}
                                     />
                                 </div>
                             </div>
                             <Separator className="mb-4" />
-                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
+                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert ">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
                             </div>
                         </section>
                     }
                 </TabsContent>
+
+                {audit.comparisonReport && (
+                    <TabsContent value="comparison">
+                        <section className="mt-6">
+                            <div className={"flex flex-col md:flex-row md:items-center items-end justify-between mb-4 gap-4"}>
+                                <div className="flex justify-end w-full gap-3 mt-1">
+                                    <ContentActions
+                                        content={audit.comparisonReport}
+                                        auditURL={audit.url}
+                                        handleDownloadPdf={() => handleDownloadReportPdf(audit.comparisonReport, `${audit.url}_competition_audit_${currentDate}.pdf`)}
+                                        isDownloadingPdf={isDownloadingReport}
+                                        notdocx={false}
+                                    />
+                                </div>
+                            </div>
+                            <Separator className="mb-4" />
+                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert ">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.comparisonReport)}</ReactMarkdown>
+                            </div>
+                        </section>
+                    </TabsContent>
+                )}
+
                 <TabsContent value="questionnaire">
                     {questionnaireError && (
-                        <Alert variant="destructive">
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Error Generating Questionnaire</AlertTitle>
-                            <AlertDescription>{questionnaireError}</AlertDescription>
-                        </Alert>
+                        <div className="mt-6 text-center py-10">
+                            <Alert variant="destructive" className="max-w-md mx-auto">
+                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTitle>Error Generating Questionnaire</AlertTitle>
+                                <AlertDescription>{questionnaireError}</AlertDescription>
+                            </Alert>
+                            <Button variant="outline" className="mt-4" onClick={handleGenerateQuestionnaire}>Try Again</Button>
+                        </div>
                     )}
                     {questionnaire && (
-                        <section>
+                        <section className="mt-6">
                             <div className="flex justify-end mb-4 mt-1">
                                 <ContentActions
                                     content={questionnaire}
@@ -225,7 +275,7 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                 />
                             </div>
                             <Separator className="mb-4" />
-                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert">
+                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert ">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{questionnaire}</ReactMarkdown>
                             </div>
                         </section>
