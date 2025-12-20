@@ -1,8 +1,7 @@
 'use client'
 
+import LedgerVisualizer from "./LedgerVisualizer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { appConfig } from "@/config/site";
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { MdOutlineRemoveCircleOutline } from "react-icons/md";
@@ -18,6 +17,8 @@ import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateQuestionnairePdf } from "@/lib/genrate-pdfs/questionare-pdf";
 import { generateQuestionnaireDocx } from "@/lib/genrate-pdfs/questionnaire-docx";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 
 interface AuditResultsProps {
     audit: any;
@@ -215,10 +216,11 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className={`grid w-full ${audit.comparisonReport ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <TabsList className={`grid w-full ${audit.comparisonReport ? 'grid-cols-4' : (audit.results ? 'grid-cols-3' : 'grid-cols-2')}`}>
                     <TabsTrigger value="report">Brand Report</TabsTrigger>
                     {audit.comparisonReport && <TabsTrigger value="comparison">Comparison Report</TabsTrigger>}
                     <TabsTrigger value="questionnaire" disabled={!questionnaire}>Questionnaire</TabsTrigger>
+                    {audit.results && <TabsTrigger value="analysis-data">Analysis Data</TabsTrigger>}
                 </TabsList>
 
                 <TabsContent value="report">
@@ -296,6 +298,14 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                         </section>
                     )}
                 </TabsContent>
+
+                {audit.results && (
+                    <TabsContent value="analysis-data">
+                        <section className="mt-6">
+                            <LedgerVisualizer data={audit.results} />
+                        </section>
+                    </TabsContent>
+                )}
             </Tabs>
         </div>
     );

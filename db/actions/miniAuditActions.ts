@@ -7,8 +7,8 @@ import { revalidatePath } from "next/cache";
 import { user as userSchema, audit as auditSchema } from "@/db/schema";
 import { 
     HBAI_MINI_AUDIT_V4_CAPTURE_REQUEST_PROMPT, 
-    HBAI_MINI_AUDIT_V4_SITE_LEDGER_PROMPT, 
-    HBAI_MINI_AUDIT_V4_REPORT_PROMPT 
+    HBAI_MINI_AUDIT_V7_SITE_LEDGER, 
+    HBAI_MINI_AUDIT_V7_REPORT 
 } from "@/lib/prompts";
 import { spiderCrawlForMiniAudit } from "./spider-crawl";
 import { generateNewContent } from "./generateContent";
@@ -52,10 +52,10 @@ async function generateCaptureRequest(clientUrl: string, competitorUrls: string[
 }
 
 async function generateSiteLedger(url: string, content: string, pageLimit: number, actualPageCount: number): Promise<SiteLedger | null> {
-    const prompt = HBAI_MINI_AUDIT_V4_SITE_LEDGER_PROMPT({
+    const prompt = HBAI_MINI_AUDIT_V7_SITE_LEDGER({
         website_url: url,
-        capturedContent: content,
-        pageLimit,
+        crawledContent: content,
+        pagelimit: pageLimit,
         actualPageCount
     });
 
@@ -73,10 +73,9 @@ async function generateSiteLedger(url: string, content: string, pageLimit: numbe
 }
 
 async function generateFinalReport(clientLedger: any, competitorLedgers: any[], competitorLabels: string[]): Promise<string | null> {
-    const prompt = HBAI_MINI_AUDIT_V4_REPORT_PROMPT({
+    const prompt = HBAI_MINI_AUDIT_V7_REPORT({
         clientLedger,
-        competitorLedgers,
-        competitorLabels
+        competitorLedgers
     });
 
     const result = await generateNewContent(prompt, "gemini-3-pro-preview");
