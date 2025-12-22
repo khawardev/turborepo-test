@@ -12,13 +12,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ContentActions } from "./ContentActions";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cleanAndFlattenBullets } from "@/lib/cleanMarkdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateQuestionnairePdf } from "@/lib/genrate-pdfs/questionare-pdf";
 import { generateQuestionnaireDocx } from "@/lib/genrate-pdfs/questionnaire-docx";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
+import StructuredAuditReport from "./StructuredAuditReport";
 
 interface AuditResultsProps {
     audit: any;
@@ -37,6 +38,20 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
     const [questionnaireError, setQuestionnaireError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState(audit.comparisonReport ? "comparison" : "report");
     const currentDate = new Date().toISOString().split("T")[0];
+
+    // Try to parse structured report
+    const structuredReport = useMemo(() => {
+        try {
+            if (!audit.auditGenratedContent) return null;
+            const parsed = JSON.parse(audit.auditGenratedContent);
+            if (parsed && typeof parsed === 'object' && parsed.executiveSummary) {
+                return parsed;
+            }
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }, [audit.auditGenratedContent]);
 
     const getDisplayName = (url: string) => {
         try {
@@ -238,9 +253,13 @@ export default function AuditResults({ audit, user, generateQuestionnaire }: Aud
                                 </div>
                             </div>
                             <Separator className="mb-4" />
-                            <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert ">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
-                            </div>
+                            {structuredReport ? (
+                                <StructuredAuditReport report={structuredReport} />
+                            ) : (
+                                <div className="prose prose-neutral max-w-none markdown-body space-y-6 dark:prose-invert ">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanAndFlattenBullets(audit.auditGenratedContent)}</ReactMarkdown>
+                                </div>
+                            )}
                         </section>
                     }
                 </TabsContent>

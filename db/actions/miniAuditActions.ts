@@ -8,10 +8,11 @@ import { user as userSchema, audit as auditSchema } from "@/db/schema";
 import { 
     HBAI_MINI_AUDIT_V4_CAPTURE_REQUEST_PROMPT, 
     HBAI_MINI_AUDIT_V7_SITE_LEDGER, 
-    HBAI_MINI_AUDIT_V7_REPORT 
+    HBAI_MINI_AUDIT_V4_REPORT_PROMPT
 } from "@/lib/prompts";
 import { spiderCrawlForMiniAudit } from "./spider-crawl";
-import { generateNewContent } from "./generateContent";
+import { generateNewContent, generateStructuredContent } from "./generateContent";
+import { MiniAuditReportSchema, MiniAuditReport } from "@/lib/schemas/miniAuditSchema";
 
 // --- Types ---
 
@@ -72,14 +73,22 @@ async function generateSiteLedger(url: string, content: string, pageLimit: numbe
     }
 }
 
-async function generateFinalReport(clientLedger: any, competitorLedgers: any[], competitorLabels: string[]): Promise<string | null> {
-    const prompt = HBAI_MINI_AUDIT_V7_REPORT({
+async function generateFinalReport(clientLedger: any, competitorLedgers: any[], competitorLabels: string[]): Promise<MiniAuditReport | null> {
+    const prompt = HBAI_MINI_AUDIT_V4_REPORT_PROMPT({
         clientLedger,
-        competitorLedgers
+        competitorLedgers,
+        competitorLabels
     });
 
-    const result = await generateNewContent(prompt, "gemini-3-pro-preview");
-    return result.generatedText;
+    const result = await generateStructuredContent(
+        prompt, 
+        MiniAuditReportSchema,
+        "gemini-3-pro-preview",
+        "MiniAuditReport", 
+        "A comprehensive brand audit report"
+    );
+    
+    return result.object;
 }
 
 // --- Main Action ---
@@ -183,7 +192,7 @@ export async function createMiniAudit(url: string, competitorUrls: string[] = []
                         competitorLedgers
                     },
                     crawledContent: clientCrawl.content.slice(0, 1000000), // Limit storage size
-                    auditGenratedContent: finalReport,
+                    auditGenratedContent: JSON.stringify(finalReport),
                     competitorsCrawledContent: competitorsCrawledContentMap,
                     updatedAt: new Date(),
                 })

@@ -76,3 +76,77 @@ export async function generateNewContent(prompt: string, modelName: string = "ge
         }
     }
 }
+
+import { generateObject } from "ai";
+import { z } from "zod";
+
+export async function generateStructuredContent<T>(
+    prompt: string,
+    schema: z.ZodSchema<T>,
+    modelName: string = "gemini-3-pro-preview",
+    schemaName?: string,
+    schemaDescription?: string
+): Promise<{ object: T | null; errorReason: string | null }> {
+    const functionName = "generateStructuredContent";
+    logger.info("AI structured generation initiated.", { functionName, model: modelName, schemaName });
+
+    let attempt = 0;
+    const maxRetries = 10;
+    
+    while (attempt <= maxRetries) {
+        try {
+            const model = google(modelName);
+            const result = await generateObject({
+                model,
+                schema,
+                prompt,
+                schemaName,
+                schemaDescription,
+                temperature: 0.7, // Keep consistent with generateNewContent
+            });
+
+            if (result.object) {
+                logger.info("AI structured generation successful.", { functionName, model: modelName });
+                return {
+                    object: result.object,
+                    errorReason: null,
+                };
+            } else {
+                 return {
+                    object: null,
+                    errorReason: "Model returned empty object",
+                 }
+            }
+
+        } catch (error: any) {
+            const errorMessage = error?.message?.toLowerCase() || "";
+            const isQuotaError = errorMessage.includes("quota") || errorMessage.includes("429") || errorMessage.includes("rate limit") || errorMessage.includes("resource has been exhausted");
+            
+            if (isQuotaError && attempt < maxRetries) {
+                let waitTime = 2000 * Math.pow(2, attempt);
+                const match = errorMessage.match(/retry in\s+([\d.]+)\s*s/);
+                if (match && match[1]) {
+                    waitTime = (parseFloat(match[1]) * 1000) + 2000;
+                }
+                logger.warn(`AI Quota exceeded (structured). Retrying in ${waitTime}ms... (Attempt ${attempt + 1}/${maxRetries})`, { functionName, waitTime });
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+                attempt++;
+                continue;
+            }
+
+            logger.error("AI structured generation failed.", {
+                functionName,
+                model: modelName,
+                error: error instanceof Error ? error.message : String(error),
+                attempt
+            });
+
+            return {
+                object: null,
+                errorReason: error instanceof Error ? error.message : "Unknown error",
+            };
+        }
+    }
+
+    return { object: null, errorReason: "Max retries exceeded" };
+}
