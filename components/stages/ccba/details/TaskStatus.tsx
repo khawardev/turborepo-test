@@ -10,14 +10,15 @@ import {
 } from '@/components/ui/tooltip';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { SCRAPE } from '@/lib/constants';
 
 interface TaskStatusProps {
   initialStatusData: CcbaStatusResponse | null;
 }
 
 const taskTypeMapping: Record<string, string> = {
-  BATCH_WEBSITE: 'Website Scrape',
-  BATCH_SOCIAL: 'Social Scrape',
+  BATCH_WEBSITE: `Website ${SCRAPE}`,
+  BATCH_SOCIAL: `Social ${SCRAPE}`,
   BATCH_WEBSITE_REPORT: 'Website Report',
   BATCH_SOCIAL_REPORT: 'Social Report'
 };

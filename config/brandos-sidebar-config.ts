@@ -8,30 +8,46 @@ import { AiOutlineKey } from "react-icons/ai";
 
 export const BrandOSConfig: any = {
     mainNav: [
+        // {
+        //     title: "Perception Intelligence",
+        //     href: "/dashboard/ccba",
+        //     desc: 'See how the brand and competitors truly show up.',
+        //     icon: LuBrain
+        // },
         {
-            title: "Perception Intelligence",
-            href: "/dashboard/ccba",
-            desc: 'See how the brand and competitors truly show up.',
-            icon: LuBrain
+            title: "BrandOS v2.1 (Beta)",
+            href: "#",
+            desc: 'Next Gen Brand Intelligence',
+            icon: RiLoopRightLine,
+            items: [
+                {
+                    title: "Start New Engagement",
+                    href: "/dashboard/brandos-v2.1/setup",
+                },
+                {
+                    title: "Phase 0: Outside-In Audit",
+                    href: "/dashboard/brandos-v2.1/phase-0",
+                }
+            ]
         },
-        {
-            title: "Intention Intelligence",
-            href: "/dashboard/bvo",
-            desc: 'Define the brand you intend to express and scale.',
-            icon: PiHandshakeDuotone
-        },
-        {
-            title: "Ground Truth & Content Studio",
-            href: "/dashboard/cge",
-            desc: ' Reconcile perception and intention activate system logic and creation.',
-            icon: MdOutlineBrandingWatermark
-        },
-        {
-            title: "Evolution Loop",
-            href: "/dashboard/cbc",
-            desc: 'Monitor, learn, refine with human-approved improvements.',
-            icon: RiLoopRightLine
-        },
+        // {
+        //     title: "Intention Intelligence",
+        //     href: "/dashboard/bvo",
+        //     desc: 'Define the brand you intend to express and scale.',
+        //     icon: PiHandshakeDuotone
+        // },
+        // {
+        //     title: "Ground Truth & Content Studio",
+        //     href: "/dashboard/cge",
+        //     desc: ' Reconcile perception and intention activate system logic and creation.',
+        //     icon: MdOutlineBrandingWatermark
+        // },
+        // {
+        //     title: "Evolution Loop",
+        //     href: "/dashboard/cbc",
+        //     desc: 'Monitor, learn, refine with human-approved improvements.',
+        //     icon: RiLoopRightLine
+        // },
     ],
     secondaryNav: [
         // {

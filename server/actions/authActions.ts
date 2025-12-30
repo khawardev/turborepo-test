@@ -16,7 +16,6 @@ export async function login(values: z.infer<typeof loginSchema>) {
     const { success, data, error } = await authRequest("/login", "POST", {
       body: JSON.stringify(values),
     });
-
     if (!success) return { success: false, message: error };
 
     const cookieStore = await cookies();

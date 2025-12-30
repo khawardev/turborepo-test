@@ -6,7 +6,8 @@ export default async function WebsiteScrapsServer({ brandName, brand_id }: { bra
     const user = await getCurrentUser();
   
     const previousWebsiteScraps:any = await getpreviousWebsiteScraps(brand_id);
-    const websiteScrapeBatchPromises = previousWebsiteScraps.map(
+    const safeScraps = Array.isArray(previousWebsiteScraps) ? previousWebsiteScraps : [];
+    const websiteScrapeBatchPromises = safeScraps.map(
         async (scrape: any) => await getscrapeBatchWebsite(brand_id, scrape.batch_id)
     );
     const websiteScrapeBatchResults = await Promise.all(websiteScrapeBatchPromises);

@@ -18,7 +18,7 @@ export function DashboardLayoutHeading({ title, subtitle }: any) {
     return (
         <>
             <DashboardInnerLayout>
-                <h1 className="text-3xl font-bold mb-2 capitalize">{title}</h1>
+                <h1 className="text-3xl font-medium mb-2 tracking-tighter capitalize">{title}</h1>
                 <p className="text-muted-foreground text-xl">{subtitle}</p>
             </DashboardInnerLayout>
             <Separator />
@@ -38,7 +38,6 @@ export const DashboardHeader = ({ title, subtitle }: any) => {
     )
 }
 
-
 export function DashboardHeaderBlock({ title, subtitle, buttonLabel, buttonHref }: any) {
     return (
         <DashboardInnerLayout>
@@ -56,4 +55,4 @@ export function DashboardHeaderBlock({ title, subtitle, buttonLabel, buttonHref 
             </BlurDelay>
         </DashboardInnerLayout>
     )
-}   
+}

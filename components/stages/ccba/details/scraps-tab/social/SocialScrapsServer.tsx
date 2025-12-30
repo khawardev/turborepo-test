@@ -11,7 +11,6 @@ export default async function SocialScrapsServer({ brandName, brand_id }: { bran
     );
     const socialScrapeBatchResults = await Promise.all(socialScrapeBatchPromises);
     const validSocialScrapeData = socialScrapeBatchResults.filter(data => data);
-
     return (
         <SocialScraps
             allSocialScrapsData={validSocialScrapeData}

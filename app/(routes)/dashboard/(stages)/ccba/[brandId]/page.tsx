@@ -10,6 +10,7 @@ import ScrapDataViewerSkeleton from '../../../../../../components/stages/ccba/de
 import { ReportDataViewerSkeleton } from '../../../../../../components/stages/ccba/details/_components/_skeleton/ReportDataViewerSkeleton';
 import { SCRAPS } from '@/lib/constants';
 import { getBatchWebsiteReports } from '@/server/actions/ccba/website/websiteReportActions';
+import { getpreviousWebsiteScraps } from '@/server/actions/ccba/website/websiteScrapeActions';
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
 
@@ -22,8 +23,9 @@ export default async function BrandDetailPage({
 
   const brandData = await getBrandbyIdWithCompetitors(brandId);
   const websiteReportData = await getBatchWebsiteReports(brandId);
+  const websiteScraps = await getpreviousWebsiteScraps(brandId);
   const taskStatusData = await getCcbaTaskStatus(brandId);
-
+console.log("websiteScraps", websiteScraps);
   
 
   const tabs = [
@@ -40,6 +42,8 @@ export default async function BrandDetailPage({
     {
       label: SCRAPS,
       value: 'brand_scraps',
+      disabled: websiteScraps?.[0].status === 'Processing',
+      disabledTooltip: 'Please Capture Data for Website',
       tooltip: 'View Brand & Competitors Captured Data',
       content: (
         <Suspense fallback={<ScrapDataViewerSkeleton />}>

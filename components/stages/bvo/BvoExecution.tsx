@@ -35,13 +35,12 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
     const [currentStep, setCurrentStep] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
-
     const handleToggleAgent = (agentId: string) => {
         setSelectedAgents(prev =>
             prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
         );
     };
-
+    
     const handleStartExecution = () => {
         setIsRunning(true);
         setCurrentStep(0);

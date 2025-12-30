@@ -172,7 +172,6 @@ export default function NewBvoForm({ brands, client_id }: any) {
         }
 
         try {
-          console.log(console.log(Object.fromEntries(formData.entries())), `<-> console.log(Object.fromEntries(formData.entries())) <->`);
 
           const { success, message, data } = await initiateBvoAgenticProcess(selectedBrand.brand_id, formData);
 

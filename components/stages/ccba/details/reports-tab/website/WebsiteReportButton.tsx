@@ -38,7 +38,6 @@ export function WebsiteReportButton({
       toast.error("No batch selected for report generation.")
       return
     }
-    toast.info("Generation may take 20–25 min to complete")
 
     setOpen(false)
     startTransition(() => {

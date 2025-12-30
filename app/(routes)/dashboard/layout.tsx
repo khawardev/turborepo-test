@@ -13,6 +13,7 @@ import { getCurrentUser } from "@/server/actions/authActions"
 import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 import { getBrandbyIdWithCompetitors, getBrands } from "@/server/actions/brandActions"
 import { getBatchSocialReports } from "@/server/actions/ccba/social/socialReportActions";
+import { DashboardInnerLayout } from "@/components/stages/ccba/dashboard/shared/DashboardComponents"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
@@ -62,7 +63,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         </Button>
                     </div>
                 </header>
-                {children}
+                <DashboardInnerLayout>
+                    {children}
+                </DashboardInnerLayout>
             </SidebarInset>
         </SidebarProvider>
     )

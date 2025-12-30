@@ -15,7 +15,6 @@ export default async function SocialAuditTab({ brandId, competitorId }: { brandI
     const latestSocialReport = socialReportsData?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
     reports = latestSocialReport?.brand_reports;
   }
-console.log(reports, `<-> reports <->`);
 
   if (!reports || reports?.length !> 0) {
     return <EmptyStateCard message="No reports are present at the moment." /> 

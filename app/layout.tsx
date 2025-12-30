@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     // ${inter.className} 
     <html lang="en" suppressHydrationWarning>
-      <body className={`relative  victor antialiased `} suppressHydrationWarning>
+      <body className={`relative  ${inter?.className} tracking-tight antialiased `} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />

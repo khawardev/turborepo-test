@@ -81,7 +81,7 @@ export async function getPreviousSocialScrapes(brand_id: string) {
 
         return filtered;
     } catch (error) {
-        console.error("Error fetching previous social scrapes:", error);
+        console.error("Error fetching previous social captures:", error);
         return null;
     }
 }

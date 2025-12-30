@@ -60,9 +60,9 @@ export async function getWebsiteBatchId(brand_id: string) {
 
         if (!success) return null;
 
-        if (!Array.isArray(data) || data.length === 0) return { success: true, data: null };
-        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+        if (!Array.isArray(data) || data.length === 0) return null;
 
+        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
         return latest?.batch_id;
     } catch {
         return null;
@@ -78,7 +78,7 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
         const { success, data, error } = await brandRequest(`/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache');
 
         if (!success) return null;
-        if (!Array.isArray(data) || data.length === 0) return { success: true, data: [] };
+        if (!Array.isArray(data) || data.length === 0) return [];
 
         const filtered = data.map((item: any) => ({
             brand_id: item.brand_id,

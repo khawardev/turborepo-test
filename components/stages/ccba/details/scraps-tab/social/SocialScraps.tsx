@@ -21,7 +21,7 @@ export default function SocialScraps({ allSocialScrapsData, brandName, brand_id 
     const [isDataTransitioning, startDataTransition] = useTransition();
     const [selectedScrapBatchId, setSelectedScrapBatchId] = useState<string | null>(null);
     const [selectedSourceName, setSelectedSourceName] = useState<string>(brandName);
-
+    console.log(allSocialScrapsData,'allSocialScrapsData')
     const sortedScraps = useMemo(() => {
         if (!allSocialScrapsData || allSocialScrapsData.length === 0) return [];
         return [...allSocialScrapsData].sort((a: any, b: any) => new Date(b.scraped_at).getTime() - new Date(a.scraped_at).getTime());
