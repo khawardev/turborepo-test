@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
 
     if (user) {
         if (authPaths.some(p => pathname.startsWith(p)) || !isDashboardPath)
-            return NextResponse.redirect(new URL("/dashboard/ccba", request.url));
+            return NextResponse.redirect(new URL("/dashboard/brandos-v2.1/setup", request.url));
     } else {
         if (isDashboardPath) {
             const res = NextResponse.redirect(new URL("/login", request.url));
