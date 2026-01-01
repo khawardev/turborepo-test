@@ -42,7 +42,7 @@ export function LoginForm({
     const { success, message, data } = await login(values);
     if (!success) return toast.error(message);
 
-    router.push("/dashboard/ccba");
+    router.push("/dashboard/brandos-v2.1/setup");
     toast.success(message);
   }
 
