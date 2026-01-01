@@ -3,10 +3,51 @@
 
 import { AgentState, CorpusManifest, EngagementConfig, EvidenceLedger, GateOutputs, EvidenceItem, CoverageGap, DataQualityFlag, CorpusAdequacy, WebsiteCoverage, ChannelCoverage, UrlExtraction, PostExtraction, ImageExtraction, WebsiteVerbalBedrock, WebsiteVisualBedrock, SocialChannelBedrock, SocialVisualBedrock, BrandPlatform, BrandArchetype, BrandVoice, FactBase, BrandNarrative, ContentStrategy, InternalConsistency, VoiceOfMarket, VisualIdentity, PositioningLandscape, ReportArtifact, CategoryGrammar, TopicOwnership, WhitespaceAnalysis, CompetitorPlaybook, VisualCompetitiveAnalysis } from '@/lib/brandos-v2.1/types';
 import { revalidatePath } from 'next/cache';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
-// Mock storage
-let activeEngagement: EngagementConfig | null = null;
-let activePhaseStatus: AgentState[] = [];
+// --- MOCK PERSISTENCE LAYER ---
+const DB_PATH = path.join(os.tmpdir(), 'brandos_mock_db_v2.json');
+
+type MockDB = {
+    engagements: Record<string, EngagementConfig>;
+    phaseStatus: Record<string, AgentState[]>; // key: engagementId_phase
+    ledger: Record<string, EvidenceLedger>;
+    manifest: Record<string, CorpusManifest>;
+    gateResults: Record<string, GateOutputs>;
+};
+
+function getDB(): MockDB {
+    try {
+        if (fs.existsSync(DB_PATH)) {
+            return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+        }
+    } catch (e) {
+        console.error("Error reading mock DB:", e);
+    }
+    return { engagements: {}, phaseStatus: {}, ledger: {}, manifest: {}, gateResults: {} };
+}
+
+function saveDB(db: MockDB) {
+    try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+    } catch (e) {
+        console.error("Error writing mock DB:", e);
+    }
+}
+
+// Helper to get/set status for a specific engagement and phase
+function getPhaseStatus(engagementId: string, phase: string): AgentState[] {
+    const db = getDB();
+    return db.phaseStatus[`${engagementId}_${phase}`] || [];
+}
+
+function setPhaseStatus(engagementId: string, phase: string, status: AgentState[]) {
+    const db = getDB();
+    db.phaseStatus[`${engagementId}_${phase}`] = status;
+    saveDB(db);
+}
 
 // Helper to generate IDs
 const generateId = (prefix: string) => `${prefix}${Math.floor(Math.random() * 10000).toString().padStart(5, '0')}`;
@@ -14,12 +55,13 @@ const generateId = (prefix: string) => `${prefix}${Math.floor(Math.random() * 10
 export async function createEngagementAction(config: EngagementConfig): Promise<{ success: boolean; engagementId: string; error?: string }> {
   try {
     console.log('Creating Engagement:', config);
-    activeEngagement = config;
-    
-    // Simulate DB delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const engagementId = `eng-${Date.now()}`;
+    
+    // Persist engagement
+    const db = getDB();
+    db.engagements[engagementId] = config;
+    saveDB(db);
+    
     return { success: true, engagementId };
   } catch (error) {
     console.error('Failed to create engagement:', error);
@@ -29,10 +71,12 @@ export async function createEngagementAction(config: EngagementConfig): Promise<
 
 export async function startPhase0Action(engagementId: string) {
   // Initialize agents
-  activePhaseStatus = [
+  const agents: AgentState[] = [
     { id: 'scrapers', name: 'Data Collection Swarm', status: 'running', progress: 0 },
     { id: 'sa-00', name: 'SA-00 Evidence Ledger Builder', status: 'idle', progress: 0 }
   ];
+
+  setPhaseStatus(engagementId, 'phase0', agents);
 
   revalidatePath('/dashboard/brandos-v2.1/phase-0');
   return { success: true };
@@ -45,6 +89,15 @@ export async function pollPhase0StatusAction(engagementId: string): Promise<{
     gateResults?: GateOutputs,
     config?: EngagementConfig | null
 }> {
+  // Retrieve state
+  let activePhaseStatus = getPhaseStatus(engagementId, 'phase0');
+  
+  // Auto-recover if empty state found
+  if (activePhaseStatus.length === 0) {
+      await startPhase0Action(engagementId);
+      activePhaseStatus = getPhaseStatus(engagementId, 'phase0');
+  }
+
   // Simulate progress
   const scrapersIndex = activePhaseStatus.findIndex(a => a.id === 'scrapers');
   if (scrapersIndex > -1) {
@@ -75,20 +128,30 @@ export async function pollPhase0StatusAction(engagementId: string): Promise<{
   
   // If SA-00 complete, return mock data
   let ledger, manifest, gateResults;
+  
+  // Retrieve config
+  const db = getDB();
+  const config = db.engagements[engagementId] || null;
+
   if (activePhaseStatus.find(a => a.id === 'sa-00')?.status === 'completed') {
-    ledger = generateMockLedger(engagementId, activeEngagement);
-    manifest = generateMockManifest(engagementId, activeEngagement, ledger);
+    ledger = generateMockLedger(engagementId, config);
+    manifest = generateMockManifest(engagementId, config, ledger);
     gateResults = generateMockGate0(engagementId, manifest);
   }
 
-  return { agents: activePhaseStatus, ledger, manifest, gateResults, config: activeEngagement };
+  // Save state
+  setPhaseStatus(engagementId, 'phase0', activePhaseStatus);
+
+  return { agents: activePhaseStatus, ledger, manifest, gateResults, config };
 }
+
+// --- PHASE 1 ACTIONS ---
 
 // --- PHASE 1 ACTIONS ---
 
 export async function startPhase1Action(engagementId: string) {
   // Initialize agents for Phase 1 - Expanded to match Inventory
-  activePhaseStatus = [
+  const agents: AgentState[] = [
     // Extraction Agents
     { id: 'oi-01', name: 'OI-01 Website Verbal Extractor', status: 'running', progress: 0 },
     { id: 'oi-02', name: 'OI-02 Visual Extractor', status: 'running', progress: 0 },
@@ -103,6 +166,8 @@ export async function startPhase1Action(engagementId: string) {
     { id: 'comp-04', name: 'COMP-04 Social Visual Compiler', status: 'idle', progress: 0 }
   ];
 
+  setPhaseStatus(engagementId, 'phase1', agents);
+
   revalidatePath('/dashboard/brandos-v2.1/phase-1');
   return { success: true };
 }
@@ -114,6 +179,14 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
     gate1Results?: GateOutputs,
     gate2Results?: GateOutputs
 }> {
+    // Retrieve state
+    let activePhaseStatus = getPhaseStatus(engagementId, 'phase1');
+
+    // Auto-recover
+    if (activePhaseStatus.length === 0) {
+        await startPhase1Action(engagementId);
+        activePhaseStatus = getPhaseStatus(engagementId, 'phase1');
+    }
     
     // Simulate Extraction Progress (OI-01, OI-02, OI-03)
     ['oi-01', 'oi-02', 'oi-03'].forEach(id => {
@@ -172,139 +245,158 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
         bedrocks = generateMockBedrocks(engagementId);
     }
 
+    // Save state
+    setPhaseStatus(engagementId, 'phase1', activePhaseStatus);
+
     return { agents: activePhaseStatus, extractions, bedrocks, gate1Results, gate2Results };
 }
 
 // --- PHASE 2 ACTIONS ---
 
-export async function startPhase2Action(engagementId: string) {
-    // Initialize agents for Phase 2 - Expanded to match Inventory
-    activePhaseStatus = [
-      // Synthesis Agents - Start with those having clear inputs from Phase 1
-      { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'running', progress: 0 },
-      { id: 'oi-12', name: 'OI-12 Content Strategist', status: 'running', progress: 0 },
-      { id: 'oi-14', name: 'OI-14 The Cartographer', status: 'running', progress: 0 },
-      { id: 'oi-15', name: 'OI-15 Comment Miner', status: 'running', progress: 0 },
-      { id: 'oi-16', name: 'OI-16 Visual Identity Synthesizer', status: 'running', progress: 0 },
-      
-      // Dependent Synthesis Agents
-      { id: 'oi-13', name: 'OI-13 The Strategist', status: 'idle', progress: 0 }, // Needs OI-11
-      { id: 'oi-17', name: 'OI-17 Visual Intelligence Analyst', status: 'idle', progress: 0 }, // Needs OI-16
+// --- PHASE 2 ACTIONS ---
 
-      // Report Generators
-      { id: 'rpt-01', name: 'RPT-01 Emergent Brand Report', status: 'idle', progress: 0 }, // After OI-11
-      { id: 'rpt-02', name: 'RPT-02 Channel Audit Report', status: 'running', progress: 0 }, // After COMP-03 (Immediate)
-      { id: 'rpt-03', name: 'RPT-03 Competitive Landscape Report', status: 'idle', progress: 0 }, // After OI-13
-      { id: 'rpt-04', name: 'RPT-04 Consistency Report', status: 'idle', progress: 0 }, // After OI-14
-      { id: 'rpt-05', name: 'RPT-05 Voice of Market Report', status: 'idle', progress: 0 }, // After OI-15
-      { id: 'rpt-06', name: 'RPT-06 Visual Identity Report', status: 'idle', progress: 0 }, // After OI-16
-      { id: 'rpt-07', name: 'RPT-07 Visual Competitive Report', status: 'idle', progress: 0 } // After OI-17
-    ];
-  
-    revalidatePath('/dashboard/brandos-v2.1/phase-2');
-    return { success: true };
+export async function startPhase2Action(engagementId: string) {
+  // Initialize agents for Phase 2 - Expanded to match Inventory
+  const agents: AgentState[] = [
+    // Synthesis Agents - Start with those having clear inputs from Phase 1
+    { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'running', progress: 0 },
+    { id: 'oi-12', name: 'OI-12 Content Strategist', status: 'running', progress: 0 },
+    { id: 'oi-14', name: 'OI-14 The Cartographer', status: 'running', progress: 0 },
+    { id: 'oi-15', name: 'OI-15 Comment Miner', status: 'running', progress: 0 },
+    { id: 'oi-16', name: 'OI-16 Visual Identity Synthesizer', status: 'running', progress: 0 },
+    
+    // Dependent Synthesis Agents
+    { id: 'oi-13', name: 'OI-13 The Strategist', status: 'idle', progress: 0 }, // Needs OI-11
+    { id: 'oi-17', name: 'OI-17 Visual Intelligence Analyst', status: 'idle', progress: 0 }, // Needs OI-16
+
+    // Report Generators
+    { id: 'rpt-01', name: 'RPT-01 Emergent Brand Report', status: 'idle', progress: 0 }, // After OI-11
+    { id: 'rpt-02', name: 'RPT-02 Channel Audit Report', status: 'running', progress: 0 }, // After COMP-03 (Immediate)
+    { id: 'rpt-03', name: 'RPT-03 Competitive Landscape Report', status: 'idle', progress: 0 }, // After OI-13
+    { id: 'rpt-04', name: 'RPT-04 Consistency Report', status: 'idle', progress: 0 }, // After OI-14
+    { id: 'rpt-05', name: 'RPT-05 Voice of Market Report', status: 'idle', progress: 0 }, // After OI-15
+    { id: 'rpt-06', name: 'RPT-06 Visual Identity Report', status: 'idle', progress: 0 }, // After OI-16
+    { id: 'rpt-07', name: 'RPT-07 Visual Competitive Report', status: 'idle', progress: 0 } // After OI-17
+  ];
+
+  setPhaseStatus(engagementId, 'phase2', agents);
+
+  revalidatePath('/dashboard/brandos-v2.1/phase-2');
+  return { success: true };
 }
 
 export async function pollPhase2StatusAction(engagementId: string): Promise<{
-    agents: AgentState[],
-    synthesis?: {
-        fact_base: FactBase;
-        platform: BrandPlatform;
-        archetype: BrandArchetype;
-        brand_narrative: BrandNarrative;
-        brand_voice: BrandVoice;
-        content_strategy: ContentStrategy;
-        internal_consistency: InternalConsistency;
-        voice_of_market: VoiceOfMarket;
-        visual_identity: VisualIdentity;
-    },
-    reports?: ReportArtifact[],
-    gate3Results?: GateOutputs,
-    gate4Results?: GateOutputs
+  agents: AgentState[],
+  synthesis?: {
+      fact_base: FactBase;
+      platform: BrandPlatform;
+      archetype: BrandArchetype;
+      brand_narrative: BrandNarrative;
+      brand_voice: BrandVoice;
+      content_strategy: ContentStrategy;
+      internal_consistency: InternalConsistency;
+      voice_of_market: VoiceOfMarket;
+      visual_identity: VisualIdentity;
+  },
+  reports?: ReportArtifact[],
+  gate3Results?: GateOutputs,
+  gate4Results?: GateOutputs
 }> {
-    
-    // 1. Run Initial Synthesis Agents
-    ['oi-11', 'oi-12', 'oi-14', 'oi-15', 'oi-16', 'rpt-02'].forEach(id => {
-         const agent = activePhaseStatus.find(a => a.id === id);
-         if (agent && agent.status === 'running') {
-             agent.progress = Math.min(agent.progress + 15, 100);
-             if (agent.progress >= 100) agent.status = 'completed';
-         }
-    });
+  
+  // Retrieve state
+  let activePhaseStatus = getPhaseStatus(engagementId, 'phase2');
 
-    // 2. Trigger Secondary Agents
-    if (activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed') {
-        // Trigger OI-13 and RPT-01
-        ['oi-13', 'rpt-01'].forEach(id => {
-            const agent = activePhaseStatus.find(a => a.id === id);
-             if (agent && agent.status === 'idle') agent.status = 'running';
-        });
-    }
+  // Auto-recover
+  if (activePhaseStatus.length === 0) {
+      await startPhase2Action(engagementId);
+      activePhaseStatus = getPhaseStatus(engagementId, 'phase2');
+  }
 
-    if (activePhaseStatus.find(a => a.id === 'oi-16')?.status === 'completed') {
-        // Trigger OI-17 and RPT-06
-        ['oi-17', 'rpt-06'].forEach(id => {
-            const agent = activePhaseStatus.find(a => a.id === id);
-             if (agent && agent.status === 'idle') agent.status = 'running';
-        });
-    }
-    
-    if (activePhaseStatus.find(a => a.id === 'oi-14')?.status === 'completed') {
-         const rpt04 = activePhaseStatus.find(a => a.id === 'rpt-04');
-         if (rpt04 && rpt04.status === 'idle') rpt04.status = 'running';
-    }
+  // 1. Run Initial Synthesis Agents
+  ['oi-11', 'oi-12', 'oi-14', 'oi-15', 'oi-16', 'rpt-02'].forEach(id => {
+       const agent = activePhaseStatus.find(a => a.id === id);
+       if (agent && agent.status === 'running') {
+           agent.progress = Math.min(agent.progress + 15, 100);
+           if (agent.progress >= 100) agent.status = 'completed';
+       }
+  });
 
-     if (activePhaseStatus.find(a => a.id === 'oi-15')?.status === 'completed') {
-         const rpt05 = activePhaseStatus.find(a => a.id === 'rpt-05');
-         if (rpt05 && rpt05.status === 'idle') rpt05.status = 'running';
-    }
+  // 2. Trigger Secondary Agents
+  if (activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed') {
+      // Trigger OI-13 and RPT-01
+      ['oi-13', 'rpt-01'].forEach(id => {
+          const agent = activePhaseStatus.find(a => a.id === id);
+           if (agent && agent.status === 'idle') agent.status = 'running';
+      });
+  }
 
+  if (activePhaseStatus.find(a => a.id === 'oi-16')?.status === 'completed') {
+      // Trigger OI-17 and RPT-06
+      ['oi-17', 'rpt-06'].forEach(id => {
+          const agent = activePhaseStatus.find(a => a.id === id);
+           if (agent && agent.status === 'idle') agent.status = 'running';
+      });
+  }
+  
+  if (activePhaseStatus.find(a => a.id === 'oi-14')?.status === 'completed') {
+       const rpt04 = activePhaseStatus.find(a => a.id === 'rpt-04');
+       if (rpt04 && rpt04.status === 'idle') rpt04.status = 'running';
+  }
 
-    // 3. Run Secondary Agents
-    ['oi-13', 'oi-17', 'rpt-01', 'rpt-06', 'rpt-04', 'rpt-05'].forEach(id => {
-        const agent = activePhaseStatus.find(a => a.id === id);
-         if (agent && agent.status === 'running') {
-             agent.progress = Math.min(agent.progress + 20, 100);
-             if (agent.progress >= 100) agent.status = 'completed';
-         }
-    });
-
-    // 4. Trigger Tertiary Agents (Reports dependent on secondary synthesis)
-    if (activePhaseStatus.find(a => a.id === 'oi-13')?.status === 'completed') {
-         const rpt03 = activePhaseStatus.find(a => a.id === 'rpt-03');
-         if (rpt03 && rpt03.status === 'idle') rpt03.status = 'running';
-    }
-    if (activePhaseStatus.find(a => a.id === 'oi-17')?.status === 'completed') {
-         const rpt07 = activePhaseStatus.find(a => a.id === 'rpt-07');
-         if (rpt07 && rpt07.status === 'idle') rpt07.status = 'running';
-    }
-
-    // 5. Run Tertiary Agents
-     ['rpt-03', 'rpt-07'].forEach(id => {
-        const agent = activePhaseStatus.find(a => a.id === id);
-         if (agent && agent.status === 'running') {
-             agent.progress = Math.min(agent.progress + 20, 100);
-             if (agent.progress >= 100) agent.status = 'completed';
-         }
-    });
+   if (activePhaseStatus.find(a => a.id === 'oi-15')?.status === 'completed') {
+       const rpt05 = activePhaseStatus.find(a => a.id === 'rpt-05');
+       if (rpt05 && rpt05.status === 'idle') rpt05.status = 'running';
+  }
 
 
-    const synthesisDone = activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed';
-    const allDone = activePhaseStatus.every(a => a.status === 'completed');
+  // 3. Run Secondary Agents
+  ['oi-13', 'oi-17', 'rpt-01', 'rpt-06', 'rpt-04', 'rpt-05'].forEach(id => {
+      const agent = activePhaseStatus.find(a => a.id === id);
+       if (agent && agent.status === 'running') {
+           agent.progress = Math.min(agent.progress + 20, 100);
+           if (agent.progress >= 100) agent.status = 'completed';
+       }
+  });
 
-    let gate3Results, gate4Results, synthesis, reports;
+  // 4. Trigger Tertiary Agents (Reports dependent on secondary synthesis)
+  if (activePhaseStatus.find(a => a.id === 'oi-13')?.status === 'completed') {
+       const rpt03 = activePhaseStatus.find(a => a.id === 'rpt-03');
+       if (rpt03 && rpt03.status === 'idle') rpt03.status = 'running';
+  }
+  if (activePhaseStatus.find(a => a.id === 'oi-17')?.status === 'completed') {
+       const rpt07 = activePhaseStatus.find(a => a.id === 'rpt-07');
+       if (rpt07 && rpt07.status === 'idle') rpt07.status = 'running';
+  }
 
-    if (synthesisDone) {
-        gate3Results = generateMockGate3(engagementId);
-        synthesis = generateMockSynthesis(engagementId);
-    }
+  // 5. Run Tertiary Agents
+   ['rpt-03', 'rpt-07'].forEach(id => {
+      const agent = activePhaseStatus.find(a => a.id === id);
+       if (agent && agent.status === 'running') {
+           agent.progress = Math.min(agent.progress + 20, 100);
+           if (agent.progress >= 100) agent.status = 'completed';
+       }
+  });
 
-    if (allDone) {
-        gate4Results = generateMockGate4(engagementId);
-        reports = generateMockReports(engagementId);
-    }
 
-    return { agents: activePhaseStatus, synthesis, reports, gate3Results, gate4Results };
+  const synthesisDone = activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed';
+  const allDone = activePhaseStatus.every(a => a.status === 'completed');
+
+  let gate3Results, gate4Results, synthesis, reports;
+
+  if (synthesisDone) {
+      gate3Results = generateMockGate3(engagementId);
+      synthesis = generateMockSynthesis(engagementId);
+  }
+
+  if (allDone) {
+      gate4Results = generateMockGate4(engagementId);
+      reports = generateMockReports(engagementId);
+  }
+  
+  // Save state
+  setPhaseStatus(engagementId, 'phase2', activePhaseStatus);
+
+  return { agents: activePhaseStatus, synthesis, reports, gate3Results, gate4Results };
 }
 
 
@@ -446,8 +538,8 @@ Client's LinkedIn serves as the primary professional engagement platform. The st
 ---
 
 ## III. Recommendations
-1. **Increase Video Output:** Shift resourcing to produce 2x weekly video clips.
-2. **Humanize the Feed:** Add employee spotlights to counter the "Corporate Ruler" persona.
+1.  **Increase Video Output:** Shift resourcing to produce 2x weekly video clips.
+2.  **Humanize the Feed:** Add employee spotlights to counter the "Corporate Ruler" persona.
 `.trim()
         },
         {
@@ -546,9 +638,10 @@ There is a clear whitespace for a "Human-Centric High Tech" visual style that co
 // --- PHASE 3 (HANDOFF) ACTIONS ---
 
 export async function startHandoffAction(engagementId: string) {
-    activePhaseStatus = [
+    const agents: AgentState[] = [
         { id: 'bridge-01', name: 'BRIDGE-01 BAM Input Pack Generator', status: 'running', progress: 0 }
     ];
+    setPhaseStatus(engagementId, 'handoff', agents);
     revalidatePath('/dashboard/brandos-v2.1/export');
     return { success: true };
 }
@@ -557,6 +650,15 @@ export async function pollHandoffStatusAction(engagementId: string): Promise<{
     agents: AgentState[],
     packageUrl?: string
 }> {
+    // Retrieve state
+    let activePhaseStatus = getPhaseStatus(engagementId, 'handoff');
+
+    // Auto-recover
+    if (activePhaseStatus.length === 0) {
+        await startHandoffAction(engagementId);
+        activePhaseStatus = getPhaseStatus(engagementId, 'handoff');
+    }
+
     const bridge = activePhaseStatus.find(a => a.id === 'bridge-01');
     if (bridge && bridge.status === 'running') {
         bridge.progress = Math.min(bridge.progress + 10, 100);
@@ -567,6 +669,9 @@ export async function pollHandoffStatusAction(engagementId: string): Promise<{
     if (bridge?.status === 'completed') {
         packageUrl = `https://brandos-artifacts.s3.amazonaws.com/${engagementId}/brandos_pack_v2.1.zip`;
     }
+
+    // Save state
+    setPhaseStatus(engagementId, 'handoff', activePhaseStatus);
 
     return { agents: activePhaseStatus, packageUrl };
 }
