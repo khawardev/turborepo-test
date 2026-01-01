@@ -52,12 +52,22 @@ export default function SetupForm() {
     form.setValue('details', {
         engagementName: `Audit Project Alpha ${randomId}`,
         clientName: `Acme Innovations ${randomId}`,
+        clientWebsite: `https://acme-innovations-${randomId}.com`,
+        clientSocials: {
+            linkedin: 'company/acme-inv',
+            twitter: '@acme_inv',
+            instagram: '@acmelife',
+            youtube: '@acmetv',
+            facebook: 'acmeinnovations',
+            tiktok: '@acme_tik'
+        },
         industry: 'Enterprise Software'
     });
     form.setValue('competitors', mockCompetitors);
     form.setValue('channels.linkedin.enabled', true);
     form.setValue('channels.twitter.enabled', true);
     form.setValue('channels.youtube.enabled', true);
+    form.setValue('channels.instagram.enabled', true);
     
     toast.success('Form autofilled with test data');
   };
@@ -109,39 +119,88 @@ export default function SetupForm() {
                 <p className="text-muted-foreground">Enter the core details for this analysis engagement.</p>
             </div>
             
-            <div className="grid gap-8 max-w-2xl">
-                <div className="space-y-3">
-                  <Label htmlFor="engagementName" className="text-base">Engagement Name</Label>
-                  <Input 
-                    id="engagementName" 
-                    className="h-12 text-lg"
-                    placeholder="e.g. Q4 Brand Audit 2025" 
-                    {...form.register('details.engagementName')}
-                  />
-                  {(form.formState.errors as any).details?.engagementName && (
-                    <p className="text-sm text-red-500">{(form.formState.errors as any).details.engagementName.message}</p>
-                  )}
+            <div className="grid lg:grid-cols-2 gap-12 ">
+                {/* Left Column: Core Info */}
+                <div className="space-y-8">
+                     <div className="space-y-3">
+                        <Label htmlFor="engagementName" className="text-base">Engagement Name</Label>
+                        <Input 
+                          id="engagementName" 
+                          className="h-12 text-lg"
+                          placeholder="e.g. Q4 Brand Audit 2025" 
+                          {...form.register('details.engagementName')}
+                        />
+                        {(form.formState.errors as any).details?.engagementName && (
+                          <p className="text-sm text-red-500">{(form.formState.errors as any).details.engagementName.message}</p>
+                        )}
+                     </div>
+                     <div className="space-y-3">
+                        <Label htmlFor="clientName" className="text-base">Client Name</Label>
+                        <Input 
+                          id="clientName" 
+                          className="h-12 text-lg"
+                          placeholder="e.g. Acme Corp" 
+                          {...form.register('details.clientName')}
+                        />
+                        {(form.formState.errors as any).details?.clientName && (
+                          <p className="text-sm text-red-500">{(form.formState.errors as any).details.clientName.message}</p>
+                        )}
+                     </div>
+                     <div className="space-y-3">
+                        <Label htmlFor="industry" className="text-base">Industry <span className="text-muted-foreground font-normal">(Optional)</span></Label>
+                        <Input 
+                          id="industry" 
+                          className="h-12 text-lg"
+                          placeholder="e.g. SaaS, Retail" 
+                          {...form.register('details.industry')}
+                        />
+                     </div>
                 </div>
-                <div className="space-y-3">
-                  <Label htmlFor="clientName" className="text-base">Client Name</Label>
-                  <Input 
-                    id="clientName" 
-                    className="h-12 text-lg"
-                    placeholder="e.g. Acme Corp" 
-                    {...form.register('details.clientName')}
-                  />
-                  {(form.formState.errors as any).details?.clientName && (
-                    <p className="text-sm text-red-500">{(form.formState.errors as any).details.clientName.message}</p>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  <Label htmlFor="industry" className="text-base">Industry <span className="text-muted-foreground font-normal">(Optional)</span></Label>
-                  <Input 
-                    id="industry" 
-                    className="h-12 text-lg"
-                    placeholder="e.g. SaaS, Retail" 
-                    {...form.register('details.industry')}
-                  />
+
+                {/* Right Column: Digital Presence */}
+                <div className="space-y-8">
+                    <div className="space-y-3">
+                        <Label htmlFor="clientWebsite" className="text-base">Client Website</Label>
+                        <Input 
+                          id="clientWebsite" 
+                          className="h-12 text-lg"
+                          placeholder="https://client-domain.com" 
+                          {...form.register('details.clientWebsite')}
+                        />
+                         {(form.formState.errors as any).details?.clientWebsite && (
+                          <p className="text-sm text-red-500">{(form.formState.errors as any).details.clientWebsite.message}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-4 pt-2">
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Client Social Channels</p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">LinkedIn</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.linkedin')} placeholder="company/..." />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">Twitter/X</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.twitter')} placeholder="@handle" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">Instagram</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.instagram')} placeholder="@handle" />
+                            </div>
+                             <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">YouTube</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.youtube')} placeholder="@channel" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">Facebook</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.facebook')} placeholder="page-url" />
+                            </div>
+                             <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground">TikTok</Label>
+                                <Input className="h-10" {...form.register('details.clientSocials.tiktok')} placeholder="@handle" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

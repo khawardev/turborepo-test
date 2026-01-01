@@ -7,13 +7,6 @@
 
 ---
 
-## How to Use This Document
-
-If you need to hand this work to another engineer/LLM, provide this pack and say:
-
-> "We are building Brand OS Phases 0–2. Read the continuation brief first, then follow the agent inventory, schemas, quality gates, and report templates. Do not add new agents or outputs unless you also update the inventory and schemas."
-
----
 
 ## What This Pack Contains
 
@@ -55,14 +48,6 @@ Old `OI-11B / OI-13B / OI-14B / OI-15B / OI-16B / OI-16C` replaced with:
 3) **Channel-specific extraction implemented**
 - `post_extraction.channel_specific` supports LinkedIn / YouTube / Instagram / X / Facebook / TikTok
 - Channel compilers summarize to `channel_characteristics`
-
-4) **Missing schemas added**
-All agent-inventory outputs now have schemas, including:
-- website_visual_bedrock, social_channel_bedrock, social_visual_bedrock
-- fact_base, content_strategy
-- positioning_landscape, category_grammar, topic_ownership, competitor_playbooks
-- visual_identity, visual_competitive_analysis
-- bam_input_pack, gate_outputs
 
 ---
 

@@ -36,6 +36,8 @@ export const channelScopeSchema = z.object({
 export const engagementDetailsSchema = z.object({
   engagementName: z.string().min(3, "Engagement name must be at least 3 characters"),
   clientName: z.string().min(2, "Client name is required"),
+  clientWebsite: z.string().url("Invalid client website URL").optional().or(z.literal('')),
+  clientSocials: socialHandlesSchema.optional(),
   industry: z.string().optional(),
 });
 

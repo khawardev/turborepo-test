@@ -8,27 +8,35 @@ import { AiOutlineKey } from "react-icons/ai";
 
 export const BrandOSConfig: any = {
     mainNav: [
-        // {
-        //     title: "Perception Intelligence",
-        //     href: "/dashboard/ccba",
-        //     desc: 'See how the brand and competitors truly show up.',
-        //     icon: LuBrain
-        // },
         {
-            title: "BrandOS v2.1 (Beta)",
-            href: "#",
-            desc: 'Next Gen Brand Intelligence',
-            icon: RiLoopRightLine,
-            items: [
-                {
-                    title: "Start New Engagement",
-                    href: "/dashboard/brandos-v2.1/setup",
-                },
-                {
-                    title: "Phase 0: Outside-In Audit",
-                    href: "/dashboard/brandos-v2.1/phase-0",
-                }
-            ]
+            title: "Start New Engagement",
+            href: "/dashboard/brandos-v2.1/setup",
+            icon: PiHandshakeDuotone
+        },
+        {
+            title: "Phase 0: Outside-In Audit",
+            href: "/dashboard/brandos-v2.1/phase-0",
+             icon: AiOutlinePieChart
+        },
+        {
+            title: "Phase 1: Extraction & Bio",
+            href: "/dashboard/brandos-v2.1/phase-1",
+             icon: LuBrain
+        },
+        {
+            title: "Phase 2: Syn & Reporting",
+            href: "/dashboard/brandos-v2.1/phase-2",
+             icon: MdOutlineBrandingWatermark
+        },
+        {
+            title: "Comparative Analysis",
+            href: "/dashboard/brandos-v2.1/comparative",
+             icon: RiLoopRightLine
+        },
+        {
+            title: "Export & Handoff",
+            href: "/dashboard/brandos-v2.1/export",
+             icon: AiOutlineKey
         },
         // {
         //     title: "Intention Intelligence",

@@ -194,8 +194,3 @@ All reports MUST be generated from templates in `Brand_OS_Report_Templates_v2.md
   - any statement likely to be challenged
 
 ---
-
-## 7) Versioning
-
-- Machine-layer schemas use `schema_version: "2.0.0"` for backwards compatibility with existing datasets.
-- Document pack version is **2.1** to reflect remediations (missing schemas, sentiment, channel-specific support, report agent IDs).

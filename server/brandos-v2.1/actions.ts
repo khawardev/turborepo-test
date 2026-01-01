@@ -1,7 +1,7 @@
 
 'use server'
 
-import { AgentState, CorpusManifest, EngagementConfig, EvidenceLedger, GateOutputs, EvidenceItem, CoverageGap, DataQualityFlag, CorpusAdequacy, WebsiteCoverage, ChannelCoverage } from '@/lib/brandos-v2.1/types';
+import { AgentState, CorpusManifest, EngagementConfig, EvidenceLedger, GateOutputs, EvidenceItem, CoverageGap, DataQualityFlag, CorpusAdequacy, WebsiteCoverage, ChannelCoverage, UrlExtraction, PostExtraction, WebsiteVerbalBedrock, SocialChannelBedrock, BrandPlatform, BrandArchetype, BrandVoice, PositioningLandscape, ReportArtifact } from '@/lib/brandos-v2.1/types';
 import { revalidatePath } from 'next/cache';
 
 // Mock storage
@@ -80,10 +80,175 @@ export async function pollPhase0StatusAction(engagementId: string): Promise<{
     gateResults = generateMockGate0(engagementId, manifest);
   }
 
+
   return { agents: activePhaseStatus, ledger, manifest, gateResults };
 }
 
+// --- PHASE 1 ACTIONS ---
+
+export async function startPhase1Action(engagementId: string) {
+  // Initialize agents for Phase 1
+  activePhaseStatus = [
+    { id: 'oi-01', name: 'OI-01 Website Verbal Extractor', status: 'running', progress: 0 },
+    { id: 'oi-02', name: 'OI-02 Visual Extractor', status: 'running', progress: 0 },
+    { id: 'oi-03', name: 'OI-03 Social Post Extractor', status: 'running', progress: 0 },
+    { id: 'comp-01', name: 'COMP-01 Website Verbal Compiler', status: 'idle', progress: 0 },
+    { id: 'comp-03', name: 'COMP-03 Social Channel Compiler', status: 'idle', progress: 0 }
+  ];
+
+  revalidatePath('/dashboard/brandos-v2.1/phase-1');
+  return { success: true };
+}
+
+export async function pollPhase1StatusAction(engagementId: string): Promise<{
+    agents: AgentState[],
+    extractions?: { url: UrlExtraction[], posts: PostExtraction[] },
+    bedrocks?: { website: WebsiteVerbalBedrock, social: SocialChannelBedrock },
+    gate1Results?: GateOutputs,
+    gate2Results?: GateOutputs
+}> {
+    
+    // Simulate Extraction Progress
+    ['oi-01', 'oi-02', 'oi-03'].forEach(id => {
+        const agent = activePhaseStatus.find(a => a.id === id);
+        if (agent && agent.status === 'running') {
+            agent.progress = Math.min(agent.progress + 20, 100);
+            if (agent.progress >= 100) agent.status = 'completed';
+        }
+    });
+
+    // Gate 1 Check (Runs after extractions)
+    const extractionsDone = ['oi-01', 'oi-02', 'oi-03'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
+    let gate1Results;
+
+    if (extractionsDone) {
+        gate1Results = generateMockGate1(engagementId);
+        
+        // Trigger Compilers
+        ['comp-01', 'comp-03'].forEach(id => {
+            const agent = activePhaseStatus.find(a => a.id === id);
+            if (agent && agent.status === 'idle') agent.status = 'running';
+        });
+    }
+
+    // Simulate Compilation Progress
+    ['comp-01', 'comp-03'].forEach(id => {
+        const agent = activePhaseStatus.find(a => a.id === id);
+        if (agent && agent.status === 'running') {
+            agent.progress = Math.min(agent.progress + 20, 100);
+            if (agent.progress >= 100) agent.status = 'completed';
+        }
+    });
+
+    // Gate 2 Check (Runs after compilations)
+    const compilationsDone = ['comp-01', 'comp-03'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
+    let gate2Results, extractions, bedrocks;
+
+    if (compilationsDone) {
+        gate2Results = generateMockGate2(engagementId);
+        extractions = generateMockExtractions(engagementId);
+        bedrocks = generateMockBedrocks(engagementId);
+    }
+
+    return { agents: activePhaseStatus, extractions, bedrocks, gate1Results, gate2Results };
+}
+
+// --- PHASE 2 ACTIONS ---
+
+export async function startPhase2Action(engagementId: string) {
+    // Initialize agents for Phase 2
+    activePhaseStatus = [
+      { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'running', progress: 0 },
+      { id: 'oi-13', name: 'OI-13 The Strategist', status: 'idle', progress: 0 }, // Wait for OI-11
+      { id: 'rpt-01', name: 'RPT-01 Report Generator', status: 'idle', progress: 0 }
+    ];
+  
+    revalidatePath('/dashboard/brandos-v2.1/phase-2');
+    return { success: true };
+}
+
+export async function pollPhase2StatusAction(engagementId: string): Promise<{
+    agents: AgentState[],
+    synthesis?: { platform: BrandPlatform, archetype: BrandArchetype },
+    reports?: ReportArtifact[],
+    gate3Results?: GateOutputs,
+    gate4Results?: GateOutputs
+}> {
+    
+    // Simulate Synthesis (OI-11)
+    const archaeologist = activePhaseStatus.find(a => a.id === 'oi-11');
+    if (archaeologist && archaeologist.status === 'running') {
+        archaeologist.progress = Math.min(archaeologist.progress + 15, 100);
+        if (archaeologist.progress >= 100) {
+            archaeologist.status = 'completed';
+            // Trigger Strategist and Report
+            const strat = activePhaseStatus.find(a => a.id === 'oi-13');
+            if (strat) strat.status = 'running';
+             const rpt = activePhaseStatus.find(a => a.id === 'rpt-01');
+            if (rpt) rpt.status = 'running';
+        }
+    }
+
+    // Simulate OI-13 and RPT-01
+    ['oi-13', 'rpt-01'].forEach(id => {
+        const agent = activePhaseStatus.find(a => a.id === id);
+        if (agent && agent.status === 'running') {
+            agent.progress = Math.min(agent.progress + 20, 100);
+            if (agent.progress >= 100) agent.status = 'completed';
+        }
+    });
+
+    const synthesisDone = activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed';
+    const allDone = activePhaseStatus.every(a => a.status === 'completed');
+
+    let gate3Results, gate4Results, synthesis, reports;
+
+    if (synthesisDone) {
+        gate3Results = generateMockGate3(engagementId);
+        synthesis = generateMockSynthesis(engagementId);
+    }
+
+    if (allDone) {
+        gate4Results = generateMockGate4(engagementId);
+        reports = generateMockReports(engagementId);
+    }
+
+    return { agents: activePhaseStatus, synthesis, reports, gate3Results, gate4Results };
+}
+
+
+
+// --- FLOW E & F ACTIONS ---
+
+export async function getComparativeDataAction(engagementId: string): Promise<PositioningLandscape | null> {
+    // Return mock comparative data
+    return {
+        schema_version: "2.0.0",
+        generated_at: new Date().toISOString(),
+        matrix: [
+            { entity: "Client", positioning: "Secure AI Leader", market_share_proxy: 0.15 },
+            { entity: "Competitor A", positioning: "Legacy Enterprise", market_share_proxy: 0.45 },
+            { entity: "Competitor B", positioning: "Cheap Alternative", market_share_proxy: 0.20 }
+        ]
+    };
+}
+
+export async function generateExportPackageAction(engagementId: string): Promise<{ downloadUrl: string, files: string[] }> {
+    // Simulate BRIDGE-01 execution
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return {
+        downloadUrl: `https://brandos-artifacts.s3.amazonaws.com/${engagementId}/brandos_pack_v2.1.zip`,
+        files: [
+            "bam_input_pack.json",
+            "emergent_brand_report.pdf",
+            "visual_identity_report.pdf",
+            "gate_outputs.json"
+        ]
+    };
+}
+
 // --- MOCK GENERATORS ---
+
 
 function generateMockLedger(engagementId: string, config: EngagementConfig | null): EvidenceLedger {
     const evidenceItems: EvidenceItem[] = [];
@@ -96,16 +261,20 @@ function generateMockLedger(engagementId: string, config: EngagementConfig | nul
     
     entities.forEach(entity => {
         let entityCount = 0;
+        const isClient = config && entity === config.details.clientName;
+        const clientWebsite = isClient ? config.details.clientWebsite : null;
+        const clientSocials = isClient ? config.details.clientSocials : null;
 
         // 1. Webpage Evidence
         const webCount = 2; 
         for (let i = 0; i < webCount; i++) {
+            const baseUrl = clientWebsite || `https://${entity.toLowerCase().replace(/\s/g, '')}.com`;
             evidenceItems.push({
                 evidence_id: `E${10000 + count}`,
                 source_type: 'webpage',
                 source_channel: 'website',
                 source_entity: entity,
-                source_url: `https://${entity.toLowerCase().replace(/\s/g, '')}.com/about`,
+                source_url: `${baseUrl.replace(/\/$/, '')}/about`,
                 source_timestamp: new Date(Date.now() - 86400000 * (i + 1)).toISOString(),
                 content_type: 'text',
                 excerpt: `The new AI-driven platform promises to revolutionize how enterprises handle data security, with a 99.9% reduction in false positives observed during the beta phase.`,
@@ -126,34 +295,46 @@ function generateMockLedger(engagementId: string, config: EngagementConfig | nul
             evidenceByType.webpage++;
         }
 
-        // 2. Social Post Evidence (LinkedIn)
-        const socialCount = 3;
-        for (let i = 0; i < socialCount; i++) {
-            evidenceItems.push({
-                evidence_id: `E${10000 + count}`,
-                source_type: 'social_post',
-                source_channel: 'linkedin',
-                source_entity: entity,
-                source_url: `https://linkedin.com/post/${entity}-update-${i}`,
-                source_timestamp: new Date(Date.now() - 43200000 * (i + 1)).toISOString(),
-                content_type: 'mixed',
-                excerpt: `We are thrilled to announce our Q3 results! Revenue is up 20% YoY. A huge thank you to our dedicated team and loyal customers. #Growth #Innovation`,
-                full_content_uri: `s3://evidence-bucket/runs/${engagementId}/${entity}/li-${i}.json`,
-                extraction_date: new Date().toISOString(),
-                metadata: {
-                    likes: 450 + (i * 50),
-                    shares: 32 + i,
-                    sentiment: {
-                        polarity: { score: 0.95, label: "very_positive" },
-                        emotional_tone: { primary: "enthusiastic", intensity: "high" },
-                        subjectivity: { score: 0.8, label: "subjective" }
+        // 2. Social Post Evidence (Dynamic based on settings)
+        const channelsToGen = ['linkedin', 'twitter', 'instagram'];
+        
+        channelsToGen.forEach((channel) => {
+             // Only generate if we have a handle or it's a competitor (mock)
+             const handle = clientSocials ? (clientSocials as any)[channel] : null;
+             if (isClient && !handle) return; 
+
+             const socialCount = 2; // Generate 2 posts per channel
+             for (let i = 0; i < socialCount; i++) {
+                const socialUrl = handle 
+                    ? `https://${channel}.com/${handle.replace('@', '')}/status/${1000+i}`
+                    : `https://${channel}.com/${entity}/status/${1000+i}`;
+
+                evidenceItems.push({
+                    evidence_id: `E${10000 + count}`,
+                    source_type: 'social_post',
+                    source_channel: channel as any,
+                    source_entity: entity,
+                    source_url: socialUrl,
+                    source_timestamp: new Date(Date.now() - 43200000 * (i + 1)).toISOString(),
+                    content_type: 'mixed',
+                    excerpt: `We are thrilled to announce our Q3 results! #Growth #Innovation`,
+                    full_content_uri: `s3://evidence-bucket/runs/${engagementId}/${entity}/${channel}-${i}.json`,
+                    extraction_date: new Date().toISOString(),
+                    metadata: {
+                        likes: 450 + (i * 50),
+                        shares: 32 + i,
+                        sentiment: {
+                            polarity: { score: 0.95, label: "very_positive" },
+                            emotional_tone: { primary: "enthusiastic", intensity: "high" },
+                            subjectivity: { score: 0.8, label: "subjective" }
+                        }
                     }
-                }
-            });
-            count++;
-            entityCount++;
-            evidenceByType.social_post++;
-        }
+                });
+                count++;
+                entityCount++;
+                evidenceByType.social_post++;
+             }
+        });
 
         // 3. Comment Evidence (Negative example for variety)
         evidenceItems.push({
@@ -373,3 +554,220 @@ function generateMockGate0(engagementId: string, manifest: CorpusManifest): Gate
         ]
     };
 }
+
+function generateMockGate1(engagementId: string): GateOutputs {
+    return {
+        schema_version: "2.0.0",
+        generated_at: new Date().toISOString(),
+        engagement_id: engagementId,
+        overall_status: 'pass',
+        gates: [
+            {
+                gate_id: "GATE-1-1",
+                name: "Extraction Quality",
+                status: 'pass',
+                messages: ["All URLs extracted with >95% success rate"],
+                affected_files: ["url_extractions"]
+            }
+        ]
+    };
+}
+
+function generateMockGate2(engagementId: string): GateOutputs {
+    return {
+        schema_version: "2.0.0",
+        generated_at: new Date().toISOString(),
+        engagement_id: engagementId,
+        overall_status: 'pass',
+        gates: [
+            {
+                gate_id: "GATE-2-1",
+                name: "Compilation Integrity",
+                status: 'pass',
+                messages: ["Bedrocks aggregated successfully"],
+                affected_files: ["bedrocks"]
+            }
+        ]
+    };
+}
+
+function generateMockExtractions(engagementId: string): { url: UrlExtraction[], posts: PostExtraction[] } {
+    return {
+        url: [
+            {
+                url_id: "URL-001",
+                evidence_id: "E10001",
+                url: "https://example.com/about",
+                page_type: "about",
+                text_content: "About us...",
+                metadata: { word_count: 500 }
+            }
+        ],
+        posts: []
+    };
+}
+
+function generateMockBedrocks(engagementId: string): { website: WebsiteVerbalBedrock, social: SocialChannelBedrock } {
+    return {
+        website: {
+            schema_version: "2.0.0",
+            generated_at: new Date().toISOString(),
+            entity: "Client",
+            channel: "website",
+            corpus_summary: { pages_analyzed: 50, total_words: 25000 },
+            linguistic_metrics: { avg_sentence_length: 15, reading_level_grade: 10 },
+            lexical_frequency: { top_nouns: [{ word: "innovation", count: 120 }] },
+            key_themes: [{ theme: "Sustainability", frequency: 45 }]
+        },
+        social: {
+            schema_version: "2.0.0",
+            generated_at: new Date().toISOString(),
+            entity: "Client",
+            channel: "linkedin",
+            corpus_summary: { post_count: 120 },
+            content_mix: { by_format: [{ format: "video", share: 0.4 }] },
+            sentiment_summary: { avg_polarity_score: 0.8 },
+            themes: [{ theme: "Leadership", share: 0.3 }]
+        }
+    };
+}
+
+function generateMockGate3(engagementId: string): GateOutputs {
+    return {
+        schema_version: "2.0.0",
+        generated_at: new Date().toISOString(),
+        engagement_id: engagementId,
+        overall_status: 'warn',
+        gates: [
+            {
+                gate_id: "gate_3",
+                name: "Synthesis Credibility",
+                status: 'warn',
+                messages: [
+                    "Confidence Summary: Avg 0.78, Min 0.52",
+                    "Evidence Density: 0.92 (Good)",
+                    "WARN: Vision confidence 0.52 (Threshold: 0.60) - Limited future-oriented content",
+                    "PASS: Mission confidence 0.90",
+                    "PASS: Values confidence 0.92"
+                ]
+            }
+        ]
+    };
+}
+
+function generateMockGate4(engagementId: string): GateOutputs {
+    return {
+        schema_version: "2.0.0",
+        generated_at: new Date().toISOString(),
+        engagement_id: engagementId,
+        overall_status: 'pass',
+        gates: [
+            {
+                gate_id: "gate_4",
+                name: "Report Quality",
+                status: 'pass',
+                messages: [
+                    "PASS: Structural Completeness (All sections present)",
+                    "PASS: Evidence Citation Density (1.2 per 200 words)",
+                    "PASS: No bullet points in narrative sections",
+                    "PASS: Numbers match JSON source of truth"
+                ]
+            }
+        ]
+    };
+}
+
+function generateMockSynthesis(engagementId: string): { platform: BrandPlatform, archetype: BrandArchetype } {
+    return {
+        platform: {
+            schema_version: "2.0.0",
+            generated_at: new Date().toISOString(),
+            entity: "Client",
+            mission: { 
+                synthesized: "To revolutionize the industry through secure AI adoption.", 
+                confidence: 0.9,
+                evidence_ids: ["E00101", "E00234"]
+            },
+            vision: { 
+                synthesized: "A world where data is secure and intelligence is accessible.", 
+                confidence: 0.85, 
+                evidence_ids: ["E00342"]
+            },
+            values: { 
+                synthesized: [
+                    { value: "Integrity", description: "Doing the right thing, always.", confidence: 0.95, evidence_ids: ["E00991"] },
+                    { value: "Innovation", description: "Pushing boundaries of what is possible.", confidence: 0.88, evidence_ids: ["E00992"] },
+                    { value: "Security", description: "Protecting what matters most.", confidence: 0.92, evidence_ids: ["E00993"] }
+                ] 
+            },
+            positioning: { 
+                synthesized: "The leader in secure AI for enterprise.", 
+                confidence: 0.88,
+                evidence_ids: ["E00551", "E00552"]
+            },
+            tagline: { synthesized_alternative: "Secure AI for Everyone." },
+            key_themes: [
+                { name: "Safety First", score: 0.35, evidence_ids: ["E00111", "E00112"] },
+                { name: "Enterprise Scale", score: 0.25, evidence_ids: ["E00113"] },
+                { name: "Future Ready", score: 0.20, evidence_ids: ["E00114"] },
+                { name: "Compliance", score: 0.15, evidence_ids: ["E00115"] }
+            ]
+        },
+        archetype: {
+            schema_version: "2.0.0",
+            generated_at: new Date().toISOString(),
+            entity: "Client",
+            primary_archetype: { name: "The Sage", score: 0.8, description: "Driven by the search for truth and knowledge." },
+            secondary_archetype: { name: "The Ruler", score: 0.15, description: "Focused on control and stability." }
+        }
+    };
+}
+
+function generateMockReports(engagementId: string): ReportArtifact[] {
+    return [
+        {
+            report_type: "Emergent Brand Report",
+            entity: "Client",
+            generated_at: new Date().toISOString(),
+            markdown_content: `# Emergent Brand Strategy Report
+**Client:** Client Inc.
+**Date:** ${new Date().toLocaleDateString()}
+**Confidence Score:** High (0.87)
+
+## 1. Executive Summary
+The synthesis of over 850 artifacts reveals a brand positioned as a "Secure AI Leader." While the stated mission emphasizes innovation, the *emergent* market perception is heavily anchored in "reliability" and "trust."
+
+## 2. Brand Platform (Synthesized)
+* **Mission:** To revolutionize the industry through secure AI adoption.
+* **Vision:** A world where data is secure and intelligence is accessible.
+* **Core Values:** Integrity, Innovation, Security.
+
+## 3. Archetypal Analysis
+The brand exhibits a primary **Sage** archetype (seeking truth/wisdom) with secondary **Ruler** traits (exercising control/stability). This combination creates a voice that is authoritative yet educational.
+
+## 4. Strategic Recommendations
+1. **Capitalize on Trust:** Your "security" perception is a massive differentiator. Lean into it.
+2. **Humanize the Voice:** The "Ruler" traits can feel cold. Incorporate more "Creator" energy in social channels.
+            `
+        },
+        {
+            report_type: "Visual Competitive Analysis",
+            entity: "Cross-Entity",
+            generated_at: new Date().toISOString(),
+            markdown_content: `# Visual Competitive Landscape
+
+## Overview
+Visual analysis of 1,200+ images across Client and 3 Competitors identifies distinct visual territories.
+
+## Territories
+* **Client:** "Industrial Blue" - Heavy use of cool tones, machinery, and posed engineering shots.
+* **Competitor A:** "Lifestyle Warmth" - Focus on end-users, warm lighting, natural settings.
+* **Competitor B:** "Abstract Tech" - Stock imagery, neon gradients, minimal human presence.
+
+## Gap Analysis
+There is a clear whitespace for a "Human-Centric High Tech" visual style that combines the reliability of the Client's industry focus with the warmth of Competitor A.
+            `
+        }
+    ];
+}
+
