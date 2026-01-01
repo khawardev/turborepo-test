@@ -4,7 +4,7 @@ import { Icons } from './Icons'
 export const ButtonSpinner = ({children}: {children: ReactNode}) => {
   return (
     <div className='flex items-center gap-2'>
-      <Icons.loading className="dark:text-primary-foreground text-primary size-3 animate-spin" /> {children}
+      <Icons.loading className="size-3 animate-spin" /> {children}
     </div>
   )
 }

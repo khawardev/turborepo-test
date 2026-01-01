@@ -18,7 +18,7 @@ import { DashboardInnerLayout } from "@/components/stages/ccba/dashboard/shared/
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
     const brandsData = await getBrands();
-    
+
     let brandsWithCompetitors = [];
     if (brandsData && brandsData.length > 0) {
         brandsWithCompetitors = await Promise.all(
@@ -45,27 +45,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <div className="flex items-center gap-2 mr-auto">
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="h-7" />
-                        <TeamDropdown />
+                        {/* <TeamDropdown /> */}
                     </div>
                     <div className="flex items-center gap-2">
                         <ThemeSwitcher />
-                        <Button variant="ghost" size="icon" className="relative">
-                            <Bell className="size-4" />
-                            <span className="absolute top-2 right-2 size-2 rounded-full bg-primary  border"></span>
-                        </Button>
-                        <Button variant="ghost" >
-                            <CircleHelp className="size-4" />
-                            Help
-                        </Button>
                         <Button  >
                             <Plus />
                             Upgrade
                         </Button>
                     </div>
                 </header>
-                <DashboardInnerLayout>
-                    {children}
-                </DashboardInnerLayout>
+
+                {children}
             </SidebarInset>
         </SidebarProvider>
     )

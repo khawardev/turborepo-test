@@ -1,7 +1,7 @@
 import { PiHandshakeDuotone } from "react-icons/pi";
 import { MdOutlineBrandingWatermark } from "react-icons/md";
 import { RiLoopRightLine } from "react-icons/ri";
-import { LuBrain } from "react-icons/lu";
+import { LuBrain, LuFingerprint, LuShare } from "react-icons/lu";
 import { AiOutlineSetting } from "react-icons/ai";
 import { AiOutlinePieChart } from "react-icons/ai";
 import { AiOutlineKey } from "react-icons/ai";
@@ -14,29 +14,29 @@ export const BrandOSConfig: any = {
             icon: PiHandshakeDuotone
         },
         {
-            title: "Phase 0: Outside-In Audit",
+            title: "Phase 0 Outside-In Audit",
             href: "/dashboard/brandos-v2.1/phase-0",
-             icon: AiOutlinePieChart
+            icon: LuBrain
         },
         {
-            title: "Phase 1: Extraction & Bio",
+            title: "Phase 1 Extraction & Bio",
             href: "/dashboard/brandos-v2.1/phase-1",
-             icon: LuBrain
+            icon: LuFingerprint
         },
         {
-            title: "Phase 2: Syn & Reporting",
+            title: "Phase 2A Syn & Reporting",
             href: "/dashboard/brandos-v2.1/phase-2",
-             icon: MdOutlineBrandingWatermark
+             icon: RiLoopRightLine
         },
         {
-            title: "Comparative Analysis",
+            title: "Phase 2B Comparative Analysis",
             href: "/dashboard/brandos-v2.1/comparative",
-             icon: RiLoopRightLine
+            icon: MdOutlineBrandingWatermark
         },
         {
             title: "Export & Handoff",
             href: "/dashboard/brandos-v2.1/export",
-             icon: AiOutlineKey
+             icon: LuShare
         },
         // {
         //     title: "Intention Intelligence",

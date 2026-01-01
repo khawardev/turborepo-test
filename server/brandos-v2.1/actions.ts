@@ -1,7 +1,7 @@
 
 'use server'
 
-import { AgentState, CorpusManifest, EngagementConfig, EvidenceLedger, GateOutputs, EvidenceItem, CoverageGap, DataQualityFlag, CorpusAdequacy, WebsiteCoverage, ChannelCoverage, UrlExtraction, PostExtraction, WebsiteVerbalBedrock, SocialChannelBedrock, BrandPlatform, BrandArchetype, BrandVoice, PositioningLandscape, ReportArtifact } from '@/lib/brandos-v2.1/types';
+import { AgentState, CorpusManifest, EngagementConfig, EvidenceLedger, GateOutputs, EvidenceItem, CoverageGap, DataQualityFlag, CorpusAdequacy, WebsiteCoverage, ChannelCoverage, UrlExtraction, PostExtraction, ImageExtraction, WebsiteVerbalBedrock, WebsiteVisualBedrock, SocialChannelBedrock, SocialVisualBedrock, BrandPlatform, BrandArchetype, BrandVoice, FactBase, BrandNarrative, ContentStrategy, InternalConsistency, VoiceOfMarket, VisualIdentity, PositioningLandscape, ReportArtifact, CategoryGrammar, TopicOwnership, WhitespaceAnalysis, CompetitorPlaybook, VisualCompetitiveAnalysis } from '@/lib/brandos-v2.1/types';
 import { revalidatePath } from 'next/cache';
 
 // Mock storage
@@ -42,7 +42,8 @@ export async function pollPhase0StatusAction(engagementId: string): Promise<{
     agents: AgentState[], 
     ledger?: EvidenceLedger, 
     manifest?: CorpusManifest,
-    gateResults?: GateOutputs 
+    gateResults?: GateOutputs,
+    config?: EngagementConfig | null
 }> {
   // Simulate progress
   const scrapersIndex = activePhaseStatus.findIndex(a => a.id === 'scrapers');
@@ -80,20 +81,26 @@ export async function pollPhase0StatusAction(engagementId: string): Promise<{
     gateResults = generateMockGate0(engagementId, manifest);
   }
 
-
-  return { agents: activePhaseStatus, ledger, manifest, gateResults };
+  return { agents: activePhaseStatus, ledger, manifest, gateResults, config: activeEngagement };
 }
 
 // --- PHASE 1 ACTIONS ---
 
 export async function startPhase1Action(engagementId: string) {
-  // Initialize agents for Phase 1
+  // Initialize agents for Phase 1 - Expanded to match Inventory
   activePhaseStatus = [
+    // Extraction Agents
     { id: 'oi-01', name: 'OI-01 Website Verbal Extractor', status: 'running', progress: 0 },
     { id: 'oi-02', name: 'OI-02 Visual Extractor', status: 'running', progress: 0 },
     { id: 'oi-03', name: 'OI-03 Social Post Extractor', status: 'running', progress: 0 },
+    // OI-10 starts after OI-01
+    { id: 'oi-10', name: 'OI-10 Fact Base Extractor', status: 'idle', progress: 0 },
+    
+    // Compilation Agents (Start as idle)
     { id: 'comp-01', name: 'COMP-01 Website Verbal Compiler', status: 'idle', progress: 0 },
-    { id: 'comp-03', name: 'COMP-03 Social Channel Compiler', status: 'idle', progress: 0 }
+    { id: 'comp-02', name: 'COMP-02 Website Visual Compiler', status: 'idle', progress: 0 },
+    { id: 'comp-03', name: 'COMP-03 Social Channel Compiler', status: 'idle', progress: 0 },
+    { id: 'comp-04', name: 'COMP-04 Social Visual Compiler', status: 'idle', progress: 0 }
   ];
 
   revalidatePath('/dashboard/brandos-v2.1/phase-1');
@@ -102,13 +109,13 @@ export async function startPhase1Action(engagementId: string) {
 
 export async function pollPhase1StatusAction(engagementId: string): Promise<{
     agents: AgentState[],
-    extractions?: { url: UrlExtraction[], posts: PostExtraction[] },
-    bedrocks?: { website: WebsiteVerbalBedrock, social: SocialChannelBedrock },
+    extractions?: { url: UrlExtraction[], posts: PostExtraction[], images: ImageExtraction[] },
+    bedrocks?: { website: WebsiteVerbalBedrock, website_visual: WebsiteVisualBedrock, social: SocialChannelBedrock, social_visual: SocialVisualBedrock },
     gate1Results?: GateOutputs,
     gate2Results?: GateOutputs
 }> {
     
-    // Simulate Extraction Progress
+    // Simulate Extraction Progress (OI-01, OI-02, OI-03)
     ['oi-01', 'oi-02', 'oi-03'].forEach(id => {
         const agent = activePhaseStatus.find(a => a.id === id);
         if (agent && agent.status === 'running') {
@@ -117,22 +124,37 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
         }
     });
 
-    // Gate 1 Check (Runs after extractions)
-    const extractionsDone = ['oi-01', 'oi-02', 'oi-03'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
+    // Trigger OI-10 after OI-01 completes
+    if (activePhaseStatus.find(a => a.id === 'oi-01')?.status === 'completed') {
+        const oi10 = activePhaseStatus.find(a => a.id === 'oi-10');
+        if (oi10 && oi10.status === 'idle') oi10.status = 'running';
+    }
+    // Simulate OI-10
+    const oi10 = activePhaseStatus.find(a => a.id === 'oi-10');
+    if (oi10 && oi10.status === 'running') {
+        oi10.progress = Math.min(oi10.progress + 25, 100);
+        if (oi10.progress >= 100) oi10.status = 'completed';
+    }
+
+
+    // Gate 1 Check (Runs after all extraction agents complete)
+    const extractionsDone = ['oi-01', 'oi-02', 'oi-03', 'oi-10'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
     let gate1Results;
 
     if (extractionsDone) {
         gate1Results = generateMockGate1(engagementId);
         
         // Trigger Compilers
-        ['comp-01', 'comp-03'].forEach(id => {
+        // COMP-01 needs OI-01; COMP-02 needs OI-02; COMP-03 needs OI-03; COMP-04 needs OI-02
+        // Since all extractions are done, we can start all compilers
+        ['comp-01', 'comp-02', 'comp-03', 'comp-04'].forEach(id => {
             const agent = activePhaseStatus.find(a => a.id === id);
             if (agent && agent.status === 'idle') agent.status = 'running';
         });
     }
 
     // Simulate Compilation Progress
-    ['comp-01', 'comp-03'].forEach(id => {
+    ['comp-01', 'comp-02', 'comp-03', 'comp-04'].forEach(id => {
         const agent = activePhaseStatus.find(a => a.id === id);
         if (agent && agent.status === 'running') {
             agent.progress = Math.min(agent.progress + 20, 100);
@@ -141,7 +163,7 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
     });
 
     // Gate 2 Check (Runs after compilations)
-    const compilationsDone = ['comp-01', 'comp-03'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
+    const compilationsDone = ['comp-01', 'comp-02', 'comp-03', 'comp-04'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
     let gate2Results, extractions, bedrocks;
 
     if (compilationsDone) {
@@ -156,11 +178,27 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
 // --- PHASE 2 ACTIONS ---
 
 export async function startPhase2Action(engagementId: string) {
-    // Initialize agents for Phase 2
+    // Initialize agents for Phase 2 - Expanded to match Inventory
     activePhaseStatus = [
+      // Synthesis Agents - Start with those having clear inputs from Phase 1
       { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'running', progress: 0 },
-      { id: 'oi-13', name: 'OI-13 The Strategist', status: 'idle', progress: 0 }, // Wait for OI-11
-      { id: 'rpt-01', name: 'RPT-01 Report Generator', status: 'idle', progress: 0 }
+      { id: 'oi-12', name: 'OI-12 Content Strategist', status: 'running', progress: 0 },
+      { id: 'oi-14', name: 'OI-14 The Cartographer', status: 'running', progress: 0 },
+      { id: 'oi-15', name: 'OI-15 Comment Miner', status: 'running', progress: 0 },
+      { id: 'oi-16', name: 'OI-16 Visual Identity Synthesizer', status: 'running', progress: 0 },
+      
+      // Dependent Synthesis Agents
+      { id: 'oi-13', name: 'OI-13 The Strategist', status: 'idle', progress: 0 }, // Needs OI-11
+      { id: 'oi-17', name: 'OI-17 Visual Intelligence Analyst', status: 'idle', progress: 0 }, // Needs OI-16
+
+      // Report Generators
+      { id: 'rpt-01', name: 'RPT-01 Emergent Brand Report', status: 'idle', progress: 0 }, // After OI-11
+      { id: 'rpt-02', name: 'RPT-02 Channel Audit Report', status: 'running', progress: 0 }, // After COMP-03 (Immediate)
+      { id: 'rpt-03', name: 'RPT-03 Competitive Landscape Report', status: 'idle', progress: 0 }, // After OI-13
+      { id: 'rpt-04', name: 'RPT-04 Consistency Report', status: 'idle', progress: 0 }, // After OI-14
+      { id: 'rpt-05', name: 'RPT-05 Voice of Market Report', status: 'idle', progress: 0 }, // After OI-15
+      { id: 'rpt-06', name: 'RPT-06 Visual Identity Report', status: 'idle', progress: 0 }, // After OI-16
+      { id: 'rpt-07', name: 'RPT-07 Visual Competitive Report', status: 'idle', progress: 0 } // After OI-17
     ];
   
     revalidatePath('/dashboard/brandos-v2.1/phase-2');
@@ -169,34 +207,87 @@ export async function startPhase2Action(engagementId: string) {
 
 export async function pollPhase2StatusAction(engagementId: string): Promise<{
     agents: AgentState[],
-    synthesis?: { platform: BrandPlatform, archetype: BrandArchetype },
+    synthesis?: {
+        fact_base: FactBase;
+        platform: BrandPlatform;
+        archetype: BrandArchetype;
+        brand_narrative: BrandNarrative;
+        brand_voice: BrandVoice;
+        content_strategy: ContentStrategy;
+        internal_consistency: InternalConsistency;
+        voice_of_market: VoiceOfMarket;
+        visual_identity: VisualIdentity;
+    },
     reports?: ReportArtifact[],
     gate3Results?: GateOutputs,
     gate4Results?: GateOutputs
 }> {
     
-    // Simulate Synthesis (OI-11)
-    const archaeologist = activePhaseStatus.find(a => a.id === 'oi-11');
-    if (archaeologist && archaeologist.status === 'running') {
-        archaeologist.progress = Math.min(archaeologist.progress + 15, 100);
-        if (archaeologist.progress >= 100) {
-            archaeologist.status = 'completed';
-            // Trigger Strategist and Report
-            const strat = activePhaseStatus.find(a => a.id === 'oi-13');
-            if (strat) strat.status = 'running';
-             const rpt = activePhaseStatus.find(a => a.id === 'rpt-01');
-            if (rpt) rpt.status = 'running';
-        }
+    // 1. Run Initial Synthesis Agents
+    ['oi-11', 'oi-12', 'oi-14', 'oi-15', 'oi-16', 'rpt-02'].forEach(id => {
+         const agent = activePhaseStatus.find(a => a.id === id);
+         if (agent && agent.status === 'running') {
+             agent.progress = Math.min(agent.progress + 15, 100);
+             if (agent.progress >= 100) agent.status = 'completed';
+         }
+    });
+
+    // 2. Trigger Secondary Agents
+    if (activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed') {
+        // Trigger OI-13 and RPT-01
+        ['oi-13', 'rpt-01'].forEach(id => {
+            const agent = activePhaseStatus.find(a => a.id === id);
+             if (agent && agent.status === 'idle') agent.status = 'running';
+        });
     }
 
-    // Simulate OI-13 and RPT-01
-    ['oi-13', 'rpt-01'].forEach(id => {
+    if (activePhaseStatus.find(a => a.id === 'oi-16')?.status === 'completed') {
+        // Trigger OI-17 and RPT-06
+        ['oi-17', 'rpt-06'].forEach(id => {
+            const agent = activePhaseStatus.find(a => a.id === id);
+             if (agent && agent.status === 'idle') agent.status = 'running';
+        });
+    }
+    
+    if (activePhaseStatus.find(a => a.id === 'oi-14')?.status === 'completed') {
+         const rpt04 = activePhaseStatus.find(a => a.id === 'rpt-04');
+         if (rpt04 && rpt04.status === 'idle') rpt04.status = 'running';
+    }
+
+     if (activePhaseStatus.find(a => a.id === 'oi-15')?.status === 'completed') {
+         const rpt05 = activePhaseStatus.find(a => a.id === 'rpt-05');
+         if (rpt05 && rpt05.status === 'idle') rpt05.status = 'running';
+    }
+
+
+    // 3. Run Secondary Agents
+    ['oi-13', 'oi-17', 'rpt-01', 'rpt-06', 'rpt-04', 'rpt-05'].forEach(id => {
         const agent = activePhaseStatus.find(a => a.id === id);
-        if (agent && agent.status === 'running') {
-            agent.progress = Math.min(agent.progress + 20, 100);
-            if (agent.progress >= 100) agent.status = 'completed';
-        }
+         if (agent && agent.status === 'running') {
+             agent.progress = Math.min(agent.progress + 20, 100);
+             if (agent.progress >= 100) agent.status = 'completed';
+         }
     });
+
+    // 4. Trigger Tertiary Agents (Reports dependent on secondary synthesis)
+    if (activePhaseStatus.find(a => a.id === 'oi-13')?.status === 'completed') {
+         const rpt03 = activePhaseStatus.find(a => a.id === 'rpt-03');
+         if (rpt03 && rpt03.status === 'idle') rpt03.status = 'running';
+    }
+    if (activePhaseStatus.find(a => a.id === 'oi-17')?.status === 'completed') {
+         const rpt07 = activePhaseStatus.find(a => a.id === 'rpt-07');
+         if (rpt07 && rpt07.status === 'idle') rpt07.status = 'running';
+    }
+
+    // 5. Run Tertiary Agents
+     ['rpt-03', 'rpt-07'].forEach(id => {
+        const agent = activePhaseStatus.find(a => a.id === id);
+         if (agent && agent.status === 'running') {
+             agent.progress = Math.min(agent.progress + 20, 100);
+             if (agent.progress >= 100) agent.status = 'completed';
+         }
+    });
+
 
     const synthesisDone = activePhaseStatus.find(a => a.id === 'oi-11')?.status === 'completed';
     const allDone = activePhaseStatus.every(a => a.status === 'completed');
@@ -220,32 +311,266 @@ export async function pollPhase2StatusAction(engagementId: string): Promise<{
 
 // --- FLOW E & F ACTIONS ---
 
-export async function getComparativeDataAction(engagementId: string): Promise<PositioningLandscape | null> {
+// --- COMPARATIVE ACTIONS ---
+
+// --- COMPARATIVE ACTIONS ---
+
+export async function getComparativeDataAction(engagementId: string): Promise<{
+    positioning_landscape: PositioningLandscape;
+    category_grammar: CategoryGrammar;
+    topic_ownership: TopicOwnership;
+    whitespace_analysis: WhitespaceAnalysis;
+    competitor_playbooks: CompetitorPlaybook;
+    visual_competitive: VisualCompetitiveAnalysis;
+} | null> {
     // Return mock comparative data
-    return {
-        schema_version: "2.0.0",
-        generated_at: new Date().toISOString(),
-        matrix: [
-            { entity: "Client", positioning: "Secure AI Leader", market_share_proxy: 0.15 },
-            { entity: "Competitor A", positioning: "Legacy Enterprise", market_share_proxy: 0.45 },
-            { entity: "Competitor B", positioning: "Cheap Alternative", market_share_proxy: 0.20 }
-        ]
-    };
+    return generateMockComparativeArtifacts(engagementId);
 }
 
-export async function generateExportPackageAction(engagementId: string): Promise<{ downloadUrl: string, files: string[] }> {
-    // Simulate BRIDGE-01 execution
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return {
-        downloadUrl: `https://brandos-artifacts.s3.amazonaws.com/${engagementId}/brandos_pack_v2.1.zip`,
-        files: [
-            "bam_input_pack.json",
-            "emergent_brand_report.pdf",
-            "visual_identity_report.pdf",
-            "gate_outputs.json"
-        ]
-    };
+// ... (Other functions) ...
+
+function generateMockReports(engagementId: string): ReportArtifact[] {
+    const date = new Date().toISOString().split('T')[0];
+    return [
+        {
+            report_type: "Emergent Brand Report",
+            entity: "Client",
+            generated_at: new Date().toISOString(),
+            markdown_content: `
+# The Emergent Brand: Client
+## Outside-In Brand Perception Analysis
+
+**Prepared by:** Humanbrand AI
+**Analysis Date:** ${date}
+**Corpus:** 150 website pages | 235 social posts | 127k words analyzed
+
+---
+
+## Executive Summary
+
+Evidence suggests Client is positioning itself as a "Secure AI Leader," emphasizing trust and enterprise-grade capability. The dominant narrative is one of enabling innovation through safety.
+
+However, a tension exists between technical authority (Language Pattern A) and approachable partnership (Language Pattern B). The brand alternates between "we build secure systems" and "we help you grow," without fully integrating these voices.
+
+The most surprising finding is the strong "Sustainability" theme in audience engagement vs. its absence in official messaging.
+
+---
+
+## I. Brand Platform
+
+### Mission
+> "To revolutionize the industry through secure AI adoption."
+
+**Confidence:** 0.90 — Validated by 12 "revolutionary" citations.
+
+### Vision
+> "A world where data is secure and intelligence is accessible."
+
+**Confidence:** 0.85 — Consistent with forward-looking statements.
+
+### Values
+
+| Value | Description | Confidence |
+|-------|-------------|------------|
+| Integrity | Doing the right thing, always. | 0.95 |
+| Innovation | Pushing boundaries. | 0.88 |
+| Security | Protecting what matters. | 0.92 |
+
+**Analysis:**
+These values are inferred from behavioral patterns rather than explicit statements. "Security" emerges most strongly, appearing in 89 instances across product content.
+
+---
+
+## II. Brand Archetype
+
+**Primary Archetype:** Ruler (Score: 0.85)
+**Secondary Archetype:** Sage (Score: 0.65)
+
+Client behaves as a Ruler—setting standards and asserting control over chaos. The Sage side appears in whitepapers and technical docs.
+
+---
+
+## III. Strategic Tensions
+
+### Tension 1: Innovation vs. Safety
+**Contradiction:** "Move fast" (Blog) vs. "Zero risk" (Homepage).
+**Strategic Implication:** Needs a "Safe Velocity" narrative bridge.
+
+---
+
+## IV. Emergent Brand Summary
+
+| Attribute | Synthesis | Confidence |
+|-----------|-----------|------------|
+| Mission | Secure AI adoption | 0.90 |
+| Archetype | Ruler / Sage | 0.85 |
+| Voice | Authoritative, Technical | 0.88 |
+
+---
+
+## Methodology Note
+Analysis based on 150 pages and 235 posts collected via Brand OS.
+`.trim()
+        },
+        {
+            report_type: "Channel Audit Report",
+            entity: "Client",
+            generated_at: new Date().toISOString(),
+            markdown_content: `
+# LinkedIn Channel Audit: Client
+## Social Media Performance & Content Analysis
+
+**Prepared by:** Humanbrand AI
+**Analysis Date:** ${date}
+
+---
+
+## Executive Summary
+Client's LinkedIn serves as the primary professional engagement platform. The standout finding is that video content generates 70% higher engagement than images, yet represents only 10% of the mix.
+
+---
+
+## I. Channel Profile
+| Metric | Value | vs. Competitors |
+|--------|-------|-----------------|
+| Followers | 45,000 | 2nd of 5 |
+| Engagement | 0.14% | Below Average |
+
+---
+
+## II. Content Performance
+**Top Performing Post:**
+> "Our new rigorous security protocols..." (Video)
+**Why it worked:** Direct addresses to customer pain points + high production value.
+
+---
+
+## III. Recommendations
+1. **Increase Video Output:** Shift resourcing to produce 2x weekly video clips.
+2. **Humanize the Feed:** Add employee spotlights to counter the "Corporate Ruler" persona.
+`.trim()
+        },
+        {
+            report_type: "Competitive Landscape Report",
+            entity: "Cross-Entity",
+            generated_at: new Date().toISOString(),
+            markdown_content: `# Competitive Landscape Report
+            
+## Executive Summary
+The market is bifurcated between "Legacy Giants" (Competitor A) and "Agile Disruptors" (Competitor B). The client occupies a unique "Secure Middle" ground but faces pressure from both sides.
+
+## Market Map
+*   **Competitor A**: Dominates the high-end enterprise market. Strength: Installed base. Weakness: Slow innovation.
+*   **Competitor B**: Aggressively targeting SMBs with low pricing. Strength: Speed. Weakness: Reliability perception.
+
+## Key Recommendation
+Double down on the "Security" differentiator, as neither competitor owns this topic fully.
+`.trim()
+        },
+        {
+             report_type: "Consistency Report",
+             entity: "Client",
+             generated_at: new Date().toISOString(),
+             markdown_content: `# Brand Consistency Report
+             
+## Scorecard
+*   **Overall Consistency Score:** 78/100 (Good)
+*   **Visual Consistency:** 92/100
+*   **Verbal Consistency:** 65/100
+
+## Analysis
+The visual identity is strictly enforced across all channels. However, the verbal identity varies significantly. The website is formal and elevated, while social channels use inconsistent slang ("Awesome", "Cool") that dilutes the premium positioning.
+
+## Action Plan
+1.  Update social media guidelines to align with "Authoritative" tone key.
+2.  Conduct training for community managers.
+`.trim()
+        },
+        {
+             report_type: "Voice of Market Report",
+             entity: "Market",
+             generated_at: new Date().toISOString(),
+             markdown_content: `# Voice of Market Analysis
+             
+## Sentiment Drivers
+*   **Positive:** Product reliability, Customer support responsiveness.
+*   **Negative:** Pricing opacity, Documentation complexity.
+
+## Unmet Needs
+Customers are repeatedly asking for "Simplified deployment guides" in community forums. This represents a content opportunity.
+
+## Topic Ownership
+*   **Security:** Client (High Association)
+*   **Ease of Use:** Competitor B (High Association)
+`.trim()
+        },
+        {
+             report_type: "Visual Identity Report",
+             entity: "Client",
+             generated_at: new Date().toISOString(),
+             markdown_content: `# Visual Identity Analysis
+             
+## Palette Usage
+*   **Primary Blue (#0F172A):** Used consistently as background.
+*   **Accent Green:** Used for CTAs. Good contrast.
+
+## Imagery
+Imagery is 80% stock photography. Recommendation: Move to custom photography to build authenticity.
+
+## Typography
+Inter font family is legible but generic. Consider a display font for headers to add character.
+`.trim()
+        },
+        {
+            report_type: "Visual Competitive Report",
+            entity: "Cross-Entity",
+            generated_at: new Date().toISOString(),
+            markdown_content: `
+# Visual Competitive Landscape
+
+## Overview
+Visual analysis of 1,200+ images across Client and 3 Competitors.
+
+## Territories
+* **Client:** "Industrial Blue" - Heavy use of cool tones, machinery, and posed engineering shots.
+* **Competitor A:** "Lifestyle Warmth" - Focus on end-users, warm lighting.
+* **Competitor B:** "Abstract Tech" - Stock imagery, neon gradients.
+
+## Gap Analysis
+There is a clear whitespace for a "Human-Centric High Tech" visual style that combines reliability with warmth.
+`.trim()
+        }
+    ];
 }
+
+// --- PHASE 3 (HANDOFF) ACTIONS ---
+
+export async function startHandoffAction(engagementId: string) {
+    activePhaseStatus = [
+        { id: 'bridge-01', name: 'BRIDGE-01 BAM Input Pack Generator', status: 'running', progress: 0 }
+    ];
+    revalidatePath('/dashboard/brandos-v2.1/export');
+    return { success: true };
+}
+
+export async function pollHandoffStatusAction(engagementId: string): Promise<{
+    agents: AgentState[],
+    packageUrl?: string
+}> {
+    const bridge = activePhaseStatus.find(a => a.id === 'bridge-01');
+    if (bridge && bridge.status === 'running') {
+        bridge.progress = Math.min(bridge.progress + 10, 100);
+        if (bridge.progress >= 100) bridge.status = 'completed';
+    }
+
+    let packageUrl;
+    if (bridge?.status === 'completed') {
+        packageUrl = `https://brandos-artifacts.s3.amazonaws.com/${engagementId}/brandos_pack_v2.1.zip`;
+    }
+
+    return { agents: activePhaseStatus, packageUrl };
+}
+
 
 // --- MOCK GENERATORS ---
 
@@ -391,7 +716,7 @@ function generateMockLedger(engagementId: string, config: EngagementConfig | nul
 
 
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         run_id: crypto.randomUUID(),
         tenant_id: "tenant-mock-123",
@@ -449,7 +774,7 @@ function generateMockManifest(engagementId: string, config: EngagementConfig | n
     });
 
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         run_id: runId,
         collection_window: {
@@ -520,7 +845,7 @@ function generateMockGate0(engagementId: string, manifest: CorpusManifest): Gate
     const gateStatus = manifest.corpus_adequacy.overall === 'adequate' ? 'pass' : 'warn';
 
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         engagement_id: engagementId,
         overall_status: gateStatus,
@@ -557,7 +882,7 @@ function generateMockGate0(engagementId: string, manifest: CorpusManifest): Gate
 
 function generateMockGate1(engagementId: string): GateOutputs {
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         engagement_id: engagementId,
         overall_status: 'pass',
@@ -575,7 +900,7 @@ function generateMockGate1(engagementId: string): GateOutputs {
 
 function generateMockGate2(engagementId: string): GateOutputs {
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         engagement_id: engagementId,
         overall_status: 'pass',
@@ -591,7 +916,245 @@ function generateMockGate2(engagementId: string): GateOutputs {
     };
 }
 
-function generateMockExtractions(engagementId: string): { url: UrlExtraction[], posts: PostExtraction[] } {
+// --- MOCK GENERATION FUNCTIONS ---
+
+function generateMockImageExtraction(): ImageExtraction[] {
+    return [
+        {
+            image_id: "IMG-001",
+            evidence_id: "VE-001",
+            url: "https://example.com/hero.jpg",
+            page_url: "https://example.com/home",
+            analysis: {
+                description: "Corporate team meeting in modern glass office with skyline view.",
+                objects_detected: ["Person", "Laptop", "Whiteboard", "Window"],
+                color_palette: ["#1A2B3C", "#FFFFFF", "#808080"],
+                text_content: "Future of Work"
+            }
+        },
+        {
+            image_id: "IMG-002",
+            evidence_id: "VE-002",
+            url: "https://example.com/product.jpg",
+            analysis: {
+                description: "Close-up of AI server rack with blue LED lighting.",
+                objects_detected: ["Server", "Cable", "Light"],
+                color_palette: ["#0000FF", "#000000"],
+            }
+        }
+    ];
+}
+
+function generateMockWebsiteVisualBedrock(): WebsiteVisualBedrock {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        channel: "website",
+        image_count: 145,
+        color_palette: {
+            primary: ["#0F172A", "#3B82F6"],
+            secondary: ["#64748B", "#F8FAFC"]
+        },
+        imagery_style: {
+            type: "Mixed",
+            mood: "Professional, Technological, Trustworthy"
+        }
+    };
+}
+
+function generateMockSocialVisualBedrock(): SocialVisualBedrock {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        channel: "linkedin",
+        image_count: 85,
+        video_count: 12,
+        visual_themes: ["Office Life", "Conference Speaker", "Infographic"],
+        color_dominance: ["#3B82F6", "#FFFFFF"]
+    };
+}
+
+function generateMockFactBase(): FactBase {
+    return {
+         schema_version: "2.0.0" as const,
+         generated_at: new Date().toISOString(),
+         entity: "Client",
+         facts: [
+             { category: "founded", fact: "2015", source_type: "webpage", evidence_ids: ["E001"] },
+             { category: "location", fact: "San Francisco, CA", source_type: "linkedin_profile", evidence_ids: ["E002"] },
+             { category: "product", fact: "Enterprise Security Platform", source_type: "webpage", evidence_ids: ["E003"] }
+         ]
+    };
+}
+
+function generateMockBrandNarrative(): BrandNarrative {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        narrative_arcs: [
+            { name: "The Security Shield", description: "Protecting the enterprise from chaos.", status: "dominant" },
+            { name: "AI Acceleration", description: "Moving fast with confidence.", status: "emerging" }
+        ],
+        core_tension: {
+            description: "Innovation vs. Safety",
+            side_a: "We move at the speed of AI.",
+            side_b: "We guarantee zero-risk deployments."
+        }
+    };
+}
+
+function generateMockBrandVoice(): BrandVoice {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        tone_profile: {
+            primary_traits: ["Authoritative", "Technical", "Secure"],
+            secondary_traits: ["Helpful", "Steady"]
+        },
+        dimensions: {
+            formal_casual: 0.8,
+            technical_accessible: 0.7,
+            serious_playful: 0.9,
+            traditional_modern: 0.6
+        },
+        lexicon: {
+            signature_words: ["Robust", "Enterprise-grade", "Seamless"],
+            avoided_words: ["Cheap", "Quick fix", "Hack"]
+        }
+    };
+}
+
+function generateMockContentStrategy(): ContentStrategy {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        pillar_analysis: [
+            { pillar: "Thought Leadership", current_weight: 0.2, recommended_weight: 0.4, gap: "Under-indexed vs Competitors" },
+            { pillar: "Product Updates", current_weight: 0.6, recommended_weight: 0.3, gap: "Over-saturated" }
+        ],
+        format_recommendations: [
+            { format: "Short-form Video", action: "increase", rationale: "High engagement, low volume currently." },
+            { format: "Long-form Text", action: "decrease", rationale: "Low read-through rates." }
+        ]
+    };
+}
+
+function generateMockInternalConsistency(): InternalConsistency {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        overall_score: 0.78,
+        channel_consistency: {
+            website: 0.85,
+            linkedin: 0.75,
+            instagram: 0.50
+        },
+        conflicts: [
+            { issue: "Tone mismatch: Formal on web, slang on IG.", severity: "medium", evidence_ids: ["E999", "E888"] }
+        ]
+    };
+}
+
+function generateMockVoiceOfMarket(): VoiceOfMarket {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        audience_sentiment: {
+            overall: "Positive but Confused",
+            drivers: ["Product Quality (Pos)", "Pricing Structure (Neg)"]
+        },
+        key_topics: [
+            { topic: "Ease of Use", sentiment: "positive", volume: "high" },
+            { topic: "Customer Support", sentiment: "negative", volume: "medium" }
+        ],
+        unmet_needs: ["Clearer pricing tier definitions", "Mobile app feature parity"]
+    };
+}
+
+function generateMockVisualIdentity(): VisualIdentity {
+    return {
+        schema_version: "2.0.0" as const,
+        generated_at: new Date().toISOString(),
+        entity: "Client",
+        palette: {
+            dominant_colors: ["#0F172A", "#FFFFFF"],
+            accent_colors: ["#3B82F6", "#10B981"]
+        },
+        typography: {
+            primary_font_style: "Sans-Serif (Inter)",
+            consistency_score: 0.95
+        },
+        imagery_guidelines: {
+            subject_matter: ["Technology", "People working", "Abstract data"],
+            mood: "Clean, Modern, Corporate"
+        }
+    };
+}
+
+function generateMockComparativeArtifacts(engagementId: string) {
+    return {
+        positioning_landscape: {
+            schema_version: "2.0.0" as const,
+            generated_at: new Date().toISOString(),
+            matrix: [
+                { entity: "Client", positioning: "Secure AI Leader", market_share_proxy: 0.15 },
+                { entity: "Competitor A", positioning: "Legacy Enterprise", market_share_proxy: 0.45 },
+                { entity: "Competitor B", positioning: "Cheap Alternative", market_share_proxy: 0.20 }
+            ]
+        },
+        category_grammar: {
+            schema_version: "2.0.0" as const,
+            generated_at: new Date().toISOString(),
+            cliches: ["Empower your business", "Seamless integration", "Next-gen"],
+            must_win_terms: ["AI-native", "Zero-trust"],
+            visual_tropes: ["Blue glowing nodes", "Handshakes"]
+        },
+        topic_ownership: {
+             schema_version: "2.0.0" as const,
+             generated_at: new Date().toISOString(),
+             topics: [
+                 { topic: "Security", owner: "Client", strength: 0.8 },
+                 { topic: "Speed", owner: "Competitor B", strength: 0.9 },
+                 { topic: "Reliability", owner: "Competitor A", strength: 0.7 }
+             ]
+        },
+        whitespace_analysis: {
+             schema_version: "2.0.0" as const,
+             generated_at: new Date().toISOString(),
+             unclaimed_territories: [
+                 { name: "Friendly AI", description: "Accessible, human-centric AI partner.", viability: "high" as const }
+             ]
+        },
+        competitor_playbooks: {
+             schema_version: "2.0.0" as const,
+             generated_at: new Date().toISOString(),
+             competitor: "Competitor A",
+             core_strategy: "Defend market share via bundle pricing.",
+             strengths: ["Installed base", "Brand recognition"],
+             weaknesses: ["Slow innovation", "Legacy UI"],
+             predicted_next_move: "Acquisition of a smaller AI startup."
+        },
+        visual_competitive: {
+            schema_version: "2.0.0" as const,
+            generated_at: new Date().toISOString(),
+            territories: [
+                { entity: "Client", visual_territory: "Dark Mode Tech", key_elements: ["Dark backgrounds", "Neon accents"] },
+                { entity: "Competitor A", visual_territory: "Corporate Blue", key_elements: ["Stock photos", "Blue overlays"] }
+            ],
+            gap_analysis: "Opportunity for 'Warm/Human' outlier visual style."
+        }
+    };
+}
+
+// Update Extractions Generator
+function generateMockExtractions(engagementId: string): { url: UrlExtraction[], posts: PostExtraction[], images: ImageExtraction[] } {
     return {
         url: [
             {
@@ -603,14 +1166,31 @@ function generateMockExtractions(engagementId: string): { url: UrlExtraction[], 
                 metadata: { word_count: 500 }
             }
         ],
-        posts: []
+        posts: [
+            {
+                post_id: "POST-001",
+                evidence_id: "E10002",
+                channel: "linkedin",
+                entity: "Client",
+                posted_at: new Date().toISOString(),
+                content: "Excited to launch our new product!",
+                engagement: { likes: 100, comments: 10, shares: 5 },
+                classification: {
+                    sentiment: { polarity: "positive", score: 0.9, emotional_tone: "Excited" },
+                    purpose: "Product Launch",
+                    format: "image"
+                }
+            }
+        ],
+        images: generateMockImageExtraction()
     };
 }
 
-function generateMockBedrocks(engagementId: string): { website: WebsiteVerbalBedrock, social: SocialChannelBedrock } {
+// Update Bedrocks Generator
+function generateMockBedrocks(engagementId: string): { website: WebsiteVerbalBedrock, website_visual: WebsiteVisualBedrock, social: SocialChannelBedrock, social_visual: SocialVisualBedrock } {
     return {
         website: {
-            schema_version: "2.0.0",
+            schema_version: "2.0.0" as const,
             generated_at: new Date().toISOString(),
             entity: "Client",
             channel: "website",
@@ -619,8 +1199,9 @@ function generateMockBedrocks(engagementId: string): { website: WebsiteVerbalBed
             lexical_frequency: { top_nouns: [{ word: "innovation", count: 120 }] },
             key_themes: [{ theme: "Sustainability", frequency: 45 }]
         },
+        website_visual: generateMockWebsiteVisualBedrock(),
         social: {
-            schema_version: "2.0.0",
+            schema_version: "2.0.0" as const,
             generated_at: new Date().toISOString(),
             entity: "Client",
             channel: "linkedin",
@@ -628,13 +1209,15 @@ function generateMockBedrocks(engagementId: string): { website: WebsiteVerbalBed
             content_mix: { by_format: [{ format: "video", share: 0.4 }] },
             sentiment_summary: { avg_polarity_score: 0.8 },
             themes: [{ theme: "Leadership", share: 0.3 }]
-        }
+        },
+        social_visual: generateMockSocialVisualBedrock()
     };
 }
 
+// Update Synthesis Generation
 function generateMockGate3(engagementId: string): GateOutputs {
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         engagement_id: engagementId,
         overall_status: 'warn',
@@ -657,7 +1240,7 @@ function generateMockGate3(engagementId: string): GateOutputs {
 
 function generateMockGate4(engagementId: string): GateOutputs {
     return {
-        schema_version: "2.0.0",
+        schema_version: "2.0.0" as const,
         generated_at: new Date().toISOString(),
         engagement_id: engagementId,
         overall_status: 'pass',
@@ -677,10 +1260,11 @@ function generateMockGate4(engagementId: string): GateOutputs {
     };
 }
 
-function generateMockSynthesis(engagementId: string): { platform: BrandPlatform, archetype: BrandArchetype } {
+function generateMockSynthesis(engagementId: string) {
     return {
+        fact_base: generateMockFactBase(),
         platform: {
-            schema_version: "2.0.0",
+            schema_version: "2.0.0" as const,
             generated_at: new Date().toISOString(),
             entity: "Client",
             mission: { 
@@ -708,66 +1292,25 @@ function generateMockSynthesis(engagementId: string): { platform: BrandPlatform,
             tagline: { synthesized_alternative: "Secure AI for Everyone." },
             key_themes: [
                 { name: "Safety First", score: 0.35, evidence_ids: ["E00111", "E00112"] },
-                { name: "Enterprise Scale", score: 0.25, evidence_ids: ["E00113"] },
-                { name: "Future Ready", score: 0.20, evidence_ids: ["E00114"] },
-                { name: "Compliance", score: 0.15, evidence_ids: ["E00115"] }
+                { name: "Enterprise Scale", score: 0.25, evidence_ids: ["E00113"] }
             ]
         },
         archetype: {
-            schema_version: "2.0.0",
+            schema_version: "2.0.0" as const,
             generated_at: new Date().toISOString(),
             entity: "Client",
             primary_archetype: { name: "The Sage", score: 0.8, description: "Driven by the search for truth and knowledge." },
             secondary_archetype: { name: "The Ruler", score: 0.15, description: "Focused on control and stability." }
-        }
+        },
+        brand_narrative: generateMockBrandNarrative(),
+        brand_voice: generateMockBrandVoice(),
+        content_strategy: generateMockContentStrategy(),
+        internal_consistency: generateMockInternalConsistency(),
+        voice_of_market: generateMockVoiceOfMarket(),
+        visual_identity: generateMockVisualIdentity()
     };
 }
 
-function generateMockReports(engagementId: string): ReportArtifact[] {
-    return [
-        {
-            report_type: "Emergent Brand Report",
-            entity: "Client",
-            generated_at: new Date().toISOString(),
-            markdown_content: `# Emergent Brand Strategy Report
-**Client:** Client Inc.
-**Date:** ${new Date().toLocaleDateString()}
-**Confidence Score:** High (0.87)
 
-## 1. Executive Summary
-The synthesis of over 850 artifacts reveals a brand positioned as a "Secure AI Leader." While the stated mission emphasizes innovation, the *emergent* market perception is heavily anchored in "reliability" and "trust."
 
-## 2. Brand Platform (Synthesized)
-* **Mission:** To revolutionize the industry through secure AI adoption.
-* **Vision:** A world where data is secure and intelligence is accessible.
-* **Core Values:** Integrity, Innovation, Security.
-
-## 3. Archetypal Analysis
-The brand exhibits a primary **Sage** archetype (seeking truth/wisdom) with secondary **Ruler** traits (exercising control/stability). This combination creates a voice that is authoritative yet educational.
-
-## 4. Strategic Recommendations
-1. **Capitalize on Trust:** Your "security" perception is a massive differentiator. Lean into it.
-2. **Humanize the Voice:** The "Ruler" traits can feel cold. Incorporate more "Creator" energy in social channels.
-            `
-        },
-        {
-            report_type: "Visual Competitive Analysis",
-            entity: "Cross-Entity",
-            generated_at: new Date().toISOString(),
-            markdown_content: `# Visual Competitive Landscape
-
-## Overview
-Visual analysis of 1,200+ images across Client and 3 Competitors identifies distinct visual territories.
-
-## Territories
-* **Client:** "Industrial Blue" - Heavy use of cool tones, machinery, and posed engineering shots.
-* **Competitor A:** "Lifestyle Warmth" - Focus on end-users, warm lighting, natural settings.
-* **Competitor B:** "Abstract Tech" - Stock imagery, neon gradients, minimal human presence.
-
-## Gap Analysis
-There is a clear whitespace for a "Human-Centric High Tech" visual style that combines the reliability of the Client's industry focus with the warmth of Competitor A.
-            `
-        }
-    ];
-}
 

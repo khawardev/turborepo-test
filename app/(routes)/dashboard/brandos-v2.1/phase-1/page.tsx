@@ -1,5 +1,6 @@
 
 import Phase1Dashboard from '@/components/brandos-v2.1/Phase1Dashboard';
+import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { Suspense } from 'react';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
@@ -15,8 +16,14 @@ export default async function Phase1Page(props: {
   }
 
   return (
-      <Suspense fallback={<div>Loading Phase 1 Dashboard...</div>}>
-         <Phase1Dashboard engagementId={engagementId} />
-      </Suspense>
+      <>
+        <DashboardLayoutHeading
+          title="Phase 1: Extraction & Compilation"
+          subtitle="Extracting structured data and compiling bedrocks."
+        />
+        <Suspense fallback={<div>Loading Phase 1 Dashboard...</div>}>
+          <Phase1Dashboard engagementId={engagementId} />
+        </Suspense>
+      </>
   );
 }

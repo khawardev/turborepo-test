@@ -2,14 +2,39 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { PositioningLandscape } from '@/lib/brandos-v2.1/types';
+import { PositioningLandscape, CategoryGrammar, TopicOwnership, WhitespaceAnalysis, CompetitorPlaybook, VisualCompetitiveAnalysis } from '@/lib/brandos-v2.1/types';
 import { getComparativeDataAction } from '@/server/brandos-v2.1/actions';
-import { DashboardLayoutHeading } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
+import { DashboardInnerLayout } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
+import { JsonViewer } from './shared/DashboardComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { DeliverablesTable, DeliverableItem } from './shared/DeliverablesTable';
+import { Button } from '@/components/ui/button';
+import { MdOutlineArrowRight } from "react-icons/md";
+import { useRouter } from 'next/navigation';
+
+interface ComparativeData {
+    positioning_landscape: PositioningLandscape;
+    category_grammar: CategoryGrammar;
+    topic_ownership: TopicOwnership;
+    whitespace_analysis: WhitespaceAnalysis;
+    competitor_playbooks: CompetitorPlaybook;
+    visual_competitive: VisualCompetitiveAnalysis;
+}
+
+const COMPARATIVE_DELIVERABLES: DeliverableItem[] = [
+    { name: 'Positioning Landscape', filename: 'positioning_landscape.json', schema: 'positioning_landscape.json', owner: 'OI-13' },
+    { name: 'Category Grammar', filename: 'category_grammar.json', schema: 'category_grammar.json', owner: 'OI-13' },
+    { name: 'Topic Ownership', filename: 'topic_ownership.json', schema: 'topic_ownership.json', owner: 'OI-13' },
+    { name: 'Whitespace Analysis', filename: 'whitespace_analysis.json', schema: 'whitespace_analysis.json', owner: 'OI-13' },
+    { name: 'Competitor Playbooks', filename: 'competitor_playbooks.json', schema: 'competitor_playbooks.json', owner: 'OI-13' },
+    { name: 'Visual Competitive Analysis', filename: 'visual_competitive_analysis.json', schema: 'visual_competitive_analysis.json', owner: 'OI-17' },
+];
 
 export default function ComparativeDashboard({ engagementId }: { engagementId: string }) {
-    const [data, setData] = useState<PositioningLandscape | null>(null);
+    const router = useRouter();
+    const [data, setData] = useState<ComparativeData | null>(null);
 
     useEffect(() => {
         if (engagementId) {
@@ -17,55 +42,91 @@ export default function ComparativeDashboard({ engagementId }: { engagementId: s
         }
     }, [engagementId]);
 
-    return (
-        <div>
-            <DashboardLayoutHeading
-                title="Flow E: Comparative Exploration"
-                subtitle="Analyze client positioning relative to competitors."
-            />
-            
-            {data && (
-                <div className="grid gap-6 mt-6 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Market Positioning Matrix</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                             <div className="space-y-4">
-                                {data.matrix.map((item, i) => (
-                                    <div key={i} className="flex justify-between items-center border-b pb-2 last:border-0">
-                                        <div>
-                                            <p className="font-bold">{item.entity}</p>
-                                            <p className="text-sm text-muted-foreground">{item.positioning}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-mono text-lg">{(item.market_share_proxy * 100).toFixed(0)}%</p>
-                                            <p className="text-xs text-muted-foreground">Share Proxy</p>
-                                        </div>
-                                    </div>
-                                ))}
-                             </div>
-                        </CardContent>
-                    </Card>
+    if (!data) return <div className="p-8">Loading comparative data...</div>;
 
-                    <Card>
-                         <CardHeader>
-                            <CardTitle>Share of Voice Estimation</CardTitle>
-                        </CardHeader>
-                        <CardContent className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.matrix}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="entity" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="market_share_proxy" fill="#8884d8" name="Market Share" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
+    const chartData = data.positioning_landscape.matrix.map(m => ({
+        name: m.entity,
+        value: m.market_share_proxy
+    }));
+
+    return (
+        <DashboardInnerLayout>
+            <div className="relative flex gap-3 mt-6">
+                <Button onClick={() => router.push(`/dashboard/brandos-v2.1/export?engagementId=${engagementId}`)}>
+                    Proceed to Export
+                    <MdOutlineArrowRight />
+                </Button>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 mt-8">
+                {/* Positioning Matrix Table */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Positioning Matrix</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Entity</TableHead>
+                                    <TableHead>Positioning</TableHead>
+                                    <TableHead className="text-right">Share Proxy</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {data.positioning_landscape.matrix.map((row, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell className="font-medium">{row.entity}</TableCell>
+                                        <TableCell>{row.positioning}</TableCell>
+                                        <TableCell className="text-right">{(row.market_share_proxy * 100).toFixed(1)}%</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                {/* Market Share Chart */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Market Share Proxy</CardTitle>
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData}>
+                                <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                                <Tooltip />
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={index === 0 ? 'var(--brandos-green)' : 'var(--muted-foreground)'} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+
+            </div>
+
+            {/* Artifacts */}
+            <div className="space-y-8 pt-12">
+                <div className="flex items-center gap-4">
+                    <h3 className="text-2xl font-medium tracking-tight">Phase 2B: Cross-Entity Outputs</h3>
+                    <div className="h-px flex-1 bg-border" />
                 </div>
-            )}
-        </div>
+
+                <DeliverablesTable items={COMPARATIVE_DELIVERABLES} />
+
+                <div className="grid md:grid-cols-2 gap-6 pt-4">
+                    <JsonViewer data={data.positioning_landscape} title="verbal_positioning_map.json" />
+                    <JsonViewer data={{ market_share_analysis: data.positioning_landscape.matrix.map(m => ({ entity: m.entity, share: m.market_share_proxy })) }} title="market_share_estimation.json" />
+                    <JsonViewer data={data.category_grammar} title="category_grammar.json" />
+                    <JsonViewer data={data.topic_ownership} title="topic_ownership.json" />
+                    <JsonViewer data={data.whitespace_analysis} title="whitespace_analysis.json" />
+                    <JsonViewer data={data.competitor_playbooks} title="competitor_playbooks.json" />
+                    <JsonViewer data={data.visual_competitive} title="visual_competitive.json" />
+                </div>
+            </div>
+        </DashboardInnerLayout>
     );
 }

@@ -23,20 +23,21 @@ export interface Competitor {
   socials: SocialHandles;
 }
 
-export interface ChannelSettings {
+export type ChannelSettings = boolean | {
   enabled: boolean;
-  lookbackDays: number; // Default 365
-  maxPosts: number; // Default 200, min 50
-  collectComments: boolean; // Default true
-}
+  lookbackDays: number;
+  maxPosts: number;
+  collectComments: boolean;
+};
 
 export interface ChannelScope {
-  linkedin: ChannelSettings;
-  youtube: ChannelSettings;
-  instagram: ChannelSettings;
-  twitter: ChannelSettings;
-  facebook: ChannelSettings;
-  tiktok: ChannelSettings;
+  linkedin?: ChannelSettings;
+  youtube?: ChannelSettings;
+  instagram?: ChannelSettings;
+  twitter?: ChannelSettings;
+  facebook?: ChannelSettings;
+  tiktok?: ChannelSettings;
+  x?: ChannelSettings;
 }
 
 export interface EngagementConfig {
@@ -194,6 +195,20 @@ export interface UrlExtraction {
     metadata: Record<string, any>;
 }
 
+export interface ImageExtraction {
+    image_id: string;
+    evidence_id: string;
+    url: string;
+    page_url?: string;
+    alt_text?: string;
+    analysis: {
+        description: string;
+        objects_detected: string[];
+        color_palette: string[];
+        text_content?: string;
+    };
+}
+
 export interface PostExtraction {
     post_id: string;
     evidence_id: string;
@@ -207,7 +222,11 @@ export interface PostExtraction {
         shares: number;
     };
     classification: {
-       sentiment: any;
+       sentiment: {
+           polarity: 'positive' | 'negative' | 'neutral';
+           score: number;
+           emotional_tone: string;
+       };
        purpose: string;
        format: string;
     };
@@ -234,6 +253,22 @@ export interface WebsiteVerbalBedrock {
     key_themes: Array<{ theme: string; frequency: number }>;
 }
 
+export interface WebsiteVisualBedrock {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    channel: "website";
+    image_count: number;
+    color_palette: {
+        primary: string[];
+        secondary: string[];
+    };
+    imagery_style: {
+        type: string; // e.g., "Photography", "Illustration"
+        mood: string;
+    };
+}
+
 export interface SocialChannelBedrock {
     schema_version: "2.0.0";
     generated_at: string;
@@ -251,7 +286,30 @@ export interface SocialChannelBedrock {
     themes: Array<{ theme: string; share: number }>;
 }
 
+export interface SocialVisualBedrock {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    channel: SourceChannel;
+    image_count: number;
+    video_count: number;
+    visual_themes: string[];
+    color_dominance: string[];
+}
+
 // --- Phase 2: Synthesis Types ---
+
+export interface FactBase {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    facts: Array<{
+        category: string;
+        fact: string;
+        source_type: string;
+        evidence_ids: string[];
+    }>;
+}
 
 export interface BrandPlatform {
     schema_version: "2.0.0";
@@ -273,20 +331,104 @@ export interface BrandArchetype {
     secondary_archetype: { name: string; score: number; description?: string };
 }
 
+export interface BrandNarrative {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    narrative_arcs: Array<{
+        name: string;
+        description: string;
+        status: 'dominant' | 'emerging' | 'receding';
+    }>;
+    core_tension: {
+        description: string;
+        side_a: string;
+        side_b: string;
+    };
+}
+
 export interface BrandVoice {
     schema_version: "2.0.0";
     generated_at: string;
     entity: string;
-    tone_of_voice: {
-        primary: string;
-        secondary: string;
+    tone_profile: {
+        primary_traits: string[];
+        secondary_traits: string[];
     };
-    dimensions?: {
-        formal_casual: number; // 1-5 scale
-        technical_accessible: number;
-        serious_playful: number;
+    dimensions: {
+        formal_casual: number; // 0-1
+        technical_accessible: number; // 0-1
+        serious_playful: number; // 0-1
+        traditional_modern: number; // 0-1
     };
-    style_guidelines: string[];
+    lexicon: {
+        signature_words: string[];
+        avoided_words: string[];
+    };
+}
+
+export interface ContentStrategy {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    pillar_analysis: Array<{
+        pillar: string;
+        current_weight: number;
+        recommended_weight: number;
+        gap: string;
+    }>;
+    format_recommendations: Array<{
+        format: string;
+        action: 'increase' | 'decrease' | 'maintain';
+        rationale: string;
+    }>;
+}
+
+export interface InternalConsistency {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    overall_score: number;
+    channel_consistency: Record<string, number>;
+    conflicts: Array<{
+        issue: string;
+        severity: 'high' | 'medium' | 'low';
+        evidence_ids: string[];
+    }>;
+}
+
+export interface VoiceOfMarket {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    audience_sentiment: {
+        overall: string;
+        drivers: string[];
+    };
+    key_topics: Array<{
+        topic: string;
+        sentiment: string;
+        volume: 'high' | 'medium' | 'low';
+    }>;
+    unmet_needs: string[];
+}
+
+export interface VisualIdentity {
+    schema_version: "2.0.0";
+    generated_at: string;
+    entity: string;
+    palette: {
+        dominant_colors: string[];
+        accent_colors: string[];
+    };
+    typography: {
+        primary_font_style: string;
+        consistency_score: number;
+    };
+    imagery_guidelines: {
+        subject_matter: string[];
+        mood: string;
+    };
 }
 
 export interface PositioningLandscape {
@@ -298,6 +440,58 @@ export interface PositioningLandscape {
         market_share_proxy: number;
     }>;
 }
+
+// --- Phase 2: Competitive Types ---
+
+export interface CategoryGrammar {
+    schema_version: "2.0.0";
+    generated_at: string;
+    cliches: string[];
+    must_win_terms: string[];
+    visual_tropes: string[];
+}
+
+export interface TopicOwnership {
+    schema_version: "2.0.0";
+    generated_at: string;
+    topics: Array<{
+        topic: string;
+        owner: string;
+        strength: number;
+    }>;
+}
+
+export interface WhitespaceAnalysis {
+    schema_version: "2.0.0";
+    generated_at: string;
+    unclaimed_territories: Array<{
+        name: string;
+        description: string;
+        viability: 'high' | 'medium' | 'low';
+    }>;
+}
+
+export interface CompetitorPlaybook {
+    schema_version: "2.0.0";
+    generated_at: string;
+    competitor: string;
+    core_strategy: string;
+    strengths: string[];
+    weaknesses: string[];
+    predicted_next_move: string;
+}
+
+export interface VisualCompetitiveAnalysis {
+    schema_version: "2.0.0";
+    generated_at: string;
+    territories: Array<{
+        entity: string;
+        visual_territory: string;
+        key_elements: string[];
+    }>;
+    gap_analysis: string;
+}
+
 
 // --- Report Types ---
 export interface ReportArtifact {
