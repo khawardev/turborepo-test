@@ -156,8 +156,6 @@ export async function startPhase1Action(engagementId: string) {
     { id: 'oi-01', name: 'OI-01 Website Verbal Extractor', status: 'running', progress: 0 },
     { id: 'oi-02', name: 'OI-02 Visual Extractor', status: 'running', progress: 0 },
     { id: 'oi-03', name: 'OI-03 Social Post Extractor', status: 'running', progress: 0 },
-    // OI-10 starts after OI-01
-    { id: 'oi-10', name: 'OI-10 Fact Base Extractor', status: 'idle', progress: 0 },
     
     // Compilation Agents (Start as idle)
     { id: 'comp-01', name: 'COMP-01 Website Verbal Compiler', status: 'idle', progress: 0 },
@@ -197,21 +195,8 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
         }
     });
 
-    // Trigger OI-10 after OI-01 completes
-    if (activePhaseStatus.find(a => a.id === 'oi-01')?.status === 'completed') {
-        const oi10 = activePhaseStatus.find(a => a.id === 'oi-10');
-        if (oi10 && oi10.status === 'idle') oi10.status = 'running';
-    }
-    // Simulate OI-10
-    const oi10 = activePhaseStatus.find(a => a.id === 'oi-10');
-    if (oi10 && oi10.status === 'running') {
-        oi10.progress = Math.min(oi10.progress + 25, 100);
-        if (oi10.progress >= 100) oi10.status = 'completed';
-    }
-
-
     // Gate 1 Check (Runs after all extraction agents complete)
-    const extractionsDone = ['oi-01', 'oi-02', 'oi-03', 'oi-10'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
+    const extractionsDone = ['oi-01', 'oi-02', 'oi-03'].every(id => activePhaseStatus.find(a => a.id === id)?.status === 'completed');
     let gate1Results;
 
     if (extractionsDone) {
@@ -253,13 +238,12 @@ export async function pollPhase1StatusAction(engagementId: string): Promise<{
 
 // --- PHASE 2 ACTIONS ---
 
-// --- PHASE 2 ACTIONS ---
-
 export async function startPhase2Action(engagementId: string) {
   // Initialize agents for Phase 2 - Expanded to match Inventory
   const agents: AgentState[] = [
     // Synthesis Agents - Start with those having clear inputs from Phase 1
-    { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'running', progress: 0 },
+    { id: 'oi-10', name: 'OI-10 Fact Base Extractor', status: 'running', progress: 0 },
+    { id: 'oi-11', name: 'OI-11 The Archaeologist', status: 'idle', progress: 0 }, // Removed "running" - usually depends on Fact Base
     { id: 'oi-12', name: 'OI-12 Content Strategist', status: 'running', progress: 0 },
     { id: 'oi-14', name: 'OI-14 The Cartographer', status: 'running', progress: 0 },
     { id: 'oi-15', name: 'OI-15 Comment Miner', status: 'running', progress: 0 },
@@ -310,6 +294,19 @@ export async function pollPhase2StatusAction(engagementId: string): Promise<{
   if (activePhaseStatus.length === 0) {
       await startPhase2Action(engagementId);
       activePhaseStatus = getPhaseStatus(engagementId, 'phase2');
+  }
+
+  // 0. Run OI-10 (Fact Analyst)
+  const oi10 = activePhaseStatus.find(a => a.id === 'oi-10');
+  if (oi10 && oi10.status === 'running') {
+      oi10.progress = Math.min(oi10.progress + 25, 100);
+      if (oi10.progress >= 100) oi10.status = 'completed';
+  }
+
+  // Trigger OI-11 after OI-10 completes
+  if (activePhaseStatus.find(a => a.id === 'oi-10')?.status === 'completed') {
+      const oi11 = activePhaseStatus.find(a => a.id === 'oi-11');
+      if (oi11 && oi11.status === 'idle') oi11.status = 'running';
   }
 
   // 1. Run Initial Synthesis Agents

@@ -24,15 +24,11 @@ export const BrandOSConfig: any = {
             icon: LuFingerprint
         },
         {
-            title: "Phase 2A Syn & Reporting",
+            title: "Phase 2 Syn & Reporting",
             href: "/dashboard/brandos-v2.1/phase-2",
              icon: RiLoopRightLine
         },
-        {
-            title: "Phase 2B Comparative Analysis",
-            href: "/dashboard/brandos-v2.1/comparative",
-            icon: MdOutlineBrandingWatermark
-        },
+
         {
             title: "Export & Handoff",
             href: "/dashboard/brandos-v2.1/export",

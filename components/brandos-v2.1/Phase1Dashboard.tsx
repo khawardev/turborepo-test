@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { DashboardInnerLayout, GateResultDisplay, JsonViewer } from './shared/DashboardComponents';
 import { AgentList } from './shared/AgentList';
 import { DeliverablesTable, DeliverableItem } from './shared/DeliverablesTable';
+import { Badge } from '@/components/ui/badge';
 
 const EXTRACTION_DELIVERABLES: DeliverableItem[] = [
     { name: 'Webpage Extraction', filename: 'url_extraction_{source_id}.json', schema: 'url_extraction.json', owner: 'OI-01' },
@@ -85,7 +86,22 @@ export default function Phase1Dashboard({ engagementId }: { engagementId: string
                         )}
                     </Button>
                 </div>
-                <AgentList agents={agents} />
+                <div className="flex flex-col gap-12">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                             <h4 className="text-lg font-medium">Extraction Agents (Map)</h4>
+                             <Badge variant="secondary" className="text-xs">Phase 1A</Badge>
+                        </div>
+                        <AgentList agents={agents.filter(a => a.id.startsWith('oi-') || a.id === 'scrapers')} />
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                             <h4 className="text-lg font-medium">Compilation Agents (Reduce)</h4>
+                             <Badge variant="secondary" className="text-xs">Phase 1B</Badge>
+                        </div>
+                         <AgentList agents={agents.filter(a => a.id.startsWith('comp-'))} />
+                    </div>
+                </div>
             </div>
             {/* Gate 1 Logic */}
             {gate1Results && (

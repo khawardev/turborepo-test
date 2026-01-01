@@ -16,7 +16,7 @@ export const BRAND_OS_AGENTS: Record<string, AgentMetadata> = {
         id: 'OI-SWARM',
         name: 'Data Collection Swarm',
         role: 'Extraction',
-        description: 'Orchestrates the parallel scraping of website and social channels (OI-01, OI-02, OI-03).',
+        description: 'Orchestrates the parallel collection of website and social channels (OI-01, OI-02, OI-03).',
         inputs: ['Target URLs', 'Social Handles'],
         outputs: ['Raw HTML', 'Social Feeds', 'Images'],
         dependencies: ['sa-00']
@@ -32,9 +32,9 @@ export const BRAND_OS_AGENTS: Record<string, AgentMetadata> = {
     },
     'oi-01': {
         id: 'OI-01',
-        name: 'Web Scraper',
+        name: 'Web Collector',
         role: 'Extraction',
-        description: 'Extracts and parses content from target website URLs.',
+        description: 'Extracts and parses content from target website URLs on a per-page basis.',
         inputs: ['Target URLs (Manifest)'],
         outputs: ['url_extraction.json'],
         dependencies: ['sa-00']
@@ -43,16 +43,16 @@ export const BRAND_OS_AGENTS: Record<string, AgentMetadata> = {
         id: 'OI-02',
         name: 'Image Analyzer',
         role: 'Extraction',
-        description: 'Analyzes visual content from websites for tags/sentiment.',
+        description: 'Analyzes visual content from websites for tags/sentiment on a per-image basis.',
         inputs: ['Image URLs'],
         outputs: ['image_extraction.json'],
         dependencies: ['oi-01']
     },
     'oi-03': {
         id: 'OI-03',
-        name: 'Social Scraper',
+        name: 'Social Collector',
         role: 'Extraction',
-        description: 'Extracts posts and engagement data from social channels.',
+        description: 'Extracts posts and engagement data from social channels on a per-post basis.',
         inputs: ['Social Handles'],
         outputs: ['post_extraction.json'],
         dependencies: ['sa-00']

@@ -25,44 +25,17 @@ This package is now internally consistent across:
 
 ---
 
-## Key Remediations Applied (v2.1)
-
-1) **Report generator IDs standardized**
-Old `OI-11B / OI-13B / OI-14B / OI-15B / OI-16B / OI-16C` replaced with:
-- RPT‑01 Emergent Brand Report Generator
-- RPT‑02 Channel Audit Report Generator
-- RPT‑03 Competitive Landscape Report Generator
-- RPT‑04 Consistency Report Generator
-- RPT‑05 Voice of Market Report Generator
-- RPT‑06 Visual Identity Report Generator
-- RPT‑07 Visual Competitive Report Generator
-
-2) **Structured Sentiment implemented**
-- `post_extraction.classification.sentiment` added (polarity + emotional_tone + optional subjectivity)
-- Channel bedrocks aggregate sentiment distributions
-- Report templates include sentiment sections:
-  - Emergent Brand Report: Emotional Signature
-  - Social Channel Audit: Sentiment & Emotional Tone
-  - Voice of Market Report: Audience Sentiment Analysis
-
-3) **Channel-specific extraction implemented**
-- `post_extraction.channel_specific` supports LinkedIn / YouTube / Instagram / X / Facebook / TikTok
-- Channel compilers summarize to `channel_characteristics`
-
----
-
 ## Implementation Checklist
 
 ### Phase 0
 - Generate `evidence_ledger.json` + `corpus_manifest.json` (SA‑00)
 
 ### Phase 1 (Map)
-- Run OI‑01 on each webpage → `url_extraction_*.json`
-- Run OI‑02 on each image → `image_extraction_*.json`
-- Run OI‑03 on each social post → `post_extraction_*.json`
+- Run OI‑01 (Web Collector) on each webpage → `url_extraction_*.json`
+- Run OI‑02 (Image Analyzer) on each image → `image_extraction_*.json`
+- Run OI‑03 (Social Collector) on each social post → `post_extraction_*.json`
 
 ### Phase 1 (Reduce / COMP)
-- Precompute aggregates in Python (cadence, distributions, etc.)
 - Run:
   - COMP‑01 → `website_verbal_bedrock.json`
   - COMP‑02 → `website_visual_bedrock.json`
@@ -87,8 +60,6 @@ Old `OI-11B / OI-13B / OI-14B / OI-15B / OI-16B / OI-16C` replaced with:
 ### Bridge
 - BRIDGE‑01 → `bam_input_pack.json`
 
-### QA
-- Produce `gate_outputs.json` using `Brand_OS_Quality_Gates.md` checks.
 
 ---
 

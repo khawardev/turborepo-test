@@ -43,7 +43,7 @@ function AgentCard({ agent }: { agent: AgentState }) {
                         </CollapsibleTrigger>
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="text-lg font-semibold leading-none">{metadata.name}</span>
+                                <span className="text-lg  leading-none">{metadata.name}</span>
                                 <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-mono bg-background/50">
                                     {metadata.id}
                                 </Badge>
@@ -67,14 +67,13 @@ function AgentCard({ agent }: { agent: AgentState }) {
                         <p className="text-muted-foreground leading-relaxed">
                             {metadata.description}
                         </p>
-                        <div className="flex gap-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
-                             <span className="font-semibold text-foreground">Dependencies:</span>
+                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded items-center">
+                             <span className="font-semibold text-foreground mr-1">Dependencies:</span>
                              {metadata.dependencies.length > 0 ? (
                                 metadata.dependencies.map((dep: string, i: number) => (
-                                    <span key={i} className="flex items-center gap-1">
-                                        {i > 0 && <span className="opacity-50">/</span>}
+                                    <Badge key={i} variant="secondary" className="text-[10px] h-5 px-1.5 font-mono uppercase">
                                         {dep}
-                                    </span>
+                                    </Badge>
                                 ))
                              ) : (
                                 <span>None (Entry point)</span>
