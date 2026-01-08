@@ -10,9 +10,11 @@ interface GatherDashboardProps {
     startDate?: string;
     endDate?: string;
     webLimit?: string;
+    triggerScrape?: boolean;
 }
 
-export default async function GatherDashboard({ brandId, startDate, endDate, webLimit }: GatherDashboardProps) {
+
+export default async function GatherDashboard({ brandId, startDate, endDate, webLimit, triggerScrape }: GatherDashboardProps) {
     console.log("========== GatherDashboard Server Render ==========");
     console.log("[GatherDashboard] Props:", { brandId, startDate, endDate, webLimit });
 
@@ -177,6 +179,7 @@ export default async function GatherDashboard({ brandId, startDate, endDate, web
                 webLimit={webLimit ? parseInt(webLimit) : 10}
                 startDate={startDate || ''}
                 endDate={endDate || ''}
+                triggerScrape={triggerScrape}
             />
         </DashboardInnerLayout>
     );

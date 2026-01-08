@@ -4,7 +4,7 @@ import { getGatherCookies } from '@/server/actions/cookieActions';
 import { redirect } from 'next/navigation';
 import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 
-export default async function GatherPage({ searchParams }: { searchParams: Promise<{ brandId: string; startDate?: string; endDate?: string; webLimit?: string; }> }) {
+export default async function GatherPage({ searchParams }: { searchParams: Promise<{ brandId: string; startDate?: string; endDate?: string; webLimit?: string; triggerScrape?: string; }> }) {
     const params = await searchParams;
     
     // Auto-Resume Logic:
@@ -50,5 +50,6 @@ export default async function GatherPage({ searchParams }: { searchParams: Promi
         startDate={params.startDate}
         endDate={params.endDate}
         webLimit={params.webLimit}
+        triggerScrape={params.triggerScrape === 'true'}
     />;
 }

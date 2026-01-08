@@ -37,7 +37,9 @@ interface GatherManagerProps {
     webLimit: number;
     startDate: string;
     endDate: string;
+    triggerScrape?: boolean;
 }
+
 
 export function GatherManager({
     brandId,
@@ -51,7 +53,8 @@ export function GatherManager({
     socialBatchId,
     webLimit,
     startDate,
-    endDate
+    endDate,
+    triggerScrape
 }: GatherManagerProps) {
     const router = useRouter();
     const [status, setStatus] = useState(initialStatus);
@@ -71,6 +74,26 @@ export function GatherManager({
             }).catch(console.error);
         }
     }, [brandId, startDate, endDate, webLimit]);
+
+    // Auto-trigger logic
+    const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
+    useEffect(() => {
+        if (triggerScrape && !hasAutoTriggered && !isStarting && !isPolling) {
+             // Only trigger if we don't have recent data or explicitly asked
+             // But triggerScrape=true usually comes from Setup, so we SHOULD run it.
+             // Avoid double running if status says running.
+             if (status && status.total_running > 0) {
+                 console.log("Skipping auto-trigger because tasks are already running.");
+                 setHasAutoTriggered(true);
+                 setIsPolling(true); // Just start polling
+                 return;
+             }
+
+             console.log("Auto-triggering scrape from URL param...");
+             setHasAutoTriggered(true);
+             handleStartCollection();
+        }
+    }, [triggerScrape, hasAutoTriggered]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Batch IDs and Statuses (Local State)
     const [currentWebBatchId, setCurrentWebBatchId] = useState<string | null>(websiteBatchId || null);
