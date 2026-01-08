@@ -8,13 +8,6 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 export default async function Phase1Page(props: {
   searchParams: SearchParams
 }) {
-  const searchParams = await props.searchParams;
-  const engagementId = typeof searchParams.engagementId === 'string' ? searchParams.engagementId : '';
-
-  if (!engagementId) {
-     return <div className="p-8">Error: No Engagement ID provided.</div>
-  }
-
   return (
       <>
         <DashboardLayoutHeading
@@ -22,7 +15,7 @@ export default async function Phase1Page(props: {
           subtitle="Extracting structured data and compiling bedrocks."
         />
         <Suspense fallback={<div>Loading Phase 1 Dashboard...</div>}>
-          <Phase1Dashboard engagementId={engagementId} />
+          <Phase1Dashboard engagementId={"345"} />
         </Suspense>
       </>
   );

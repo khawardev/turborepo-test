@@ -8,13 +8,6 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 export default async function ExportPage(props: {
   searchParams: SearchParams
 }) {
-  const searchParams = await props.searchParams;
-  const engagementId = typeof searchParams.engagementId === 'string' ? searchParams.engagementId : '';
-
-  if (!engagementId) {
-     return <div className="p-8">Error: No Engagement ID provided.</div>
-  }
-
   return (
       <>
         <DashboardLayoutHeading
@@ -22,7 +15,7 @@ export default async function ExportPage(props: {
           subtitle="Package synthesis for Brand Action Model (BAM)."
         />
         <Suspense fallback={<div>Loading Export...</div>}>
-          <ExportDashboard engagementId={engagementId} />
+          <ExportDashboard engagementId={"345"} />
         </Suspense>
       </>
   );

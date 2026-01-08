@@ -11,10 +11,7 @@ export default async function Phase0Page(props: {
   const searchParams = await props.searchParams;
   const engagementId = typeof searchParams.engagementId === 'string' ? searchParams.engagementId : '';
 
-  if (!engagementId) {
-     return <div className="p-8">Error: No Engagement ID provided. Please start from Setup.</div>
-  }
-
+ 
   return (
       <>
         <DashboardLayoutHeading
@@ -22,7 +19,7 @@ export default async function Phase0Page(props: {
           subtitle="Collecting evidence and establishing the corpus."
         />
         <Suspense fallback={<div>Loading Phase 0...</div>}>
-          <Phase0Dashboard engagementId={engagementId} />
+          <Phase0Dashboard engagementId={"345"} />
         </Suspense>
       </>
   );
