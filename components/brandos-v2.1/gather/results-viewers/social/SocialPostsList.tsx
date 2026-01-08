@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Heart, MessageSquare } from 'lucide-react';
 import { formatNumber, formatDuration } from '../utils';
+import { useInView } from 'react-intersection-observer';
 
 interface SocialPostsListProps {
     posts: any[];
@@ -11,7 +13,25 @@ interface SocialPostsListProps {
 }
 
 export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsListProps) {
+    const [visibleCount, setVisibleCount] = useState(20);
+    const { ref, inView } = useInView({
+        threshold: 0.1,
+        rootMargin: '200px',
+    });
+
+    useEffect(() => {
+        if (inView && visibleCount < posts.length) {
+            setVisibleCount(prev => Math.min(prev + 20, posts.length));
+        }
+    }, [inView, visibleCount, posts.length]);
+
+    useEffect(() => {
+        setVisibleCount(20);
+    }, [posts]);
+
     if (!posts || posts.length === 0) return null;
+
+    const visiblePosts = posts.slice(0, visibleCount);
 
     return (
         <div className="lg:col-span-1">
@@ -22,7 +42,7 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
                 </h4>
                 <ScrollArea className="h-[60vh] border rounded-lg">
                     <div className="p-2 space-y-2">
-                        {posts.map((post: any, idx: number) => {
+                        {visiblePosts.map((post: any, idx: number) => {
                             const displayText = post.title || post.description || post.message || post.text || post.full_text || post.caption || 'Untitled Post';
                             const hasImages = (post.image_urls && post.image_urls.length > 0) || (post.images && post.images.length > 0);
                             const thumbnail = post.video_id 
@@ -90,6 +110,11 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
                                 </Button>
                             );
                         })}
+                        {visibleCount < posts.length && (
+                            <div ref={ref} className="py-2 text-center text-xs text-muted-foreground">
+                                Loading more posts...
+                            </div>
+                        )}
                     </div>
                 </ScrollArea>
             </div>

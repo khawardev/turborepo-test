@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, ExternalLink, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useInView } from 'react-intersection-observer';
 
 interface WebsiteImageViewerProps {
     imageUrls: string[];
@@ -14,6 +16,22 @@ export function WebsiteImageViewer({ imageUrls }: WebsiteImageViewerProps) {
         });
     };
 
+    const [visibleCount, setVisibleCount] = useState(20);
+    const { ref, inView } = useInView({
+        threshold: 0.1,
+        rootMargin: '200px',
+    });
+
+    useEffect(() => {
+        if (inView && visibleCount < imageUrls.length) {
+            setVisibleCount(prev => Math.min(prev + 20, imageUrls.length));
+        }
+    }, [inView, visibleCount, imageUrls.length]);
+
+    useEffect(() => {
+        setVisibleCount(20);
+    }, [imageUrls]);
+
     if (!imageUrls || imageUrls.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -22,6 +40,8 @@ export function WebsiteImageViewer({ imageUrls }: WebsiteImageViewerProps) {
             </div>
         );
     }
+
+    const visibleImages = imageUrls.slice(0, visibleCount);
 
     return (
         <ScrollArea className="h-[55vh] w-full border rounded-lg p-4 bg-background">
@@ -42,7 +62,7 @@ export function WebsiteImageViewer({ imageUrls }: WebsiteImageViewerProps) {
 
                 {/* Masonry Gallery */}
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-                    {imageUrls.map((url, idx) => {
+                    {visibleImages.map((url, idx) => {
                         const isHttpUrl = url.startsWith('http://') || url.startsWith('https://');
                         const isS3Url = url.startsWith('s3://');
 
@@ -119,6 +139,11 @@ export function WebsiteImageViewer({ imageUrls }: WebsiteImageViewerProps) {
                         );
                     })}
                 </div>
+                 {visibleCount < imageUrls.length && (
+                    <div ref={ref} className="py-2 text-center text-xs text-muted-foreground">
+                        Loading more images...
+                    </div>
+                )}
             </div>
         </ScrollArea>
     );
