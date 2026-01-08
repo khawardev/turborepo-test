@@ -78,7 +78,7 @@ export function AgentStatusCard({ status, isComplete, hasData, onStart, isStarti
                                 </Badge>
                             </div>
                             <span className="text-xs font-medium text-muted-foreground mt-1 block">
-                                Autonomous multi-source scraper for Web & Social
+                                Autonomous multi-source capture agent for Web & Social
                             </span>
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export function AgentStatusCard({ status, isComplete, hasData, onStart, isStarti
                 <CollapsibleContent className="pl-9 space-y-4 pt-2">
                     <div className="text-sm space-y-4 animate-in slide-in-from-top-2">
                         <p className="text-muted-foreground leading-relaxed">
-                            Orchestrates web crawling and social media API extraction across multiple threads. Returns raw HTML, JSON, and unstructured text for downstream compilation.
+                            Orchestrates web data capture and social media API extraction across multiple threads. Returns raw HTML, JSON, and unstructured text for downstream compilation.
                         </p>
                         <div className="grid grid-cols-1 gap-3 p-3 bg-background/50 rounded-lg border">
                             <div className="space-y-1.5">

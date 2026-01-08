@@ -79,7 +79,7 @@ export function GatherManager({
 
     // --- Auditors Logic ---
 
-    // Calculate available social channels from scraped data
+    // Calculate available social channels from captured data
     const availableChannels = (() => {
         if (!socialData) return [];
         let channels: string[] = [];
@@ -254,7 +254,7 @@ export function GatherManager({
         }, 3000);
     };
 
-    // --- Polling Logic for Scraper ---
+    // --- Polling Logic ---
     const checkBatchStatuses = useCallback(async () => {
         let webStatus = null;
         let socialStatus = null;
@@ -409,7 +409,7 @@ export function GatherManager({
                                 {/* Website Auditor Section */}
                                 <AuditorAgentCard 
                                     title="Website Auditor"
-                                    description="Analyze scraped website content for verbal bedrock."
+                                    description="Analyze captured website content for verbal bedrock."
                                     icon={Globe}
                                     agentCode="OI-WEB-AUDIT"
                                     status={isAuditorRunning ? 'running' : auditorResult ? 'complete' : 'idle'}
