@@ -76,12 +76,14 @@ export function GatherManager({
     const [auditorTaskId, setAuditorTaskId] = useState<string | null>(null);
     const [auditorResult, setAuditorResult] = useState<any>(null);
     const [isAuditorRunning, setIsAuditorRunning] = useState(false);
+    const [websiteAuditScope, setWebsiteAuditScope] = useState<string>("both");
 
     // Social Auditor State
     const [socialAuditorTaskId, setSocialAuditorTaskId] = useState<string | null>(null);
     const [socialAuditorResult, setSocialAuditorResult] = useState<any>(null);
     const [isSocialAuditorRunning, setIsSocialAuditorRunning] = useState(false);
     const [selectedChannel, setSelectedChannel] = useState<string>("linkedin");
+    const [socialAuditScope, setSocialAuditScope] = useState<string>("brand");
 
     const hasResults = !!(websiteData || socialData);
     const isWebComplete = webBatchStatus === 'Completed' || webBatchStatus === 'CompletedWithErrors';
@@ -149,13 +151,13 @@ export function GatherManager({
             return;
         }
         setIsAuditorRunning(true);
-        toast.info("Starting Auditor Agent analysis...");
+        toast.info(`Starting Website Auditor analysis (${websiteAuditScope})...`);
         try {
             const res = await runAuditorAgent({
                 client_id: brandData.client_id,
                 brand_id: brandId,
                 batch_id: currentWebBatchId,
-                analysis_scope: 'both'
+                analysis_scope: websiteAuditScope as any
             });
 
             if (res.success && res.data?.task_id) {
@@ -210,7 +212,7 @@ export function GatherManager({
         }
         setIsSocialAuditorRunning(true);
         setSocialAuditorResult(null); // Clear previous
-        toast.info(`Starting Social Auditor Analysis for ${selectedChannel}...`);
+        toast.info(`Starting Social Auditor Analysis for ${selectedChannel} (${socialAuditScope})...`);
 
         try {
             const res = await runSocialAuditorAgent({
@@ -218,7 +220,7 @@ export function GatherManager({
                 brand_id: brandId,
                 batch_id: currentSocialBatchId,
                 channel_name: selectedChannel as any, // Cast to expected type
-                analysis_scope: 'both'
+                analysis_scope: socialAuditScope as any
             });
 
             if (res.success && res.data?.task_id) {
@@ -461,6 +463,22 @@ export function GatherManager({
                                     RenderResult={AuditorResultViewer}
                                     isDisabled={!currentWebBatchId}
                                     buttonLabel="Run Website Audit"
+                                    controls={
+                                         <Select 
+                                            value={websiteAuditScope} 
+                                            onValueChange={setWebsiteAuditScope} 
+                                            disabled={isAuditorRunning}
+                                        >
+                                            <SelectTrigger className="w-[180px] h-9 bg-background">
+                                                <SelectValue placeholder="Scope" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="brand">Brand Only</SelectItem>
+                                                <SelectItem value="competitors">Competitors Only</SelectItem>
+                                                <SelectItem value="both">Brand & Competitors</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    }
                                 />
 
                                 {/* Social Auditor Section */}
@@ -478,24 +496,41 @@ export function GatherManager({
                                     isDisabled={!currentSocialBatchId || !availableChannels.length}
                                     buttonLabel="Run Analysis"
                                     controls={
-                                         <Select 
-                                            value={selectedChannel} 
-                                            onValueChange={setSelectedChannel} 
-                                            disabled={isSocialAuditorRunning || !availableChannels.length}
-                                        >
-                                            <SelectTrigger className="w-[140px] h-9 bg-background">
-                                                <SelectValue placeholder="Channel" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {availableChannels.length > 0 ? (
-                                                    availableChannels.map(channel => (
-                                                        <SelectItem key={channel} value={channel} className="capitalize">{channel}</SelectItem>
-                                                    ))
-                                                ) : (
-                                                    <SelectItem value="none" disabled>No Data Available</SelectItem>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
+                                        <div className="flex items-center gap-2">
+                                             <Select 
+                                                value={selectedChannel} 
+                                                onValueChange={setSelectedChannel} 
+                                                disabled={isSocialAuditorRunning || !availableChannels.length}
+                                            >
+                                                <SelectTrigger className="w-[140px] h-9 bg-background">
+                                                    <SelectValue placeholder="Channel" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {availableChannels.length > 0 ? (
+                                                        availableChannels.map(channel => (
+                                                            <SelectItem key={channel} value={channel} className="capitalize">{channel}</SelectItem>
+                                                        ))
+                                                    ) : (
+                                                        <SelectItem value="none" disabled>No Data Available</SelectItem>
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+
+                                            <Select 
+                                                value={socialAuditScope} 
+                                                onValueChange={setSocialAuditScope} 
+                                                disabled={isSocialAuditorRunning}
+                                            >
+                                                <SelectTrigger className="w-[160px] h-9 bg-background">
+                                                    <SelectValue placeholder="Scope" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="brand">Brand Only</SelectItem>
+                                                    <SelectItem value="competitors">Competitors Only</SelectItem>
+                                                    <SelectItem value="both">Brand & Competitors</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     }
                                 />
                             </div>
