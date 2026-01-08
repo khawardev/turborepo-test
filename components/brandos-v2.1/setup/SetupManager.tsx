@@ -53,71 +53,45 @@ export function SetupManager() {
     const mockCompetitors = [
       { 
         id: crypto.randomUUID(), 
-        name: 'Writer', 
-        website: 'https://writer.com/', 
+        name: 'Nike', 
+        website: 'https://www.nike.com/', 
         socials: { 
-          linkedin: 'https://www.linkedin.com/company/getwriter', 
-          twitter: 'https://x.com/get_writer', 
-          facebook: '',
-          instagram: '',
-          youtube: '',
-          tiktok: ''
+          linkedin: 'https://www.linkedin.com/company/nike/', 
+          twitter: 'https://x.com/Nike', 
+          facebook: 'https://www.facebook.com/nike',
+          instagram: 'https://www.instagram.com/nike/',
+          youtube: 'https://www.youtube.com/@nike',
+          tiktok: 'https://www.tiktok.com/@nike?lang=en'
         } 
       },
       { 
         id: crypto.randomUUID(), 
-        name: 'Brand AI', 
-        website: 'https://brand.ai/', 
+        name: 'On', 
+        website: 'https://www.on.com/en-us/', 
         socials: { 
-          linkedin: 'https://www.linkedin.com/company/brand-ai/', 
-          twitter: '', 
-          facebook: '',
-          instagram: 'https://www.instagram.com/brandai/',
-          youtube: '',
-          tiktok: ''
-        } 
-      },
-      { 
-        id: crypto.randomUUID(), 
-        name: 'Jasper', 
-        website: 'https://www.jasper.ai/', 
-        socials: { 
-          linkedin: 'https://www.linkedin.com/company/heyjasperai/', 
-          twitter: 'https://x.com/heyjasperai', 
-          facebook: 'https://www.facebook.com/heyjasperai',
-          instagram: 'https://www.instagram.com/heyjasperai/',
-          youtube: 'https://www.youtube.com/@JasperAI',
-          tiktok: ''
-        } 
-      },
-      { 
-        id: crypto.randomUUID(), 
-        name: 'Sweep', 
-        website: 'https://www.sweep.io/', 
-        socials: { 
-          linkedin: 'https://www.linkedin.com/company/sweephq/', 
-          twitter: 'https://x.com/sweep_io', 
-          facebook: '',
-          instagram: 'https://www.instagram.com/sweep.io/',
-          youtube: 'https://www.youtube.com/@sweep_io',
-          tiktok: ''
+          linkedin: 'https://www.linkedin.com/company/on-ag/', 
+          twitter: 'https://x.com/on_running', 
+          facebook: 'https://www.facebook.com/On/',
+          instagram: 'https://www.instagram.com/on',
+          youtube: 'https://www.youtube.com/On-Running',
+          tiktok: 'https://www.tiktok.com/@onrunning'
         } 
       }
     ];
 
     form.setValue('details', {
-      engagementName: `Humanbrand AI Market Analysis ${new Date().getFullYear()}`,
-      clientName: 'Humanbrand AI',
-      clientWebsite: 'https://www.humanbrand.ai/',
+      engagementName: `Under Armour Market Analysis ${new Date().getFullYear()}`,
+      clientName: 'Under Armour',
+      clientWebsite: 'https://www.underarmour.com/en-us/',
       clientSocials: {
-        linkedin: 'https://www.linkedin.com/company/humanbrand-ai/',
-        twitter: '',
-        instagram: '',
-        youtube: '',
-        facebook: '',
-        tiktok: ''
+        linkedin: 'https://www.linkedin.com/company/under-armour/',
+        twitter: 'https://x.com/UnderArmour',
+        instagram: 'https://www.instagram.com/underarmour/',
+        youtube: 'https://www.youtube.com/user/underarmour',
+        facebook: 'https://www.facebook.com/UnderArmour/',
+        tiktok: 'https://www.tiktok.com/@underarmour?lang=en'
       },
-      industry: 'Artificial Intelligence'
+      industry: 'Sports Apparel'
     });
     form.setValue('competitors', mockCompetitors);
     
@@ -129,7 +103,7 @@ export function SetupManager() {
     form.setValue('channels.facebook.enabled', true);
     form.setValue('channels.tiktok.enabled', true);
 
-    toast.success('Form autofilled with Humanbrand AI data');
+    toast.success('Form autofilled with Under Armour data');
   };
 
   const onSubmit = async (data: EngagementConfigV2) => {
@@ -270,8 +244,8 @@ export function SetupManager() {
                 )}
             </div>
 
-            <div className="space-y-4 pt-2">
-                <p className="text-sm font-medium uppercase tracking-wider">Client Social Channels</p>
+              <div className="space-y-4 pt-2">
+                <Label htmlFor="clientWebsite" className="text-base">Client Social Channels</Label>
                 <div className="grid grid-cols-2 gap-4">
                 <SocialInput icon={Linkedin} label="LinkedIn" register={form.register('details.clientSocials.linkedin')} placeholder="company/..." />
                 <SocialInput icon={Twitter} label="Twitter/X" register={form.register('details.clientSocials.twitter')} placeholder="@handle" />

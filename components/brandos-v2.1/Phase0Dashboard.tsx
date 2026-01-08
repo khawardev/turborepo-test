@@ -54,19 +54,29 @@ export default function Phase0Dashboard({ engagementId }: { engagementId: string
 
     const overallStatus = (gateResults?.overall_status === 'pass' || gateResults?.overall_status === 'warn') ? 'complete' : 'pending';
     const canProceed = overallStatus === 'complete';
+    const isSwarmComplete = agents.length > 0 && agents.every(a => a.status === 'completed' || a.status === 'failed');
 
     return (
         <DashboardInnerLayout>
+            {/* Agents */}
+            <div className="space-y-6">
+                <div className="border-b pb-2">
+                    <h3 className="text-2xl font-medium tracking-tight">Agent Swarm Status</h3>
+                    <p className="text-muted-foreground mt-1">Real-time status of Phase 0 agents.</p>
+                </div>
+                <AgentList agents={agents} />
+            </div>
+
             {/* Gate 0 */}
-            {gateResults && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            {isSwarmComplete && gateResults && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 mt-8">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 0: Corpus Adequacy</h3>
                     <GateResultDisplay results={gateResults} />
                 </div>
             )}
 
             {/* Artifacts */}
-            {(ledger || manifest || config) && (
+            {isSwarmComplete && (ledger || manifest || config) && (
                 <div className="space-y-8 pt-12">
                     <div className="flex items-center gap-4">
                         <h3 className="text-2xl font-medium tracking-tight">Phase 0 Deliverables</h3>

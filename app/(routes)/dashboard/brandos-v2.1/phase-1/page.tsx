@@ -3,11 +3,7 @@ import Phase1Dashboard from '@/components/brandos-v2.1/Phase1Dashboard';
 import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { Suspense } from 'react';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function Phase1Page(props: {
-  searchParams: SearchParams
-}) {
+export default function Phase1Page() {
   return (
       <>
         <DashboardLayoutHeading

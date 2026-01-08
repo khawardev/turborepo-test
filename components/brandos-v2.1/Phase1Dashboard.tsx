@@ -65,6 +65,7 @@ export default function Phase1Dashboard({ engagementId }: { engagementId: string
 
     const overallStatus = (gate2Results?.overall_status === 'pass' || gate2Results?.overall_status === 'warn') ? 'complete' : 'pending';
     const canProceed = overallStatus === 'complete';
+    const isSwarmComplete = agents.length > 0 && agents.every(a => a.status === 'completed' || a.status === 'failed');
 
     return (
         <DashboardInnerLayout>
@@ -99,12 +100,12 @@ export default function Phase1Dashboard({ engagementId }: { engagementId: string
                              <h4 className="text-lg font-medium">Compilation Agents (Reduce)</h4>
                              <Badge variant="secondary" className="text-xs">Phase 1B</Badge>
                         </div>
-                         <AgentList agents={agents.filter(a => a.id.startsWith('comp-'))} />
+                        <AgentList agents={agents.filter(a => a.id.startsWith('comp-'))} />
                     </div>
                 </div>
             </div>
             {/* Gate 1 Logic */}
-            {gate1Results && (
+            {isSwarmComplete && gate1Results && (
                 <div className="space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 1: Extraction Quality</h3>
                     <GateResultDisplay results={gate1Results} />
@@ -112,7 +113,7 @@ export default function Phase1Dashboard({ engagementId }: { engagementId: string
             )}
 
             {/* Gate 2 Logic */}
-            {gate2Results && (
+            {isSwarmComplete && gate2Results && (
                 <div className="space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 2: Compilation Integrity</h3>
                     <GateResultDisplay results={gate2Results} />
@@ -120,7 +121,7 @@ export default function Phase1Dashboard({ engagementId }: { engagementId: string
             )}
 
             {/* Artifacts Viewer */}
-            {(extractions || bedrocks) && (
+            {isSwarmComplete && (extractions || bedrocks) && (
                 <div className="space-y-8 pt-12">
                     <div className="flex items-center gap-4">
                         <h3 className="text-2xl font-medium tracking-tight">Phase 1 Deliverables</h3>

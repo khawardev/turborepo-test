@@ -42,6 +42,8 @@ export default function ExportDashboard({ engagementId }: { engagementId: string
         return () => clearInterval(interval);
     }, [engagementId, isPolling]);
 
+    const isSwarmComplete = agents.length > 0 && agents.every(a => a.status === 'completed' || a.status === 'failed');
+
     return (
         <DashboardInnerLayout>
             {/* Agents */}
@@ -54,16 +56,18 @@ export default function ExportDashboard({ engagementId }: { engagementId: string
             </div>
 
             {/* Deliverables List */}
-            <div className="space-y-8 mt-8">
-                <div className="flex items-center gap-4">
-                    <h3 className="text-2xl font-medium tracking-tight">Phase 3: Bridge Outputs</h3>
-                    <div className="h-px flex-1 bg-border" />
+            {isSwarmComplete && (
+                <div className="space-y-8 mt-8">
+                    <div className="flex items-center gap-4">
+                        <h3 className="text-2xl font-medium tracking-tight">Phase 3: Bridge Outputs</h3>
+                        <div className="h-px flex-1 bg-border" />
+                    </div>
+                    <DeliverablesTable items={BRIDGE_DELIVERABLES} />
                 </div>
-                <DeliverablesTable items={BRIDGE_DELIVERABLES} />
-            </div>
+            )}
 
             {/* Download */}
-            {packageUrl && (
+            {isSwarmComplete && packageUrl && (
                 <div className="mt-8 animate-in fade-in slide-in-from-bottom-4">
                     <Card className="bg-(--brandos-green)/10 border-[var(--brandos-green)]/30">
                         <CardHeader>

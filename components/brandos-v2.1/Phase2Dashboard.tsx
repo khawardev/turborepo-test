@@ -117,6 +117,7 @@ export default function Phase2Dashboard({ engagementId }: { engagementId: string
 
     const overallStatus = (gate4Results?.overall_status === 'pass' || gate4Results?.overall_status === 'warn') ? 'complete' : 'pending';
     const canProceed = overallStatus === 'complete';
+    const isSwarmComplete = agents.length > 0 && agents.every(a => a.status === 'completed' || a.status === 'failed');
 
     return (
         <DashboardInnerLayout>
@@ -127,7 +128,7 @@ export default function Phase2Dashboard({ engagementId }: { engagementId: string
                         <h3 className="text-2xl font-medium tracking-tight">Agent Swarm Status</h3>
                         <p className="text-muted-foreground mt-1">Real-time status of strategy and reporting agents.</p>
                     </div>
-                     <Button disabled={!canProceed} onClick={() => router.push(`/dashboard/brandos-v2.1/export?engagementId=${engagementId}`)} >
+                    <Button disabled={!canProceed} onClick={() => router.push(`/dashboard/brandos-v2.1/export?engagementId=${engagementId}`)} >
                         {canProceed ? (
                             <>
                                 Proceed to Export
@@ -167,7 +168,7 @@ export default function Phase2Dashboard({ engagementId }: { engagementId: string
             </div>
 
             {/* Gate 3 */}
-            {gate3Results && (
+            {isSwarmComplete && gate3Results && (
                 <div className="space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 3: Synthesis Credibility</h3>
                     <GateResultDisplay results={gate3Results} />
@@ -175,7 +176,7 @@ export default function Phase2Dashboard({ engagementId }: { engagementId: string
             )}
 
             {/* Gate 4 */}
-            {gate4Results && (
+            {isSwarmComplete && gate4Results && (
                 <div className="space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 4: Report Quality</h3>
                     <GateResultDisplay results={gate4Results} />
@@ -183,7 +184,7 @@ export default function Phase2Dashboard({ engagementId }: { engagementId: string
             )}
 
             {/* Artifacts */}
-            {(synthesis || reports || comparative) && (
+            {isSwarmComplete && (synthesis || reports || comparative) && (
                 <div className="space-y-8 pt-12">
                     <div className="flex items-center gap-4">
                         <h3 className="text-2xl font-medium tracking-tight">Phase 2 Deliverables</h3>

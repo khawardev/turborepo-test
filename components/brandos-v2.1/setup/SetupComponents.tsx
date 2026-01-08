@@ -49,15 +49,14 @@ export function CompetitorSection({ form }: { form: any }) {
 
       <div className="grid gap-6">
         {competitors.map((comp: any, index: number) => (
-          <div key={comp.id} className="relative p-6 border rounded-xl bg-background/50 hover:bg-accent/5 transition-colors">
+          <div key={comp.id} className="relative p-6 border rounded-xl bg-accent/50 hover:bg-accent/5 transition-colors">
             <Button
               type="button"
               variant="ghost"
-              size="icon"
               className="absolute top-4 right-4 text-muted-foreground hover:text-destructive"
               onClick={() => removeCompetitor(index)}
             >
-              <Trash2 className="h-5 w-5" />
+             Remove
             </Button>
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div className="space-y-2">
@@ -76,7 +75,7 @@ export function CompetitorSection({ form }: { form: any }) {
             </div>
 
             <div>
-              <p className="text-sm font-medium mb-4 text-muted-foreground uppercase tracking-wider">Social Channels</p>
+              <Label className="text-base mb-3">Social Channels</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <SocialInput icon={Linkedin} label="LinkedIn" register={form.register(`competitors.${index}.socials.linkedin`)} placeholder="company/..." />
                 <SocialInput icon={Twitter} label="Twitter/X" register={form.register(`competitors.${index}.socials.twitter`)} placeholder="@handle" />

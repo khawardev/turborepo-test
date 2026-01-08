@@ -14,8 +14,10 @@ import { AuditorResultViewer } from './AuditorResultViewer';
 import { SocialAuditorResultViewer } from './SocialAuditorResultViewer';
 import BrandProfile from "@/components/stages/ccba/details/profile-tab/BrandProfile";
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
-import { scrapeBatchWebsite, getWebsiteBatchStatus } from '@/server/actions/ccba/website/websiteScrapeActions';
-import { scrapeBatchSocial, getSocialBatchStatus } from '@/server/actions/ccba/social/socialScrapeActions';
+import { scrapeBatchWebsite } from '@/server/actions/ccba/website/websiteScrapeActions';
+import { scrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActions';
+import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
+import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAuditorOutput } from '@/server/actions/auditorActions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,9 +58,19 @@ export function GatherManager({
     const [isPolling, setIsPolling] = useState(false);
     const [pollingMessage, setPollingMessage] = useState<string>("");
     
-    // Batch IDs
+    // Batch IDs and Statuses (Local State)
     const [currentWebBatchId, setCurrentWebBatchId] = useState<string | null>(websiteBatchId || null);
     const [currentSocialBatchId, setCurrentSocialBatchId] = useState<string | null>(socialBatchId || null);
+    const [webBatchStatus, setWebBatchStatus] = useState<string | null>(websiteBatchStatus || null);
+    const [socBatchStatus, setSocBatchStatus] = useState<string | null>(socialBatchStatus || null);
+
+    // Update local state when props change (e.g. after refresh)
+    useEffect(() => {
+        if (websiteBatchStatus) setWebBatchStatus(websiteBatchStatus);
+        if (socialBatchStatus) setSocBatchStatus(socialBatchStatus);
+        if (websiteBatchId) setCurrentWebBatchId(websiteBatchId);
+        if (socialBatchId) setCurrentSocialBatchId(socialBatchId);
+    }, [websiteBatchStatus, socialBatchStatus, websiteBatchId, socialBatchId]);
 
     // Auditor State
     const [auditorTaskId, setAuditorTaskId] = useState<string | null>(null);
@@ -72,13 +84,12 @@ export function GatherManager({
     const [selectedChannel, setSelectedChannel] = useState<string>("linkedin");
 
     const hasResults = !!(websiteData || socialData);
-    const isWebComplete = websiteBatchStatus === 'Completed' || websiteBatchStatus === 'CompletedWithErrors';
-    const isSocialComplete = socialBatchStatus === 'Completed' || socialBatchStatus === 'CompletedWithErrors';
+    const isWebComplete = webBatchStatus === 'Completed' || webBatchStatus === 'CompletedWithErrors';
+    const isSocialComplete = socBatchStatus === 'Completed' || socBatchStatus === 'CompletedWithErrors';
     const isComplete = hasResults && isWebComplete && isSocialComplete;
     const isRunning = (status && status.total_running > 0) || isPolling;
 
     // --- Auditors Logic ---
-
     // Calculate available social channels from captured data
     const availableChannels = (() => {
         if (!socialData) return [];
@@ -259,10 +270,18 @@ export function GatherManager({
         let webStatus = null;
         let socialStatus = null;
 
-        if (currentWebBatchId) webStatus = await getWebsiteBatchStatus(brandId, currentWebBatchId);
-        if (currentSocialBatchId) socialStatus = await getSocialBatchStatus(brandId, currentSocialBatchId);
+        if (currentWebBatchId) {
+            webStatus = await getBatchWebsiteScrapeStatus(brandId, currentWebBatchId);
+            if (webStatus?.status) setWebBatchStatus(webStatus.status); // Update local status
+        }
+        if (currentSocialBatchId) {
+            socialStatus = await getBatchSocialScrapeStatus(brandId, currentSocialBatchId);
+            if (socialStatus?.status) setSocBatchStatus(socialStatus.status); // Update local status
+        }
+        
         const taskStatus = await getCcbaTaskStatus(brandId);
         setStatus(taskStatus);
+        
         return { webStatus, socialStatus, taskStatus };
     }, [brandId, currentWebBatchId, currentSocialBatchId]);
 
@@ -276,21 +295,31 @@ export function GatherManager({
             setPollingMessage(`Checking status... (${pollCount})`);
             try {
                 const { webStatus, socialStatus, taskStatus } = await checkBatchStatuses();
+                
+                // Use the returned status or local state for checks
                 const webDone = webStatus?.status === 'Completed' || webStatus?.status === 'CompletedWithErrors' || webStatus?.status === 'Failed';
                 const socialDone = socialStatus?.status === 'Completed' || socialStatus?.status === 'CompletedWithErrors' || socialStatus?.status === 'Failed';
                 const tasksRunning = taskStatus?.total_running > 0;
 
+                // If both are done OR failed OR we don't have IDs for them (shouldn't happen if we started them), AND global tasks are 0
                 if ((webDone || !currentWebBatchId) && (socialDone || !currentSocialBatchId) && !tasksRunning) {
                     toast.success("Data collection completed!");
-                    setIsPolling(false);
                     setPollingMessage("");
                     clearInterval(interval);
-                    setTimeout(() => router.refresh(), 1000);
+                    setIsPolling(false);
+                    startTransition(() => {
+                        router.refresh();
+                    });
                     return;
                 }
-                if (webStatus?.progress) {
-                    setPollingMessage(`Web: ${webStatus.progress.completed}/${webStatus.progress.total_urls} | Social: Processing...`);
-                }
+                
+                // Construct progress string
+                let msgParts = [];
+                if (webStatus?.progress) msgParts.push(`Web: ${webStatus.progress.completed}/${webStatus.progress.total_urls}`);
+                if (socialStatus?.status) msgParts.push(`Social: ${socialStatus.status}`);
+                
+                setPollingMessage(msgParts.length > 0 ? msgParts.join(" | ") : "Processing...");
+                
             } catch (e) {
                 console.error("[GatherManager] Polling error:", e);
             }
@@ -311,6 +340,10 @@ export function GatherManager({
                 return;
             }
             toast.info("Initializing Data Collection Swarm...");
+            // Reset local statuses to indicate starting
+            setWebBatchStatus("Initializing");
+            setSocBatchStatus("Initializing");
+            
             try {
                 const webResult = await scrapeBatchWebsite(brandId, webLimit);
                 if (!webResult?.success) {
@@ -324,7 +357,15 @@ export function GatherManager({
                     toast.error(`Social capture failed: ${socialResult?.message}`);
                     return;
                 }
-                if (socialResult.data?.task_id) setCurrentSocialBatchId(socialResult.data.task_id);
+                
+                // Set Social Batch ID - handle both task_id and batch_id
+                const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
+                if (sBatchId) {
+                    setCurrentSocialBatchId(sBatchId);
+                    console.log("Social Batch ID set to:", sBatchId);
+                } else {
+                    console.warn("No Social Batch ID returned", socialResult);
+                }
 
                 toast.success("Swarm agents deployed.");
                 setIsPolling(true);
@@ -371,7 +412,7 @@ export function GatherManager({
                             </TabsTrigger>
                             <TabsTrigger value="ai_audit" disabled={!isComplete}>
                                 <Bot className="w-4 h-4" />
-                                AI Audit
+                                Outside-in Audit
                             </TabsTrigger>
                         </TabsList>
 

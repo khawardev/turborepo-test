@@ -3,13 +3,7 @@ import Phase0Dashboard from '@/components/brandos-v2.1/Phase0Dashboard';
 import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { Suspense } from 'react';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function Phase0Page(props: {
-  searchParams: SearchParams
-}) {
-  const searchParams = await props.searchParams;
-  const engagementId = typeof searchParams.engagementId === 'string' ? searchParams.engagementId : '';
+export default function Phase0Page() {
 
  
   return (
