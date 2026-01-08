@@ -123,7 +123,7 @@ export function LoginForm({
           <Button type="submit" className="w-full">
             Login
           </Button>
-          <div className="flex items-center justify-center gap-2">
+          {/* <div className="flex items-center justify-center gap-2">
             <span className="flex-1 border-t" />
             <span className="text-xs uppercase text-muted-foreground">
               Or
@@ -132,7 +132,7 @@ export function LoginForm({
           </div>
           <Button variant="outline" type="button" className="w-full" onClick={() => googleLogin()}>
             <FcGoogle /> Continue with Google
-          </Button>
+          </Button> */}
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
