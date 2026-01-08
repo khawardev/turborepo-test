@@ -30,7 +30,7 @@ export const DashboardHeader = ({ title, subtitle }: any) => {
     return (
         <div className="flex flex-col w-full gap-5">
             <div>
-                <h1 className="text-2xl font-bold ">{title}</h1>
+                <h1 className="text-2xl ">{title}</h1>
                 {subtitle && <p className=" text-muted-foreground mt-1">{subtitle}</p>}
             </div>
             <Separator />

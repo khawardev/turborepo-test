@@ -57,30 +57,9 @@ export default function Phase0Dashboard({ engagementId }: { engagementId: string
 
     return (
         <DashboardInnerLayout>
-            {/* Agents */}
-            <div className="space-y-6 ">
-                <div className="border-b pb-2 flex justify-between">
-                    <div>
-                        <h3 className="text-2xl font-medium tracking-tight">Agent Swarm Status</h3>
-                        <p className="text-muted-foreground mt-1">Real-time status of setup agents.</p>
-                    </div>
-                    <Button disabled={!canProceed} onClick={() => router.push(`/dashboard/brandos-v2.1/phase-1?engagementId=${engagementId}`)} >
-                        {canProceed ? (
-                            <>
-                                Proceed to Phase 1
-                                <MdOutlineArrowRight />
-                            </>
-                        ) : (
-                            <ButtonSpinner> Phase 0</ButtonSpinner>
-                        )}
-                    </Button>
-                </div>
-                <AgentList agents={agents} />
-            </div>
-
             {/* Gate 0 */}
             {gateResults && (
-                <div className="space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4">
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                     <h3 className="text-2xl font-medium tracking-tight">Gate 0: Corpus Adequacy</h3>
                     <GateResultDisplay results={gateResults} />
                 </div>

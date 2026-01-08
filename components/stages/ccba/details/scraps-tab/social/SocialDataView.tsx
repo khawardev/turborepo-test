@@ -1,7 +1,7 @@
-
 'use client'
 import { EmptyStateCard } from '@/components/shared/CardsUI';
 import PlatformCard from './PlatformCard';
+import { cn } from '@/lib/utils';
 
 export default function SocialDataView({ socialScrapedData }: any) {
 
@@ -9,10 +9,19 @@ export default function SocialDataView({ socialScrapedData }: any) {
         return <EmptyStateCard message="No social media data available for this selection." />
     }
 
+    const platformCount = socialScrapedData.social_platforms.length;
+    const isMultiColumn = platformCount > 1;
+
     return (
-        <div className="columns-1 md:columns-2  gap-6">
+        <div className={cn(
+            "gap-6 space-y-6",
+            isMultiColumn ? "columns-1 md:columns-2 md:space-y-0" : "w-full"
+        )}>
             {socialScrapedData.social_platforms.map((platformData: any) => (
-                <div key={platformData.platform} className="whitespace-normal mb-6">
+                <div key={platformData.platform} className={cn(
+                    "break-inside-avoid",
+                    isMultiColumn && "mb-6" 
+                )}>
                     <PlatformCard platformData={platformData} />
                 </div>
             ))}

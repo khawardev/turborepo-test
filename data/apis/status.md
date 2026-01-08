@@ -29,7 +29,7 @@ string
 ## Request : 
 
 curl -X 'GET' \
-  'http://54.221.221.0:8000/stage/running-tasks?stage=ccba&client_id=763d503f-9d24-42c4-b6d5-0fa2beba5da9&brand_id=1ea9c057-d7dd-45fd-9d12-7ce4b0211474' \
+  'http://54.221.221.0:8000/stage/running-tasks?stage=ccba&client_id=2ea1a375-9bbe-4125-b063-3fa15068f48f&brand_id=cfbcfb0a-6b64-4d4d-9345-732ee037c0b2' \
   -H 'accept: application/json'
 
 ## Response 

@@ -25,7 +25,6 @@ export default async function BrandDetailPage({
   const websiteReportData = await getBatchWebsiteReports(brandId);
   const websiteScraps = await getpreviousWebsiteScraps(brandId);
   const taskStatusData = await getCcbaTaskStatus(brandId);
-console.log("websiteScraps", websiteScraps);
   
 
   const tabs = [

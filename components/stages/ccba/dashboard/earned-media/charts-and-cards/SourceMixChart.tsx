@@ -26,7 +26,7 @@ export default function SourceMixChart({ data }: any) {
                             <div key={item.name}>
                                 <div className="flex justify-between items-center text-sm mb-1">
                                     <div className="flex items-center">
-                                        <div className="w-2 h-2 mr-2" style={{ backgroundColor: item.color, border: item.color === '#FAFAFA' ? '1px solid #555' : 'none' }}></div>
+                                        <div className="w-2 h-2 " style={{ backgroundColor: item.color, border: item.color === '#FAFAFA' ? '1px solid #555' : 'none' }}></div>
                                         <span>{item.name}</span>
                                     </div>
                                     <span className="font-bold">{item.value}%</span>

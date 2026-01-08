@@ -20,8 +20,8 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
             <div className="group  inset-0 flex flex-col justify-end">
                 <div className="flex flex-col gap-4 bg-opacity-50 py-4 rounded-lg backdrop-blur-sm">
                     <div>
-                        {post.tags.map((tag:any) => (
-                            <Badge key={tag} className="mr-2">
+                        {post.tags.map((tag: any) => (
+                            <Badge key={tag} className="">
                                 {tag}
                             </Badge>
                         ))}

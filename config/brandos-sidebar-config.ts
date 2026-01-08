@@ -14,6 +14,11 @@ export const BrandOSConfig: any = {
             icon: PiHandshakeDuotone
         },
         {
+            title: "Gather Data",
+            href: "/dashboard/brandos-v2.1/gather",
+            icon: LuShare
+        },
+        {
             title: "Phase 0 Outside-In Audit",
             href: "/dashboard/brandos-v2.1/phase-0",
             icon: LuBrain

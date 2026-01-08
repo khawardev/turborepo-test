@@ -31,44 +31,40 @@ const sizeStyles: Record<InputSize, string> = {
   "3xl": "h-20 px-30 py-4 text-base rounded-none",
 }
 
-function Input({
-  className,
-  type,
-  variant = "default",
-  size = "md",
-  icon,
-  endElement,
-  ...props
-}: InputProps) {
-  const hasIcon = !!icon
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, variant = "default", size = "md", icon, endElement, ...props }, ref) => {
+    const hasIcon = !!icon
 
-  return (
-    <div className={cn("relative flex-1", hasIcon && "group")}>
-      {icon && (
-        <span className="-translate-y-1/2 absolute top-1/2 md:left-10 left-4  text-muted-foreground/50 transition-opacity group-focus-within:opacity-70">
-          {icon}
-        </span>
-      )}
-      <input
-        type={type}
-        data-slot="input"
-        className={cn(
-          "flex w-full min-w-0 rounded-md border shadow-xs transition-colors duration-100 ease-in-out outline-none",
-          variant !== "muted" && variantStyles[variant],
-          variant === "muted" && variantStyles.muted,
-          sizeStyles[size],
-          hasIcon && "md:pl-17 pl-11",
-          className
+    return (
+      <div className={cn("relative flex-1", hasIcon && "group")}>
+        {icon && (
+          <span className="-translate-y-1/2 absolute top-1/2 md:left-4 left-4  text-muted-foreground/50 transition-opacity group-focus-within:opacity-70">
+            {icon}
+          </span>
         )}
-        {...props}
-      />
-      {endElement && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2">
-          {endElement}
-        </div>
-      )}
-    </div>
-  )
-}
+        <input
+          type={type}
+          data-slot="input"
+          className={cn(
+            "flex w-full min-w-0 rounded-md border shadow-xs transition-colors duration-100 ease-in-out outline-none",
+            variant !== "muted" && variantStyles[variant],
+            variant === "muted" && variantStyles.muted,
+            sizeStyles[size],
+            hasIcon && " pl-11",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {endElement && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+            {endElement}
+          </div>
+        )}
+      </div>
+    )
+  }
+)
+Input.displayName = "Input"
 
 export { Input }

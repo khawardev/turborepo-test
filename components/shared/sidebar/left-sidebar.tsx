@@ -32,7 +32,7 @@ export function LeftSidebar({ user, brands, ...props}: any) {
                         <FullLogo />
                     </div>
                 </section>
-                <div className="px-1 my-2 relative group-data-[collapsible=icon]:hidden text-base">
+                {/* <div className="px-1 my-2 relative group-data-[collapsible=icon]:hidden text-base">
                     <div className="relative">
                         <Command className="absolute left-2 top-2.5 size-3.5 text-muted-foreground" />
                         <SidebarInput placeholder="Search" className="pl-8 bg-background border-input" />
@@ -40,7 +40,7 @@ export function LeftSidebar({ user, brands, ...props}: any) {
                             <span className="text-xs">⌘</span>K
                         </div>
                     </div>
-                </div>
+                </div> */}
             </SidebarHeader>
             
             <SidebarContent>

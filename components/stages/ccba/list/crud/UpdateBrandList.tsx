@@ -86,7 +86,7 @@ export function EditBrandList({
         setOpen(false);
 
         if (!success) return toast.error(message || "Failed to update brand.");
-        
+
         toast.success(message);
         router.refresh();
     }
@@ -241,7 +241,7 @@ export function EditBrandList({
                                     })
                                 }
                             >
-                                <Plus className="mr-2 h-4 w-4" /> Competitor
+                                <Plus className=" h-4 w-4" /> Competitor
                             </Button>
                         </section>
 

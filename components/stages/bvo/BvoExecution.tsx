@@ -40,7 +40,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
             prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
         );
     };
-    
+
     const handleStartExecution = () => {
         setIsRunning(true);
         setCurrentStep(0);
@@ -55,7 +55,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
             setIsRunning(false);
         }
     };
-    
+
     const handleEnd = () => {
         setIsFinished(true);
         setIsRunning(false);
@@ -71,7 +71,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
                     <p className="mb-4">Current mode: <strong>{mode}</strong></p>
                     {/* <Button asChild variant="outline">
                         <Link href="/dashboard/bam/new">
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="h-4 w-4 " />
                             Create New BAM
                         </Link>
                     </Button> */}
@@ -115,7 +115,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
                     )}
 
                     <Button onClick={handleStartExecution} className="mt-4">
-                        {mode === 'interactive' ? <Play className="h-4 w-4 mr-2" /> : <FastForward className="h-4 w-4 mr-2" />}
+                        {mode === 'interactive' ? <Play className="h-4 w-4 " /> : <FastForward className="h-4 w-4 " />}
                         Start Execution
                     </Button>
                 </CardContent>
@@ -142,15 +142,15 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
                     <Separator className="my-6" />
                     <div className="flex flex-wrap gap-2">
                         <Button onClick={handleNext}>
-                            <Check className="h-4 w-4 mr-2" />
+                            <Check className="h-4 w-4 " />
                             Accept & Next
                         </Button>
                         <Button variant="outline">
-                            <Download className="h-4 w-4 mr-2" />
+                            <Download className="h-4 w-4 " />
                             Download PDF
                         </Button>
                         <Button variant="destructive" onClick={handleEnd}>
-                            <X className="h-4 w-4 mr-2" />
+                            <X className="h-4 w-4 " />
                             End and Finalize
                         </Button>
                     </div>
@@ -213,7 +213,7 @@ export default function BvoExecution({ bvo }: { bvo: { id: string; name: string;
             <CardContent>
                 <p>The BVO execution has been finalized. You can download the final report.</p>
                 <Button className="mt-4">
-                    <Download className="h-4 w-4 mr-2" />
+                    <Download className="h-4 w-4 " />
                     Download Final Report
                 </Button>
             </CardContent>

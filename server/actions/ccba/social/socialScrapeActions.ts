@@ -21,50 +21,86 @@ export async function scrapeBatchSocial(
             end_date: end_date,
         }
 
+        console.log("[scrapeBatchSocial] Payload:", scrapePayload);
+
         const { success, data, error } = await brandRequest("/batch/social", "POST", scrapePayload);
+
+        console.log("[scrapeBatchSocial] Response:", { success, data, error });
 
         if (!success) return { success: false, message: error };
 
         revalidatePath(`/dashboard/ccba/${brand_id}`);
+        revalidatePath(`/dashboard/brandos-v2.1/gather`);
         return { success: true, message: `Social ${SCRAPING} started successfully`, data };
     } catch (error: any) {
-        console.error(`Failed batch social ${SCRAPE} for brand ${brand_id}:`, error);
+        console.error(`[scrapeBatchSocial] Error for brand ${brand_id}:`, error);
         return { success: false, message: `Batch social ${SCRAPING} failed` };
     }
 }
 
+export async function getSocialBatchStatus(brand_id: string, batch_id: string) {
+    try {
+        const user = await getCurrentUser();
+
+        console.log("[getSocialBatchStatus] Checking status for batch:", batch_id);
+
+        const { success, data, error } = await brandRequest(
+            `/batch/social-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
+            "GET"
+        );
+
+        console.log("[getSocialBatchStatus] Response:", { success, data, error });
+
+        if (!success) return null;
+
+        return data;
+    } catch (error) {
+        console.error("[getSocialBatchStatus] Error:", error);
+        return null;
+    }
+}
 
 export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
     try {
         const user = await getCurrentUser();
 
         if (!batch_id) {
-            return { success: false, message: "No batch_id found for this brand." };
+            console.warn("[getScrapeBatchSocial] No batch_id provided");
+            return null;
         }
+
+        console.log("[getScrapeBatchSocial] Fetching results for batch:", batch_id);
 
         const { success, data, error } = await brandRequest(
             `/batch/social-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
             "GET"
         );
 
+        console.log("[getScrapeBatchSocial] Response success:", success, "Has data:", !!data);
+
         if (!success) return null;
 
         return data;
     } catch (error) {
+        console.error("[getScrapeBatchSocial] Error:", error);
         return null;
     }
 }
-
-
 
 export async function getPreviousSocialScrapes(brand_id: string) {
     try {
         const user = await getCurrentUser();
 
+        console.log("[getPreviousSocialScrapes] Fetching for brand:", brand_id);
+
         const { success, data, error } = await brandRequest(
             `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`,
-            "GET"
+            "GET",
+            undefined,
+            'no-store'
         );
+
+        console.log("[getPreviousSocialScrapes] Response:", { success, count: data?.length, error });
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
@@ -79,21 +115,23 @@ export async function getPreviousSocialScrapes(brand_id: string) {
             end_date: item.end_date,
         }));
 
+        console.log("[getPreviousSocialScrapes] Latest batch:", filtered[0]);
+
         return filtered;
     } catch (error) {
-        console.error("Error fetching previous social captures:", error);
+        console.error("[getPreviousSocialScrapes] Error:", error);
         return null;
     }
 }
-
-
 
 export async function getSocialBatchId(brand_id: string) {
     try {
         const user = await getCurrentUser();
 
-
-        const { success, data, error } = await brandRequest(`/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, "GET");
+        const { success, data, error } = await brandRequest(
+            `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
+            "GET"
+        );
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return null;
@@ -102,7 +140,7 @@ export async function getSocialBatchId(brand_id: string) {
 
         return latest?.batch_id || null;
     } catch (error) {
-        console.error("Error fetching batch_id:", error);
+        console.error("[getSocialBatchId] Error:", error);
         return null;
     }
 }

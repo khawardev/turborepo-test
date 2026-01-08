@@ -16,47 +16,80 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
             name: `${brand_id} - website Capture`,
         }
 
+        console.log("[scrapeBatchWebsite] Payload:", scrapePayload);
+
         const { success, data, error } = await brandRequest("/batch/website", "POST", scrapePayload);
+
+        console.log("[scrapeBatchWebsite] Response:", { success, data, error });
 
         if (!success) return { success: false, message: error };
 
         revalidatePath(`/dashboard/ccba/${brand_id}`);
-        return { success: true, message: `${SCRAPING} and report extraction  successfully`, data };
-    } catch {
+        revalidatePath(`/dashboard/brandos-v2.1/gather`);
+        return { success: true, message: `${SCRAPING} and report extraction successfully`, data };
+    } catch (e) {
+        console.error("[scrapeBatchWebsite] Error:", e);
         return { success: false, message: `Batch ${SCRAPING} failed` };
     }
 }
 
+export async function getWebsiteBatchStatus(brand_id: string, batch_id: string) {
+    try {
+        const user = await getCurrentUser();
 
+        console.log("[getWebsiteBatchStatus] Checking status for batch:", batch_id);
+
+        const { success, data, error } = await brandRequest(
+            `/batch/website-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
+            "GET"
+        );
+
+        console.log("[getWebsiteBatchStatus] Response:", { success, data, error });
+
+        if (!success) return null;
+
+        return data;
+    } catch (error) {
+        console.error("[getWebsiteBatchStatus] Error:", error);
+        return null;
+    }
+}
 
 export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
     try {
         const user = await getCurrentUser();
 
         if (!batch_id) {
-            return { success: false, message: "No batch_id found for this brand." };
+            console.warn("[getscrapeBatchWebsite] No batch_id provided");
+            return null;
         }
+
+        console.log("[getscrapeBatchWebsite] Fetching results for batch:", batch_id);
 
         const { success, data, error } = await brandRequest(
             `/batch/website-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
             "GET"
         );
 
+        console.log("[getscrapeBatchWebsite] Response success:", success, "Has data:", !!data);
+
         if (!success) return null;
 
         return data;
     } catch (error) {
+        console.error("[getscrapeBatchWebsite] Error:", error);
         return null;
     }
 }
-
-
 
 export async function getWebsiteBatchId(brand_id: string) {
     try {
         const user = await getCurrentUser();
 
-        const { success, data, error } = await brandRequest(`/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, "GET");
+        const { success, data, error } = await brandRequest(
+            `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
+            "GET"
+        );
 
         if (!success) return null;
 
@@ -69,13 +102,20 @@ export async function getWebsiteBatchId(brand_id: string) {
     }
 }
 
-
 export async function getpreviousWebsiteScraps(brand_id: string) {
     try {
         const user = await getCurrentUser();
 
+        console.log("[getpreviousWebsiteScraps] Fetching for brand:", brand_id);
 
-        const { success, data, error } = await brandRequest(`/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, "GET", undefined, 'force-cache');
+        const { success, data, error } = await brandRequest(
+            `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
+            "GET",
+            undefined,
+            'no-store'
+        );
+
+        console.log("[getpreviousWebsiteScraps] Response:", { success, count: data?.length, error });
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
@@ -89,8 +129,11 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
             batch_id: item.batch_id
         }));
 
+        console.log("[getpreviousWebsiteScraps] Latest batch:", filtered[0]);
+
         return filtered;
-    } catch {
+    } catch (e) {
+        console.error("[getpreviousWebsiteScraps] Error:", e);
         return null;
     }
 }

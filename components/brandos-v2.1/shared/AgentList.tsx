@@ -53,7 +53,7 @@ function AgentCard({ agent }: { agent: AgentState }) {
                     </div>
                     <StatusBadge status={agent.status} />
                 </div>
-                
+
                 <div className="space-y-1.5 pl-9">
                     <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Progress</span>
@@ -68,16 +68,16 @@ function AgentCard({ agent }: { agent: AgentState }) {
                             {metadata.description}
                         </p>
                         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded items-center">
-                             <span className="font-semibold text-foreground mr-1">Dependencies:</span>
-                             {metadata.dependencies.length > 0 ? (
+                            <span className="font-semibold text-foreground mr-1">Dependencies:</span>
+                            {metadata.dependencies.length > 0 ? (
                                 metadata.dependencies.map((dep: string, i: number) => (
                                     <Badge key={i} variant="secondary" className="text-[10px] h-5 px-1.5 font-mono uppercase">
                                         {dep}
                                     </Badge>
                                 ))
-                             ) : (
+                            ) : (
                                 <span>None (Entry point)</span>
-                             )}
+                            )}
                         </div>
                         <div className="grid grid-cols-1 gap-3 p-3 bg-background/50 rounded-lg border">
                             <div className="space-y-1.5">
@@ -93,7 +93,7 @@ function AgentCard({ agent }: { agent: AgentState }) {
                                 </ul>
                             </div>
                             <div className="space-y-1.5 pt-2 border-t">
-                                    <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
                                     <FileOutput className="w-3 h-3" /> Outputs
                                 </span>
                                 <ul className="grid gap-1">
@@ -114,9 +114,9 @@ function AgentCard({ agent }: { agent: AgentState }) {
 
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
-        case 'running': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Running</span>;
-        case 'completed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"><CheckCircle2 className="w-4 h-4 mr-2" /> Completed</span>;
-        case 'failed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"><AlertCircle className="w-4 h-4 mr-2" /> Failed</span>;
-        default: return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"><Clock className="w-4 h-4 mr-2" /> Pending</span>;
+        case 'running': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"><Loader2 className="w-4 h-4  animate-spin" /> Running</span>;
+        case 'completed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"><CheckCircle2 className="w-4 h-4 " /> Completed</span>;
+        case 'failed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"><AlertCircle className="w-4 h-4 " /> Failed</span>;
+        default: return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"><Clock className="w-4 h-4 " /> Pending</span>;
     }
 }

@@ -49,10 +49,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     </div>
                     <div className="flex items-center gap-2">
                         <ThemeSwitcher />
-                        <Button  >
+                        {/* <Button  >
                             <Plus />
                             Upgrade
-                        </Button>
+                        </Button> */}
                     </div>
                 </header>
 
