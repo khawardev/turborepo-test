@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
 import { engagementConfigSchema, EngagementConfigV2 } from '@/lib/brandos-v2.1/schemas';
 import { addBrand } from '@/server/actions/brandActions';
+import { setGatherCookies } from '@/server/actions/cookieActions';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -156,6 +157,13 @@ export function SetupManager() {
           setIsSubmitting(false);
           return;
       }
+
+      await setGatherCookies({
+        brandId,
+        startDate,
+        endDate,
+        webLimit: webLimit.toString()
+      });
 
       router.push(`/dashboard/brandos-v2.1/gather?brandId=${brandId}&triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`);
 

@@ -8,6 +8,10 @@ import { getCurrentUser } from "@/server/actions/authActions";
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) {
+            console.error("[scrapeBatchWebsite] User not authenticated or missing client_id");
+            return { success: false, message: "User not authenticated" };
+        }
 
         const scrapePayload = {
             client_id: user.client_id,
@@ -36,6 +40,7 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
 export async function getWebsiteBatchStatus(brand_id: string, batch_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         console.log("[getWebsiteBatchStatus] Checking status for batch:", batch_id);
 
@@ -58,6 +63,7 @@ export async function getWebsiteBatchStatus(brand_id: string, batch_id: string) 
 export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         if (!batch_id) {
             console.warn("[getscrapeBatchWebsite] No batch_id provided");
@@ -85,6 +91,7 @@ export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
 export async function getWebsiteBatchId(brand_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         const { success, data, error } = await brandRequest(
             `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
@@ -105,6 +112,7 @@ export async function getWebsiteBatchId(brand_id: string) {
 export async function getpreviousWebsiteScraps(brand_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         console.log("[getpreviousWebsiteScraps] Fetching for brand:", brand_id);
 

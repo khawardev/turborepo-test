@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid } from 'lucide-react';
+import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AgentStatusCard } from './AgentStatusCard';
 import { AuditorAgentCard } from './AuditorAgentCard';
@@ -19,6 +20,7 @@ import { scrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActi
 import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAuditorOutput } from '@/server/actions/auditorActions';
+import { setGatherCookies } from '@/server/actions/cookieActions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -58,6 +60,18 @@ export function GatherManager({
     const [isPolling, setIsPolling] = useState(false);
     const [pollingMessage, setPollingMessage] = useState<string>("");
     
+    // Sync to cookies
+    useEffect(() => {
+        if (brandId) {
+            setGatherCookies({
+                brandId,
+                startDate,
+                endDate,
+                webLimit: webLimit.toString()
+            }).catch(console.error);
+        }
+    }, [brandId, startDate, endDate, webLimit]);
+
     // Batch IDs and Statuses (Local State)
     const [currentWebBatchId, setCurrentWebBatchId] = useState<string | null>(websiteBatchId || null);
     const [currentSocialBatchId, setCurrentSocialBatchId] = useState<string | null>(socialBatchId || null);
@@ -386,6 +400,12 @@ export function GatherManager({
                     <p className="text-muted-foreground">Real-time status of the multi-source data collection swarm and auditors.</p>
                     {pollingMessage && <p className="text-sm text-blue-500 mt-1">{pollingMessage}</p>}
                 </div>
+                 <Button variant="outline" asChild>
+                    <Link href="/dashboard/brandos-v2.1/gather">
+                        <LayoutGrid className="w-4 h-4 mr-2" />
+                        Switch Brand
+                    </Link>
+                </Button>
             </div>
 
             <div className="space-y-4">

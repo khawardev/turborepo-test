@@ -12,6 +12,10 @@ export async function scrapeBatchSocial(
 ) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) {
+            console.error("[scrapeBatchSocial] User not authenticated or missing client_id");
+            return { success: false, message: "User not authenticated" };
+        }
 
         const scrapePayload = {
             client_id: user.client_id,
@@ -41,6 +45,7 @@ export async function scrapeBatchSocial(
 export async function getSocialBatchStatus(brand_id: string, batch_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         console.log("[getSocialBatchStatus] Checking status for batch:", batch_id);
 
@@ -63,6 +68,7 @@ export async function getSocialBatchStatus(brand_id: string, batch_id: string) {
 export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         if (!batch_id) {
             console.warn("[getScrapeBatchSocial] No batch_id provided");
@@ -90,6 +96,7 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
 export async function getPreviousSocialScrapes(brand_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         console.log("[getPreviousSocialScrapes] Fetching for brand:", brand_id);
 
@@ -127,6 +134,7 @@ export async function getPreviousSocialScrapes(brand_id: string) {
 export async function getSocialBatchId(brand_id: string) {
     try {
         const user = await getCurrentUser();
+        if (!user || !user.client_id) return null;
 
         const { success, data, error } = await brandRequest(
             `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
