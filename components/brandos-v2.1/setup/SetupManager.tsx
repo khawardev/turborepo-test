@@ -178,7 +178,7 @@ export function SetupManager() {
       const endDate = socialDateRange?.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
 
       if (!startDate) {
-          toast.error("Please select a start date for social scraping");
+          toast.error("Please select a start date for social data capture");
           setIsSubmitting(false);
           return;
       }

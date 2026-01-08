@@ -66,9 +66,19 @@ export default async function GatherDashboard({ brandId, startDate, endDate, web
             websiteBatchStatus = latestWeb.status;
             websiteBatchId = latestWeb.batch_id;
             
-            if (latestWeb.status === 'Completed' || latestWeb.status === 'CompletedWithErrors') {
-                console.log("[GatherDashboard] Website batch completed, fetching results...");
-                const fullWebData = await getscrapeBatchWebsite(brandId, latestWeb.batch_id);
+            // Fallback logic for data fetching
+            let dataBatch = latestWeb;
+            if (latestWeb.status !== 'Completed' && latestWeb.status !== 'CompletedWithErrors') {
+                const completedBatch = sorted.find((b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors');
+                if (completedBatch) {
+                    console.log("[GatherDashboard] Latest website batch not ready, falling back to previous completed batch:", completedBatch.batch_id);
+                    dataBatch = completedBatch;
+                }
+            }
+            
+            if (dataBatch.status === 'Completed' || dataBatch.status === 'CompletedWithErrors') {
+                console.log("[GatherDashboard] Website batch completed (or fallback), fetching results...", dataBatch.batch_id);
+                const fullWebData = await getscrapeBatchWebsite(brandId, dataBatch.batch_id);
                 if (fullWebData) {
                     websiteData = fullWebData;
                     console.log("[GatherDashboard] Website Data fetched:", {
@@ -108,9 +118,19 @@ export default async function GatherDashboard({ brandId, startDate, endDate, web
             socialBatchStatus = latestSocial.status;
             socialBatchId = latestSocial.batch_id;
             
-            if (latestSocial.status === 'Completed' || latestSocial.status === 'CompletedWithErrors') {
-                console.log("[GatherDashboard] Social batch completed, fetching results...");
-                const fullSocialData = await getScrapeBatchSocial(brandId, latestSocial.batch_id);
+            // Fallback logic for data fetching
+            let dataBatch = latestSocial;
+            if (latestSocial.status !== 'Completed' && latestSocial.status !== 'CompletedWithErrors') {
+                const completedBatch = sorted.find((b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors');
+                if (completedBatch) {
+                    console.log("[GatherDashboard] Latest social batch not ready, falling back to previous completed batch:", completedBatch.batch_id);
+                    dataBatch = completedBatch;
+                }
+            }
+            
+            if (dataBatch.status === 'Completed' || dataBatch.status === 'CompletedWithErrors') {
+                console.log("[GatherDashboard] Social batch completed (or fallback), fetching results...", dataBatch.batch_id);
+                const fullSocialData = await getScrapeBatchSocial(brandId, dataBatch.batch_id);
                 if (fullSocialData) {
                     socialData = fullSocialData;
                     console.log("[GatherDashboard] Social Data fetched:", {

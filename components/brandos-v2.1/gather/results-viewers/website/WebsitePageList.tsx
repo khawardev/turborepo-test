@@ -13,7 +13,7 @@ export function WebsitePageList({ pages, selectedPage, onSelect }: WebsitePageLi
     return (
         <ScrollArea className="h-[70vh] col-span-1 min-w-0 border rounded-lg p-2">
             <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Scraped Pages ({pages.length})
+                Captured Pages ({pages.length})
             </h5>
             <ul className="space-y-1">
                 {pages.map((page, index) => (

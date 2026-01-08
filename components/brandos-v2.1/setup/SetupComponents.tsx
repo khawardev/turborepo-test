@@ -116,10 +116,10 @@ export function ChannelSection({ form, socialDateRange, setSocialDateRange }: { 
         {/* Website Config */}
         <div className="space-y-4 border p-6 rounded-xl bg-accent">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className=" text-lg">Website Scrape Config</h3>
+            <h3 className=" text-lg">Website Capture Config</h3>
           </div>
           <div className="space-y-2">
-            <Label>Max Pages to Scrape</Label>
+            <Label>Max Pages to Capture</Label>
             <Input
               type="number"
               placeholder="10"
@@ -134,7 +134,7 @@ export function ChannelSection({ form, socialDateRange, setSocialDateRange }: { 
         {/* Social Config */}
         <div className="space-y-4 border p-6 rounded-xl bg-accent">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg">Social Scrape Config</h3>
+            <h3 className="text-lg">Social Capture Config</h3>
           </div>
           <div className="space-y-2">
             <Label>Social Date Range</Label>
