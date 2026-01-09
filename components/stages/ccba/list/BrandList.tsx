@@ -20,7 +20,6 @@ async function BrandList() {
     brands.map(async (brand: any) => {
       const brandData = await getBrandbyIdWithCompetitors(brand?.brand_id);
       const batch_id = await getWebsiteBatchId(brandData?.brand_id);
-      console.log("batch_id", batch_id);
 
       return {
         brand: brandData,

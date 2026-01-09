@@ -1,9 +1,8 @@
+import { redirect } from 'next/navigation';
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions';
-import { getpreviousWebsiteScraps, getscrapeBatchWebsite } from '@/server/actions/ccba/website/websiteScrapeActions';
-import { getPreviousSocialScrapes, getScrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActions';
-import { DashboardInnerLayout } from './shared/DashboardComponents';
-import { GatherManager } from './gather/GatherManager';
+import { getpreviousWebsiteScraps } from '@/server/actions/ccba/website/websiteScrapeActions';
+import { getPreviousSocialScrapes } from '@/server/actions/ccba/social/socialScrapeActions';
 
 interface GatherDashboardProps {
     brandId: string;
@@ -13,174 +12,52 @@ interface GatherDashboardProps {
     triggerScrape?: boolean;
 }
 
-
 export default async function GatherDashboard({ brandId, startDate, endDate, webLimit, triggerScrape }: GatherDashboardProps) {
-    console.log("========== GatherDashboard Server Render ==========");
-    console.log("[GatherDashboard] Props:", { brandId, startDate, endDate, webLimit });
-
     if (!brandId) {
-        console.error("[GatherDashboard] No Brand ID provided");
-        return <div>No Brand ID provided</div>;
+        redirect('/dashboard/brandos-v2.1/gather');
     }
 
-    let status = null;
-    let brandData = null;
-    let websiteData = null;
-    let socialData = null;
     let websiteBatchStatus = null;
     let socialBatchStatus = null;
-    let websiteBatchId = null;
-    let socialBatchId = null;
 
-    // 1. Fetch Status
-    try {
-        status = await getCcbaTaskStatus(brandId);
-        console.log("[GatherDashboard] Task Status:", status);
-    } catch (e) {
-        console.error("[GatherDashboard] Error fetching status:", e);
-    }
-
-    // 2. Fetch Brand Data
-    try {
-        brandData = await getBrandbyIdWithCompetitors(brandId);
-        console.log("[GatherDashboard] Brand Data:", brandData ? { name: brandData.name, competitors: brandData.competitors?.length } : null);
-    } catch (e) {
-        console.error("[GatherDashboard] Error fetching brand:", e);
-    }
-
-    // 3. Fetch Latest Website Scraps
     try {
         const prevWeb = await getpreviousWebsiteScraps(brandId);
-        console.log("[GatherDashboard] Previous Website Scraps Count:", prevWeb?.length || 0);
-        
         if (Array.isArray(prevWeb) && prevWeb.length > 0) {
-            const sorted = prevWeb.sort((a: any, b: any) => 
+            const sorted = prevWeb.sort((a: any, b: any) =>
                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             );
-            const latestWeb = sorted[0];
-            
-            console.log("[GatherDashboard] Latest Website Batch:", {
-                batch_id: latestWeb.batch_id,
-                status: latestWeb.status,
-                created_at: latestWeb.created_at
-            });
-            
-            websiteBatchStatus = latestWeb.status;
-            websiteBatchId = latestWeb.batch_id;
-            
-            // Fallback logic for data fetching
-            let dataBatch = latestWeb;
-            if (latestWeb.status !== 'Completed' && latestWeb.status !== 'CompletedWithErrors') {
-                const completedBatch = sorted.find((b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors');
-                if (completedBatch) {
-                    console.log("[GatherDashboard] Latest website batch not ready, falling back to previous completed batch:", completedBatch.batch_id);
-                    dataBatch = completedBatch;
-                }
-            }
-            
-            if (dataBatch.status === 'Completed' || dataBatch.status === 'CompletedWithErrors') {
-                console.log("[GatherDashboard] Website batch completed (or fallback), fetching results...", dataBatch.batch_id);
-                const fullWebData = await getscrapeBatchWebsite(brandId, dataBatch.batch_id);
-                if (fullWebData) {
-                    websiteData = fullWebData;
-                    console.log("[GatherDashboard] Website Data fetched:", {
-                        hasBrand: !!fullWebData.brand,
-                        competitorCount: fullWebData.competitors?.length || 0
-                    });
-                } else {
-                    console.warn("[GatherDashboard] No website data returned for completed batch");
-                }
-            } else {
-                console.log("[GatherDashboard] Website batch not completed, status:", latestWeb.status);
-            }
-        } else {
-            console.log("[GatherDashboard] No previous website scraps found");
+            websiteBatchStatus = sorted[0]?.status;
         }
     } catch (e) {
         console.error("[GatherDashboard] Error fetching website scraps:", e);
     }
 
-    // 4. Fetch Latest Social Scraps
     try {
         const prevSocial = await getPreviousSocialScrapes(brandId);
-        console.log("[GatherDashboard] Previous Social Scraps Count:", prevSocial?.length || 0);
-        
         if (Array.isArray(prevSocial) && prevSocial.length > 0) {
-            const sorted = prevSocial.sort((a: any, b: any) => 
+            const sorted = prevSocial.sort((a: any, b: any) =>
                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             );
-            const latestSocial = sorted[0];
-            
-            console.log("[GatherDashboard] Latest Social Batch:", {
-                batch_id: latestSocial.batch_id,
-                status: latestSocial.status,
-                created_at: latestSocial.created_at
-            });
-            
-            socialBatchStatus = latestSocial.status;
-            socialBatchId = latestSocial.batch_id;
-            
-            // Fallback logic for data fetching
-            let dataBatch = latestSocial;
-            if (latestSocial.status !== 'Completed' && latestSocial.status !== 'CompletedWithErrors') {
-                const completedBatch = sorted.find((b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors');
-                if (completedBatch) {
-                    console.log("[GatherDashboard] Latest social batch not ready, falling back to previous completed batch:", completedBatch.batch_id);
-                    dataBatch = completedBatch;
-                }
-            }
-            
-            if (dataBatch.status === 'Completed' || dataBatch.status === 'CompletedWithErrors') {
-                console.log("[GatherDashboard] Social batch completed (or fallback), fetching results...", dataBatch.batch_id);
-                const fullSocialData = await getScrapeBatchSocial(brandId, dataBatch.batch_id);
-                if (fullSocialData) {
-                    socialData = fullSocialData;
-                    console.log("[GatherDashboard] Social Data fetched:", {
-                        hasBrand: !!fullSocialData.brand,
-                        competitorCount: fullSocialData.competitors?.length || 0
-                    });
-                } else {
-                    console.warn("[GatherDashboard] No social data returned for completed batch");
-                }
-            } else {
-                console.log("[GatherDashboard] Social batch not completed, status:", latestSocial.status);
-            }
-        } else {
-            console.log("[GatherDashboard] No previous social scraps found");
+            socialBatchStatus = sorted[0]?.status;
         }
     } catch (e) {
         console.error("[GatherDashboard] Error fetching social scraps:", e);
     }
 
-    console.log("[GatherDashboard] Final State:", {
-        hasStatus: !!status,
-        hasBrandData: !!brandData,
-        hasWebsiteData: !!websiteData,
-        hasSocialData: !!socialData,
-        websiteBatchStatus,
-        socialBatchStatus,
-        websiteBatchId,
-        socialBatchId
-    });
-    console.log("========== GatherDashboard Server Render Complete ==========");
+    const isWebComplete = websiteBatchStatus === 'Completed' || websiteBatchStatus === 'CompletedWithErrors';
+    const isSocialComplete = socialBatchStatus === 'Completed' || socialBatchStatus === 'CompletedWithErrors';
+    const isAllComplete = isWebComplete && isSocialComplete;
 
-    return (
-        <DashboardInnerLayout>
-            <GatherManager 
-                brandId={brandId}
-                initialStatus={status}
-                brandData={brandData}
-                websiteData={websiteData}
-                socialData={socialData}
-                websiteBatchStatus={websiteBatchStatus}
-                socialBatchStatus={socialBatchStatus}
-                websiteBatchId={websiteBatchId}
-                socialBatchId={socialBatchId}
-                webLimit={webLimit ? parseInt(webLimit) : 10}
-                startDate={startDate || ''}
-                endDate={endDate || ''}
-                triggerScrape={triggerScrape}
-            />
-        </DashboardInnerLayout>
-    );
+    if (isAllComplete && !triggerScrape) {
+        redirect(`/dashboard/brandos-v2.1/gather/data/${brandId}`);
+    }
+
+    const queryParams = new URLSearchParams();
+    if (triggerScrape) queryParams.set('triggerScrape', 'true');
+    if (webLimit) queryParams.set('webLimit', webLimit);
+    if (startDate) queryParams.set('startDate', startDate);
+    if (endDate) queryParams.set('endDate', endDate);
+
+    const queryString = queryParams.toString();
+    redirect(`/dashboard/brandos-v2.1/gather/collecting/${brandId}${queryString ? `?${queryString}` : ''}`);
 }

@@ -25,11 +25,7 @@ export async function scrapeBatchSocial(
             end_date: end_date,
         }
 
-        console.log("[scrapeBatchSocial] Payload:", scrapePayload);
-
         const { success, data, error } = await brandRequest("/batch/social", "POST", scrapePayload);
-
-        console.log("[scrapeBatchSocial] Response:", { success, data, error });
 
         if (!success) return { success: false, message: error };
 
@@ -47,14 +43,10 @@ export async function getSocialBatchStatus(brand_id: string, batch_id: string) {
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
 
-        console.log("[getSocialBatchStatus] Checking status for batch:", batch_id);
-
         const { success, data, error } = await brandRequest(
             `/batch/social-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET"
         );
-
-        console.log("[getSocialBatchStatus] Response:", { success, data, error });
 
         if (!success) return null;
 
@@ -75,14 +67,10 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
             return null;
         }
 
-        console.log("[getScrapeBatchSocial] Fetching results for batch:", batch_id);
-
         const { success, data, error } = await brandRequest(
             `/batch/social-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
             "GET"
         );
-
-        console.log("[getScrapeBatchSocial] Response success:", success, "Has data:", !!data);
 
         if (!success) return null;
 
@@ -98,16 +86,12 @@ export async function getPreviousSocialScrapes(brand_id: string) {
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
 
-        console.log("[getPreviousSocialScrapes] Fetching for brand:", brand_id);
-
         const { success, data, error } = await brandRequest(
             `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET",
             undefined,
             'no-store'
         );
-
-        console.log("[getPreviousSocialScrapes] Response:", { success, count: data?.length, error });
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
@@ -121,8 +105,6 @@ export async function getPreviousSocialScrapes(brand_id: string) {
             start_date: item.start_date,
             end_date: item.end_date,
         }));
-
-        console.log("[getPreviousSocialScrapes] Latest batch:", filtered[0]);
 
         return filtered;
     } catch (error) {

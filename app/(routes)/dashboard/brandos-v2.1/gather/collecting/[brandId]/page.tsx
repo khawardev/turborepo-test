@@ -1,0 +1,107 @@
+import { redirect } from 'next/navigation';
+import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions';
+import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
+import { getpreviousWebsiteScraps } from '@/server/actions/ccba/website/websiteScrapeActions';
+import { getPreviousSocialScrapes } from '@/server/actions/ccba/social/socialScrapeActions';
+import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
+import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
+import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
+import { DashboardInnerLayout } from '@/components/brandos-v2.1/shared/DashboardComponents';
+import { CollectionStatusManager } from '@/components/brandos-v2.1/gather/collection/CollectionStatusManager';
+
+type PageProps = {
+    params: Promise<{ brandId: string }>;
+    searchParams: Promise<{
+        triggerScrape?: string;
+        webLimit?: string;
+        startDate?: string;
+        endDate?: string;
+    }>;
+};
+
+async function getLatestBatchData(brandId: string) {
+    let websiteBatchId = null;
+    let socialBatchId = null;
+    let websiteBatchStatus = null;
+    let socialBatchStatus = null;
+
+    try {
+        const prevWeb = await getpreviousWebsiteScraps(brandId);
+        if (Array.isArray(prevWeb) && prevWeb.length > 0) {
+            const sorted = prevWeb.sort((a: any, b: any) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
+            const latestWeb = sorted[0];
+            websiteBatchId = latestWeb.batch_id;
+            websiteBatchStatus = latestWeb.status;
+        }
+    } catch (e) {
+        console.error("[CollectingPage] Error fetching website scraps:", e);
+    }
+
+    try {
+        const prevSocial = await getPreviousSocialScrapes(brandId);
+        if (Array.isArray(prevSocial) && prevSocial.length > 0) {
+            const sorted = prevSocial.sort((a: any, b: any) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
+            const latestSocial = sorted[0];
+            socialBatchId = latestSocial.batch_id;
+            socialBatchStatus = latestSocial.status;
+        }
+    } catch (e) {
+        console.error("[CollectingPage] Error fetching social scraps:", e);
+    }
+
+    return { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus };
+}
+
+export default async function CollectingPage({ params, searchParams }: PageProps) {
+    const { brandId } = await params;
+    const queryParams = await searchParams;
+
+    if (!brandId) {
+        redirect('/dashboard/brandos-v2.1/gather');
+    }
+
+    const brandData = await getBrandbyIdWithCompetitors(brandId);
+
+    if (!brandData) {
+        redirect('/dashboard/brandos-v2.1/gather');
+    }
+
+    const status = await getCcbaTaskStatus(brandId);
+    const { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus } = await getLatestBatchData(brandId);
+
+    const isWebComplete = websiteBatchStatus === 'Completed' || websiteBatchStatus === 'CompletedWithErrors';
+    const isSocialComplete = socialBatchStatus === 'Completed' || socialBatchStatus === 'CompletedWithErrors';
+    const isAllComplete = isWebComplete && isSocialComplete;
+
+    if (isAllComplete && !queryParams.triggerScrape) {
+        redirect(`/dashboard/brandos-v2.1/gather/data/${brandId}`);
+    }
+
+    return (
+        <div className="space-y-6">
+            <DashboardLayoutHeading
+                title={`Collecting: ${brandData.name}`}
+                subtitle="Real-time status of the multi-source data collection swarm."
+            />
+            <DashboardInnerLayout>
+                <CollectionStatusManager
+                    brandId={brandId}
+                    brandData={brandData}
+                    initialStatus={status}
+                    websiteBatchId={websiteBatchId}
+                    socialBatchId={socialBatchId}
+                    websiteBatchStatus={websiteBatchStatus}
+                    socialBatchStatus={socialBatchStatus}
+                    triggerScrape={queryParams.triggerScrape === 'true'}
+                    webLimit={queryParams.webLimit ? parseInt(queryParams.webLimit) : 10}
+                    startDate={queryParams.startDate || ''}
+                    endDate={queryParams.endDate || ''}
+                />
+            </DashboardInnerLayout>
+        </div>
+    );
+}

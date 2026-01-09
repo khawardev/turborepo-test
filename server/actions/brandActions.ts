@@ -195,6 +195,7 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
     return {
       ...brand,
       competitors,
+      client_id: user.client_id,
     };
   } catch {
     return null;

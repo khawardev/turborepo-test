@@ -165,7 +165,7 @@ export function SetupManager() {
         webLimit: webLimit.toString()
       });
 
-      router.push(`/dashboard/brandos-v2.1/gather?brandId=${brandId}&triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`);
+      router.push(`/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`);
 
     } catch (error) {
       console.error(error);

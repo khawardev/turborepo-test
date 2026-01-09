@@ -20,11 +20,9 @@ export async function scrapeBatchWebsite(brand_id: any, limit: any) {
             name: `${brand_id} - website Capture`,
         }
 
-        console.log("[scrapeBatchWebsite] Payload:", scrapePayload);
 
         const { success, data, error } = await brandRequest("/batch/website", "POST", scrapePayload);
 
-        console.log("[scrapeBatchWebsite] Response:", { success, data, error });
 
         if (!success) return { success: false, message: error };
 
@@ -42,14 +40,12 @@ export async function getWebsiteBatchStatus(brand_id: string, batch_id: string) 
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
 
-        console.log("[getWebsiteBatchStatus] Checking status for batch:", batch_id);
 
         const { success, data, error } = await brandRequest(
             `/batch/website-task-status/${batch_id}?client_id=${user.client_id}&brand_id=${brand_id}`,
             "GET"
         );
 
-        console.log("[getWebsiteBatchStatus] Response:", { success, data, error });
 
         if (!success) return null;
 
@@ -70,14 +66,11 @@ export async function getscrapeBatchWebsite(brand_id: string, batch_id: any) {
             return null;
         }
 
-        console.log("[getscrapeBatchWebsite] Fetching results for batch:", batch_id);
-
         const { success, data, error } = await brandRequest(
             `/batch/website-scrape-results?client_id=${user.client_id}&brand_id=${brand_id}&batch_id=${batch_id}`,
             "GET"
         );
 
-        console.log("[getscrapeBatchWebsite] Response success:", success, "Has data:", !!data);
 
         if (!success) return null;
 
@@ -114,8 +107,6 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
 
-        console.log("[getpreviousWebsiteScraps] Fetching for brand:", brand_id);
-
         const { success, data, error } = await brandRequest(
             `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
             "GET",
@@ -123,7 +114,6 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
             'no-store'
         );
 
-        console.log("[getpreviousWebsiteScraps] Response:", { success, count: data?.length, error });
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
@@ -137,7 +127,6 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
             batch_id: item.batch_id
         }));
 
-        console.log("[getpreviousWebsiteScraps] Latest batch:", filtered[0]);
 
         return filtered;
     } catch (e) {

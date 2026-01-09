@@ -9,7 +9,6 @@ interface SocialPlatformProfileProps {
 
 export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) {
     if (!platform?.page_info) return null;
-console.log(platform, `<-> platform <->`);
 
     const { page_info } = platform;
 

@@ -54,7 +54,6 @@ const generateId = (prefix: string) => `${prefix}${Math.floor(Math.random() * 10
 
 export async function createEngagementAction(config: EngagementConfig): Promise<{ success: boolean; engagementId: string; error?: string }> {
   try {
-    console.log('Creating Engagement:', config);
     const engagementId = `eng-${Date.now()}`;
     
     // Persist engagement

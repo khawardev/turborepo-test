@@ -33,44 +33,36 @@ export function SimpleWebsiteScrapViewer({ scrapsData, brandName, status }: View
         }
     }, [scrapsData, brandName, status]);
 
-    if (!scrapsData) {
-        if (status && status !== 'Completed' && status !== 'CompletedWithErrors') {
-            return <EmptyStateCard message={`Website capture status: ${status}`} />;
-        }
-        return <div className="p-8 text-center text-muted-foreground border border-dashed rounded-xl">No website data collected yet.</div>;
-    }
-
     // Handle potential structure variations
-    const brandDataObj = scrapsData.brand || (scrapsData.pages ? scrapsData : null);
-    const competitors = scrapsData.competitors || brandDataObj?.competitors || [];
+    const brandDataObj = scrapsData?.brand || (scrapsData?.pages ? scrapsData : null);
+    const competitors = scrapsData?.competitors || brandDataObj?.competitors || [];
 
-    const sources = [
-        { 
-            name: brandDataObj?.brand_name || brandName, 
-            data: brandDataObj, 
-            type: 'brand' 
-        },
-        ...competitors.map((c: any) => ({ 
-            name: c.competitor_name || c.name || "Unknown Competitor", 
-            data: c, 
-            type: 'competitor' 
-        }))
-    ];
+    const sources = useMemo(() => {
+        if (!scrapsData) return [];
+        return [
+            { 
+                name: brandDataObj?.brand_name || brandName, 
+                data: brandDataObj, 
+                type: 'brand' 
+            },
+            ...competitors.map((c: any) => ({ 
+                name: c.competitor_name || c.name || "Unknown Competitor", 
+                data: c, 
+                type: 'competitor' 
+            }))
+        ];
+    }, [scrapsData, brandDataObj, brandName, competitors]);
 
     const currentSource = sources.find(s => s.name === selectedSource) || sources[0];
-
+    
     // Ensure selectedSource is valid
     useEffect(() => {
-        if (!sources.some(s => s.name === selectedSource)) {
+        if (sources.length > 0 && !sources.some(s => s.name === selectedSource)) {
             setSelectedSource(sources[0]?.name || brandName);
         }
     }, [sources, selectedSource, brandName]);
 
-    const getPages = (): WebsitePage[] => {
-        return currentSource?.data?.pages || [];
-    };
-
-    const pages = getPages();
+    const pages = currentSource?.data?.pages || [];
 
     const uniquePages = useMemo(() => {
         const map = new Map<string, WebsitePage>();
@@ -92,6 +84,13 @@ export function SimpleWebsiteScrapViewer({ scrapsData, brandName, status }: View
             }
         }
     }, [uniquePages, selectedPage]);
+
+    if (!scrapsData) {
+        if (status && status !== 'Completed' && status !== 'CompletedWithErrors') {
+            return <EmptyStateCard message={`Website capture status: ${status}`} />;
+        }
+        return <div className="p-8 text-center text-muted-foreground border border-dashed rounded-xl">No website data collected yet.</div>;
+    }
 
     return (
         <div className="space-y-6">

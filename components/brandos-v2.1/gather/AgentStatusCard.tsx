@@ -16,7 +16,6 @@ export function AgentStatusCard({ status, isComplete, hasData, onStart, isStarti
     // isStarting includes both the transition state and polling state from parent
     const isRunning = isStarting || (status && status.total_running > 0);
 
-    console.log("[AgentStatusCard] State:", { isComplete, hasData, isStarting, isRunning, totalRunning: status?.total_running });
 
     // Determine what to show in the status area
     const renderStatusBadge = () => {
