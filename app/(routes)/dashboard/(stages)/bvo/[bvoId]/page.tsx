@@ -18,7 +18,7 @@ export default async function BvoDetailPage({ params, searchParams }: any) {
       <ContainerMd>
         <StaticBanner title="Error" badge="BVO Execution" />
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <p>Brand ID is missing from the URL. Please go back and try again.</p>
           </CardContent>
         </Card>

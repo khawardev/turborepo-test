@@ -49,7 +49,7 @@ export function CompetitorSection({ form }: { form: any }) {
 
       <div className="grid gap-6">
         {competitors.map((comp: any, index: number) => (
-          <div key={comp.id} className="relative p-6 border rounded-xl bg-accent/50 hover:bg-accent/5 transition-colors">
+          <div key={comp.id} className="relative p-6 border rounded-xl bg-accent transition-colors">
             <Button
               type="button"
               variant="ghost"

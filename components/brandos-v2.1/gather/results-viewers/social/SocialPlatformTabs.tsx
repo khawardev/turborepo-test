@@ -39,16 +39,17 @@ export function SocialPlatformTabs({
     }
 
     return (
-        <Tabs value={selectedPlatform || ''} onValueChange={onPlatformSelect} className="w-full">
-            <TabsList className="gap-2 bg-transparent p-0">
+        <Tabs value={selectedPlatform || ''} onValueChange={onPlatformSelect} >
+            <TabsList>
                 {platforms.map((platform: any) => (
                     <TabsTrigger 
                         key={platform.platform} 
                         value={platform.platform}
+                        className="my-2"
                     >
                         {getPlatformIcon(platform.platform)}
-                        <span className="ml-2 capitalize">{platform.platform}</span>
-                        <Badge variant="secondary" className="ml-2 text-[10px]">
+                        <span className="capitalize">{platform.platform}</span>
+                        <Badge variant={'outline'} className="ml-2 text-foreground">
                             {platform.posts?.length || 0}
                         </Badge>
                     </TabsTrigger>

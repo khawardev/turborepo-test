@@ -32,8 +32,8 @@ export function WebsitePageList({ pages, selectedPage, onSelect }: WebsitePageLi
     const visiblePages = pages.slice(0, visibleCount);
 
     return (
-        <ScrollArea className="h-[70vh] col-span-1 min-w-0 border rounded-lg p-2">
-            <h5 className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <ScrollArea className="h-[70vh] col-span-1 min-w-0 ">
+            <h5 className="px-2 py-2 mb-4  text-xs text-muted-foreground uppercase tracking-wider">
                 Captured Pages ({pages.length})
             </h5>
             <ul className="space-y-1">

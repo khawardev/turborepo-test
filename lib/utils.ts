@@ -108,3 +108,26 @@ export function arrangeAgentIds(ids:any) {
 
   return withMeta.map((x:any) => x.raw);
 }
+
+export const normalizeImageUrl = (url: string | null | undefined): string => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    
+    // Handle s3:// protocol
+    if (url.startsWith('s3://')) {
+        // Format: s3://bucket-name/path/to/key
+        // Example: s3://east1-brandos-backend-dev/images/...
+        const parts = url.replace('s3://', '').split('/');
+        const bucket = parts[0];
+        const key = parts.slice(1).join('/');
+        
+        // Construct standard S3 HTTP URL
+        // Note: This assumes standard AWS S3 naming. 
+        // If the bucket is in a specific region other than us-east-1 and not using CNAME, 
+        // s3.amazonaws.com might redirect or fail. 
+        // Ideally, we'd know the region, but this is a best-effort client-side conversion.
+        return `https://${bucket}.s3.amazonaws.com/${key}`;
+    }
+    
+    return url;
+};

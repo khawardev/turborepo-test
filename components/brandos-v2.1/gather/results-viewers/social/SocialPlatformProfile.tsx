@@ -17,8 +17,8 @@ export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) 
         if (value === undefined || value === null || value === '') return null;
         
         return (
-            <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">{label}</p>
+            <div className="space-y-1 space-x-1">
+                <Badge variant={'secondary'} className="text-xs font-normal">{label}</Badge>
                 {isCode ? (
                     <code className="text-xs bg-muted px-1 rounded block w-fit max-w-full truncate" title={String(value)}>{value}</code>
                 ) : badge ? (
@@ -34,8 +34,8 @@ export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) 
 
     return (
         <Card className="bg-muted/30">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
                     {getPlatformIcon(platform.platform)}
                     <span className="capitalize">{platform.platform} Profile</span>
                     {page_info.is_verified && (
@@ -44,7 +44,7 @@ export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) 
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {/* Identity */}
                     <StatItem label="Username" value={page_info.username ? `@${page_info.username}` : null} />
                     <StatItem label="Name" value={page_info.name || page_info.display_name} />
@@ -77,12 +77,12 @@ export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) 
                 {(page_info.description || page_info.bio || page_info.tagline) && (
                     <div className="mt-4 pt-4 border-t space-y-2">
                          {page_info.tagline && (
-                            <p className="text-sm font-medium italic text-muted-foreground">"{page_info.tagline}"</p>
+                            <p className="text-muted-foreground">{page_info.tagline}</p>
                         )}
                         {(page_info.description || page_info.bio) && (
                             <div>
-                                <p className="text-xs text-muted-foreground mb-1">About</p>
-                                <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                                <Badge variant={'secondary'} className="text-sm mb-4">About</Badge>
+                                <p className="leading-relaxed whitespace-pre-wrap">
                                     {page_info.description || page_info.bio}
                                 </p>
                             </div>
@@ -93,7 +93,7 @@ export function SocialPlatformProfile({ platform }: SocialPlatformProfileProps) 
                 {/* Specialties (LinkedIn) */}
                 {page_info.specialties && Array.isArray(page_info.specialties) && page_info.specialties.length > 0 && (
                     <div className="mt-4 pt-4 border-t">
-                        <p className="text-xs text-muted-foreground mb-2">Specialties</p>
+                        <Badge variant={'secondary'} className="text-sm mb-4">Specialties</Badge>
                         <div className="flex flex-wrap gap-2">
                             {page_info.specialties.map((s: string, i: number) => (
                                 <Badge key={i} variant="outline" className="text-xs font-normal">{s}</Badge>

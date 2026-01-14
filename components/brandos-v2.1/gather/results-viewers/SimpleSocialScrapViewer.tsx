@@ -87,11 +87,21 @@ export function SimpleSocialScrapViewer({ scrapsData, brandName, brandData, stat
         }
     }, [platforms, selectedPlatform]);
 
-    const getTotalStats = (): SocialStats => {
-        if (!filteredData?.social_platforms) return { posts: 0, views: 0, likes: 0, shares: 0, comments: 0 };
+    const getTotalStats = (): { stats: SocialStats, totalFollowers: number } => {
+        if (!filteredData?.social_platforms) return { stats: { posts: 0, views: 0, likes: 0, shares: 0, comments: 0 }, totalFollowers: 0 };
         
         let stats = { posts: 0, views: 0, likes: 0, shares: 0, comments: 0 };
+        let totalFollowers = 0;
+
         filteredData.social_platforms.forEach((platform: any) => {
+            // Calculate Audience
+            if (platform.page_info) {
+                const followers = parseInt(platform.page_info.follower_count) || 0;
+                const subscribers = parseInt(platform.page_info.subscriber_count) || 0;
+                // Some platforms might have both or just one, typically one primary metric per platform
+                totalFollowers += Math.max(followers, subscribers); 
+            }
+
             if (platform.posts) {
                 stats.posts += platform.posts.length;
                 platform.posts.forEach((post: any) => {
@@ -104,10 +114,10 @@ export function SimpleSocialScrapViewer({ scrapsData, brandName, brandData, stat
                 });
             }
         });
-        return stats;
+        return { stats, totalFollowers };
     };
 
-    const stats = getTotalStats();
+    const { stats, totalFollowers } = getTotalStats();
 
     const handleSourceSelect = (source: string) => {
         setSelectedSource(source);
@@ -138,7 +148,7 @@ export function SimpleSocialScrapViewer({ scrapsData, brandName, brandData, stat
             />
 
             {platforms.length > 0 && (
-                <SocialStatsCards stats={stats} platformCount={platforms.length} />
+                <SocialStatsCards stats={stats} totalFollowers={totalFollowers} platformCount={platforms.length} />
             )}
 
             <SocialPlatformTabs 

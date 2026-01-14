@@ -83,7 +83,6 @@ function BrandItemSkeleton() {
 export default function BrandItem({ brand, isScrapped, index }: any) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  console.log("isScrapped", isScrapped);
   const scrapeBrand = (limit: any) => {
     startTransition(() => {
       (async () => {

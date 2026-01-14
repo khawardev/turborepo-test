@@ -165,7 +165,8 @@ export function SetupManager() {
         webLimit: webLimit.toString()
       });
 
-      router.push(`/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`);
+      const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
+      window.location.href = redirectUrl;
 
     } catch (error) {
       console.error(error);
@@ -192,7 +193,7 @@ export function SetupManager() {
             Autofill
         </Button>
         </div>
-        <TabsContent value="basics" className="space-y-8 animate-in fade-in-50 slide-in-from-bottom-2 pt-6">
+        <TabsContent value="basics" className="space-y-8  pt-6">
         <div className="mb-6">
             <h2 className="text-2xl font-medium mb-2">Engagement Basics</h2>
             <p className="text-muted-foreground">Enter the core details for this analysis engagement.</p>
@@ -271,7 +272,7 @@ export function SetupManager() {
         </div>
         </TabsContent>
 
-        <TabsContent value="competitors" className="space-y-8 animate-in fade-in-50 slide-in-from-bottom-2">
+        <TabsContent value="competitors" className="space-y-8  pt-6">
         <CompetitorSection form={form} />
         <div className="flex gap-4 pt-6 w-full justify-end">
             <Button type="button" variant="ghost" onClick={() => nextTab('basics')}>Back</Button>
@@ -279,7 +280,7 @@ export function SetupManager() {
         </div>
         </TabsContent>
 
-        <TabsContent value="channels" className="space-y-8 animate-in fade-in-50 slide-in-from-bottom-2">
+        <TabsContent value="channels" className="space-y-8  pt-6">
         <ChannelSection form={form} socialDateRange={socialDateRange} setSocialDateRange={setSocialDateRange} />
         <div className="flex gap-4 pt-6 w-full justify-end">
             <Button type="button" variant="ghost" onClick={() => nextTab('competitors')}>Back</Button>

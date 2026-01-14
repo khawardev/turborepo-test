@@ -18,7 +18,7 @@ interface AuditorAgentCardProps {
     onRun: () => void;
     taskId?: string | null;
     result?: any;
-    RenderResult?: React.ComponentType<{ data: any }>;
+    RenderResult?: React.ComponentType<{ data: any, onReRun?: () => void, isReRunning?: boolean }>;
     controls?: ReactNode; // Extra controls like Select
     isDisabled?: boolean;
     buttonLabel?: string;
@@ -57,17 +57,40 @@ export function AuditorAgentCard({
 
         if (status === 'complete') {
             return (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Analysis Complete
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                        <CheckCircle2 className="w-3 h-3 mr-1" /> Done
+                    </span>
+                    {controls}
+                    <Button 
+                        onClick={onRun} 
+                        disabled={isDisabled || isRunning} 
+                        size="sm" 
+                        variant="outline"
+                        className="h-8"
+                    >
+                        {isRunning ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 mr-1" />}
+                        Run Again
+                    </Button>
+                </div>
             );
         }
 
         if (status === 'error') {
             return (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
-                    <AlertCircle className="w-4 h-4 mr-2" /> Analysis Failed
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                        <AlertCircle className="w-4 h-4 mr-2" /> Failed
+                    </span>
+                     <Button 
+                        onClick={onRun} 
+                        size="sm" 
+                        variant="ghost"
+                        className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                        Retry
+                    </Button>
+                </div>
             );
         }
 
@@ -96,7 +119,7 @@ export function AuditorAgentCard({
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                     <div className="flex items-center gap-3">
-                        <CollapsibleTrigger asChild>
+                      <CollapsibleTrigger asChild>
                             <Button variant="ghost" size="sm" className="p-0 h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground">
                                 <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                             </Button>
@@ -136,7 +159,12 @@ export function AuditorAgentCard({
                 {result && RenderResult && (
                     <CollapsibleContent className="pl-0 md:pl-9 space-y-4 pt-2">
                          <div className="animate-in slide-in-from-top-2 fade-in duration-500">
-                            <RenderResult data={result} />
+                             {/* Pass re-run capability explicitly to the result viewer as well */}
+                            <RenderResult 
+                                data={result} 
+                                onReRun={onRun}
+                                isReRunning={isRunning} 
+                            />
                          </div>
                     </CollapsibleContent>
                 )}

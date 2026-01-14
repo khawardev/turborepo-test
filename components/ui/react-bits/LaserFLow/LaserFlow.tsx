@@ -540,12 +540,12 @@ const LaserFlowComponent: React.FC<Props> = ({
     mouseSmoothTime,
   ]);
 
-  return <div ref={mountRef} className={`laser-flow-container  ${className || ''}`} style={style} >
-    <BlurDelay3 className=" absolute top-1/2 left-1/2 -translate-x-1/2 w-full rounded-3xl  px-4  mx-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
+  return <div ref={mountRef} className={`laser-flow-container   ${className || ''}`} style={style} >
+    <BlurDelay3 className=" absolute top-1/2  left-1/2 -translate-x-1/2 w-full rounded-3xl  px-4  mx-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px]">
       <div className="mask-b-from-5%">
         <div className="inset-shadow-2xs border ring-background dark:inset-shadow-border/20 bg-border relative mx-auto overflow-hidden rounded-2xl  p-1 shadow-lg shadow-zinc-950/15 ">
           <Image
-            className=" h-140 w-full relative hidden rounded-xl dark:block object-cover  object-top"
+            className=" h-140   w-full relative hidden rounded-xl dark:block object-cover  object-top"
             src="https://i.postimg.cc/mrV67BTn/Capture-2025-10-31-172856.png"
             alt="BrandOS hero dark section"
             width={2074}

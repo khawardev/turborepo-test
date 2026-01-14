@@ -206,26 +206,20 @@ export function CollectionStatusManager({
                 <div>
                     <h3 className="text-2xl font-medium tracking-tight">{brandData.name}</h3>
                     <p className="text-muted-foreground">Data Collection Status</p>
-                    {pollingMessage && <p className="text-sm text-blue-500 mt-1">{pollingMessage}</p>}
                 </div>
-                <Button variant="outline" asChild>
-                    <Link href="/dashboard/brandos-v2.1/gather">
-                        <LayoutGrid className="w-4 h-4 mr-2" />
-                        All Brands
-                    </Link>
-                </Button>
+                {pollingMessage && <p className="text-sm text-blue-500 mt-1">{pollingMessage}</p>}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <StatusCard
-                    title="Website Scraping"
+                    title="Website Data Gathering"
                     icon={Globe}
                     status={webBatchStatus}
                     batchId={currentWebBatchId}
                     isRunning={isRunning && !isWebComplete}
                 />
                 <StatusCard
-                    title="Social Media Scraping"
+                    title="Social Media Data Gathering"
                     icon={Share2}
                     status={socBatchStatus}
                     batchId={currentSocialBatchId}
@@ -255,8 +249,8 @@ export function CollectionStatusManager({
             </div>
 
             {isRunning && (
-                <Card className="border-blue-200 dark:border-blue-900/50">
-                    <CardContent className="pt-6">
+                <Card>
+                    <CardContent>
                         <div className="flex items-center gap-3">
                             <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
                             <div>

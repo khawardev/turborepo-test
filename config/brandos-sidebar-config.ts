@@ -2,9 +2,8 @@ import { PiHandshakeDuotone } from "react-icons/pi";
 import { MdOutlineBrandingWatermark } from "react-icons/md";
 import { RiLoopRightLine } from "react-icons/ri";
 import { LuBrain, LuFingerprint, LuShare } from "react-icons/lu";
-import { AiOutlineSetting } from "react-icons/ai";
 import { AiOutlinePieChart } from "react-icons/ai";
-import { AiOutlineKey } from "react-icons/ai";
+import { TbMobiledata } from "react-icons/tb";
 
 export const BrandOSConfig: any = {
     mainNav: [
@@ -14,9 +13,9 @@ export const BrandOSConfig: any = {
             icon: PiHandshakeDuotone
         },
         {
-            title: "Gather Data",
+            title: "Data Gathering",
             href: "/dashboard/brandos-v2.1/gather",
-            icon: LuShare
+            icon: AiOutlinePieChart
         },
         {
             title: "Phase 0 Outside-In Audit",

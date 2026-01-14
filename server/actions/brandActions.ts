@@ -141,6 +141,16 @@ export async function getBrands() {
 
     if (!success) return null;
 
+
+    if (Array.isArray(data)) {
+        // Sort by created_at descending
+        data.sort((a: any, b: any) => {
+            const dateA = new Date(a.created_at || 0).getTime();
+            const dateB = new Date(b.created_at || 0).getTime();
+            return dateB - dateA;
+        });
+    }
+
     return data;
   } catch (error) {
     return null;
@@ -185,12 +195,25 @@ export async function getBrandbyIdWithCompetitors(brand_id: string) {
     const { success: compSuccess, data: compData, error: compError } = competitorRes;
 
     if (!brandSuccess) return null;
-    if (!compSuccess) return null;
+    
+    // Handle both Array (list with filter) and Object (direct get) responses
+    let brand = null;
+    if (Array.isArray(brandData)) {
+        brand = brandData.length > 0 ? brandData[0] : null;
+    } else {
+        brand = brandData;
+    }
 
-    const brand = Array.isArray(brandData) ? brandData[0] : null;
     if (!brand) return null;
 
-    const competitors = compData?.competitors || [];
+    // Handle competitors response structure
+    // If competitor fetch failed, we assume empty or handle it gracefully rather than failing the whole request
+    let competitors: any[] = [];
+    if (compSuccess) {
+        competitors = Array.isArray(compData) ? compData : (compData?.competitors || []);
+    } else {
+        // Optional: console.warn("Failed to fetch competitors for brand", brand_id, compError);
+    }
 
     return {
       ...brand,

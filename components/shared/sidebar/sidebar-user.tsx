@@ -70,9 +70,9 @@ export default function SidebarUser({ user }: any ) {
           <DropdownMenuItem asChild>
             <Link href='/dashboard/profile'><RiUserSmileLine /> Profile</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
+          {/* <DropdownMenuItem asChild>
             <Link href='/dashboard/blog'><Book /> Blog</Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
           <DropdownMenuItem asChild>

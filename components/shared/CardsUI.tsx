@@ -14,12 +14,14 @@ export function ClickableListCard({
     children,
     isActive,
     href,
-    onClick
+    onClick,
+    className
 }: {
     children: React.ReactNode
     isActive?: boolean
     href?: string
     onClick?: () => void
+    className?: string
 }) {
     const router = useRouter()
 
@@ -35,7 +37,7 @@ export function ClickableListCard({
     }
 
     return (
-        <div className={`w-full shadow-none rounded-none border-x-0 relative transition-all   shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 py-6 border border-t border-b-0   ${isActive && "hover:bg-border/50 cursor-pointer"}`}
+        <div className={`w-full shadow-none rounded-none border-x-0 relative transition-all shadow-zinc-950/10 text-card-foreground flex flex-col gap-6 py-6 border border-t border-b-0 ${isActive ? "hover:bg-border/50 cursor-pointer" : ""} ${className || ""}`}
             onClick={isActive ? handleCardClick : undefined}
         >
             {children}

@@ -76,8 +76,8 @@ export function WebsitePageContent({ page }: WebsitePageContentProps) {
                     </Button>
                 </div>
 
-                <TabsContent value="markdown" className="mt-4">
-                    <ScrollArea className="h-[55vh] w-full border rounded-lg p-4 bg-background">
+                <TabsContent value="markdown" >
+                    <ScrollArea className="h-[55vh] w-full">
                         {page.content ? (
                             <MarkdownViewer content={page.content} />
                         ) : (

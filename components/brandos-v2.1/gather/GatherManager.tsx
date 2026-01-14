@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid } from 'lucide-react';
+import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AgentStatusCard } from './AgentStatusCard';
@@ -21,8 +21,8 @@ import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websi
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAuditorOutput } from '@/server/actions/auditorActions';
 import { setGatherCookies } from '@/server/actions/cookieActions';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Spinner } from '@/components/shared/SpinnerLoader';
 
 interface GatherManagerProps {
     brandId: string;
@@ -63,7 +63,6 @@ export function GatherManager({
     const [isPolling, setIsPolling] = useState(false);
     const [pollingMessage, setPollingMessage] = useState<string>("");
     
-    // Sync to cookies
     useEffect(() => {
         if (brandId) {
             setGatherCookies({
@@ -415,6 +414,62 @@ export function GatherManager({
         });
     };
 
+    const handleScrapeWebsite = () => {
+        startTransition(async () => {
+            setWebBatchStatus("Initializing");
+            toast.info("Starting Website Collection...");
+            try {
+                const webResult = await scrapeBatchWebsite(brandId, webLimit);
+                if (!webResult?.success) {
+                    toast.error(`Website capture failed: ${webResult?.message}`);
+                    setWebBatchStatus("Failed");
+                    return;
+                }
+                if (webResult.data?.task_id) {
+                    setCurrentWebBatchId(webResult.data.task_id);
+                     toast.success("Website agent deployed.");
+                     setIsPolling(true);
+                }
+            } catch (e) {
+                console.error(e);
+                toast.error("Error starting website collection");
+                setWebBatchStatus("Failed");
+            }
+        });
+    };
+
+    const handleScrapeSocial = () => {
+        startTransition(async () => {
+            if (!startDate) {
+                toast.error("Start Date is required.");
+                return;
+            }
+            setSocBatchStatus("Initializing");
+            toast.info("Starting Social Collection...");
+            try {
+                const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
+                if (!socialResult?.success) {
+                    toast.error(`Social capture failed: ${socialResult?.message}`);
+                    setSocBatchStatus("Failed");
+                    return;
+                }
+                
+                const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
+                if (sBatchId) {
+                    setCurrentSocialBatchId(sBatchId);
+                    toast.success("Social agent deployed.");
+                    setIsPolling(true);
+                } else {
+                    toast.error("Failed to get batch ID for social scan");
+                }
+            } catch (e) {
+                console.error(e);
+                toast.error("Error starting social collection");
+                setSocBatchStatus("Failed");
+            }
+        });
+    };
+
     return (
         <div className="space-y-8 w-full pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -425,7 +480,7 @@ export function GatherManager({
                 </div>
                  <Button variant="outline" asChild>
                     <Link href="/dashboard/brandos-v2.1/gather">
-                        <LayoutGrid className="w-4 h-4 mr-2" />
+                        <LayoutGrid className="w-4 h-4" />
                         Switch Brand
                     </Link>
                 </Button>
@@ -451,9 +506,9 @@ export function GatherManager({
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList>
                             <TabsTrigger value="brand_profile">Brand Profile</TabsTrigger>
-                            <TabsTrigger value="captured_data" disabled={!hasResults}>
+                            <TabsTrigger value="captured_data">
                                 Captured Data
-                                {!hasResults && <span className="ml-2 text-xs text-muted-foreground">(pending)</span>}
+                                {!hasResults && <span className="ml-2 text-xs text-muted-foreground"><Spinner /></span>}
                             </TabsTrigger>
                             <TabsTrigger value="ai_audit" disabled={!isComplete}>
                                 <Bot className="w-4 h-4" />
@@ -482,10 +537,46 @@ export function GatherManager({
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="website" className="pt-6">
-                                    <SimpleWebsiteScrapViewer scrapsData={websiteData} brandName={brandData.name} status={websiteBatchStatus} />
+                                    {!websiteData ? (
+                                        <div className="flex flex-col items-center justify-center py-12 text-center border rounded-lg bg-muted/5 border-dashed">
+                                            <Globe className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                                            <h3 className="text-lg font-medium">No Website Data</h3>
+                                            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+                                                Collect website data to analyze brand messaging and content structure.
+                                            </p>
+                                            <Button onClick={handleScrapeWebsite} disabled={isPolling || isStarting}>
+                                                {isPolling && webBatchStatus === 'Initializing' ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Play className="w-4 h-4" />
+                                                )}
+                                                Run Website Collection
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <SimpleWebsiteScrapViewer scrapsData={websiteData} brandName={brandData.name} status={websiteBatchStatus} />
+                                    )}
                                 </TabsContent>
                                 <TabsContent value="social" className="pt-6">
-                                    <SimpleSocialScrapViewer scrapsData={socialData} brandName={brandData.name} brandData={brandData} status={socialBatchStatus} />
+                                    {!socialData ? (
+                                        <div className="flex flex-col items-center justify-center py-12 text-center border rounded-lg bg-muted/5 border-dashed">
+                                            <Fingerprint className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                                            <h3 className="text-lg font-medium">No Social Data</h3>
+                                            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+                                                Collect social media data to analyze audience engagement and sentiment.
+                                            </p>
+                                            <Button onClick={handleScrapeSocial} disabled={isPolling || isStarting}>
+                                                {isPolling && socBatchStatus === 'Initializing' ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Play className="w-4 h-4" />
+                                                )}
+                                                Run Social Collection
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <SimpleSocialScrapViewer scrapsData={socialData} brandName={brandData.name} brandData={brandData} status={socialBatchStatus} />
+                                    )}
                                 </TabsContent>
                             </Tabs>
                         </TabsContent>
@@ -507,20 +598,21 @@ export function GatherManager({
                                     isDisabled={!currentWebBatchId}
                                     buttonLabel="Run Website Audit"
                                     controls={
-                                         <Select 
-                                            value={websiteAuditScope} 
-                                            onValueChange={setWebsiteAuditScope} 
-                                            disabled={isAuditorRunning}
-                                        >
-                                            <SelectTrigger className="w-[180px] h-9 bg-background">
-                                                <SelectValue placeholder="Scope" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="brand">Brand Only</SelectItem>
-                                                <SelectItem value="competitors">Competitors Only</SelectItem>
-                                                <SelectItem value="both">Brand & Competitors</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                         <DropdownMenu>
+                                            <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
+                                                <Button variant="outline" className="w-[180px] h-9 justify-between bg-background font-normal">
+                                                    {websiteAuditScope === 'brand' ? 'Brand Only' : 
+                                                     websiteAuditScope === 'competitors' ? 'Competitors Only' : 
+                                                     'Brand & Competitors'}
+                                                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-[180px]">
+                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('brand')}>Brand Only</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('competitors')}>Competitors Only</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('both')}>Brand & Competitors</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     }
                                 />
 
@@ -537,42 +629,44 @@ export function GatherManager({
                                     result={socialAuditorResult}
                                     RenderResult={SocialAuditorResultViewer}
                                     isDisabled={!currentSocialBatchId || !availableChannels.length}
-                                    buttonLabel="Run Analysis"
+                                    buttonLabel="Run  Analysis"
                                     controls={
                                         <div className="flex items-center gap-2">
-                                             <Select 
-                                                value={selectedChannel} 
-                                                onValueChange={setSelectedChannel} 
-                                                disabled={isSocialAuditorRunning || !availableChannels.length}
-                                            >
-                                                <SelectTrigger className="w-[140px] h-9 bg-background">
-                                                    <SelectValue placeholder="Channel" />
-                                                </SelectTrigger>
-                                                <SelectContent>
+                                             <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isSocialAuditorRunning || !availableChannels.length}>
+                                                     <Button variant="outline" className="w-[140px] h-9 justify-between bg-background capitalize font-normal">
+                                                        {selectedChannel || "Channel"}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[140px]">
                                                     {availableChannels.length > 0 ? (
                                                         availableChannels.map(channel => (
-                                                            <SelectItem key={channel} value={channel} className="capitalize">{channel}</SelectItem>
+                                                            <DropdownMenuItem key={channel} onClick={() => setSelectedChannel(channel)} className="capitalize">
+                                                                {channel}
+                                                            </DropdownMenuItem>
                                                         ))
                                                     ) : (
-                                                        <SelectItem value="none" disabled>No Data Available</SelectItem>
+                                                         <DropdownMenuItem disabled>No Data Available</DropdownMenuItem>
                                                     )}
-                                                </SelectContent>
-                                            </Select>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
 
-                                            <Select 
-                                                value={socialAuditScope} 
-                                                onValueChange={setSocialAuditScope} 
-                                                disabled={isSocialAuditorRunning}
-                                            >
-                                                <SelectTrigger className="w-[160px] h-9 bg-background">
-                                                    <SelectValue placeholder="Scope" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="brand">Brand Only</SelectItem>
-                                                    <SelectItem value="competitors">Competitors Only</SelectItem>
-                                                    <SelectItem value="both">Brand & Competitors</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isSocialAuditorRunning}>
+                                                    <Button variant="outline" className="w-[160px] h-9 justify-between bg-background font-normal">
+                                                         {socialAuditScope === 'brand' ? 'Brand Only' : 
+                                                         socialAuditScope === 'competitors' ? 'Competitors Only' : 
+                                                         'Brand & Competitors'}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[160px]">
+                                                    <DropdownMenuItem onClick={() => setSocialAuditScope('brand')}>Brand Only</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setSocialAuditScope('competitors')}>Competitors Only</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setSocialAuditScope('both')}>Brand & Competitors</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
                                     }
                                 />

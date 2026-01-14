@@ -16,36 +16,43 @@ import { SocialAuditorResultViewer } from '../SocialAuditorResultViewer';
 import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAuditorOutput } from '@/server/actions/auditorActions';
 import { useAuditor } from './hooks/UseAuditor';
 import { useSocialAuditor } from './hooks/UseSocialAuditor';
+import { AiOutlinePieChart } from "react-icons/ai";
 
 type DataViewManagerProps = {
     brandId: string;
     brandData: any;
-    websiteData: any;
-    socialData: any;
     websiteBatchId: string | null;
     socialBatchId: string | null;
     websiteBatchStatus: string | null;
     socialBatchStatus: string | null;
+    websiteSlot: React.ReactNode;
+    socialSlot: React.ReactNode;
+    availableChannels: string[];
+    hasResults: boolean;
+    isWebComplete: boolean;
+    isSocialComplete: boolean;
 };
 
 export function DataViewManager({
     brandId,
     brandData,
-    websiteData,
-    socialData,
     websiteBatchId,
     socialBatchId,
     websiteBatchStatus,
-    socialBatchStatus
+    socialBatchStatus,
+    websiteSlot,
+    socialSlot,
+    availableChannels,
+    hasResults,
+    isWebComplete,
+    isSocialComplete
 }: DataViewManagerProps) {
     const [activeTab, setActiveTab] = useState('brand_profile');
     const [websiteAuditScope, setWebsiteAuditScope] = useState<string>('both');
     const [socialAuditScope, setSocialAuditScope] = useState<string>('brand');
     const [selectedChannel, setSelectedChannel] = useState<string>('linkedin');
-
-    const hasResults = !!(websiteData || socialData);
-    const isWebComplete = websiteBatchStatus === 'Completed' || websiteBatchStatus === 'CompletedWithErrors';
-    const isSocialComplete = socialBatchStatus === 'Completed' || socialBatchStatus === 'CompletedWithErrors';
+    
+    // Derived state moved to parent or props
     const isComplete = hasResults && isWebComplete && isSocialComplete;
 
     const {
@@ -59,8 +66,6 @@ export function DataViewManager({
         batchId: websiteBatchId,
         scope: websiteAuditScope
     });
-
-    const availableChannels = getAvailableSocialChannels(socialData);
 
     const {
         taskId: socialAuditorTaskId,
@@ -83,16 +88,16 @@ export function DataViewManager({
                     <p className="text-muted-foreground">Captured Data & Analysis</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" asChild>
+                    <Button asChild variant={'secondary'}>
                         <Link href={`/dashboard/brandos-v2.1/gather/collecting/${brandId}`}>
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            Re-collect Data
+                            <RefreshCw className="w-4 h-4" />
+                            Re Collect
                         </Link>
                     </Button>
-                    <Button variant="outline" asChild>
+                    <Button asChild variant={'secondary'}>
                         <Link href="/dashboard/brandos-v2.1/gather">
-                            <LayoutGrid className="w-4 h-4 mr-2" />
-                            All Brands
+                            <AiOutlinePieChart className="w-4 h-4" />
+                            Gather Data
                         </Link>
                     </Button>
                 </div>
@@ -132,19 +137,10 @@ export function DataViewManager({
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="website" className="pt-6">
-                            <SimpleWebsiteScrapViewer
-                                scrapsData={websiteData}
-                                brandName={brandData.name}
-                                status={websiteBatchStatus}
-                            />
+                            {websiteSlot}
                         </TabsContent>
                         <TabsContent value="social" className="pt-6">
-                            <SimpleSocialScrapViewer
-                                scrapsData={socialData}
-                                brandName={brandData.name}
-                                brandData={brandData}
-                                status={socialBatchStatus}
-                            />
+                            {socialSlot}
                         </TabsContent>
                     </Tabs>
                 </TabsContent>
@@ -194,7 +190,7 @@ export function DataViewManager({
                             result={socialAuditorResult}
                             RenderResult={SocialAuditorResultViewer}
                             isDisabled={!socialBatchId || !availableChannels.length}
-                            buttonLabel="Run Analysis"
+                            buttonLabel="Run Social Analysis"
                             controls={
                                 <div className="flex items-center gap-2">
                                     <Select

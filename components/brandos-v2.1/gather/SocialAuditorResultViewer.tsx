@@ -1,12 +1,19 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Eye, MessageSquare, Heart, Hash, Globe, Activity, TrendingUp, Target, Star, Users, Lightbulb, Zap } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { 
+    Eye, MessageSquare, Heart, Hash, Globe, Activity, TrendingUp, Target, 
+    Star, Users, Lightbulb, Zap, Calendar, MapPin, Briefcase, Info, 
+    Megaphone, CheckCircle2, Quote, Share2
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SocialAuditorResultViewerProps {
-    data: any; // Social Auditor Output JSON
+    data: any; 
 }
 
 export function SocialAuditorResultViewer({ data }: SocialAuditorResultViewerProps) {
@@ -17,249 +24,324 @@ export function SocialAuditorResultViewer({ data }: SocialAuditorResultViewerPro
         profile_snapshot = {}, 
         emergent_brand_attributes = {}, 
         channel_specific_insights = {}, 
-        engagement_analysis = {} 
+        engagement_analysis = {},
+        audit_metadata = {}
     } = social_audit_report;
 
-    const attributes = [
-        { key: 'VoiceTone', label: 'Voice & Tone', icon: MessageSquare },
-        { key: 'Positioning', label: 'Positioning', icon: Target },
-        { key: 'RhetoricalStyle', label: 'Rhetorical Style', icon: Eye },
-        { key: 'BusinessDrivers', label: 'Business Drivers', icon: Activity },
-        { key: 'Personas', label: 'Target Personas', icon: Users },
-        { key: 'Lexicon', label: 'Lexicon', icon: Hash },
-        { key: 'Values', label: 'Core Values', icon: Heart },
-        { key: 'BrandPromise', label: 'Brand Promise', icon: Star },
-        { key: 'KeyThemes', label: 'Key Themes', icon: Lightbulb },
-    ];
-
-    // Helper to render Finding + Evidence sections
-    const renderAnalysisSection = (data: any) => {
-        if (!data) return null;
-        // Check if data follows { finding, evidence } structure
-        const finding = data.finding;
-        const evidence = Array.isArray(data.evidence) ? data.evidence : [];
-
-        if (!finding && evidence.length === 0) {
-             // Fallback for simple string or array if schema differs
-             if (typeof data === 'string') return <p className="text-sm text-foreground/90">{data}</p>;
-             if (Array.isArray(data)) return (
-                <div className="flex flex-wrap gap-2">
-                    {data.map((item, i) => (
-                        <Badge key={i} variant="secondary">{item}</Badge>
-                    ))}
-                </div>
-             );
-             return null;
-        }
-
-        return (
-            <div className="space-y-3">
-                {finding && (
-                    <p className="text-sm leading-relaxed text-foreground/90">
-                        {finding}
-                    </p>
-                )}
-                {evidence.length > 0 && (
-                    <div className="bg-muted/30 rounded-md p-3 border border-muted/50">
-                        <h6 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Evidence & Verbatim</h6>
-                        <ul className="space-y-2">
-                            {evidence.slice(0, 4).map((item: string, idx: number) => (
-                                <li key={idx} className="text-xs italic text-muted-foreground flex gap-2">
-                                    <span className="shrink-0 text-primary/50">"</span>
-                                    <span>{item.length > 150 ? item.substring(0, 150) + "..." : item}</span>
-                                    <span className="shrink-0 text-primary/50">"</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-        );
-    };
+    // Helper to format keys like "best_posting_times" -> "Best Posting Times"
+    const formatKey = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     return (
-        <div className="space-y-6">
-            {/* Top Cards: Channel & Engagement */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <Globe className="h-4 w-4" /> Channel Info
-                        </CardTitle>
+        <div className="space-y-6 animate-in fade-in duration-500">
+            
+            {/* 1. Header & Profile Snapshot */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="md:col-span-2  shadow-sm bg-gradient-to-r from-background to-muted/20">
+                    <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                             <div className="space-y-1">
+                                <CardTitle className="text-xl flex items-center gap-2">
+                                    {audit_metadata.channel_name || data.channel_name || 'Social Audit Report'}
+                                </CardTitle>
+                                <CardDescription>
+                                    Analysis Window: {audit_metadata.analysis_window || 'N/A'}
+                                </CardDescription>
+                            </div>
+                            <div className="flex gap-2">
+                                <Badge variant="outline" className="flex gap-1 items-center px-3 py-1 bg-background">
+                                    <Activity className="w-3.5 h-3.5 text-primary" />
+                                    {audit_metadata.posts_analyzed || '0'} Posts
+                                </Badge>
+                                <Badge variant="outline" className="flex gap-1 items-center px-3 py-1 bg-background">
+                                    <Users className="w-3.5 h-3.5 text-primary" />
+                                    {parseInt(profile_snapshot.follower_count || '0').toLocaleString()} Followers
+                                </Badge>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex items-center gap-2 mb-2">
-                             <div className="text-xl font-bold capitalize">{data.channel_name || 'Social Channel'}</div>
-                             {profile_snapshot.last_updated && <span className="text-[10px] text-muted-foreground ml-auto">Updated: {profile_snapshot.last_updated}</span>}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="flex flex-col">
-                                <span className="text-muted-foreground text-xs">Followers</span>
-                                <span className="font-mono font-bold">{profile_snapshot.follower_count?.toLocaleString() || 'N/A'}</span>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-muted-foreground text-xs">Posts Analyzed</span>
-                                <span className="font-mono font-bold">{social_audit_report.audit_metadata?.posts_analyzed || data.scraped_urls_count || 'N/A'}</span>
-                            </div>
-                        </div>
                         {profile_snapshot.bio_description && (
-                            <div className="mt-4 text-xs italic text-muted-foreground border-l-2 border-primary/20 pl-3">
-                                {profile_snapshot.bio_description}
+                            <div className="relative">
+                                <Quote className="w-8 h-8 text-muted-foreground/10 absolute -top-2 -left-2" />
+                                <p className="text-sm text-muted-foreground  pl-8 leading-relaxed">
+                                    {profile_snapshot.bio_description}
+                                </p>
                             </div>
                         )}
                     </CardContent>
                 </Card>
 
-                <Card>
+                {/* KPI / Quick Stats Card */}
+                 <Card >
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                           <Activity className="h-4 w-4" /> Engagement Pulse
-                       </CardTitle>
+                         <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Audit Status</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                         {engagement_analysis.engagement_patterns?.content_type_performance ? (
-                             <div className="space-y-3">
-                                 <div className="text-xs font-medium text-muted-foreground">Top Performing Content Types</div>
-                                 <div className="space-y-2">
-                                     {Object.entries(engagement_analysis.engagement_patterns.content_type_performance).slice(0, 2).map(([type, perf]: [string, any], i) => (
-                                         <div key={i} className="text-xs bg-muted/20 p-2 rounded">
-                                             <span className="font-semibold capitalize text-foreground">{type.replace(/_/g, ' ')}:</span> <span className="text-muted-foreground">{perf.toString().substring(0, 60)}...</span>
-                                         </div>
-                                     ))}
-                                 </div>
-                             </div>
-                         ) : (
-                            <div className="flex items-center justify-center h-24 text-muted-foreground text-xs italic">
-                                Limited engagement data available
-                            </div>
-                         )}
+                    <CardContent className="space-y-4">
+                        <div className="flex justify-between items-center border-b border-primary/10 pb-2">
+                            <span className="text-sm font-medium">Agent</span>
+                            <span className="text-sm text-muted-foreground">{audit_metadata.agent_name || 'Social Auditor'}</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-primary/10 pb-2">
+                            <span className="text-sm font-medium">Date</span>
+                            <span className="text-sm text-muted-foreground">
+                                {new Date(audit_metadata.analysis_date || Date.now()).toLocaleDateString()}
+                            </span>
+                        </div>
+                         <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Posts</span>
+                            <span className="text-sm text-primary">{audit_metadata.posts_analyzed} Analysis</span>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
 
-            <Accordion type="multiple" defaultValue={["attributes", "insights"]} className="w-full">
-                
-                {/* Brand Attributes */}
-                 <AccordionItem value="attributes" className="border rounded-lg px-4 mb-4 bg-card">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-primary/10 p-2 rounded-full text-primary">
-                                <Hash className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-semibold text-base">Emergent Brand Attributes</h4>
-                                <p className="text-xs text-muted-foreground font-normal">Personality, tone, and strategic drivers</p>
-                            </div>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4 space-y-6">
-                        {attributes.map((attr) => {
-                            const attrData = emergent_brand_attributes[attr.key];
-                            if (!attrData) return null;
-                            const Icon = attr.icon;
-                            
-                            return (
-                                <div key={attr.key} className="relative pl-4 border-l-2 border-primary/20 hover:border-primary/50 transition-colors">
-                                    <h5 className="flex items-center gap-2 font-medium text-sm mb-2 text-primary">
-                                        <Icon className="w-4 h-4" /> {attr.label}
-                                    </h5>
-                                    {renderAnalysisSection(attrData)}
-                                </div>
-                            );
-                        })}
-                    </AccordionContent>
-                </AccordionItem>
-
-                {/* Channel Specific Insights */}
-                 <AccordionItem value="insights" className="border rounded-lg px-4 mb-4 bg-card">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-orange-500/10 p-2 rounded-full text-orange-500">
-                                <Lightbulb className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-semibold text-base">Channel Insights</h4>
-                                <p className="text-xs text-muted-foreground font-normal">Platform performance and strategy</p>
-                            </div>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4 space-y-8">
-                        {/* Channel Specific Keys */}
-                        {Object.entries(channel_specific_insights).map(([key, val]: [string, any]) => (
-                             <div key={key} className="space-y-2">
-                                 <h5 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                                     <Zap className="w-3 h-3 text-orange-500" />
-                                     {key.replace(/_/g, ' ')}
-                                 </h5>
-                                 {renderAnalysisSection(val)}
-                             </div>
-                        ))}
-
-                         {/* Comment Quality Analysis (if presents in Engagement but relevant here) */}
-                         {engagement_analysis.comment_quality_analysis && (
-                             <div className="space-y-2 pt-4 border-t">
-                                 <h5 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                                     <MessageSquare className="w-3 h-3 text-blue-500" />
-                                     Community Sentiment
-                                 </h5>
-                                 {renderAnalysisSection(engagement_analysis.comment_quality_analysis)}
-                             </div>
-                         )}
-                    </AccordionContent>
-                </AccordionItem>
-
-                {/* Engagement Deep Dive */}
-                {engagement_analysis.top_performing_posts && engagement_analysis.top_performing_posts.length > 0 && (
-                    <AccordionItem value="engagement" className="border rounded-lg px-4 mb-4 bg-card">
-                         <AccordionTrigger className="hover:no-underline py-4">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-green-500/10 p-2 rounded-full text-green-500">
-                                    <TrendingUp className="h-5 w-5" />
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="font-semibold text-base">Top Content</h4>
-                                    <p className="text-xs text-muted-foreground font-normal">Highest performing posts</p>
-                                </div>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pb-4 relative">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {engagement_analysis.top_performing_posts.map((post: any, idx: number) => (
-                                    <div key={idx} className="bg-muted/20 p-3 rounded-lg border text-sm space-y-2">
-                                        <p className="italic text-muted-foreground line-clamp-3">"{post.text_preview}"</p>
-                                        <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground pt-2 border-t border-muted/50">
-                                            {post.likes !== "0" && <span className="flex items-center gap-1"><Heart className="w-3 h-3" /> {post.likes}</span>}
-                                            {post.comments !== "0" && <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" /> {post.comments}</span>}
-                                            {post.engagement_rate && <span className="flex items-center gap-1"><Activity className="w-3 h-3" /> {(parseFloat(post.engagement_rate) * 100).toFixed(2)}%</span>}
+            {/* 2. Top Performing Content */}
+            {engagement_analysis.top_performing_posts?.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-green-600" />
+                        Top Performing Content
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {engagement_analysis.top_performing_posts.map((post: any, idx: number) => (
+                            <Card key={idx} className="flex flex-col h-full hover:shadow-md transition-shadow bg-card border-l-4 border-l-green-500/50">
+                                <CardContent className="pt-4 flex-1 space-y-3">
+                                    <p className="text-sm text-foreground/90 italic line-clamp-4 relative">
+                                        <span className="text-green-500/40 text-2xl absolute -top-2 -left-1">"</span>
+                                        <span className="pl-3">{post.text_preview}</span>
+                                    </p>
+                                    
+                                     {post.engagement_note && (
+                                        <div className="bg-green-50 dark:bg-green-950/20 p-2 rounded text-xs text-green-800 dark:text-green-200 mt-2">
+                                            <strong>Insight:</strong> {post.engagement_note}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    )}
+                                </CardContent>
+                                <div className="p-3 bg-muted/30 border-t flex justify-between items-center text-xs font-medium text-muted-foreground">
+                                     <div className="flex gap-3">
+                                        {post.likes !== "0" && <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {post.likes}</span>}
+                                        {post.comments !== "0" && <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {post.comments}</span>}
+                                        {post.shares !== "0" && <span className="flex items-center gap-1"><Share2 className="w-3.5 h-3.5" /> {post.shares}</span>}
+                                     </div>
+                                     {post.engagement_rate && (
+                                         <Badge variant="secondary" className="font-mono text-[10px]">
+                                             {(parseFloat(post.engagement_rate) * 100).toFixed(3)}% ER
+                                         </Badge>
+                                     )}
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* 3. Emergent Brand Attributes */}
+            <div className="space-y-3">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Target className="w-5 h-5 text-purple-600" />
+                    Emergent Brand DNA
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                     <Accordion type="multiple" defaultValue={['Positioning', 'Values']} className="w-full space-y-2">
+                        {Object.entries(emergent_brand_attributes).map(([key, attr]: [string, any]) => {
+                             if (!attr || (!attr.finding && (!attr.evidence || attr.evidence.length === 0))) return null;
+                             
+                             const Icon = getAttributeIcon(key);
+                             const label = formatKey(key);
+
+                             return (
+                                <AccordionItem key={key} value={key} className="border rounded-lg bg-card px-2">
+                                    <AccordionTrigger className="hover:no-underline py-3 px-2">
+                                        <div className="flex items-center gap-3 text-left">
+                                            <div className="bg-muted p-2 rounded-full hidden sm:block">
+                                                <Icon className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-base">{label}</h4>
+                                                {attr.finding && (
+                                                    <p className="text-xs text-muted-foreground line-clamp-1 font-normal text-left pr-4">
+                                                        {attr.finding.substring(0, 100)}...
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-2 pb-4">
+                                        <div className="space-y-4 pt-2">
+                                            {attr.finding && (
+                                                <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                                                    <p className="text-sm leading-relaxed text-foreground/90 font-medium">
+                                                        {attr.finding}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {attr.evidence && attr.evidence.length > 0 && (
+                                                <div className="pl-4 border-l-2 border-muted">
+                                                    <h5 className="text-xs font-bold uppercase text-muted-foreground mb-2">Supporting Evidence</h5>
+                                                    <ul className="space-y-2">
+                                                        {attr.evidence.map((ev: string, i: number) => (
+                                                            <li key={i} className="text-xs italic text-muted-foreground">
+                                                                "{ev}"
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                             )
+                        })}
+                     </Accordion>
+                </div>
+            </div>
+
+            {/* 4. Strategic Insights Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Engagement Patterns */}
+                <div className="space-y-4">
+                     <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-blue-600" />
+                        Engagement Patterns
+                    </h3>
+                    <Card className="bg-card h-full">
+                        <CardContent className="pt-6 space-y-6">
+                             {engagement_analysis.engagement_patterns?.engagement_quality && (
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                                        <Star className="w-4 h-4 text-yellow-500" />
+                                        Quality of Engagement
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        {engagement_analysis.engagement_patterns.engagement_quality}
+                                    </p>
+                                </div>
+                             )}
+
+                             {engagement_analysis.engagement_patterns?.content_type_performance && (
+                                 <div className="space-y-2">
+                                     <h4 className="text-sm font-semibold">Content Performance</h4>
+                                     <div className="grid gap-2">
+                                         {Object.entries(engagement_analysis.engagement_patterns.content_type_performance).map(([k, v]: [string, any]) => (
+                                             <div key={k} className="bg-muted/30 p-2 rounded text-xs">
+                                                 <span className="font-semibold capitalize text-foreground">{formatKey(k)}:</span> <span className="text-muted-foreground">{v}</span>
+                                             </div>
+                                         ))}
+                                     </div>
+                                 </div>
+                             )}
+
+                             {engagement_analysis.engagement_patterns?.comment_sentiment_patterns && (
+                                 <div className="space-y-2">
+                                     <h4 className="text-sm font-semibold">Sentiment Drivers</h4>
+                                      <div className="grid gap-2">
+                                         {Object.entries(engagement_analysis.engagement_patterns.comment_sentiment_patterns).map(([k, v]: [string, any]) => (
+                                             <div key={k} className="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded text-xs border border-blue-100 dark:border-blue-900/30">
+                                                 <span className="font-semibold capitalize text-blue-700 dark:text-blue-300">{formatKey(k)}:</span> <span className="text-muted-foreground block mt-1">{v}</span>
+                                             </div>
+                                         ))}
+                                     </div>
+                                 </div>
+                             )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Channel Insights */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5 text-orange-600" />
+                        Channel Strategy
+                    </h3>
+                    <div className="space-y-4">
+                        {/* Recursive styling for channel insights */}
+                        {Object.entries(channel_specific_insights).map(([category, insights]: [string, any]) => (
+                            <Card key={category} className="shadow-sm">
+                                <CardHeader className="py-3 bg-muted/20 border-b">
+                                     <CardTitle className="text-sm font-medium uppercase tracking-wider flex items-center gap-2">
+                                        <Zap className="w-3.5 h-3.5 text-orange-500" />
+                                        {formatKey(category)}
+                                     </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-3 space-y-2">
+                                    {typeof insights === 'string' ? (
+                                        <p className="text-sm text-muted-foreground">{insights}</p>
+                                    ) : (
+                                        Object.entries(insights).map(([k, v]: [string, any]) => (
+                                            <div key={k} className="text-xs">
+                                                <div className="font-semibold text-foreground mb-0.5">{formatKey(k)}</div>
+                                                {Array.isArray(v) ? (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {v.map((tag, i) => <Badge key={i} variant="secondary" className="font-normal text-[10px]">{tag}</Badge>)}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-muted-foreground">{String(v)}</p>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Zero Engagement Anomaly / Warnings */}
+            {engagement_analysis.zero_engagement_anomaly && (
+                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-4 flex gap-3 text-sm">
+                     <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                     <div className="space-y-1 text-amber-900 dark:text-amber-100">
+                         <p className="font-medium">Analysis Note: {engagement_analysis.zero_engagement_anomaly.observation}</p>
+                         <p className="text-amber-700 dark:text-amber-300/80 text-xs">
+                             {engagement_analysis.zero_engagement_anomaly.impact_on_analysis}
+                         </p>
+                     </div>
+                 </div>
+            )}
+
+            {/* Raw Data (Collapsed) */}
+            <div className="mt-8 pt-4 border-t">
+                <Accordion type="single" collapsible>
+                    <AccordionItem value="raw" className="border-none">
+                        <AccordionTrigger className="text-xs text-muted-foreground py-2 justify-start gap-2 hover:no-underline hover:text-foreground">
+                             Review Raw JSON Data
+                        </AccordionTrigger>
+                        <AccordionContent>
+                             <ScrollArea className="h-64 rounded-md border bg-muted/50 p-4">
+                                <pre className="text-[10px] font-mono whitespace-pre-wrap">
+                                    {JSON.stringify(data, (key, value) => {
+                                        if (key === 'model_used') return undefined; // Hide model used
+                                        return value;
+                                    }, 2)}
+                                </pre>
+                            </ScrollArea>
                         </AccordionContent>
                     </AccordionItem>
-                )}
-            </Accordion>
-
-            <div className="mt-8 pt-4 border-t">
-                <details className="group">
-                    <summary className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors">
-                        <Terminal className="h-4 w-4" />
-                        <span className="font-medium">Raw Analysis Data</span>
-                    </summary>
-                    <div className="mt-4 bg-muted/50 rounded-lg p-4 font-mono text-xs overflow-auto max-h-[500px] border">
-                        <pre>{JSON.stringify(data, null, 2)}</pre>
-                    </div>
-                </details>
+                </Accordion>
             </div>
         </div>
     );
 }
 
-function Terminal({ className }: { className?: string }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polyline points="4 17 10 11 4 5" />
-            <line x1="12" x2="20" y1="19" y2="19" />
-        </svg>
-    )
+
+// Helper for Icons
+const getAttributeIcon = (key: string) => {
+    const map: Record<string, any> = {
+        'VoiceTone': MessageSquare,
+        'Positioning': Target,
+        'RhetoricalStyle': Eye,
+        'BusinessDrivers': Activity,
+        'Personas': Users,
+        'Lexicon': Hash,
+        'Values': Heart,
+        'BrandPromise': Star,
+        'KeyThemes': Lightbulb,
+        'ProductNarratives': Megaphone,
+        'CommunityEngagement': Globe,
+        'LeadershipVoice': Briefcase,
+        'EmployerBrand': Users,
+    };
+    return map[key] || CheckCircle2;
 }

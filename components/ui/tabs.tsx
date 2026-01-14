@@ -4,6 +4,7 @@ import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
+import { Blur } from "@/components/shared/MagicBlur"
 
 function Tabs({
   className,
@@ -12,7 +13,7 @@ function Tabs({
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      className={cn("flex flex-col gap-7", className)}
+      className={cn("flex flex-col gap-6", className)}
       {...props}
     />
   )
@@ -26,7 +27,8 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "dark:bg-accent/40 bg-accent/60 border gap-1 text-base inline-flex h-8 w-fit max-w-full items-center justify-start rounded-lg  p-[2.5px] overflow-x-auto flex-nowrap scrollbar-hide ",
+        "inline-flex h-10 items-center justify-start gap-1 rounded-lg bg-muted/80 p-1 text-muted-foreground border border-border/50",
+        "overflow-x-auto max-w-full scrollbar-hide backdrop-blur-sm",
         className
       )}
       {...props}
@@ -42,7 +44,10 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "data-[state=active]:bg-primary  data-[state=active]:text-background dark:data-[state=active]:text-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-primary text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-shrink-0 items-center justify-center gap-1.5 rounded-md   px-3 py-1 text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4   ",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm  ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "data-[state=active]:bg-primary data-[state=active]:text-background data-[state=active]:shadow-sm data-[state=active]:font-medium",
+        "hover:text-foreground hover:bg-muted-foreground/10",
+        "[&_svg]:size-4 [&_svg]:mr-2 ",
         className
       )}
       {...props}
@@ -50,8 +55,12 @@ function TabsTrigger({
   )
 }
 
+
+
+
 function TabsContent({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Content>) {
   return (
@@ -59,7 +68,11 @@ function TabsContent({
       data-slot="tabs-content"
       className={cn("flex-1 outline-none", className)}
       {...props}
-    />
+    >
+      <Blur className="w-full h-full space-y-8">
+        {children}
+      </Blur>
+    </TabsPrimitive.Content>
   )
 }
 

@@ -20,13 +20,14 @@ export default function HeroSection() {
                     </Link>
                 </Button>
             </BlurDelay2>
-            <div className='mt-50 '>
+            <div className='mt-70 '>
 
-            </div>
             <LaserFlow
                 horizontalBeamOffset={0.1}
                 verticalBeamOffset={0}
-            />
+                />
+            </div>
+
         </ContainerLg>
     )
 }

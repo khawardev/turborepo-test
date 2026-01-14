@@ -19,7 +19,7 @@ import { SidebarList } from "./sidebar-list"
 import SidebarUser from "./sidebar-user"
 import { BrandOSConfig } from "@/config/brandos-sidebar-config"
 
-export function LeftSidebar({ user, brands, ...props}: any) {
+export function LeftSidebar({ user, ...props}: any) {
 
     return (
         <Sidebar collapsible="icon" variant='inset' {...props}>
@@ -44,11 +44,11 @@ export function LeftSidebar({ user, brands, ...props}: any) {
             </SidebarHeader>
             
             <SidebarContent>
-                <SidebarList brands={brands} data={BrandOSConfig} />
+                <SidebarList data={BrandOSConfig} />
             </SidebarContent>
 
             <SidebarFooter>
-                <WhatsNew />
+                {/* <WhatsNew /> */}
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarUser user={user} />

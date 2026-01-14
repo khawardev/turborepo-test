@@ -1,20 +1,22 @@
-
-import Phase0Dashboard from '@/components/brandos-v2.1/Phase0Dashboard';
-import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { Suspense } from 'react';
+import { getBrands } from "@/server/actions/brandActions";
+import { getCurrentUser } from "@/server/actions/authActions";
+import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
+import { Phase0BrandList } from '@/components/brandos-v2.1/phase0/Phase0BrandList';
+import { Phase0BrandCardWrapper, Phase0BrandCardSkeleton } from './Phase0BrandCardWrapper';
 
-export default function Phase0Page() {
+export default async function Phase0Page() {
+    await getCurrentUser();
+    const brands = await getBrands();
+    const brandCount = brands ? brands.length : 0;
 
- 
-  return (
-      <>
-        <DashboardLayoutHeading
-          title="Phase 0: Outside-In Audit"
-          subtitle="Collecting evidence and establishing the corpus."
-        />
-        <Suspense fallback={<div>Loading Phase 0...</div>}>
-          <Phase0Dashboard engagementId={"345"} />
-        </Suspense>
-      </>
-  );
+    return (
+        <div>
+            <DashboardLayoutHeading
+                title="Phase 0: Outside-In Audit"
+                subtitle="Establish the evidence ledger and evaluate corpus adequacy."
+            />
+            <Phase0BrandList brandCount={brandCount} brands={brands} />
+        </div>
+    );
 }

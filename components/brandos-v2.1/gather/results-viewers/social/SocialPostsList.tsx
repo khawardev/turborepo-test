@@ -3,7 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Heart, MessageSquare } from 'lucide-react';
-import { formatNumber, formatDuration } from '../utils';
+import { formatNumber, formatDuration, normalizeImageUrl } from '../utils';
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from 'next/image';
+import { cn } from "@/lib/utils";
 import { useInView } from 'react-intersection-observer';
 
 interface SocialPostsListProps {
@@ -36,19 +39,34 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
     return (
         <div className="lg:col-span-1">
             <div className="sticky top-4">
-                <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
+                <h4 className="mb-3 flex items-center gap-2">
                     Posts ({posts.length})
                 </h4>
-                <ScrollArea className="h-[60vh] border rounded-lg">
-                    <div className="p-2 space-y-2">
+                <ScrollArea className="h-[60vh] rounded-lg">
+                    <div className="space-y-2">
                         {visiblePosts.map((post: any, idx: number) => {
                             const displayText = post.title || post.description || post.message || post.text || post.full_text || post.caption || 'Untitled Post';
-                            const hasImages = (post.image_urls && post.image_urls.length > 0) || (post.images && post.images.length > 0);
-                            const thumbnail = post.video_id 
-                                ? `https://img.youtube.com/vi/${post.video_id}/default.jpg` 
-                                : hasImages ? (post.image_urls?.[0] || post.images?.[0]) : null;
                             
+                            // Align image logic with SocialPostDetail.tsx
+                            let derivedImages = post.image_urls || post.images || [];
+                            if (!Array.isArray(derivedImages)) derivedImages = [];
+
+                            // Prepend thumbnail if valid string
+                            if (post.thumbnail && typeof post.thumbnail === 'string') {
+                                const thumb = post.thumbnail;
+                                if (!derivedImages.includes(thumb)) {
+                                     derivedImages = [thumb, ...derivedImages];
+                                }
+                            }
+
+                            // Find first valid, normalized image URL
+                            let thumbnail = derivedImages.map((img: any) => normalizeImageUrl(img)).find((url: string | null) => url);
+
+                            // Fallback to video thumbnail if no images found
+                            if (!thumbnail && post.video_id) {
+                                thumbnail = `https://img.youtube.com/vi/${post.video_id}/default.jpg`;
+                            }
+
                             const likes = post.engagement?.likes ?? post.engagement?.reactions ?? 0;
                             const views = post.engagement?.views;
                             const comments = post.comments?.length ?? post.engagement?.comments ?? 0;
@@ -61,14 +79,14 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
                                     onClick={() => onSelect(post)}
                                 >
                                     <div className="flex items-center gap-2 absolute top-2 right-2">
-                                         <Badge variant="outline" className="text-[9px] h-4 px-1">
+                                        <Badge variant="outline" className="text-[9px] h-4 px-1">
                                             #{idx + 1}
                                         </Badge>
                                     </div>
 
                                     {thumbnail && (
-                                        <div className="w-16 h-12 shrink-0 rounded overflow-hidden bg-muted mt-1">
-                                            <img src={thumbnail} alt="thumb" className="w-full h-full object-cover" />
+                                        <div className="w-16 h-12 shrink-0 rounded overflow-hidden bg-muted mt-1 relative">
+                                            <PostThumbnail src={thumbnail} alt="thumb" />
                                         </div>
                                     )}
 
@@ -78,7 +96,7 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
                                                 {displayText}
                                             </p>
                                         </div>
-                                        
+
                                         {post.published_at && (
                                             <p className="text-[10px] text-muted-foreground">
                                                 {new Date(post.published_at).toLocaleDateString()}
@@ -119,5 +137,26 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
                 </ScrollArea>
             </div>
         </div>
+    );
+}
+
+function PostThumbnail({ src, alt }: { src: string, alt: string }) {
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Filter out invalid URLs or non-http strings if necessary, though <Image> usually handles or errors
+    if (!src || (!src.startsWith('http') && !src.startsWith('/'))) return null;
+
+    return (
+        <>
+            {isLoading && <Skeleton className="absolute inset-0 w-full h-full" />}
+            <Image
+                src={src}
+                alt={alt}
+                fill
+                className={cn("object-cover transition-opacity duration-300", isLoading ? "opacity-0" : "opacity-100")}
+                onLoadingComplete={() => setIsLoading(false)}
+                unoptimized={src.includes('youtube.com')}
+            />
+        </>
     );
 }
