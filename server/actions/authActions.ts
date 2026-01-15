@@ -134,15 +134,22 @@ export async function getCurrentUser() {
   const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!accessToken && !refreshToken) return null;
+  if (!accessToken && !refreshToken) {
+    console.log("[getCurrentUser] No tokens available");
+    return null;
+  }
 
   if (accessToken) {
     try {
-      const { success, data } = await authRequest("/users/me/", "GET", {
+      const { success, data, error } = await authRequest("/users/me/", "GET", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      
-      if (success) return data;
+
+      if (success) {
+        return data;
+      }
+
+      console.log("[getCurrentUser] Access token invalid, will attempt refresh:", error);
     } catch (error) {
       console.error("[getCurrentUser] Access token validation error:", error);
     }
@@ -150,36 +157,53 @@ export async function getCurrentUser() {
 
   if (refreshToken) {
     try {
+      console.log("[getCurrentUser] Attempting token refresh...");
       const refreshRes = await authRequest("/refresh-token", "POST", {
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
 
-      if (refreshRes.success && refreshRes.data?.access_token) {
-        cookieStore.set("access_token", refreshRes.data.access_token, {
+      if (!refreshRes.success) {
+        console.error("[getCurrentUser] Token refresh failed:", refreshRes.error);
+        return null;
+      }
+
+      if (!refreshRes.data?.access_token) {
+        console.error("[getCurrentUser] Refresh response missing access_token");
+        return null;
+      }
+
+      console.log("[getCurrentUser] Token refresh successful, updating cookies...");
+
+      cookieStore.set("access_token", refreshRes.data.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+
+      if (refreshRes.data?.refresh_token) {
+        cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           path: "/",
         });
-        
-        if (refreshRes.data?.refresh_token) {
-          cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-          });
-        }
-
-        const userRes = await authRequest("/users/me/", "GET", {
-          headers: { Authorization: `Bearer ${refreshRes.data.access_token}` },
-        });
-
-        if (userRes.success) return userRes.data;
       }
+
+      const userRes = await authRequest("/users/me/", "GET", {
+        headers: { Authorization: `Bearer ${refreshRes.data.access_token}` },
+      });
+
+      if (userRes.success) {
+        console.log("[getCurrentUser] User fetched successfully after refresh");
+        return userRes.data;
+      }
+
+      console.error("[getCurrentUser] Failed to fetch user after refresh:", userRes.error);
     } catch (error) {
       console.error("[getCurrentUser] Token refresh error:", error);
     }
   }
 
+  console.log("[getCurrentUser] All authentication attempts failed");
   return null;
 }
 

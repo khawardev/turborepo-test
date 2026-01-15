@@ -2,6 +2,24 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { authRequest } from "@/server/api/authRequest";
 
+function setCookiesOnResponse(
+    response: NextResponse,
+    accessToken: string,
+    refreshToken: string
+) {
+    response.cookies.set("access_token", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+    });
+    response.cookies.set("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+    });
+    return response;
+}
+
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
@@ -15,30 +33,46 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
-    let response = NextResponse.next();
     let user = null;
+    let newAccessToken: string | null = null;
+    let newRefreshToken: string | null = null;
 
-    const userRes = await authRequest("/users/me/", "GET", { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (accessToken) {
+        const userRes = await authRequest("/users/me/", "GET", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
 
-    if (userRes.success) {
-        user = userRes.data;
-    } else {
+        if (userRes.success) {
+            user = userRes.data;
+        }
+    }
+
+    if (!user && refreshToken) {
         try {
-            const refreshRes = await authRequest("/refresh-token", "POST", { body: JSON.stringify({ refresh_token: refreshToken }) });
+            const refreshRes = await authRequest("/refresh-token", "POST", {
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            });
 
             if (!refreshRes.success) {
+                console.error("[Middleware] Token refresh failed:", refreshRes.error);
                 const res = NextResponse.redirect(new URL("/login", request.url));
                 res.cookies.delete("access_token");
                 res.cookies.delete("refresh_token");
                 return res;
             }
 
-            response.cookies.set("access_token", refreshRes.data.access_token, { httpOnly: true, secure: process.env.NODE_ENV === "production", path: "/" });
-            response.cookies.set("refresh_token", refreshRes.data.refresh_token, { httpOnly: true, secure: process.env.NODE_ENV === "production", path: "/" });
+            newAccessToken = refreshRes.data.access_token;
+            newRefreshToken = refreshRes.data.refresh_token;
 
-            const newUser = await authRequest("/users/me/", "GET", { headers: { Authorization: `Bearer ${refreshRes.data.access_token}` } });
-            if (newUser.success) user = newUser.data;
-        } catch {
+            const newUserRes = await authRequest("/users/me/", "GET", {
+                headers: { Authorization: `Bearer ${newAccessToken}` },
+            });
+
+            if (newUserRes.success) {
+                user = newUserRes.data;
+            }
+        } catch (error) {
+            console.error("[Middleware] Token refresh error:", error);
             const res = NextResponse.redirect(new URL("/login", request.url));
             res.cookies.delete("access_token");
             res.cookies.delete("refresh_token");
@@ -47,18 +81,33 @@ export async function proxy(request: NextRequest) {
     }
 
     if (user) {
-        if (authPaths.some(p => pathname.startsWith(p)) || !isDashboardPath)
-            return NextResponse.redirect(new URL("/dashboard/brandos-v2.1/setup", request.url));
-    } else {
-        if (isDashboardPath) {
-            const res = NextResponse.redirect(new URL("/login", request.url));
-            res.cookies.delete("access_token");
-            res.cookies.delete("refresh_token");
-            return res;
+        if (authPaths.some((p) => pathname.startsWith(p)) || !isDashboardPath) {
+            const redirectRes = NextResponse.redirect(
+                new URL("/dashboard/brandos-v2.1/setup", request.url)
+            );
+            if (newAccessToken && newRefreshToken) {
+                setCookiesOnResponse(redirectRes, newAccessToken, newRefreshToken);
+            }
+            return redirectRes;
         }
+
+        const response = NextResponse.next();
+        if (newAccessToken && newRefreshToken) {
+            setCookiesOnResponse(response, newAccessToken, newRefreshToken);
+        }
+        return response;
     }
 
-    return response;
+    if (isDashboardPath) {
+        const res = NextResponse.redirect(new URL("/login", request.url));
+        res.cookies.delete("access_token");
+        res.cookies.delete("refresh_token");
+        return res;
+    }
+
+    return NextResponse.next();
 }
 
-export const config = { matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"] };
+export const config = {
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
