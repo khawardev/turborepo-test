@@ -150,8 +150,11 @@ export function CollectionStatusManager({
                 if (socialStatus?.status) msgParts.push(`Social: ${socialStatus.status}`);
 
                 setPollingMessage(msgParts.length > 0 ? msgParts.join(' | ') : 'Processing...');
-            } catch (e) {
+            } catch (e: any) {
                 console.error('[CollectionStatusManager] Polling error:', e);
+                if (e?.message?.includes('Unauthorized') || e?.authError) {
+                    setPollingMessage('Session issue - refreshing...');
+                }
             }
 
             if (pollCount >= maxPolls) {
@@ -176,26 +179,36 @@ export function CollectionStatusManager({
 
             try {
                 const webResult = await scrapeBatchWebsite(brandId, webLimit);
+                
                 if (!webResult?.success) {
+                    console.error('[handleStartCollection] Website result failed:', webResult);
                     toast.error(`Website capture failed: ${webResult?.message}`);
-                    return;
+                    setWebBatchStatus('Failed');
+                } else {
+                    const webBatchId = webResult.data?.task_id || webResult.data?.batch_id;
+                    if (webBatchId) setCurrentWebBatchId(webBatchId);
                 }
-                if (webResult.data?.task_id) setCurrentWebBatchId(webResult.data.task_id);
 
                 const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
+
                 if (!socialResult?.success) {
+                    console.error('[handleStartCollection] Social result failed:', socialResult);
                     toast.error(`Social capture failed: ${socialResult?.message}`);
-                    return;
+                    setSocBatchStatus('Failed');
+                } else {
+                    const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
+                    if (sBatchId) setCurrentSocialBatchId(sBatchId);
                 }
 
-                const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
-                if (sBatchId) setCurrentSocialBatchId(sBatchId);
-
-                toast.success('Swarm agents deployed.');
-                setIsPolling(true);
-            } catch (e) {
-                console.error(e);
-                toast.error('Trigger error');
+                if (webResult?.success || socialResult?.success) {
+                    toast.success('Swarm agents deployed.');
+                    setIsPolling(true);
+                }
+            } catch (e: any) {
+                console.error('[handleStartCollection] Critical error:', e);
+                console.error('[handleStartCollection] Error message:', e?.message);
+                console.error('[handleStartCollection] Error stack:', e?.stack);
+                toast.error(`Collection error: ${e?.message || 'Unknown error'}`);
             }
         });
     };
@@ -228,7 +241,7 @@ export function CollectionStatusManager({
             </div>
 
             <div className="flex gap-4">
-                {!isRunning && !isAllComplete && (
+                {/* {!isRunning && !isAllComplete && (
                     <Button onClick={handleStartCollection} disabled={isStarting}>
                         {isStarting ? (
                             <><RotateCw className="w-4 h-4 mr-2 animate-spin" /> Starting...</>
@@ -236,7 +249,7 @@ export function CollectionStatusManager({
                             <><Play className="w-4 h-4 mr-2" /> Start Collection</>
                         )}
                     </Button>
-                )}
+                )} */}
 
                 {isAllComplete && (
                     <Button asChild>
@@ -284,17 +297,17 @@ function StatusCard({
     isRunning: boolean;
 }) {
     const getStatusBadge = () => {
-        if (isRunning) {
+        if (status === 'Processing' || status === 'processing') {
             return (
-                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                <Badge variant="outline" className=" text-blue-700 dark:text-blue-300">
+                    <Loader2 className="w-3 h-3 animate-spin" />
                     Processing
                 </Badge>
             );
         }
         if (status === 'Completed' || status === 'CompletedWithErrors') {
             return (
-                <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                <Badge variant="outline" className=" text-green-700 dark:text-green-300">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     {status}
                 </Badge>
@@ -309,9 +322,9 @@ function StatusCard({
             );
         }
         if (status) {
-            return <Badge variant="outline">{status}</Badge>;
+            return <Badge variant="outline"><Loader2 className="w-3 h-3 animate-spin" />{status}</Badge>;
         }
-        return <Badge variant="outline" className="text-muted-foreground">Pending</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground"><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Pending</Badge>;
     };
 
     return (

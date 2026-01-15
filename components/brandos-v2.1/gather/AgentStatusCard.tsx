@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, ChevronDown, FileInput, FileOutput, Loader2, Play, RotateCw, AlertCircle } from "lucide-react";
+import { MdOutlineArrowRight } from "react-icons/md";
 
 interface AgentStatusCardProps {
     status: any;
@@ -50,7 +51,7 @@ export function AgentStatusCard({ status, isComplete, hasData, onStart, isStarti
                     {isStarting ? (
                         <><RotateCw className="w-4 h-4  animate-spin" /> Starting...</>
                     ) : (
-                        <><Play className="w-4 h-4 " /> Start Collection</>
+                        <> Start Collection <MdOutlineArrowRight className="w-4 h-4 " /></>
                     )}
                 </Button>
             );

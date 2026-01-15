@@ -1,13 +1,12 @@
 import { getCurrentUser } from "@/server/actions/authActions";
-import { getBrands } from "@/server/actions/brandActions";
-import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
+import { getEnrichedBrands } from "@/server/actions/brandActions";
+import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { GatherBrandList } from '@/components/brandos-v2.1/gather/GatherBrandList';
 import { ActiveTasksBannerWrapper } from './ActiveTasksBannerWrapper';
-import { Suspense } from "react";
 
 export default async function GatherPage() {
     await getCurrentUser();
-    const brands = await getBrands();
+    const brands = await getEnrichedBrands();
  
     if (!brands) {
         return null;
@@ -20,8 +19,8 @@ export default async function GatherPage() {
                 subtitle="Manage data collection and view captured content for your brands."
             />
             <div className="w-full">
-                <ActiveTasksBannerWrapper brands={brands} />
-                <GatherBrandList brands={brands} />
+                    <ActiveTasksBannerWrapper brands={brands} />
+                    <GatherBrandList brands={brands} />
             </div>
         </div>
     );

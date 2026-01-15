@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 
 interface BatchInfoProps {
     batchId: string;
@@ -8,6 +9,15 @@ interface BatchInfoProps {
     pagesCount?: number;
     startDate?: string;
     endDate?: string;
+}
+
+function formatDate(dateString: string): string {
+    try {
+        const date = parseISO(dateString);
+        return format(date, 'd MMM yyyy');
+    } catch {
+        return dateString;
+    }
 }
 
 export function BatchInfo({ 
@@ -23,7 +33,7 @@ export function BatchInfo({
     return (
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
             <span>Batch: <code className="bg-background px-1 rounded">{batchId}</code></span>
-            <span>Status: <Badge variant="outline" className="text-[10px]">{status}</Badge></span>
+            {/* <span>Status: <Badge variant="outline" className="text-[10px]">{status}</Badge></span> */}
             
             {pagesCount !== undefined && (
                 <span>Pages: {pagesCount}</span>
@@ -32,7 +42,7 @@ export function BatchInfo({
             {startDate && endDate && (
                 <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {startDate} - {endDate}
+                    {formatDate(startDate)} - {formatDate(endDate)}
                 </span>
             )}
             

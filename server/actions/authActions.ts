@@ -134,19 +134,53 @@ export async function getCurrentUser() {
   const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!accessToken || !refreshToken) return null;
+  if (!accessToken && !refreshToken) return null;
 
-  try {
-    const { success, data, error } = await authRequest("/users/me/", "GET", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    
-    if (!success) return null;
-
-    return data;
-  } catch (error) {
-    return null;
+  if (accessToken) {
+    try {
+      const { success, data } = await authRequest("/users/me/", "GET", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      
+      if (success) return data;
+    } catch (error) {
+      console.error("[getCurrentUser] Access token validation error:", error);
+    }
   }
+
+  if (refreshToken) {
+    try {
+      const refreshRes = await authRequest("/refresh-token", "POST", {
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (refreshRes.success && refreshRes.data?.access_token) {
+        cookieStore.set("access_token", refreshRes.data.access_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+        });
+        
+        if (refreshRes.data?.refresh_token) {
+          cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+          });
+        }
+
+        const userRes = await authRequest("/users/me/", "GET", {
+          headers: { Authorization: `Bearer ${refreshRes.data.access_token}` },
+        });
+
+        if (userRes.success) return userRes.data;
+      }
+    } catch (error) {
+      console.error("[getCurrentUser] Token refresh error:", error);
+    }
+  }
+
+  return null;
 }
 
 export async function googleLogin() {

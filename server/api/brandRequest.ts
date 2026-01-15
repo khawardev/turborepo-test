@@ -1,7 +1,6 @@
 'use server'
 
 import { cookies } from "next/headers";
-import { getCurrentUser } from "../actions/authActions";
 const API_URL = process.env.API_URL;
 
 export async function brandRequest(
@@ -10,27 +9,36 @@ export async function brandRequest(
     body?: any,
     cache: RequestCache = "no-store"
 ) {
-    await getCurrentUser();
-
     const accessToken = (await cookies()).get("access_token")?.value;
-    if (!accessToken) throw new Error("Unauthorized");
+    
+    if (!accessToken) {
+        return { success: false, error: "Unauthorized - No access token" };
+    }
 
     const headers: HeadersInit = { Authorization: `Bearer ${accessToken}` };
     const isFormData = body instanceof FormData;
 
     if (!isFormData) headers["Content-Type"] = "application/json";
 
-    const res = await fetch(`${API_URL}${endpoint}`, {
-        method, headers, body: isFormData ? body : body ? JSON.stringify(body) : undefined, cache,
-    });
+    try {
+        const res = await fetch(`${API_URL}${endpoint}`, {
+            method, headers, body: isFormData ? body : body ? JSON.stringify(body) : undefined, cache,
+        });
 
-    let data;
-    try { data = await res.json(); } catch { data = null }
+        let data;
+        try { data = await res.json(); } catch { data = null }
 
-    if (res.ok) {
-        return { success: true, data };
+        if (res.ok) {
+            return { success: true, data };
+        }
+
+        if (res.status === 401) {
+            return { success: false, error: "Unauthorized - Token expired", authError: true };
+        }
+
+        return { success: false, error: data?.message || data?.detail || "Request failed" };
+    } catch (e) {
+        console.error("[brandRequest] Fetch error:", e);
+        return { success: false, error: "Network error" };
     }
-
-    return { success: false, error: data?.message || data?.detail || "Request failed" };
 }
-

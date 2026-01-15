@@ -23,6 +23,7 @@ import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAudi
 import { setGatherCookies } from '@/server/actions/cookieActions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Spinner } from '@/components/shared/SpinnerLoader';
+import { MdOutlineArrowRight } from "react-icons/md";
 
 interface GatherManagerProps {
     brandId: string;
@@ -526,13 +527,13 @@ export function GatherManager({
                                     <TabsTrigger value="website">
                                         Website Data
                                         {websiteBatchStatus && websiteBatchStatus !== 'Completed' && (
-                                            <span className="ml-2 text-xs">({websiteBatchStatus})</span>
+                                            <span className="ml-2 text-xs"><Loader2 className="w-3 h-3 animate-spin" /> ({websiteBatchStatus})</span>
                                         )}
                                     </TabsTrigger>
                                     <TabsTrigger value="social">
                                         Social Media Data
                                         {socialBatchStatus && socialBatchStatus !== 'Completed' && (
-                                            <span className="ml-2 text-xs">({socialBatchStatus})</span>
+                                            <span className="ml-2 text-xs"><Loader2 className="w-3 h-3 animate-spin" /> ({socialBatchStatus})</span>
                                         )}
                                     </TabsTrigger>
                                 </TabsList>
@@ -548,7 +549,7 @@ export function GatherManager({
                                                 {isPolling && webBatchStatus === 'Initializing' ? (
                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                 ) : (
-                                                    <Play className="w-4 h-4" />
+                                                    <MdOutlineArrowRight className="w-4 h-4" />
                                                 )}
                                                 Run Website Collection
                                             </Button>
@@ -569,7 +570,7 @@ export function GatherManager({
                                                 {isPolling && socBatchStatus === 'Initializing' ? (
                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                 ) : (
-                                                    <Play className="w-4 h-4" />
+                                                    <MdOutlineArrowRight className="w-4 h-4" />
                                                 )}
                                                 Run Social Collection
                                             </Button>

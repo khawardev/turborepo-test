@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, ChevronDown, Loader2, Play, AlertCircle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import { MdOutlineArrowRight } from "react-icons/md";
 
 interface AuditorAgentCardProps {
     title: string;
@@ -69,8 +70,8 @@ export function AuditorAgentCard({
                         variant="outline"
                         className="h-8"
                     >
-                        {isRunning ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 mr-1" />}
-                        Run Again
+                        Run Again 
+                        {isRunning ? <Loader2 className="w-3 h-3 animate-spin" /> : <MdOutlineArrowRight className="w-3 h-3 mr-1" />}
                     </Button>
                 </div>
             );
@@ -107,7 +108,7 @@ export function AuditorAgentCard({
                     {isRunning ? (
                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {processingLabels.running}</>
                     ) : (
-                         <><Play className="w-4 h-4 mr-2" /> {buttonLabel}</>
+                            <>{buttonLabel}<MdOutlineArrowRight className="w-4 h-4" /></>
                     )}
                 </Button>
             </div>

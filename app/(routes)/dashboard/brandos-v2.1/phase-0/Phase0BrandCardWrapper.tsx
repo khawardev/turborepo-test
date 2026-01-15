@@ -1,68 +1,16 @@
-import { Suspense } from "react";
+
 import Link from "next/link";
 import { MdOutlineArrowRight } from "react-icons/md";
-import { getCompetitors } from "@/server/actions/brandActions";
-import { getWebsiteBatchId } from "@/server/actions/ccba/website/websiteScrapeActions";
-import { getSocialBatchId } from "@/server/actions/ccba/social/socialScrapeActions";
-import { getBatchWebsiteScrapeStatus } from "@/server/actions/ccba/website/websiteStatusAction";
-import { getBatchSocialScrapeStatus } from "@/server/actions/ccba/social/socialStatusAction";
-import BrandItem, { BrandItemSkeleton } from "@/components/brandos-v2.1/gather/BrandItem";
 import { Button } from "@/components/ui/button";
 import { 
-    CompetitorsSkeleton, 
     CompetitorsTable, 
-    StatusBadge, 
-    StatusBadgeSkeleton 
+    StatusBadge 
 } from "@/components/brandos-v2.1/gather/BrandItemParts";
-
-async function CompetitorsFetcher({ brandId }: { brandId: string }) {
-    let competitors = [];
-    try {
-        const res = await getCompetitors(brandId);
-        if (res?.competitors) competitors = res.competitors;
-    } catch (e) {
-        console.error("Competitor fetch error", e);
-    }
-    return <CompetitorsTable competitors={competitors} />;
-}
-
-async function WebStatusFetcher({ brandId, batchId }: { brandId: string, batchId: string }) {
-    let status = null;
-    try {
-        const data = await getBatchWebsiteScrapeStatus(brandId, batchId);
-        status = data?.status || null;
-    } catch (e) { 
-        console.error("Web status fetch error", e); 
-    }
-    return <StatusBadge type="Website" status={status} />;
-}
-
-async function SocialStatusFetcher({ brandId, batchId }: { brandId: string, batchId: string }) {
-    let status = null;
-    try {
-        const data = await getBatchSocialScrapeStatus(brandId, batchId);
-        status = data?.status || null;
-    } catch (e) { 
-        console.error("Social status fetch error", e); 
-    }
-    return <StatusBadge type="Social" status={status} />;
-}
-
-// --- Main Wrapper ---
+import BrandItem, { BrandItemSkeleton } from "@/components/brandos-v2.1/gather/BrandItem";
 
 export async function Phase0BrandCardWrapper({ brand, index }: { brand: any, index: number }) {
-    // blocked data types
-    let websiteBatchId = null;
-    let socialBatchId = null;
-
-    try {
-        [websiteBatchId, socialBatchId] = await Promise.all([
-             getWebsiteBatchId(brand.brand_id).catch(() => null),
-             getSocialBatchId(brand.brand_id).catch(() => null)
-        ]);
-    } catch (e) {
-        // ignore errors
-    }
+    // Data is pre-fetched by getEnrichedBrands
+    const { websiteBatchId, socialBatchId, webStatus, socialStatus, competitors } = brand;
 
     const canAudit = websiteBatchId && socialBatchId;
 
@@ -88,7 +36,7 @@ export async function Phase0BrandCardWrapper({ brand, index }: { brand: any, ind
         socialBatchId,
         hasData: false, 
         isProcessing: false,
-        actionsSlot, // Pass the custom actions
+        actionsSlot, 
     };
 
     return (
@@ -96,22 +44,16 @@ export async function Phase0BrandCardWrapper({ brand, index }: { brand: any, ind
             item={itemProps} 
             index={index}
             competitorsSlot={
-                <Suspense fallback={<CompetitorsSkeleton />}>
-                    <CompetitorsFetcher brandId={brand.brand_id} />
-                </Suspense>
+                <CompetitorsTable competitors={competitors || []} />
             }
             webStatusSlot={
                 websiteBatchId ? (
-                    <Suspense fallback={<StatusBadgeSkeleton />}>
-                        <WebStatusFetcher brandId={brand.brand_id} batchId={websiteBatchId} />
-                    </Suspense>
+                    <StatusBadge type="Website" status={webStatus} />
                 ) : null
             }
             socialStatusSlot={
                  socialBatchId ? (
-                    <Suspense fallback={<StatusBadgeSkeleton />}>
-                        <SocialStatusFetcher brandId={brand.brand_id} batchId={socialBatchId} />
-                    </Suspense>
+                    <StatusBadge type="Social" status={socialStatus} />
                 ) : null
             }
         />

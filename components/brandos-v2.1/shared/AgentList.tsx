@@ -114,9 +114,9 @@ function AgentCard({ agent }: { agent: AgentState }) {
 
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
-        case 'running': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"><Loader2 className="w-4 h-4  animate-spin" /> Running</span>;
-        case 'completed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"><CheckCircle2 className="w-4 h-4 " /> Completed</span>;
-        case 'failed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"><AlertCircle className="w-4 h-4 " /> Failed</span>;
-        default: return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"><Clock className="w-4 h-4 " /> Pending</span>;
+        case 'running': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Running</span>;
+        case 'completed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"><CheckCircle2 className="w-4 h-4 mr-2" /> Completed</span>;
+        case 'failed': return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"><AlertCircle className="w-4 h-4 mr-2" /> Failed</span>;
+        default: return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"><Clock className="w-4 h-4 mr-2" /> Pending</span>;
     }
 }

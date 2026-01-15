@@ -176,7 +176,7 @@ export default function BrandItem({ brand, isScrapped, index }: any) {
 
               <div>
                 <h4 className="text-md font-medium mb-2">Competitors</h4>
-                {brand.competitors.length > 0 ? (
+                {brand.competitors?.length > 0 ? (
                   <div>
                     <Table>
                       <TableHeader>

@@ -5,6 +5,11 @@ import { brandRequest } from "@/server/api/brandRequest";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/server/actions/authActions";
+import { getWebsiteBatchId } from "@/server/actions/ccba/website/websiteScrapeActions";
+import { getSocialBatchId } from "@/server/actions/ccba/social/socialScrapeActions";
+import { getBatchWebsiteScrapeStatus } from "@/server/actions/ccba/website/websiteStatusAction";
+import { getBatchSocialScrapeStatus } from "@/server/actions/ccba/social/socialStatusAction";
+
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
   try {
@@ -285,4 +290,75 @@ export async function getClientDetails() {
   } catch (error) {
     return null;
   }
+}
+
+export async function getEnrichedBrands() {
+  const brands = await getBrands();
+  if (!brands || brands.length === 0) return [];
+
+  const enrichBrand = async (brand: any) => {
+    let websiteBatchId = null;
+    let socialBatchId = null;
+    let competitors: any[] = [];
+    let webStatus = null;
+    let socialStatus = null;
+
+    try {
+      const [webBatchResult, socialBatchResult, competitorsResult] = await Promise.allSettled([
+        getWebsiteBatchId(brand.brand_id),
+        getSocialBatchId(brand.brand_id),
+        getCompetitors(brand.brand_id)
+      ]);
+
+      if (webBatchResult.status === 'fulfilled') {
+        websiteBatchId = webBatchResult.value || null;
+      }
+      if (socialBatchResult.status === 'fulfilled') {
+        socialBatchId = socialBatchResult.value || null;
+      }
+      if (competitorsResult.status === 'fulfilled' && competitorsResult.value?.competitors) {
+        competitors = competitorsResult.value.competitors;
+      }
+
+      const statusFetches: Promise<any>[] = [];
+      if (websiteBatchId) {
+        statusFetches.push(getBatchWebsiteScrapeStatus(brand.brand_id, websiteBatchId));
+      } else {
+        statusFetches.push(Promise.resolve(null));
+      }
+      if (socialBatchId) {
+        statusFetches.push(getBatchSocialScrapeStatus(brand.brand_id, socialBatchId));
+      } else {
+        statusFetches.push(Promise.resolve(null));
+      }
+
+      const [webStatusResult, socialStatusResult] = await Promise.allSettled(statusFetches);
+
+      if (webStatusResult.status === 'fulfilled' && webStatusResult.value) {
+        webStatus = webStatusResult.value.status || null;
+      }
+      if (socialStatusResult.status === 'fulfilled' && socialStatusResult.value) {
+        socialStatus = socialStatusResult.value.status || null;
+      }
+    } catch (e) {
+      console.error(`[getEnrichedBrands] Error enriching brand ${brand.brand_id}:`, e);
+    }
+
+    return {
+      ...brand,
+      websiteBatchId,
+      socialBatchId,
+      competitors,
+      webStatus,
+      socialStatus
+    };
+  };
+
+  const enrichedBrands: any[] = [];
+  for (const brand of brands) {
+    const enrichedBrand = await enrichBrand(brand);
+    enrichedBrands.push(enrichedBrand);
+  }
+
+  return enrichedBrands;
 }

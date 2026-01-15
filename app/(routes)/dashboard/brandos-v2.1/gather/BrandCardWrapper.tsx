@@ -1,73 +1,29 @@
-import { Suspense } from "react";
-import { getCompetitors } from "@/server/actions/brandActions";
-import { getWebsiteBatchId } from "@/server/actions/ccba/website/websiteScrapeActions";
-import { getSocialBatchId } from "@/server/actions/ccba/social/socialScrapeActions";
-import { getBatchWebsiteScrapeStatus } from "@/server/actions/ccba/website/websiteStatusAction";
-import { getBatchSocialScrapeStatus } from "@/server/actions/ccba/social/socialStatusAction";
-import BrandItem from "@/components/brandos-v2.1/gather/BrandItem";
+
 import { 
-    CompetitorsSkeleton, 
     CompetitorsTable, 
-    StatusBadge, 
-    StatusBadgeSkeleton 
+    StatusBadge,
+    PollingStatusBadge
 } from "@/components/brandos-v2.1/gather/BrandItemParts";
+import BrandItem from "@/components/brandos-v2.1/gather/BrandItem";
 
-
-async function CompetitorsFetcher({ brandId }: { brandId: string }) {
-    let competitors = [];
-    try {
-        const res = await getCompetitors(brandId);
-        if (res?.competitors) competitors = res.competitors;
-    } catch (e) {
-        console.error("Competitor fetch error", e);
-    }
-    return <CompetitorsTable competitors={competitors} />;
+function isStatusProcessing(status: string | null): boolean {
+    if (!status) return false;
+    const completedStatuses = ['Completed', 'CompletedWithErrors', 'Failed'];
+    return !completedStatuses.includes(status);
 }
-
-async function WebStatusFetcher({ brandId, batchId }: { brandId: string, batchId: string }) {
-    let status = null;
-    try {
-        const data = await getBatchWebsiteScrapeStatus(brandId, batchId);
-        status = data?.status || null;
-    } catch (e) { 
-        console.error("Web status fetch error", e); 
-    }
-    return <StatusBadge type="Website" status={status} />;
-}
-
-async function SocialStatusFetcher({ brandId, batchId }: { brandId: string, batchId: string }) {
-    let status = null;
-    try {
-        const data = await getBatchSocialScrapeStatus(brandId, batchId);
-        status = data?.status || null;
-    } catch (e) { 
-        console.error("Social status fetch error", e); 
-    }
-    return <StatusBadge type="Social" status={status} />;
-}
-
-// --- Main Wrapper ---
 
 export async function BrandCardWrapper({ brand, index }: { brand: any, index: number }) {
-    // blocked data types
-    let websiteBatchId = null;
-    let socialBatchId = null;
+    const { websiteBatchId, socialBatchId, webStatus, socialStatus, competitors } = brand;
 
-    try {
-        [websiteBatchId, socialBatchId] = await Promise.all([
-             getWebsiteBatchId(brand.brand_id).catch(() => null),
-             getSocialBatchId(brand.brand_id).catch(() => null)
-        ]);
-    } catch (e) {
-        // ignore errors
-    }
+    const isWebProcessing = isStatusProcessing(webStatus);
+    const isSocialProcessing = isStatusProcessing(socialStatus);
 
     const itemProps = {
         brand,
         websiteBatchId,
         socialBatchId,
         hasData: false, 
-        isProcessing: false,
+        isProcessing: isWebProcessing || isSocialProcessing,
     };
 
     return (
@@ -75,22 +31,34 @@ export async function BrandCardWrapper({ brand, index }: { brand: any, index: nu
             item={itemProps} 
             index={index}
             competitorsSlot={
-                <Suspense fallback={<CompetitorsSkeleton />}>
-                    <CompetitorsFetcher brandId={brand.brand_id} />
-                </Suspense>
+                <CompetitorsTable competitors={competitors || []} />
             }
             webStatusSlot={
                 websiteBatchId ? (
-                    <Suspense fallback={<StatusBadgeSkeleton />}>
-                        <WebStatusFetcher brandId={brand.brand_id} batchId={websiteBatchId} />
-                    </Suspense>
+                    isWebProcessing ? (
+                        <PollingStatusBadge 
+                            type="Website" 
+                            initialStatus={webStatus} 
+                            brandId={brand.brand_id}
+                            batchId={websiteBatchId}
+                        />
+                    ) : (
+                        <StatusBadge type="Website" status={webStatus} />
+                    )
                 ) : null
             }
             socialStatusSlot={
                  socialBatchId ? (
-                    <Suspense fallback={<StatusBadgeSkeleton />}>
-                        <SocialStatusFetcher brandId={brand.brand_id} batchId={socialBatchId} />
-                    </Suspense>
+                    isSocialProcessing ? (
+                        <PollingStatusBadge 
+                            type="Social" 
+                            initialStatus={socialStatus} 
+                            brandId={brand.brand_id}
+                            batchId={socialBatchId}
+                        />
+                    ) : (
+                        <StatusBadge type="Social" status={socialStatus} />
+                    )
                 ) : null
             }
         />

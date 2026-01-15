@@ -17,6 +17,7 @@ import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAudi
 import { useAuditor } from './hooks/UseAuditor';
 import { useSocialAuditor } from './hooks/UseSocialAuditor';
 import { AiOutlinePieChart } from "react-icons/ai";
+import { RecollectDialog } from '../RecollectDialog';
 
 type DataViewManagerProps = {
     brandId: string;
@@ -52,7 +53,6 @@ export function DataViewManager({
     const [socialAuditScope, setSocialAuditScope] = useState<string>('brand');
     const [selectedChannel, setSelectedChannel] = useState<string>('linkedin');
     
-    // Derived state moved to parent or props
     const isComplete = hasResults && isWebComplete && isSocialComplete;
 
     const {
@@ -88,16 +88,20 @@ export function DataViewManager({
                     <p className="text-muted-foreground">Captured Data & Analysis</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button asChild variant={'secondary'}>
-                        <Link href={`/dashboard/brandos-v2.1/gather/collecting/${brandId}`}>
-                            <RefreshCw className="w-4 h-4" />
-                            Re Collect
-                        </Link>
-                    </Button>
+                    <RecollectDialog 
+                        brandId={brandId} 
+                        brandName={brandData.name}
+                        variant="button"
+                        trigger={
+                            <Button>
+                                Re Capture
+                            </Button>
+                        }
+                    />
                     <Button asChild variant={'secondary'}>
                         <Link href="/dashboard/brandos-v2.1/gather">
                             <AiOutlinePieChart className="w-4 h-4" />
-                            Gather Data
+                            Data Gathering
                         </Link>
                     </Button>
                 </div>
