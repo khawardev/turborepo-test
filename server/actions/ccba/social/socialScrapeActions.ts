@@ -134,3 +134,24 @@ export async function getSocialBatchId(brand_id: string) {
         return null;
     }
 }
+
+export async function getSocialBatchIdWithUser(brand_id: string, user: any) {
+    try {
+        if (!user || !user.client_id) return null;
+
+        const { success, data, error } = await brandRequest(
+            `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
+            "GET"
+        );
+
+        if (!success) return null;
+        if (!Array.isArray(data) || data.length === 0) return null;
+
+        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+
+        return latest?.batch_id || null;
+    } catch (error) {
+        console.error("[getSocialBatchIdWithUser] Error:", error);
+        return null;
+    }
+}

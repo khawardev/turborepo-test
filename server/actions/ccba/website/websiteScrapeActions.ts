@@ -102,6 +102,26 @@ export async function getWebsiteBatchId(brand_id: string) {
     }
 }
 
+export async function getWebsiteBatchIdWithUser(brand_id: string, user: any) {
+    try {
+        if (!user || !user.client_id) return null;
+
+        const { success, data, error } = await brandRequest(
+            `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
+            "GET"
+        );
+
+        if (!success) return null;
+
+        if (!Array.isArray(data) || data.length === 0) return null;
+
+        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+        return latest?.batch_id;
+    } catch {
+        return null;
+    }
+}
+
 export async function getpreviousWebsiteScraps(brand_id: string) {
     try {
         const user = await getCurrentUser();
