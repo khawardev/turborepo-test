@@ -9,9 +9,10 @@ type UseAuditorProps = {
     brandId: string;
     batchId: string | null;
     scope: string;
+    modelName?: string;
 };
 
-export function useAuditor({ clientId, brandId, batchId, scope }: UseAuditorProps) {
+export function useAuditor({ clientId, brandId, batchId, scope, modelName }: UseAuditorProps) {
     const [taskId, setTaskId] = useState<string | null>(null);
     const [result, setResult] = useState<any>(null);
     const [isRunning, setIsRunning] = useState(false);
@@ -57,7 +58,8 @@ export function useAuditor({ clientId, brandId, batchId, scope }: UseAuditorProp
                 client_id: clientId,
                 brand_id: brandId,
                 batch_id: batchId,
-                analysis_scope: scope as any
+                analysis_scope: scope as any,
+                model_name: modelName
             });
 
             if (res.success && res.data?.task_id) {

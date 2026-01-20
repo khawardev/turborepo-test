@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid, ChevronDown } from 'lucide-react';
+
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AgentStatusCard } from './AgentStatusCard';
@@ -114,6 +115,7 @@ export function GatherManager({
     const [auditorResult, setAuditorResult] = useState<any>(null);
     const [isAuditorRunning, setIsAuditorRunning] = useState(false);
     const [websiteAuditScope, setWebsiteAuditScope] = useState<string>("both");
+    const [websiteAuditModel, setWebsiteAuditModel] = useState<string>("claude-4.5-sonnet");
 
     // Social Auditor State
     const [socialAuditorTaskId, setSocialAuditorTaskId] = useState<string | null>(null);
@@ -194,7 +196,8 @@ export function GatherManager({
                 client_id: brandData.client_id,
                 brand_id: brandId,
                 batch_id: currentWebBatchId,
-                analysis_scope: websiteAuditScope as any
+                analysis_scope: websiteAuditScope as any,
+                model_name: websiteAuditModel
             });
 
             if (res.success && res.data?.task_id) {
@@ -599,21 +602,39 @@ export function GatherManager({
                                     isDisabled={!currentWebBatchId}
                                     buttonLabel="Run Website Audit"
                                     controls={
-                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
-                                                <Button variant="outline" className="w-[180px] h-9 justify-between bg-background font-normal">
-                                                    {websiteAuditScope === 'brand' ? 'Brand Only' : 
-                                                     websiteAuditScope === 'competitors' ? 'Competitors Only' : 
-                                                     'Brand & Competitors'}
-                                                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="w-[180px]">
-                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('brand')}>Brand Only</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('competitors')}>Competitors Only</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => setWebsiteAuditScope('both')}>Brand & Competitors</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                         <div className="flex items-center gap-2">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
+                                                    <Button variant="outline" className="w-[180px] h-9 justify-between bg-background font-normal">
+                                                        {websiteAuditModel === 'claude-4.5-sonnet' ? 'Claude 4.5 Sonnet' : 
+                                                         websiteAuditModel === 'claude-3-5-sonnet' ? 'Claude 3.5 Sonnet' : 
+                                                         'Claude 3 Haiku'}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[180px]">
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditModel('claude-4.5-sonnet')}>Claude 4.5 Sonnet</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditModel('claude-3-5-sonnet')}>Claude 3.5 Sonnet</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditModel('claude-3-haiku')}>Claude 3 Haiku</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
+                                                    <Button variant="outline" className="w-[140px] h-9 justify-between bg-background font-normal">
+                                                        {websiteAuditScope === 'brand' ? 'Brand Only' : 
+                                                         websiteAuditScope === 'competitors' ? 'Competitors Only' : 
+                                                         'Brand & Competitors'}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[140px]">
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditScope('brand')}>Brand Only</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditScope('competitors')}>Competitors Only</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setWebsiteAuditScope('both')}>Brand & Competitors</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                         </div>
                                     }
                                 />
 
@@ -695,7 +716,9 @@ export function GatherManager({
             </Collapsible>
         </div>
     );
+
 }
+
 
 function DebugIdRow({ label, value }: { label: string, value: string }) {
     return (

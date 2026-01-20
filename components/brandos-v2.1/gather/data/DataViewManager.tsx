@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Copy, Terminal, LayoutGrid, Bot, RefreshCw } from 'lucide-react';
+import { Copy, Terminal, LayoutGrid, Bot, RefreshCw, Database } from 'lucide-react';
 import { SimpleWebsiteScrapViewer, SimpleSocialScrapViewer } from '../ResultsViewers';
 import BrandProfile from '@/components/stages/ccba/details/profile-tab/BrandProfile';
 import { AuditorAgentCard } from '../AuditorAgentCard';
@@ -18,6 +18,7 @@ import { useAuditor } from './hooks/UseAuditor';
 import { useSocialAuditor } from './hooks/UseSocialAuditor';
 import { AiOutlinePieChart } from "react-icons/ai";
 import { RecollectDialog } from '../RecollectDialog';
+import { WebAgentsManager } from '../WebAgentsManager';
 
 type DataViewManagerProps = {
     brandId: string;
@@ -50,6 +51,7 @@ export function DataViewManager({
 }: DataViewManagerProps) {
     const [activeTab, setActiveTab] = useState('brand_profile');
     const [websiteAuditScope, setWebsiteAuditScope] = useState<string>('both');
+    const [websiteAuditModel, setWebsiteAuditModel] = useState<string>('claude-4.5-sonnet');
     const [socialAuditScope, setSocialAuditScope] = useState<string>('brand');
     const [selectedChannel, setSelectedChannel] = useState<string>('linkedin');
     
@@ -64,7 +66,8 @@ export function DataViewManager({
         clientId: brandData.client_id,
         brandId,
         batchId: websiteBatchId,
-        scope: websiteAuditScope
+        scope: websiteAuditScope,
+        modelName: websiteAuditModel
     });
 
     const {
@@ -118,6 +121,10 @@ export function DataViewManager({
                         <Bot className="w-4 h-4 mr-1" />
                         Outside-in Audit
                     </TabsTrigger>
+                    <TabsTrigger value="web_agents" disabled={!isWebComplete}>
+                        <Database className="w-4 h-4 mr-1" />
+                        Web Agents
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="brand_profile" className="space-y-6 pt-4">
@@ -165,20 +172,36 @@ export function DataViewManager({
                             isDisabled={!websiteBatchId}
                             buttonLabel="Run Website Audit"
                             controls={
-                                <Select
-                                    value={websiteAuditScope}
-                                    onValueChange={setWebsiteAuditScope}
-                                    disabled={isAuditorRunning}
-                                >
-                                    <SelectTrigger className="w-[180px] h-9 bg-background">
-                                        <SelectValue placeholder="Scope" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="brand">Brand Only</SelectItem>
-                                        <SelectItem value="competitors">Competitors Only</SelectItem>
-                                        <SelectItem value="both">Brand & Competitors</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-2">
+                                    <Select
+                                        value={websiteAuditModel}
+                                        onValueChange={setWebsiteAuditModel}
+                                        disabled={isAuditorRunning}
+                                    >
+                                        <SelectTrigger className="w-[180px] h-9 bg-background">
+                                            <SelectValue placeholder="Model" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="claude-4.5-sonnet">Claude 4.5 Sonnet</SelectItem>
+                                            <SelectItem value="claude-3-5-sonnet">Claude 3.5 Sonnet</SelectItem>
+                                            <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select
+                                        value={websiteAuditScope}
+                                        onValueChange={setWebsiteAuditScope}
+                                        disabled={isAuditorRunning}
+                                    >
+                                        <SelectTrigger className="w-[140px] h-9 bg-background">
+                                            <SelectValue placeholder="Scope" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="brand">Brand Only</SelectItem>
+                                            <SelectItem value="competitors">Competitors Only</SelectItem>
+                                            <SelectItem value="both">Brand & Competitors</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             }
                         />
 
@@ -236,6 +259,21 @@ export function DataViewManager({
                             }
                         />
                     </div>
+                </TabsContent>
+
+                <TabsContent value="web_agents" className="space-y-6 pt-4">
+                    <WebAgentsManager 
+                        clientId={brandData?.client_id}
+                        brandId={brandId}
+                        batchWebsiteTaskId={websiteBatchId}
+                        brandName={brandData?.name}
+                        competitors={
+                            brandData?.competitors?.map((c: any) => ({
+                                id: c.competitor_id,
+                                name: c.name
+                            })) || []
+                        }
+                    />
                 </TabsContent>
             </Tabs>
 
