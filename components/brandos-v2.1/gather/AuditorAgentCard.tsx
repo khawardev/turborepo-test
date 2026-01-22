@@ -66,9 +66,7 @@ export function AuditorAgentCard({
                     <Button 
                         onClick={onRun} 
                         disabled={isDisabled || isRunning} 
-                        size="sm" 
                         variant="outline"
-                        className="h-8"
                     >
                         Run Again 
                         {isRunning ? <Loader2 className="w-3 h-3 animate-spin" /> : <MdOutlineArrowRight className="w-3 h-3 mr-1" />}

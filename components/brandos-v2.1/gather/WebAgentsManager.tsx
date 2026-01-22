@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { 
     Play, Trash2, Eye, ChevronDown, Loader2, Clock, Cpu, 
-    FileText, RefreshCw, Search, Database, Sparkles, AlertCircle
+    FileText, RefreshCw, Search, Database, Sparkles, AlertCircle, Building2, Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MdOutlineArrowRight } from 'react-icons/md';
@@ -471,21 +471,29 @@ export function WebAgentsManager({
                                             >
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[100px]">
+                                                        {task.entity_name && (
+                                                            <Badge 
+                                                                variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
+                                                                className="text-[9px] py-0 gap-1"
+                                                            >
+                                                                {task.entity_name}
+                                                            </Badge>
+                                                        )}
+                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[80px]">
                                                             {task.task_id.slice(0, 8)}...
                                                         </code>
                                                         <Badge variant="outline" className="text-[9px] py-0">
                                                             {formatExecutionTime(task.execution_time_seconds)}
                                                         </Badge>
-                                                        {task.model_used && (
-                                                            <Badge variant="secondary" className="text-[8px] py-0 px-1">
-                                                                {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
-                                                            </Badge>
-                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
                                                         <Clock className="h-3 w-3" />
                                                         {formatDate(task.timestamp)}
+                                                        {task.model_used && (
+                                                            <span className="text-[8px] opacity-70">
+                                                                • {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-1">
@@ -561,8 +569,18 @@ export function WebAgentsManager({
                                             key={task.task_id}
                                             onClick={() => setSelectedExtractionForSynthesis(task.task_id)}
                                         >
-                                            <div className="flex flex-col">
-                                                <span className="font-mono text-xs">{task.task_id.slice(0, 16)}...</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="flex items-center gap-1.5">
+                                                    {task.entity_name && (
+                                                        <Badge 
+                                                            variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
+                                                            className="text-[8px] py-0 h-4"
+                                                        >
+                                                            {task.entity_name}
+                                                        </Badge>
+                                                    )}
+                                                    <span className="font-mono text-[10px] text-muted-foreground">{task.task_id.slice(0, 8)}...</span>
+                                                </div>
                                                 <span className="text-[10px] text-muted-foreground">{formatDate(task.timestamp)}</span>
                                             </div>
                                         </DropdownMenuItem>
@@ -587,8 +605,8 @@ export function WebAgentsManager({
                                 )}
                             </Button>
                             <Button 
-                                variant="ghost" 
-                                size="icon" 
+                                variant="ghost"
+                                size="icon"
                                 onClick={loadSynthesisTasks}
                                 disabled={isLoadingSynthesisTasks}
                             >
@@ -630,21 +648,29 @@ export function WebAgentsManager({
                                             >
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[100px]">
+                                                        {task.entity_name && (
+                                                            <Badge 
+                                                                variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
+                                                                className="text-[9px] py-0 gap-1"
+                                                            >
+                                                                {task.entity_name}
+                                                            </Badge>
+                                                        )}
+                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[80px]">
                                                             {task.task_id.slice(0, 8)}...
                                                         </code>
                                                         <Badge variant="outline" className="text-[9px] py-0">
                                                             {formatExecutionTime(task.execution_time_seconds)}
                                                         </Badge>
-                                                        {task.model_used && (
-                                                            <Badge variant="secondary" className="text-[8px] py-0 px-1">
-                                                                {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
-                                                            </Badge>
-                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
                                                         <Clock className="h-3 w-3" />
                                                         {formatDate(task.timestamp)}
+                                                        {task.model_used && (
+                                                            <span className="text-[8px] opacity-70">
+                                                                • {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-1">

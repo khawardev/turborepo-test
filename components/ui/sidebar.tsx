@@ -301,7 +301,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
         <main
             data-slot="sidebar-inset"
             className={cn(
-                "relative flex border min-h-svh flex-1 flex-col bg-accent/50",
+                "relative flex border min-w-0 min-h-svh flex-1 flex-col bg-accent/50",
                 "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm",
                 className
             )}
@@ -369,7 +369,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
             data-slot="sidebar-content"
             data-sidebar="content"
             className={cn(
-                "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+                "flex min-h-0   flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
                 className
             )}
             {...props}

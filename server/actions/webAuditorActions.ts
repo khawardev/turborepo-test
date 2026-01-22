@@ -54,6 +54,8 @@ export type DeleteWebSynthesisTaskParams = {
 
 export type WebExtractionTask = {
     task_id: string;
+    entity_name: string;
+    analysis_scope: 'brand' | 'competitors';
     timestamp: string;
     model_used: string;
     batch_id: string;
@@ -66,6 +68,8 @@ export type WebExtractionOutput = {
     client_id: string;
     brand_id: string;
     extraction_output: string;
+    entity_name: string;
+    analysis_scope: 'brand' | 'competitors';
     batch_id: string;
     scraped_urls_count: number;
     model_used: string;
@@ -75,6 +79,8 @@ export type WebExtractionOutput = {
 
 export type WebSynthesisTask = {
     task_id: string;
+    entity_name: string;
+    analysis_scope: 'brand' | 'competitors';
     timestamp: string;
     model_used: string;
     batch_id: string;
@@ -86,6 +92,8 @@ export type WebSynthesisOutput = {
     client_id: string;
     brand_id: string;
     synthesis_report: string;
+    entity_name: string;
+    analysis_scope: 'brand' | 'competitors';
     batch_id: string;
     model_used: string;
     timestamp: string;

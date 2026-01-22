@@ -19,9 +19,9 @@ interface AuditorResultViewerProps {
 
 export function AuditorResultViewer({ data, onReRun, isReRunning = false }: AuditorResultViewerProps) {
     if (!data || !data.verbal_bedrock) return null;
-    
+
     const { verbal_bedrock } = data;
-    
+
     // Destructuring based on new schema
     const metadata = verbal_bedrock.verbal_audit_metadata || {};
     const narrative = verbal_bedrock.narrative_data_points || {};
@@ -36,7 +36,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
         <div className="space-y-6 w-full max-w-full overflow-x-hidden animate-in fade-in duration-500">
             {/* Header Section */}
             <div className="flex justify-between items-center pb-2 border-b">
-                 <div>
+                <div>
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-brand-lime" />
                         Verbal Identity Audit
@@ -44,67 +44,67 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                     <p className="text-sm text-muted-foreground mt-1">
                         Analyzed {metadata.source_url ? new URL(metadata.source_url).hostname : 'Website Content'} • {new Date(metadata.audit_date || Date.now()).toLocaleDateString()}
                     </p>
-                 </div>
-                 {onReRun && (
-                     <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={onReRun} 
+                </div>
+                {onReRun && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onReRun}
                         disabled={isReRunning}
                         className="gap-2"
                     >
                         <RefreshCw className={cn("w-4 h-4", isReRunning && "animate-spin")} />
                         {isReRunning ? "Running..." : "Re-run Analysis"}
-                     </Button>
-                 )}
+                    </Button>
+                )}
             </div>
 
             {/* Summary Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card >
-                    <CardHeader className="pb-2 pt-4">
+                    <CardHeader >
                         <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <FileText className="h-3.5 w-3.5" /> Pages
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-4">
+                    <CardContent >
                         <div className="text-2xl font-bold">{data.scraped_urls_count || 'N/A'}</div>
                     </CardContent>
                 </Card>
                 <Card >
-                    <CardHeader className="pb-2 pt-4">
+                    <CardHeader >
                         <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <BarChart3 className="h-3.5 w-3.5" /> Words
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-4">
+                    <CardContent >
                         <div className="text-2xl font-bold">{parseInt(baseline.total_words_analyzed || '0').toLocaleString()}</div>
                     </CardContent>
                 </Card>
                 <Card >
-                    <CardHeader className="pb-2 pt-4">
+                    <CardHeader >
                         <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <Lightbulb className="h-3.5 w-3.5" /> Themes
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-4">
+                    <CardContent >
                         <div className="text-2xl font-bold">{themes.theme_clusters?.length || 0}</div>
                     </CardContent>
                 </Card>
                 <Card >
-                    <CardHeader className="pb-2 pt-4">
+                    <CardHeader >
                         <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <Users className="h-3.5 w-3.5" /> Segments
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-4">
+                    <CardContent >
                         <div className="text-2xl font-bold">{audience.industry_sector_focus?.length || 0}</div>
                     </CardContent>
                 </Card>
             </div>
 
             <Accordion type="multiple" defaultValue={["positioning", "narrative", "themes", "audience"]} className="w-full space-y-4">
-                
+
                 {/* Visual Section: Positioning */}
                 <AccordionItem value="positioning" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
                     <AccordionTrigger className="hover:no-underline py-4">
@@ -143,7 +143,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 </h5>
                                 <div className="grid gap-3">
                                     {positioning.mission_vision_statements.map((item: any, i: number) => (
-                                         <div key={i} className="bg-muted/30 p-4 rounded-lg border text-sm relative group hover:bg-muted/50 transition-colors">
+                                        <div key={i} className="bg-muted/30 p-4 rounded-lg border text-sm relative group hover:bg-muted/50 transition-colors">
                                             {item.context && <Badge variant="outline" className="mb-2 text-[10px] uppercase tracking-wider">{item.context}</Badge>}
                                             <p className="text-foreground/90 italic font-medium leading-relaxed">"{item.statement}"</p>
                                             {item.source_url && (
@@ -153,7 +153,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                                     </Link>
                                                 </div>
                                             )}
-                                         </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -179,7 +179,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                 {/* Visual Section: Narrative (Words) */}
                 <AccordionItem value="narrative" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
                     <AccordionTrigger className="hover:no-underline py-4">
-                         <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <div className="bg-purple-500/10 p-2.5 rounded-full text-purple-600 dark:text-purple-400 shrink-0">
                                 <Megaphone className="h-5 w-5" />
                             </div>
@@ -187,13 +187,13 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 <h4 className="font-semibold text-lg">Linguistic DNA</h4>
                                 <p className="text-sm text-muted-foreground font-normal">Vocabulary, tone, and lexical choices</p>
                             </div>
-                         </div>
+                        </div>
                     </AccordionTrigger>
                     <AccordionContent className="pt-2 pb-6 space-y-8">
                         {/* Word Clouds */}
                         <div className="grid md:grid-cols-2 gap-8">
-                             {/* Top Adjectives */}
-                             <div className="space-y-3">
+                            {/* Top Adjectives */}
+                            <div className="space-y-3">
                                 <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
                                     Top Adjectives
                                     <span className="text-[10px] font-normal normal-case bg-muted px-2 py-0.5 rounded-full">Count</span>
@@ -201,15 +201,15 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 <div className="flex flex-wrap gap-2">
                                     {(narrative.top_adjectives || []).slice(0, 15).map((item: any, i: number) => (
                                         <Badge key={i} variant="outline" className="text-sm font-normal py-1 pr-1 pl-3 gap-2 hover:bg-muted/50 transition-colors">
-                                            {item.word} 
+                                            {item.word}
                                             <span className="flex items-center justify-center bg-muted text-[10px] font-mono h-5 min-w-5 px-1 rounded-sm text-muted-foreground">{item.frequency || item.count}</span>
                                         </Badge>
                                     ))}
                                 </div>
-                             </div>
+                            </div>
 
-                             {/* Top Verbs */}
-                             <div className="space-y-3">
+                            {/* Top Verbs */}
+                            <div className="space-y-3">
                                 <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
                                     Top Verbs
                                     <span className="text-[10px] font-normal normal-case bg-muted px-2 py-0.5 rounded-full">Count</span>
@@ -217,17 +217,17 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 <div className="flex flex-wrap gap-2">
                                     {(narrative.top_verbs || []).slice(0, 15).map((item: any, i: number) => (
                                         <Badge key={i} variant="outline" className="text-sm font-normal py-1 pr-1 pl-3 gap-2 hover:bg-muted/50 transition-colors">
-                                            {item.word} 
+                                            {item.word}
                                             <span className="flex items-center justify-center bg-muted text-[10px] font-mono h-5 min-w-5 px-1 rounded-sm text-muted-foreground">{item.frequency || item.count}</span>
                                         </Badge>
                                     ))}
                                 </div>
-                             </div>
+                            </div>
                         </div>
 
-                         {/* Value Laden Words */}
-                         {narrative.value_laden_words?.length > 0 && (
-                             <div className="space-y-3 pt-6 border-t border-dashed">
+                        {/* Value Laden Words */}
+                        {narrative.value_laden_words?.length > 0 && (
+                            <div className="space-y-3 pt-6 border-t border-dashed">
                                 <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Value-Laden Vocabulary</h5>
                                 <div className="flex flex-wrap gap-2">
                                     {(narrative.value_laden_words || []).slice(0, 20).map((item: any, i: number) => (
@@ -237,13 +237,13 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                         </Badge>
                                     ))}
                                 </div>
-                             </div>
-                         )}
+                            </div>
+                        )}
                     </AccordionContent>
                 </AccordionItem>
-                
+
                 {/* Visual Section: Emergent Themes */}
-                 <AccordionItem value="themes" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
+                <AccordionItem value="themes" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
                     <AccordionTrigger className="hover:no-underline py-4">
                         <div className="flex items-center gap-3">
                             <div className="bg-amber-500/10 p-2.5 rounded-full text-amber-600 dark:text-amber-500 shrink-0">
@@ -255,7 +255,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                             </div>
                         </div>
                     </AccordionTrigger>
-                     <AccordionContent className="pt-2 pb-6 space-y-8">
+                    <AccordionContent className="pt-2 pb-6 space-y-8">
                         {/* Theme Clusters with Progress Bars */}
                         {themes.theme_clusters?.length > 0 && (
                             <div className="grid gap-6">
@@ -269,13 +269,13 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                                 </h5>
                                                 <span className="text-xs font-bold font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">{percentage}% SOV</span>
                                             </div>
-                                            <Progress value={percentage} className="h-2.5 bg-muted"  />
+                                            <Progress value={percentage} className="h-2.5 bg-muted" />
                                             <div className="flex flex-wrap gap-1.5 mt-2">
-                                                 {cluster.constituent_phrases?.map((phrase: string, pIdx: number) => (
-                                                     <span key={pIdx} className="text-[11px] text-muted-foreground bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 px-2 py-0.5 rounded-full">
-                                                         {phrase}
-                                                     </span>
-                                                 ))}
+                                                {cluster.constituent_phrases?.map((phrase: string, pIdx: number) => (
+                                                    <span key={pIdx} className="text-[11px] text-muted-foreground bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 px-2 py-0.5 rounded-full">
+                                                        {phrase}
+                                                    </span>
+                                                ))}
                                             </div>
                                         </div>
                                     );
@@ -285,7 +285,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
 
                         {/* Page Level Concentration */}
                         {themes.page_level_theme_concentration && Object.keys(themes.page_level_theme_concentration).length > 0 && (
-                             <div className="pt-6 border-t border-dashed">
+                            <div className="pt-6 border-t border-dashed">
                                 <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Theme Concentration by Page</h5>
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     {Object.entries(themes.page_level_theme_concentration).map(([page, pageThemes]: [string, any], i) => (
@@ -296,13 +296,13 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                             </h6>
                                             <div className="flex flex-wrap gap-1">
                                                 {Array.isArray(pageThemes) && pageThemes.map((t: string, ti: number) => (
-                                                     <span key={ti} className="text-[10px] bg-background border px-1.5 py-0.5 rounded text-muted-foreground">{t}</span>
+                                                    <span key={ti} className="text-[10px] bg-background border px-1.5 py-0.5 rounded text-muted-foreground">{t}</span>
                                                 ))}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                             </div>
+                            </div>
                         )}
 
                         {/* Frequent Noun Phrases */}
@@ -311,7 +311,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 <h5 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Most Frequent Topics</h5>
                                 <div className="flex flex-wrap gap-2">
                                     {themes.frequent_noun_phrases.slice(0, 30).map((phrase: any, i: number) => {
-                                        const text = typeof phrase === 'string' ? phrase : phrase.phrase; 
+                                        const text = typeof phrase === 'string' ? phrase : phrase.phrase;
                                         const count = typeof phrase === 'string' ? null : phrase.count || phrase.frequency;
                                         return (
                                             <Badge key={i} variant="secondary" className="text-xs font-normal">
@@ -324,11 +324,11 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                         )}
                     </AccordionContent>
                 </AccordionItem>
-                
-                 {/* Visual Section: Audience */}
-                 <AccordionItem value="audience" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
+
+                {/* Visual Section: Audience */}
+                <AccordionItem value="audience" className="border rounded-xl px-4 bg-card overflow-hidden shadow-sm">
                     <AccordionTrigger className="hover:no-underline py-4">
-                         <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <div className="bg-pink-500/10 p-2.5 rounded-full text-pink-600 dark:text-pink-400 shrink-0">
                                 <Users className="h-5 w-5" />
                             </div>
@@ -358,7 +358,7 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 </div>
                             )}
 
-                             {audience.industry_sector_focus?.length > 0 && (
+                            {audience.industry_sector_focus?.length > 0 && (
                                 <div className="space-y-3">
                                     <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Sector Focus</h5>
                                     <div className="space-y-2">
@@ -384,8 +384,8 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                                 <div className="flex flex-wrap gap-2">
                                     {ctas.top_ctas.map((cta: any, i: number) => (
                                         <Badge key={i} className="bg-pink-600 hover:bg-pink-700 text-white border-0 py-1.5 px-3">
-                                            {cta.cta_text || cta.text} 
-                                            {(cta.frequency && parseInt(cta.frequency) > 1) && 
+                                            {cta.cta_text || cta.text}
+                                            {(cta.frequency && parseInt(cta.frequency) > 1) &&
                                                 <span className="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-sm">{cta.frequency}</span>
                                             }
                                         </Badge>
@@ -397,41 +397,41 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                         {(proof.statistics_data?.length > 0 || proof.testimonials?.length > 0) && (
                             <div className="space-y-4 pt-6 border-t border-dashed">
                                 {proof.statistics_data?.length > 0 && (
-                                     <div className="space-y-3">
+                                    <div className="space-y-3">
                                         <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Statistical Proof Points</h5>
                                         <div className="grid gap-2">
-                                             {proof.statistics_data.map((stat: any, i: number) => (
-                                                 <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-green-50/50 p-3 rounded-lg border border-green-100 dark:bg-green-900/10 dark:border-green-900/30 gap-1">
-                                                     <div className="flex gap-2 items-start">
-                                                         <PieChart className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                                                         <span className="text-sm font-medium text-green-800 dark:text-green-300">{stat.claim || stat.statement}</span>
-                                                     </div>
-                                                     {stat.context && <Badge variant="outline" className="w-fit text-[10px] text-muted-foreground border-green-200">{stat.context}</Badge>}
-                                                 </div>
-                                             ))}
+                                            {proof.statistics_data.map((stat: any, i: number) => (
+                                                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-green-50/50 p-3 rounded-lg border border-green-100 dark:bg-green-900/10 dark:border-green-900/30 gap-1">
+                                                    <div className="flex gap-2 items-start">
+                                                        <PieChart className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                                                        <span className="text-sm font-medium text-green-800 dark:text-green-300">{stat.claim || stat.statement}</span>
+                                                    </div>
+                                                    {stat.context && <Badge variant="outline" className="w-fit text-[10px] text-muted-foreground border-green-200">{stat.context}</Badge>}
+                                                </div>
+                                            ))}
                                         </div>
-                                     </div>
+                                    </div>
                                 )}
 
                                 {proof.testimonials?.length > 0 && (
-                                     <div className="space-y-3 mt-4">
+                                    <div className="space-y-3 mt-4">
                                         <h5 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Testimonials</h5>
                                         <div className="grid md:grid-cols-2 gap-3">
-                                             {proof.testimonials.map((item: any, i: number) => (
-                                                 <div key={i} className="bg-muted/30 p-4 rounded-lg border text-sm flex flex-col justify-between h-full hover:shadow-sm transition-shadow">
-                                                     <p className="italic text-muted-foreground mb-3 leading-relaxed">"{item.quote || item.text || item.statement}"</p>
-                                                     {item.attribution && (
+                                            {proof.testimonials.map((item: any, i: number) => (
+                                                <div key={i} className="bg-muted/30 p-4 rounded-lg border text-sm flex flex-col justify-between h-full hover:shadow-sm transition-shadow">
+                                                    <p className="italic text-muted-foreground mb-3 leading-relaxed">"{item.quote || item.text || item.statement}"</p>
+                                                    {item.attribution && (
                                                         <div className="font-semibold text-xs flex items-center gap-1.5 mt-auto pt-3 border-t border-dashed border-border/50 text-foreground">
                                                             <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
                                                                 <Users className="w-3 h-3 text-muted-foreground" />
                                                             </div>
                                                             {item.attribution}
                                                         </div>
-                                                     )}
-                                                 </div>
-                                             ))}
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
-                                     </div>
+                                    </div>
                                 )}
                             </div>
                         )}
@@ -446,13 +446,13 @@ export function AuditorResultViewer({ data, onReRun, isReRunning = false }: Audi
                         <span className="font-medium">View Raw JSON</span>
                     </summary>
                     <div className="mt-2 bg-muted/50 rounded-lg overflow-hidden border">
-                         <ScrollArea className="h-[300px] w-full">
-                             <div className="p-4">
+                        <ScrollArea className="h-[300px] w-full">
+                            <div className="p-4">
                                 <pre className="text-[10px] font-mono whitespace-pre-wrap break-all text-muted-foreground">
                                     {JSON.stringify(data, null, 2)}
                                 </pre>
-                             </div>
-                         </ScrollArea>
+                            </div>
+                        </ScrollArea>
                     </div>
                 </details>
             </div>

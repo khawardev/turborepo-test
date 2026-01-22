@@ -23,7 +23,7 @@ export default function ImplicationCard({ attribute, searchQuery, brandPerceptio
 
                 return (
                     <Card key={brand} className={cn("transition-all shadow-sm", brand === primaryBrand && "bg-primary/10")}>
-                        <CardHeader className="pb-3">
+                        <CardHeader >
                             <CardTitle className={cn("text-base", brand === primaryBrand ? "text-primary" : "")}>
                                 {brand}
                             </CardTitle>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid, ChevronDown } from 'lucide-react';
+import { Copy, Terminal, RefreshCw, Bot, Play, Loader2, CheckCircle2, AlertCircle, LayoutGrid, ChevronDown, FileText } from 'lucide-react';
 
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -14,6 +14,7 @@ import { AuditorAgentCard } from './AuditorAgentCard';
 import { SimpleWebsiteScrapViewer, SimpleSocialScrapViewer } from './ResultsViewers';
 import { AuditorResultViewer } from './AuditorResultViewer';
 import { SocialAuditorResultViewer } from './SocialAuditorResultViewer';
+import { SocialReportsResultViewer, SocialReportsTaskListViewer } from './SocialReportsResultViewer';
 import BrandProfile from "@/components/stages/ccba/details/profile-tab/BrandProfile";
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { scrapeBatchWebsite } from '@/server/actions/ccba/website/websiteScrapeActions';
@@ -21,10 +22,22 @@ import { scrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActi
 import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { runAuditorAgent, getAuditorOutput, runSocialAuditorAgent, getSocialAuditorOutput } from '@/server/actions/auditorActions';
+import {
+    runSocialReportsAgent,
+    getSocialReportsOutput,
+    listSocialReportsTasks,
+    deleteSocialReportsTask,
+    type SocialChannelName,
+    type AnalysisScope
+} from '@/server/actions/socialReportsActions';
 import { setGatherCookies } from '@/server/actions/cookieActions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Spinner } from '@/components/shared/SpinnerLoader';
 import { MdOutlineArrowRight } from "react-icons/md";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface GatherManagerProps {
     brandId: string;
@@ -64,7 +77,7 @@ export function GatherManager({
     const [isStarting, startTransition] = useTransition();
     const [isPolling, setIsPolling] = useState(false);
     const [pollingMessage, setPollingMessage] = useState<string>("");
-    
+
     useEffect(() => {
         if (brandId) {
             setGatherCookies({
@@ -76,33 +89,27 @@ export function GatherManager({
         }
     }, [brandId, startDate, endDate, webLimit]);
 
-    // Auto-trigger logic
     const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
     useEffect(() => {
         if (triggerScrape && !hasAutoTriggered && !isStarting && !isPolling) {
-             // Only trigger if we don't have recent data or explicitly asked
-             // But triggerScrape=true usually comes from Setup, so we SHOULD run it.
-             // Avoid double running if status says running.
-             if (status && status.total_running > 0) {
-                 console.log("Skipping auto-trigger because tasks are already running.");
-                 setHasAutoTriggered(true);
-                 setIsPolling(true); // Just start polling
-                 return;
-             }
+            if (status && status.total_running > 0) {
+                console.log("Skipping auto-trigger because tasks are already running.");
+                setHasAutoTriggered(true);
+                setIsPolling(true);
+                return;
+            }
 
-             console.log("Auto-triggering scrape from URL param...");
-             setHasAutoTriggered(true);
-             handleStartCollection();
+            console.log("Auto-triggering scrape from URL param...");
+            setHasAutoTriggered(true);
+            handleStartCollection();
         }
     }, [triggerScrape, hasAutoTriggered]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Batch IDs and Statuses (Local State)
     const [currentWebBatchId, setCurrentWebBatchId] = useState<string | null>(websiteBatchId || null);
     const [currentSocialBatchId, setCurrentSocialBatchId] = useState<string | null>(socialBatchId || null);
     const [webBatchStatus, setWebBatchStatus] = useState<string | null>(websiteBatchStatus || null);
     const [socBatchStatus, setSocBatchStatus] = useState<string | null>(socialBatchStatus || null);
 
-    // Update local state when props change (e.g. after refresh)
     useEffect(() => {
         if (websiteBatchStatus) setWebBatchStatus(websiteBatchStatus);
         if (socialBatchStatus) setSocBatchStatus(socialBatchStatus);
@@ -110,19 +117,29 @@ export function GatherManager({
         if (socialBatchId) setCurrentSocialBatchId(socialBatchId);
     }, [websiteBatchStatus, socialBatchStatus, websiteBatchId, socialBatchId]);
 
-    // Auditor State
     const [auditorTaskId, setAuditorTaskId] = useState<string | null>(null);
     const [auditorResult, setAuditorResult] = useState<any>(null);
     const [isAuditorRunning, setIsAuditorRunning] = useState(false);
     const [websiteAuditScope, setWebsiteAuditScope] = useState<string>("both");
     const [websiteAuditModel, setWebsiteAuditModel] = useState<string>("claude-4.5-sonnet");
 
-    // Social Auditor State
     const [socialAuditorTaskId, setSocialAuditorTaskId] = useState<string | null>(null);
     const [socialAuditorResult, setSocialAuditorResult] = useState<any>(null);
     const [isSocialAuditorRunning, setIsSocialAuditorRunning] = useState(false);
     const [selectedChannel, setSelectedChannel] = useState<string>("linkedin");
     const [socialAuditScope, setSocialAuditScope] = useState<string>("brand");
+
+    const [socialReportsTaskId, setSocialReportsTaskId] = useState<string | null>(null);
+    const [socialReportsResult, setSocialReportsResult] = useState<any>(null);
+    const [isSocialReportsRunning, setIsSocialReportsRunning] = useState(false);
+    const [socialReportsChannel, setSocialReportsChannel] = useState<SocialChannelName>("linkedin");
+    const [socialReportsScope, setSocialReportsScope] = useState<AnalysisScope>("brand");
+    const [socialReportsInstruction, setSocialReportsInstruction] = useState<string>("");
+    const [socialReportsCompetitorId, setSocialReportsCompetitorId] = useState<string>("");
+    const [socialReportsTasks, setSocialReportsTasks] = useState<any[]>([]);
+    const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+    const [isDeletingTask, setIsDeletingTask] = useState(false);
+    const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
     const hasResults = !!(websiteData || socialData);
     const isWebComplete = webBatchStatus === 'Completed' || webBatchStatus === 'CompletedWithErrors';
@@ -130,59 +147,74 @@ export function GatherManager({
     const isComplete = hasResults && isWebComplete && isSocialComplete;
     const isRunning = (status && status.total_running > 0) || isPolling;
 
-    // --- Auditors Logic ---
-    // Calculate available social channels from captured data
     const availableChannels = (() => {
         if (!socialData) return [];
         let channels: string[] = [];
 
-        // Check if socialData itself is an array of objects (posts/profiles)
         if (Array.isArray(socialData)) {
-             channels = socialData.map((item: any) => item.platform || item.network || item.channel || item.source).filter(Boolean);
+            channels = socialData.map((item: any) => item.platform || item.network || item.channel || item.source).filter(Boolean);
         }
-        // Check for posts array inside
         else if (socialData.posts && Array.isArray(socialData.posts)) {
             channels = socialData.posts.map((item: any) => item.platform || item.network || item.channel || item.source).filter(Boolean);
         }
-        // Scenario 1: centralized social_platforms array
         else if (socialData.social_platforms && Array.isArray(socialData.social_platforms)) {
             channels = socialData.social_platforms.map((p: any) => p.name || p.network || p.platform);
         }
-        // Scenario 2: Nested in brand object
         else if (socialData.brand?.social_platforms && Array.isArray(socialData.brand.social_platforms)) {
             channels = socialData.brand.social_platforms.map((p: any) => p.name || p.network || p.platform);
         }
-        // Scenario 3: socialData itself is the brand object with social_platforms
         else if (Array.isArray(socialData.social_platforms)) {
-             channels = socialData.social_platforms.map((p: any) => p.name || p.network || p.platform);
+            channels = socialData.social_platforms.map((p: any) => p.name || p.network || p.platform);
         }
-        // Scenario 4: keyed object (e.g. { linkedin: {...}, facebook: {...} })
         else if (typeof socialData === 'object') {
-             // check for known keys
-             const knownPlatforms = ['linkedin', 'facebook', 'instagram', 'x', 'twitter', 'youtube', 'tiktok'];
-             channels = Object.keys(socialData).filter(key => knownPlatforms.includes(key.toLowerCase()));
+            const knownPlatforms = ['linkedin', 'facebook', 'instagram', 'x', 'twitter', 'youtube', 'tiktok'];
+            channels = Object.keys(socialData).filter(key => knownPlatforms.includes(key.toLowerCase()));
         }
 
         const unique = Array.from(new Set(channels.filter(Boolean).map(c => c.toLowerCase())));
-        
-        // Fallback: If data exists but no channels extracted, default to allow selection
+
         if (unique.length === 0 && (Array.isArray(socialData) ? socialData.length > 0 : Object.keys(socialData).length > 0)) {
-            // Check specifically for common structures
             if (JSON.stringify(socialData).toLowerCase().includes('linkedin')) return ['linkedin'];
-            return ['linkedin']; // Default fallback to ensure usability
+            return ['linkedin'];
         }
-        
+
         return unique;
     })();
 
-    // Set initial selected channel if available
+    const competitors = brandData?.competitors || [];
+
     useEffect(() => {
         if (availableChannels.length > 0 && !availableChannels.includes(selectedChannel)) {
             setSelectedChannel(availableChannels[0]);
         }
-    }, [availableChannels, selectedChannel]);
+        if (availableChannels.length > 0 && !availableChannels.includes(socialReportsChannel)) {
+            setSocialReportsChannel(availableChannels[0] as SocialChannelName);
+        }
+    }, [availableChannels, selectedChannel, socialReportsChannel]);
 
+    useEffect(() => {
+        if (currentSocialBatchId && brandData?.client_id) {
+            loadSocialReportsTasks();
+        }
+    }, [currentSocialBatchId, brandData?.client_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const loadSocialReportsTasks = async () => {
+        if (!brandData?.client_id) return;
+        setIsLoadingTasks(true);
+        try {
+            const res = await listSocialReportsTasks({
+                client_id: brandData.client_id,
+                brand_id: brandId,
+            });
+            if (res.success && res.data?.tasks) {
+                setSocialReportsTasks(res.data.tasks);
+            }
+        } catch (e) {
+            console.error("Failed to load social reports tasks", e);
+        } finally {
+            setIsLoadingTasks(false);
+        }
+    };
 
     const handleRunAuditor = async () => {
         if (!currentWebBatchId) {
@@ -203,7 +235,6 @@ export function GatherManager({
             if (res.success && res.data?.task_id) {
                 setAuditorTaskId(res.data.task_id);
                 toast.success("Auditor Agent started! Analyzing content...");
-                // Start polling for result
                 pollAuditorResult(res.data.task_id);
             } else {
                 toast.error(`Auditor failed to start: ${res.error || 'Unknown error'}`);
@@ -218,8 +249,8 @@ export function GatherManager({
 
     const pollAuditorResult = async (taskId: string) => {
         let attempts = 0;
-        const maxAttempts = 60; // 2 minutes approx (2s interval)
-        
+        const maxAttempts = 60;
+
         const interval = setInterval(async () => {
             attempts++;
             try {
@@ -251,7 +282,7 @@ export function GatherManager({
             return;
         }
         setIsSocialAuditorRunning(true);
-        setSocialAuditorResult(null); // Clear previous
+        setSocialAuditorResult(null);
         toast.info(`Starting Social Auditor Analysis for ${selectedChannel} (${socialAuditScope})...`);
 
         try {
@@ -259,7 +290,7 @@ export function GatherManager({
                 client_id: brandData.client_id,
                 brand_id: brandId,
                 batch_id: currentSocialBatchId,
-                channel_name: selectedChannel as any, // Cast to expected type
+                channel_name: selectedChannel as any,
                 analysis_scope: socialAuditScope as any
             });
 
@@ -280,8 +311,8 @@ export function GatherManager({
 
     const pollSocialAuditorResult = async (taskId: string) => {
         let attempts = 0;
-        const maxAttempts = 60; 
-        
+        const maxAttempts = 60;
+
         const interval = setInterval(async () => {
             attempts++;
             try {
@@ -307,43 +338,164 @@ export function GatherManager({
         }, 3000);
     };
 
-    // --- Polling Logic ---
+    const handleRunSocialReports = async () => {
+        if (!currentSocialBatchId) {
+            toast.error("No social data found. Please run data collection first.");
+            return;
+        }
+
+        if (socialReportsScope === 'competitors' && !socialReportsCompetitorId) {
+            toast.error("Please select a competitor for competitor analysis.");
+            return;
+        }
+
+        setIsSocialReportsRunning(true);
+        setSocialReportsResult(null);
+        toast.info(`Starting Social Reports Agent for ${socialReportsChannel} (${socialReportsScope})...`);
+
+        try {
+            const res = await runSocialReportsAgent({
+                client_id: brandData.client_id,
+                brand_id: brandId,
+                batch_id: currentSocialBatchId,
+                channel_name: socialReportsChannel,
+                analysis_scope: socialReportsScope,
+                competitor_id: socialReportsScope === 'competitors' ? socialReportsCompetitorId : undefined,
+                instruction: socialReportsInstruction || undefined
+            });
+
+            if (res.success && res.data?.task_id) {
+                setSocialReportsTaskId(res.data.task_id);
+                toast.success(`Social Reports Agent started for ${socialReportsChannel}!`);
+                pollSocialReportsResult(res.data.task_id);
+            } else {
+                toast.error(`Social Reports Agent failed: ${res.error || 'Unknown error'}`);
+                setIsSocialReportsRunning(false);
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Error starting Social Reports Agent");
+            setIsSocialReportsRunning(false);
+        }
+    };
+
+    const pollSocialReportsResult = async (taskId: string) => {
+        let attempts = 0;
+        const maxAttempts = 120;
+
+        const interval = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await getSocialReportsOutput({
+                    client_id: brandData.client_id,
+                    brand_id: brandId,
+                    task_id: taskId
+                });
+
+                if (res.success && res.data) {
+                    setSocialReportsResult(res.data);
+                    toast.success("Social report generated successfully!");
+                    setIsSocialReportsRunning(false);
+                    clearInterval(interval);
+                    loadSocialReportsTasks();
+                } else if (attempts >= maxAttempts) {
+                    toast.error("Social report generation timed out.");
+                    setIsSocialReportsRunning(false);
+                    clearInterval(interval);
+                }
+            } catch (e) {
+                console.error("Polling social reports error", e);
+            }
+        }, 3000);
+    };
+
+    const handleSelectSocialReportTask = async (taskId: string) => {
+        setSocialReportsTaskId(taskId);
+        setIsSocialReportsRunning(true);
+        try {
+            const res = await getSocialReportsOutput({
+                client_id: brandData.client_id,
+                brand_id: brandId,
+                task_id: taskId
+            });
+            if (res.success && res.data) {
+                setSocialReportsResult(res.data);
+            } else {
+                toast.error("Failed to load report");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Error loading report");
+        } finally {
+            setIsSocialReportsRunning(false);
+        }
+    };
+
+    const handleDeleteSocialReportTask = async (taskId: string) => {
+        if (!confirm("Are you sure you want to delete this report? This action cannot be undone.")) {
+            return;
+        }
+        setIsDeletingTask(true);
+        setDeletingTaskId(taskId);
+        try {
+            const res = await deleteSocialReportsTask({
+                client_id: brandData.client_id,
+                brand_id: brandId,
+                task_id: taskId
+            });
+            if (res.success) {
+                toast.success("Report deleted successfully");
+                if (socialReportsTaskId === taskId) {
+                    setSocialReportsTaskId(null);
+                    setSocialReportsResult(null);
+                }
+                loadSocialReportsTasks();
+            } else {
+                toast.error(`Failed to delete report: ${res.error || 'Unknown error'}`);
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Error deleting report");
+        } finally {
+            setIsDeletingTask(false);
+            setDeletingTaskId(null);
+        }
+    };
+
     const checkBatchStatuses = useCallback(async () => {
         let webStatus = null;
         let socialStatus = null;
 
         if (currentWebBatchId) {
             webStatus = await getBatchWebsiteScrapeStatus(brandId, currentWebBatchId);
-            if (webStatus?.status) setWebBatchStatus(webStatus.status); // Update local status
+            if (webStatus?.status) setWebBatchStatus(webStatus.status);
         }
         if (currentSocialBatchId) {
             socialStatus = await getBatchSocialScrapeStatus(brandId, currentSocialBatchId);
-            if (socialStatus?.status) setSocBatchStatus(socialStatus.status); // Update local status
+            if (socialStatus?.status) setSocBatchStatus(socialStatus.status);
         }
-        
+
         const taskStatus = await getCcbaTaskStatus(brandId);
         setStatus(taskStatus);
-        
+
         return { webStatus, socialStatus, taskStatus };
     }, [brandId, currentWebBatchId, currentSocialBatchId]);
 
     useEffect(() => {
         if (!isPolling) return;
         let pollCount = 0;
-        const maxPolls = 36; 
+        const maxPolls = 36;
 
         const interval = setInterval(async () => {
             pollCount++;
             setPollingMessage(`Checking status... (${pollCount})`);
             try {
                 const { webStatus, socialStatus, taskStatus } = await checkBatchStatuses();
-                
-                // Use the returned status or local state for checks
+
                 const webDone = webStatus?.status === 'Completed' || webStatus?.status === 'CompletedWithErrors' || webStatus?.status === 'Failed';
                 const socialDone = socialStatus?.status === 'Completed' || socialStatus?.status === 'CompletedWithErrors' || socialStatus?.status === 'Failed';
                 const tasksRunning = taskStatus?.total_running > 0;
 
-                // If both are done OR failed OR we don't have IDs for them (shouldn't happen if we started them), AND global tasks are 0
                 if ((webDone || !currentWebBatchId) && (socialDone || !currentSocialBatchId) && !tasksRunning) {
                     toast.success("Data collection completed!");
                     setPollingMessage("");
@@ -354,14 +506,13 @@ export function GatherManager({
                     });
                     return;
                 }
-                
-                // Construct progress string
+
                 let msgParts = [];
                 if (webStatus?.progress) msgParts.push(`Web: ${webStatus.progress.completed}/${webStatus.progress.total_urls}`);
                 if (socialStatus?.status) msgParts.push(`Social: ${socialStatus.status}`);
-                
+
                 setPollingMessage(msgParts.length > 0 ? msgParts.join(" | ") : "Processing...");
-                
+
             } catch (e) {
                 console.error("[GatherManager] Polling error:", e);
             }
@@ -370,7 +521,7 @@ export function GatherManager({
                 setPollingMessage("");
                 clearInterval(interval);
             }
-        }, 10000); 
+        }, 10000);
 
         return () => clearInterval(interval);
     }, [isPolling, checkBatchStatuses, router, currentWebBatchId, currentSocialBatchId]);
@@ -382,10 +533,9 @@ export function GatherManager({
                 return;
             }
             toast.info("Initializing Data Collection Swarm...");
-            // Reset local statuses to indicate starting
             setWebBatchStatus("Initializing");
             setSocBatchStatus("Initializing");
-            
+
             try {
                 const webResult = await scrapeBatchWebsite(brandId, webLimit);
                 if (!webResult?.success) {
@@ -399,8 +549,7 @@ export function GatherManager({
                     toast.error(`Social capture failed: ${socialResult?.message}`);
                     return;
                 }
-                
-                // Set Social Batch ID - handle both task_id and batch_id
+
                 const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
                 if (sBatchId) {
                     setCurrentSocialBatchId(sBatchId);
@@ -431,8 +580,8 @@ export function GatherManager({
                 }
                 if (webResult.data?.task_id) {
                     setCurrentWebBatchId(webResult.data.task_id);
-                     toast.success("Website agent deployed.");
-                     setIsPolling(true);
+                    toast.success("Website agent deployed.");
+                    setIsPolling(true);
                 }
             } catch (e) {
                 console.error(e);
@@ -457,7 +606,7 @@ export function GatherManager({
                     setSocBatchStatus("Failed");
                     return;
                 }
-                
+
                 const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
                 if (sBatchId) {
                     setCurrentSocialBatchId(sBatchId);
@@ -482,7 +631,7 @@ export function GatherManager({
                     <p className="text-muted-foreground">Real-time status of the multi-source data collection swarm and auditors.</p>
                     {pollingMessage && <p className="text-sm text-blue-500 mt-1">{pollingMessage}</p>}
                 </div>
-                 <Button variant="outline" asChild>
+                <Button variant="outline" asChild>
                     <Link href="/dashboard/brandos-v2.1/gather">
                         <LayoutGrid className="w-4 h-4" />
                         Switch Brand
@@ -491,10 +640,10 @@ export function GatherManager({
             </div>
 
             <div className="space-y-4">
-                <AgentStatusCard 
-                    status={status} 
-                    isComplete={isComplete} 
-                    hasData={hasResults} 
+                <AgentStatusCard
+                    status={status}
+                    isComplete={isComplete}
+                    hasData={hasResults}
                     onStart={handleStartCollection}
                     isStarting={isStarting || isPolling}
                 />
@@ -517,6 +666,10 @@ export function GatherManager({
                             <TabsTrigger value="ai_audit" disabled={!isComplete}>
                                 <Bot className="w-4 h-4" />
                                 Outside-in Audit
+                            </TabsTrigger>
+                            <TabsTrigger value="social_reports" disabled={!isSocialComplete}>
+                                <FileText className="w-4 h-4" />
+                                Social Reports
                             </TabsTrigger>
                         </TabsList>
 
@@ -587,8 +740,7 @@ export function GatherManager({
 
                         <TabsContent value="ai_audit" className="space-y-8 pt-4">
                             <div className="flex flex-col gap-8">
-                                {/* Website Auditor Section */}
-                                <AuditorAgentCard 
+                                <AuditorAgentCard
                                     title="Website Auditor"
                                     description="Analyze captured website content for verbal bedrock."
                                     icon={Globe}
@@ -602,13 +754,13 @@ export function GatherManager({
                                     isDisabled={!currentWebBatchId}
                                     buttonLabel="Run Website Audit"
                                     controls={
-                                         <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
                                                     <Button variant="outline" className="w-[180px] h-9 justify-between bg-background font-normal">
-                                                        {websiteAuditModel === 'claude-4.5-sonnet' ? 'Claude 4.5 Sonnet' : 
-                                                         websiteAuditModel === 'claude-3-5-sonnet' ? 'Claude 3.5 Sonnet' : 
-                                                         'Claude 3 Haiku'}
+                                                        {websiteAuditModel === 'claude-4.5-sonnet' ? 'Claude 4.5 Sonnet' :
+                                                            websiteAuditModel === 'claude-3-5-sonnet' ? 'Claude 3.5 Sonnet' :
+                                                                'Claude 3 Haiku'}
                                                         <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -622,9 +774,9 @@ export function GatherManager({
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild disabled={isAuditorRunning}>
                                                     <Button variant="outline" className="w-[140px] h-9 justify-between bg-background font-normal">
-                                                        {websiteAuditScope === 'brand' ? 'Brand Only' : 
-                                                         websiteAuditScope === 'competitors' ? 'Competitors Only' : 
-                                                         'Brand & Competitors'}
+                                                        {websiteAuditScope === 'brand' ? 'Brand Only' :
+                                                            websiteAuditScope === 'competitors' ? 'Competitors Only' :
+                                                                'Brand & Competitors'}
                                                         <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -634,12 +786,11 @@ export function GatherManager({
                                                     <DropdownMenuItem onClick={() => setWebsiteAuditScope('both')}>Brand & Competitors</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                         </div>
+                                        </div>
                                     }
                                 />
 
-                                {/* Social Auditor Section */}
-                                <AuditorAgentCard 
+                                <AuditorAgentCard
                                     title="Social Auditor"
                                     description="Extract emergent attributes from social channels."
                                     icon={Fingerprint}
@@ -654,9 +805,9 @@ export function GatherManager({
                                     buttonLabel="Run  Analysis"
                                     controls={
                                         <div className="flex items-center gap-2">
-                                             <DropdownMenu>
+                                            <DropdownMenu>
                                                 <DropdownMenuTrigger asChild disabled={isSocialAuditorRunning || !availableChannels.length}>
-                                                     <Button variant="outline" className="w-[140px] h-9 justify-between bg-background capitalize font-normal">
+                                                    <Button variant="outline" className="w-[140px] h-9 justify-between bg-background capitalize font-normal">
                                                         {selectedChannel || "Channel"}
                                                         <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                                                     </Button>
@@ -669,7 +820,7 @@ export function GatherManager({
                                                             </DropdownMenuItem>
                                                         ))
                                                     ) : (
-                                                         <DropdownMenuItem disabled>No Data Available</DropdownMenuItem>
+                                                        <DropdownMenuItem disabled>No Data Available</DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -677,9 +828,9 @@ export function GatherManager({
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild disabled={isSocialAuditorRunning}>
                                                     <Button variant="outline" className="w-[160px] h-9 justify-between bg-background font-normal">
-                                                         {socialAuditScope === 'brand' ? 'Brand Only' : 
-                                                         socialAuditScope === 'competitors' ? 'Competitors Only' : 
-                                                         'Brand & Competitors'}
+                                                        {socialAuditScope === 'brand' ? 'Brand Only' :
+                                                            socialAuditScope === 'competitors' ? 'Competitors Only' :
+                                                                'Brand & Competitors'}
                                                         <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -692,6 +843,132 @@ export function GatherManager({
                                         </div>
                                     }
                                 />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="social_reports" className="space-y-8 pt-4">
+                            <div className="flex flex-col gap-8">
+                                <AuditorAgentCard
+                                    title="Social Reports Agent"
+                                    description="Generate comprehensive reports from social media batch data with AI-powered analysis."
+                                    icon={FileText}
+                                    agentCode="OI-SOC-REPORTS"
+                                    status={isSocialReportsRunning ? 'running' : socialReportsResult ? 'complete' : 'idle'}
+                                    isRunning={isSocialReportsRunning}
+                                    onRun={handleRunSocialReports}
+                                    taskId={socialReportsTaskId}
+                                    result={socialReportsResult}
+                                    RenderResult={SocialReportsResultViewer}
+                                    isDisabled={!currentSocialBatchId || !availableChannels.length}
+                                    buttonLabel="Generate Report"
+                                    processingLabels={{
+                                        running: "Generating Report...",
+                                        processing: "AI agent is analyzing social data and generating report..."
+                                    }}
+                                    controls={
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isSocialReportsRunning || !availableChannels.length}>
+                                                    <Button variant="outline" className="w-[140px] h-9 justify-between bg-background capitalize font-normal">
+                                                        {socialReportsChannel || "Channel"}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[140px]">
+                                                    {availableChannels.length > 0 ? (
+                                                        availableChannels.map(channel => (
+                                                            <DropdownMenuItem
+                                                                key={channel}
+                                                                onClick={() => setSocialReportsChannel(channel as SocialChannelName)}
+                                                                className="capitalize"
+                                                            >
+                                                                {channel}
+                                                            </DropdownMenuItem>
+                                                        ))
+                                                    ) : (
+                                                        <DropdownMenuItem disabled>No Data Available</DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild disabled={isSocialReportsRunning}>
+                                                    <Button variant="outline" className="w-[140px] h-9 justify-between bg-background font-normal">
+                                                        {socialReportsScope === 'brand' ? 'Brand' : 'Competitors'}
+                                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-[140px]">
+                                                    <DropdownMenuItem onClick={() => setSocialReportsScope('brand')}>Brand</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setSocialReportsScope('competitors')}>Competitors</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+
+                                            {socialReportsScope === 'competitors' && competitors.length > 0 && (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild disabled={isSocialReportsRunning}>
+                                                        <Button variant="outline" className="w-[180px] h-9 justify-between bg-background font-normal">
+                                                            {competitors.find((c: any) => c.id === socialReportsCompetitorId)?.name || "Select Competitor"}
+                                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent className="w-[180px]">
+                                                        {competitors.map((comp: any) => (
+                                                            <DropdownMenuItem
+                                                                key={comp.id}
+                                                                onClick={() => setSocialReportsCompetitorId(comp.id)}
+                                                            >
+                                                                {comp.name}
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
+                                        </div>
+                                    }
+                                />
+
+                                <Card className="border-dashed">
+                                    <CardHeader >
+                                        <CardTitle className="text-sm font-medium">Custom Instructions (Optional)</CardTitle>
+                                        <CardDescription className="text-xs">
+                                            Provide specific guidance for the AI analysis, e.g., &quot;Focus on visual trends&quot; or &quot;Analyze competitor positioning&quot;
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Input
+                                            placeholder="Enter custom instructions for the analysis..."
+                                            value={socialReportsInstruction}
+                                            onChange={(e) => setSocialReportsInstruction(e.target.value)}
+                                            disabled={isSocialReportsRunning}
+                                            className="max-w-xl"
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                {socialReportsTasks.length > 0 && (
+                                    <Card>
+                                        <CardHeader >
+                                            <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                                <FileText className="w-4 h-4" />
+                                                Report History
+                                            </CardTitle>
+                                            <CardDescription className="text-xs">
+                                                View and manage previously generated social reports
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <SocialReportsTaskListViewer
+                                                tasks={socialReportsTasks}
+                                                onSelectTask={handleSelectSocialReportTask}
+                                                onDeleteTask={handleDeleteSocialReportTask}
+                                                selectedTaskId={socialReportsTaskId}
+                                                isDeleting={isDeletingTask}
+                                                deletingTaskId={deletingTaskId}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                )}
                             </div>
                         </TabsContent>
                     </Tabs>
