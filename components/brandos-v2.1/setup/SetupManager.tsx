@@ -52,59 +52,166 @@ export function SetupManager() {
 
   const autofill = () => {
     const mockCompetitors = [
-      { 
-        id: crypto.randomUUID(), 
-        name: 'Nike', 
-        website: 'https://www.nike.com/', 
-        socials: { 
-          linkedin: 'https://www.linkedin.com/company/nike/', 
-          twitter: 'https://x.com/Nike', 
-          facebook: 'https://www.facebook.com/nike',
-          instagram: 'https://www.instagram.com/nike/',
-          youtube: 'https://www.youtube.com/@nike',
-          tiktok: 'https://www.tiktok.com/@nike?lang=en'
-        } 
+      {
+        id: crypto.randomUUID(),
+        name: 'George P Johnson',
+        website: 'https://www.gpj.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/george-p-johnson/',
+          twitter: 'https://x.com/GPJExpMktg',
+          facebook: 'https://www.facebook.com/experiencegpj/',
+          instagram: 'https://www.instagram.com/gpjexperiencemarketing/',
+          youtube: 'https://www.youtube.com/user/georgepjohnson',
+          tiktok: ''
+        }
       },
-      { 
-        id: crypto.randomUUID(), 
-        name: 'On', 
-        website: 'https://www.on.com/en-us/', 
-        socials: { 
-          linkedin: 'https://www.linkedin.com/company/on-ag/', 
-          twitter: 'https://x.com/on_running', 
-          facebook: 'https://www.facebook.com/On/',
-          instagram: 'https://www.instagram.com/on',
-          youtube: 'https://www.youtube.com/On-Running',
-          tiktok: 'https://www.tiktok.com/@onrunning'
-        } 
+      {
+        id: crypto.randomUUID(),
+        name: 'Astound Group',
+        website: 'https://astoundgroup.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/astoundgroup/',
+          twitter: 'https://x.com/ASTOUNDGroup',
+          facebook: 'https://www.facebook.com/ASTOUNDGroup/',
+          instagram: 'https://www.instagram.com/astoundgroup/',
+          youtube: 'https://www.youtube.com/user/astoundmedia',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'EWI Worldwide',
+        website: 'https://www.ewiworldwide.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/ewi-worldwide/',
+          twitter: '',
+          facebook: '',
+          instagram: 'https://www.instagram.com/ewiworldwide/',
+          youtube: '', 
+          tiktok: ''
+        }
+      },
+        {
+        id: crypto.randomUUID(),
+        name: 'Activate Inc.',
+        website: 'https://www.activateexp.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/activate-inc-/',
+          twitter: '',
+          facebook: 'https://www.facebook.com/ActivateInc',
+          instagram: 'https://www.instagram.com/activatedetroit/',
+          youtube: '',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Hamilton Exhibits',
+        website: 'https://hamilton-ex.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/hamilton-ex/',
+          twitter: 'https://x.com/Hamilton_Ex',
+          facebook: 'https://www.facebook.com/hamilton.ex',
+          instagram: 'https://www.instagram.com/hamilton.ex/',
+          youtube: 'https://www.youtube.com/@hamilton-ex',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Spiro',
+        website: 'https://spiro.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/thisisspiro/',
+          twitter: '',
+          facebook: 'https://www.facebook.com/thisisspiro',
+          instagram: 'https://www.instagram.com/thisisspiro/',
+          youtube: '',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Sparks',
+        website: 'https://www.wearesparks.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/poweredbysparks/',
+          twitter: 'https://x.com/poweredbysparks/',
+          facebook: 'https://www.facebook.com/SparksMarketing',
+          instagram: 'https://www.instagram.com/poweredbysparks/',
+          youtube: 'https://www.youtube.com/user/SparksMktg',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Techcom, Inc.',
+        website: 'https://www.techcom.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/techcom-inc/',
+          twitter: 'https://x.com/Techcom_indy',
+          facebook: 'https://www.facebook.com/TechcomInc',
+          instagram: 'https://www.instagram.com/techcom_inc/',
+          youtube: 'https://www.youtube.com/@techcominc',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Bluewater Technologies',
+        website: 'https://bluewatertech.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/bluewater-technologies/',
+          twitter: '',
+          facebook: 'https://www.facebook.com/bluewatertechnologies',
+          instagram: 'https://www.instagram.com/experiencebluewater',
+          youtube: '',
+          tiktok: ''
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Steelhead',
+        website: 'https://steelheadproductions.com/',
+        socials: {
+          linkedin: 'https://www.linkedin.com/company/steelhead-productions/',
+          twitter: 'https://x.com/ExhibitHappy',
+          facebook: 'https://www.facebook.com/Steelhead.Productions/',
+          instagram: 'https://www.instagram.com/exhibithappy/',
+          youtube: 'https://www.youtube.com/@ExhibitHappy',
+          tiktok: ''
+        }
       }
     ];
 
     form.setValue('details', {
-      engagementName: `Under Armour Market Analysis ${new Date().getFullYear()}`,
-      clientName: 'Under Armour',
-      clientWebsite: 'https://www.underarmour.com/en-us/',
+      engagementName: `Creative Solutions Group Analysis ${new Date().getFullYear()}`,
+      clientName: 'Creative Solutions Group',
+      clientWebsite: 'https://csgnow.com/',
       clientSocials: {
-        linkedin: 'https://www.linkedin.com/company/under-armour/',
-        twitter: 'https://x.com/UnderArmour',
-        instagram: 'https://www.instagram.com/underarmour/',
-        youtube: 'https://www.youtube.com/user/underarmour',
-        facebook: 'https://www.facebook.com/UnderArmour/',
-        tiktok: 'https://www.tiktok.com/@underarmour?lang=en'
+        linkedin: 'https://www.linkedin.com/company/creative-solutions-group/',
+        twitter: '',
+        instagram: 'https://www.instagram.com/csgnow/?hl=en',
+        youtube: '',
+        facebook: 'https://www.facebook.com/csgnow/',
+        tiktok: ''
       },
-      industry: 'Sports Apparel'
+      industry: 'Experiential Marketing'
     });
     form.setValue('competitors', mockCompetitors);
     
     // Enable all channels
     form.setValue('channels.linkedin.enabled', true);
-    form.setValue('channels.twitter.enabled', true);
-    form.setValue('channels.youtube.enabled', true);
     form.setValue('channels.instagram.enabled', true);
     form.setValue('channels.facebook.enabled', true);
-    form.setValue('channels.tiktok.enabled', true);
+    
+    // Enable channels present in competitors even if main client doesn't use them heavily, to catch competitor data
+    form.setValue('channels.twitter.enabled', true);
+    form.setValue('channels.youtube.enabled', true);
+    
+    form.setValue('channels.tiktok.enabled', false);
 
-    toast.success('Form autofilled with Under Armour data');
+    toast.success('Form autofilled with Creative Solutions Group data');
   };
 
   const onSubmit = async (data: EngagementConfigV2) => {
