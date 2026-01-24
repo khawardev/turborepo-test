@@ -2,7 +2,7 @@
   color: var(--color-foreground);
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-family: var(--font-pt-serif), serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 .markdown-body h1,

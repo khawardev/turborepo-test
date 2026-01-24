@@ -17,27 +17,27 @@ export const BrandOSConfig: any = {
             href: "/dashboard/brandos-v2.1/gather",
             icon: AiOutlinePieChart
         },
-        {
-            title: "Phase 0 Outside-In Audit",
-            href: "/dashboard/brandos-v2.1/phase-0",
-            icon: LuBrain
-        },
-        {
-            title: "Phase 1 Extraction & Bio",
-            href: "/dashboard/brandos-v2.1/phase-1",
-            icon: LuFingerprint
-        },
-        {
-            title: "Phase 2 Syn & Reporting",
-            href: "/dashboard/brandos-v2.1/phase-2",
-             icon: RiLoopRightLine
-        },
+        // {
+        //     title: "Phase 0 Outside-In Audit",
+        //     href: "/dashboard/brandos-v2.1/phase-0",
+        //     icon: LuBrain
+        // },
+        // {
+        //     title: "Phase 1 Extraction & Bio",
+        //     href: "/dashboard/brandos-v2.1/phase-1",
+        //     icon: LuFingerprint
+        // },
+        // {
+        //     title: "Phase 2 Syn & Reporting",
+        //     href: "/dashboard/brandos-v2.1/phase-2",
+        //      icon: RiLoopRightLine
+        // },
 
-        {
-            title: "Export & Handoff",
-            href: "/dashboard/brandos-v2.1/export",
-             icon: LuShare
-        },
+        // {
+        //     title: "Export & Handoff",
+        //     href: "/dashboard/brandos-v2.1/export",
+        //      icon: LuShare
+        // },
         // {
         //     title: "Intention Intelligence",
         //     href: "/dashboard/bvo",

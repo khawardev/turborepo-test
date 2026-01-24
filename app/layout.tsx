@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`relative font-sf-pro ${inter?.className} ${ptSerif.variable} tracking-tight antialiased `} suppressHydrationWarning>
+      <body className={`relative font-sf-pro ${inter?.className}  tracking-tight antialiased `} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <LightRaysWrapper>
             <HeaderServer />

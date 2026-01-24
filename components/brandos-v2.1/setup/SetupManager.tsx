@@ -46,6 +46,9 @@ export function SetupManager() {
         twitter: { enabled: false, lookbackDays: 365, maxPosts: 200, collectComments: true },
         facebook: { enabled: false, lookbackDays: 365, maxPosts: 200, collectComments: true },
         tiktok: { enabled: false, lookbackDays: 365, maxPosts: 200, collectComments: true },
+      },
+      scrapeSettings: {
+        webLimit: 500
       }
     }
   });
@@ -254,7 +257,7 @@ export function SetupManager() {
       toast.success('Brand created successfully');
 
       // 3. Redirect to Gather Phase with explicit parameters
-      const webLimit = (data as any).scrapeSettings?.webLimit || 10;
+      const webLimit = (data as any).scrapeSettings?.webLimit || 500;
       
       const startDate = socialDateRange?.from ? format(socialDateRange.from, 'yyyy-MM-dd') : '';
       const endDate = socialDateRange?.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');

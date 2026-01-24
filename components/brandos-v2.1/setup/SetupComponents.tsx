@@ -121,10 +121,10 @@ export function ChannelSection({ form, socialDateRange, setSocialDateRange }: { 
             <Label>Max Pages to Capture</Label>
             <Input
               type="number"
-              placeholder="10"
+              placeholder="500"
               className="h-11 text-lg"
               {...form.register('scrapeSettings.webLimit', { valueAsNumber: true })}
-              defaultValue={10}
+              defaultValue={500}
             />
             <p className="text-xs text-muted-foreground">Number of pages to crawl per website (Client & Competitors).</p>
           </div>

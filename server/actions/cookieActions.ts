@@ -8,6 +8,7 @@ export async function setGatherCookies(params: {
     endDate?: string;
     webLimit?: string;
 }) {
+    await clearGatherCookies();
     const cookieStore = await cookies();
     
     if (params.brandId) {
