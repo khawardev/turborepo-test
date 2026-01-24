@@ -104,6 +104,7 @@ export async function getPreviousSocialScrapes(brand_id: string) {
             batch_id: item.batch_id,
             start_date: item.start_date,
             end_date: item.end_date,
+            error: item.error
         }));
 
         return filtered;
@@ -126,9 +127,8 @@ export async function getSocialBatchId(brand_id: string) {
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return null;
 
-        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-
-        return latest?.batch_id || null;
+        const sorted = data.toSorted((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        return sorted[0]?.batch_id ?? null;
     } catch (error) {
         console.error("[getSocialBatchId] Error:", error);
         return null;
@@ -141,15 +141,17 @@ export async function getSocialBatchIdWithUser(brand_id: string, user: any) {
 
         const { success, data, error } = await brandRequest(
             `/batch/social-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
-            "GET"
+            "GET",
+            undefined,
+            'no-store'
         );
 
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return null;
 
-        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-
-        return latest?.batch_id || null;
+        const sorted = data.toSorted((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        const latest = sorted[0];
+        return latest ? { batchId: latest.batch_id, status: latest.status, error: latest.error } : null; 
     } catch (error) {
         console.error("[getSocialBatchIdWithUser] Error:", error);
         return null;

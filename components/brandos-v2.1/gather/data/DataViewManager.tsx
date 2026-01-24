@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Copy, Terminal, Bot, Database, FileText } from 'lucide-react';
+import { ScrapeStatusBadge } from '../ScrapeStatusBadge';
 import { SimpleWebsiteScrapViewer, SimpleSocialScrapViewer } from '../ResultsViewers';
 import BrandProfile from '@/components/stages/ccba/details/profile-tab/BrandProfile';
 import { AuditorAgentCard } from '../AuditorAgentCard';
@@ -76,11 +77,17 @@ export function DataViewManager({
     const [isDeletingTask, setIsDeletingTask] = useState(false);
     const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
-    const isComplete = hasResults && isWebComplete && isSocialComplete;
-    const competitors = brandData?.competitors?.map((c: any) => ({
-        id: c.competitor_id,
-        name: c.name
-    })) || [];
+    const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isComplete = useMemo(() => hasResults && isWebComplete && isSocialComplete, [hasResults, isWebComplete, isSocialComplete]);
+    
+    const competitors = useMemo(() => 
+        brandData?.competitors?.map((c: any) => ({
+            id: c.competitor_id,
+            name: c.name
+        })) ?? [], 
+        [brandData?.competitors]
+    );
 
     const {
         taskId: auditorTaskId,
@@ -135,7 +142,47 @@ export function DataViewManager({
         }
     }, [brandData?.client_id, brandId]);
 
-    const handleRunSocialReports = async () => {
+    const pollSocialReportsResult = useCallback((taskId: string) => {
+        if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+        }
+        
+        let attempts = 0;
+        const maxAttempts = 120;
+
+        pollIntervalRef.current = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await getSocialReportsOutput({
+                    client_id: brandData.client_id,
+                    brand_id: brandId,
+                    task_id: taskId
+                });
+
+                if (res.success && res.data) {
+                    setSocialReportsResult(res.data);
+                    toast.success("Social report generated successfully!");
+                    setIsSocialReportsRunning(false);
+                    if (pollIntervalRef.current) {
+                        clearInterval(pollIntervalRef.current);
+                        pollIntervalRef.current = null;
+                    }
+                    loadSocialReportsTasks();
+                } else if (attempts >= maxAttempts) {
+                    toast.error("Social report generation timed out.");
+                    setIsSocialReportsRunning(false);
+                    if (pollIntervalRef.current) {
+                        clearInterval(pollIntervalRef.current);
+                        pollIntervalRef.current = null;
+                    }
+                }
+            } catch (e) {
+                console.error("Polling social reports error", e);
+            }
+        }, 3000);
+    }, [brandData.client_id, brandId, loadSocialReportsTasks]);
+
+    const handleRunSocialReports = useCallback(async () => {
         if (!socialBatchId) {
             toast.error("No social data found. Please run data collection first.");
             return;
@@ -174,37 +221,15 @@ export function DataViewManager({
             toast.error("Error starting Social Reports Agent");
             setIsSocialReportsRunning(false);
         }
-    };
+    }, [socialBatchId, socialReportsScope, socialReportsCompetitorId, socialReportsChannel, socialReportsInstruction, brandData.client_id, brandId, pollSocialReportsResult]);
 
-    const pollSocialReportsResult = async (taskId: string) => {
-        let attempts = 0;
-        const maxAttempts = 120;
-
-        const interval = setInterval(async () => {
-            attempts++;
-            try {
-                const res = await getSocialReportsOutput({
-                    client_id: brandData.client_id,
-                    brand_id: brandId,
-                    task_id: taskId
-                });
-
-                if (res.success && res.data) {
-                    setSocialReportsResult(res.data);
-                    toast.success("Social report generated successfully!");
-                    setIsSocialReportsRunning(false);
-                    clearInterval(interval);
-                    loadSocialReportsTasks();
-                } else if (attempts >= maxAttempts) {
-                    toast.error("Social report generation timed out.");
-                    setIsSocialReportsRunning(false);
-                    clearInterval(interval);
-                }
-            } catch (e) {
-                console.error("Polling social reports error", e);
+    useEffect(() => {
+        return () => {
+            if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
             }
-        }, 3000);
-    };
+        };
+    }, []);
 
     const handleSelectSocialReportTask = async (taskId: string) => {
         setSocialReportsTaskId(taskId);
@@ -314,16 +339,26 @@ export function DataViewManager({
                 <TabsContent value="captured_data" className="space-y-6 pt-4">
                     <Tabs defaultValue="website" className="w-full">
                         <TabsList>
-                            <TabsTrigger value="website">
+                            <TabsTrigger value="website" className="gap-2">
                                 Website Data
                                 {websiteBatchStatus && websiteBatchStatus !== 'Completed' && (
-                                    <span className="ml-2 text-xs">({websiteBatchStatus})</span>
+                                    <ScrapeStatusBadge
+                                        label="Website"
+                                        status={websiteBatchStatus}
+                                        showLabel={false}
+                                        size="sm"
+                                    />
                                 )}
                             </TabsTrigger>
-                            <TabsTrigger value="social">
+                            <TabsTrigger value="social" className="gap-2">
                                 Social Media Data
                                 {socialBatchStatus && socialBatchStatus !== 'Completed' && (
-                                    <span className="ml-2 text-xs">({socialBatchStatus})</span>
+                                    <ScrapeStatusBadge
+                                        label="Social"
+                                        status={socialBatchStatus}
+                                        showLabel={false}
+                                        size="sm"
+                                    />
                                 )}
                             </TabsTrigger>
                         </TabsList>

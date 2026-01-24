@@ -1,20 +1,14 @@
 'use client';
 
-import { useEffect, useState, useTransition, useCallback } from 'react';
+import { useEffect, useRef, useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-    LayoutGrid, 
-    Play, 
-    RotateCw, 
     Loader2, 
-    CheckCircle2, 
-    AlertCircle,
     Globe,
     Share2,
     ArrowRight
@@ -25,6 +19,7 @@ import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websi
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { getCcbaTaskStatus } from '@/server/actions/ccba/statusActions';
 import { setGatherCookies } from '@/server/actions/cookieActions';
+import { ScrapeStatusBadge } from '@/components/brandos-v2.1/gather/ScrapeStatusBadge';
 
 type CollectionStatusManagerProps = {
     brandId: string;
@@ -38,7 +33,66 @@ type CollectionStatusManagerProps = {
     webLimit: number;
     startDate: string;
     endDate: string;
+    websiteBatchError?: string | null;
+    socialBatchError?: string | null;
 };
+
+type CollectionState = {
+    webBatchId: string | null;
+    socialBatchId: string | null;
+    webStatus: string | null;
+    socialStatus: string | null; 
+    webError: string | null;
+    socialError: string | null;
+    isPolling: boolean;
+    pollingMessage: string;
+    isStarting: boolean;
+    hasAutoTriggered: boolean;
+    taskStatus: any;
+};
+
+type CollectionAction =
+    | { type: 'SET_WEB_BATCH'; payload: { id: string; status?: string } }
+    | { type: 'SET_SOCIAL_BATCH'; payload: { id: string; status?: string } }
+    | { type: 'UPDATE_WEB_STATUS'; payload: { status: string; error?: string } }
+    | { type: 'UPDATE_SOCIAL_STATUS'; payload: { status: string; error?: string } }
+    | { type: 'SET_POLLING'; payload: boolean }
+    | { type: 'SET_POLLING_MESSAGE'; payload: string }
+    | { type: 'SET_STARTING'; payload: boolean }
+    | { type: 'SET_AUTO_TRIGGERED' }
+    | { type: 'SET_TASK_STATUS'; payload: any }
+    | { type: 'INIT_COLLECTION' };
+
+function collectionReducer(state: CollectionState, action: CollectionAction): CollectionState {
+    switch (action.type) {
+        case 'SET_WEB_BATCH':
+            return { ...state, webBatchId: action.payload.id, webStatus: action.payload.status || state.webStatus };
+        case 'SET_SOCIAL_BATCH':
+            return { ...state, socialBatchId: action.payload.id, socialStatus: action.payload.status || state.socialStatus };
+        case 'UPDATE_WEB_STATUS':
+            return { ...state, webStatus: action.payload.status, webError: action.payload.error || state.webError };
+        case 'UPDATE_SOCIAL_STATUS':
+            return { ...state, socialStatus: action.payload.status, socialError: action.payload.error || state.socialError };
+        case 'SET_POLLING':
+            return { ...state, isPolling: action.payload };
+        case 'SET_POLLING_MESSAGE':
+            return { ...state, pollingMessage: action.payload };
+        case 'SET_STARTING':
+            return { ...state, isStarting: action.payload };
+        case 'SET_AUTO_TRIGGERED':
+            return { ...state, hasAutoTriggered: true };
+        case 'SET_TASK_STATUS':
+            return { ...state, taskStatus: action.payload };
+        case 'INIT_COLLECTION':
+            return { ...state, webStatus: 'Initializing', socialStatus: 'Initializing', isStarting: true };
+        default:
+            return state;
+    }
+}
+
+function isComplete(status: string | null): boolean {
+    return status === 'Completed' || status === 'CompletedWithErrors' || status === 'Failed';
+}
 
 export function CollectionStatusManager({
     brandId,
@@ -51,20 +105,33 @@ export function CollectionStatusManager({
     triggerScrape,
     webLimit,
     startDate,
-    endDate
+    endDate,
+    websiteBatchError,
+    socialBatchError
 }: CollectionStatusManagerProps) {
     const router = useRouter();
-    const [status, setStatus] = useState(initialStatus);
-    const [isStarting, startTransition] = useTransition();
-    const [isPolling, setIsPolling] = useState(false);
-    const [pollingMessage, setPollingMessage] = useState<string>('');
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const pollCountRef = useRef(0);
+    const maxPolls = 36;
 
-    const [currentWebBatchId, setCurrentWebBatchId] = useState<string | null>(initialWebBatchId);
-    const [currentSocialBatchId, setCurrentSocialBatchId] = useState<string | null>(initialSocialBatchId);
-    const [webBatchStatus, setWebBatchStatus] = useState<string | null>(initialWebStatus);
-    const [socBatchStatus, setSocBatchStatus] = useState<string | null>(initialSocialStatus);
+    const [state, dispatch] = useReducer(collectionReducer, {
+        webBatchId: initialWebBatchId,
+        socialBatchId: initialSocialBatchId,
+        webStatus: initialWebStatus,
+        socialStatus: initialSocialStatus,
+        webError: websiteBatchError || null,
+        socialError: socialBatchError || null,
+        isPolling: false,
+        pollingMessage: '',
+        isStarting: false,
+        hasAutoTriggered: false,
+        taskStatus: initialStatus
+    });
 
-    const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
+    const isWebComplete = isComplete(state.webStatus);
+    const isSocialComplete = isComplete(state.socialStatus);
+    const isAllComplete = isWebComplete && isSocialComplete;
+    const isRunning = state.isStarting || state.isPolling || (state.taskStatus?.total_running > 0);
 
     useEffect(() => {
         if (brandId) {
@@ -78,139 +145,125 @@ export function CollectionStatusManager({
     }, [brandId, startDate, endDate, webLimit]);
 
     useEffect(() => {
-        if (triggerScrape && !hasAutoTriggered && !isStarting && !isPolling) {
-            if (status && status.total_running > 0) {
-                setHasAutoTriggered(true);
-                setIsPolling(true);
+        if (triggerScrape && !state.hasAutoTriggered && !state.isStarting && !state.isPolling) {
+            dispatch({ type: 'SET_AUTO_TRIGGERED' });
+            if (state.taskStatus?.total_running > 0) {
+                dispatch({ type: 'SET_POLLING', payload: true });
                 return;
             }
-            setHasAutoTriggered(true);
             handleStartCollection();
         }
-    }, [triggerScrape, hasAutoTriggered]);
+    }, [triggerScrape, state.hasAutoTriggered, state.isStarting, state.isPolling, state.taskStatus]);
 
     useEffect(() => {
-        if (initialWebStatus) setWebBatchStatus(initialWebStatus);
-        if (initialSocialStatus) setSocBatchStatus(initialSocialStatus);
-        if (initialWebBatchId) setCurrentWebBatchId(initialWebBatchId);
-        if (initialSocialBatchId) setCurrentSocialBatchId(initialSocialBatchId);
-    }, [initialWebStatus, initialSocialStatus, initialWebBatchId, initialSocialBatchId]);
+        if (!state.isPolling) return;
 
-    const isWebComplete = webBatchStatus === 'Completed' || webBatchStatus === 'CompletedWithErrors';
-    const isSocialComplete = socBatchStatus === 'Completed' || socBatchStatus === 'CompletedWithErrors';
-    const isAllComplete = isWebComplete && isSocialComplete;
-    const isRunning = isStarting || isPolling || (status && status.total_running > 0);
-
-    const checkBatchStatuses = useCallback(async () => {
-        let webStatus = null;
-        let socialStatus = null;
-
-        if (currentWebBatchId) {
-            webStatus = await getBatchWebsiteScrapeStatus(brandId, currentWebBatchId);
-            if (webStatus?.status) setWebBatchStatus(webStatus.status);
-        }
-        if (currentSocialBatchId) {
-            socialStatus = await getBatchSocialScrapeStatus(brandId, currentSocialBatchId);
-            if (socialStatus?.status) setSocBatchStatus(socialStatus.status);
-        }
-
-        const taskStatus = await getCcbaTaskStatus(brandId);
-        setStatus(taskStatus);
-
-        return { webStatus, socialStatus, taskStatus };
-    }, [brandId, currentWebBatchId, currentSocialBatchId]);
-
-    useEffect(() => {
-        if (!isPolling) return;
-        let pollCount = 0;
-        const maxPolls = 36;
-
-        const interval = setInterval(async () => {
-            pollCount++;
-            setPollingMessage(`Checking status... (${pollCount})`);
+        const poll = async () => {
+            pollCountRef.current++;
+            dispatch({ type: 'SET_POLLING_MESSAGE', payload: `Checking status... (${pollCountRef.current})` });
 
             try {
-                const { webStatus, socialStatus, taskStatus } = await checkBatchStatuses();
+                let webRes = null;
+                let socialRes = null;
 
-                const webDone = webStatus?.status === 'Completed' || webStatus?.status === 'CompletedWithErrors' || webStatus?.status === 'Failed';
-                const socialDone = socialStatus?.status === 'Completed' || socialStatus?.status === 'CompletedWithErrors' || socialStatus?.status === 'Failed';
+                if (state.webBatchId) {
+                    webRes = await getBatchWebsiteScrapeStatus(brandId, state.webBatchId);
+                    if (webRes?.status) {
+                        dispatch({ type: 'UPDATE_WEB_STATUS', payload: { status: webRes.status, error: webRes.error } });
+                    }
+                }
+
+                if (state.socialBatchId) {
+                    socialRes = await getBatchSocialScrapeStatus(brandId, state.socialBatchId);
+                    if (socialRes?.status) {
+                        dispatch({ type: 'UPDATE_SOCIAL_STATUS', payload: { status: socialRes.status, error: socialRes.error } });
+                    }
+                }
+
+                const taskStatus = await getCcbaTaskStatus(brandId);
+                dispatch({ type: 'SET_TASK_STATUS', payload: taskStatus });
+
+                const webDone = isComplete(webRes?.status) || !state.webBatchId;
+                const socialDone = isComplete(socialRes?.status) || !state.socialBatchId;
                 const tasksRunning = taskStatus?.total_running > 0;
 
-                if ((webDone || !currentWebBatchId) && (socialDone || !currentSocialBatchId) && !tasksRunning) {
+                if (webDone && socialDone && !tasksRunning) {
                     toast.success('Data collection completed!');
-                    setPollingMessage('');
-                    clearInterval(interval);
-                    setIsPolling(false);
+                    dispatch({ type: 'SET_POLLING_MESSAGE', payload: '' });
+                    dispatch({ type: 'SET_POLLING', payload: false });
+                    if (intervalRef.current) clearInterval(intervalRef.current);
                     router.push(`/dashboard/brandos-v2.1/gather/data/${brandId}`);
                     return;
                 }
 
-                let msgParts = [];
-                if (webStatus?.progress) msgParts.push(`Web: ${webStatus.progress.completed}/${webStatus.progress.total_urls}`);
-                if (socialStatus?.status) msgParts.push(`Social: ${socialStatus.status}`);
+                const msgParts = [];
+                if (webRes?.progress) msgParts.push(`Web: ${webRes.progress.completed}/${webRes.progress.total_urls}`);
+                if (socialRes?.status) msgParts.push(`Social: ${socialRes.status}`);
+                dispatch({ type: 'SET_POLLING_MESSAGE', payload: msgParts.length > 0 ? msgParts.join(' | ') : 'Processing...' });
 
-                setPollingMessage(msgParts.length > 0 ? msgParts.join(' | ') : 'Processing...');
             } catch (e: any) {
                 console.error('[CollectionStatusManager] Polling error:', e);
-                if (e?.message?.includes('Unauthorized') || e?.authError) {
-                    setPollingMessage('Session issue - refreshing...');
-                }
             }
 
-            if (pollCount >= maxPolls) {
-                setIsPolling(false);
-                setPollingMessage('');
-                clearInterval(interval);
+            if (pollCountRef.current >= maxPolls) {
+                dispatch({ type: 'SET_POLLING', payload: false });
+                dispatch({ type: 'SET_POLLING_MESSAGE', payload: '' });
+                if (intervalRef.current) clearInterval(intervalRef.current);
             }
-        }, 10000);
+        };
 
-        return () => clearInterval(interval);
-    }, [isPolling, checkBatchStatuses, router, brandId, currentWebBatchId, currentSocialBatchId]);
+        intervalRef.current = setInterval(poll, 10000);
 
-    const handleStartCollection = () => {
-        startTransition(async () => {
-            if (!startDate) {
-                toast.error('Start Date is required.');
-                return;
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
-            toast.info('Initializing Data Collection Swarm...');
-            setWebBatchStatus('Initializing');
-            setSocBatchStatus('Initializing');
+        };
+    }, [state.isPolling, state.webBatchId, state.socialBatchId, brandId, router]);
 
-            try {
-                const webResult = await scrapeBatchWebsite(brandId, webLimit);
-                
-                if (!webResult?.success) {
-                    console.error('[handleStartCollection] Website result failed:', webResult);
-                    toast.error(`Website capture failed: ${webResult?.message}`);
-                    setWebBatchStatus('Failed');
-                } else {
-                    const webBatchId = webResult.data?.task_id || webResult.data?.batch_id;
-                    if (webBatchId) setCurrentWebBatchId(webBatchId);
-                }
+    const handleStartCollection = async () => {
+        if (!startDate) {
+            toast.error('Start Date is required.');
+            return;
+        }
 
-                const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
+        dispatch({ type: 'INIT_COLLECTION' });
+        toast.info('Initializing Data Collection Swarm...');
 
-                if (!socialResult?.success) {
-                    console.error('[handleStartCollection] Social result failed:', socialResult);
-                    toast.error(`Social capture failed: ${socialResult?.message}`);
-                    setSocBatchStatus('Failed');
-                } else {
-                    const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
-                    if (sBatchId) setCurrentSocialBatchId(sBatchId);
-                }
-
-                if (webResult?.success || socialResult?.success) {
-                    toast.success('Swarm agents deployed.');
-                    setIsPolling(true);
-                }
-            } catch (e: any) {
-                console.error('[handleStartCollection] Critical error:', e);
-                console.error('[handleStartCollection] Error message:', e?.message);
-                console.error('[handleStartCollection] Error stack:', e?.stack);
-                toast.error(`Collection error: ${e?.message || 'Unknown error'}`);
+        try {
+            const webResult = await scrapeBatchWebsite(brandId, webLimit);
+            
+            if (!webResult?.success) {
+                toast.error(`Website capture failed: ${webResult?.message}`);
+                dispatch({ type: 'UPDATE_WEB_STATUS', payload: { status: 'Failed' } });
+            } else {
+                const webBatchId = webResult.data?.task_id || webResult.data?.batch_id;
+                if (webBatchId) dispatch({ type: 'SET_WEB_BATCH', payload: { id: webBatchId, status: 'Processing' } });
             }
-        });
+
+            const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
+
+            if (!socialResult?.success) {
+                toast.error(`Social capture failed: ${socialResult?.message}`);
+                dispatch({ type: 'UPDATE_SOCIAL_STATUS', payload: { status: 'Failed' } });
+            } else {
+                const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
+                if (sBatchId) dispatch({ type: 'SET_SOCIAL_BATCH', payload: { id: sBatchId, status: 'Processing' } });
+            }
+
+            dispatch({ type: 'SET_STARTING', payload: false });
+
+            if (webResult?.success || socialResult?.success) {
+                toast.success('Swarm agents deployed.');
+                pollCountRef.current = 0;
+                dispatch({ type: 'SET_POLLING', payload: true });
+            }
+        } catch (e: any) {
+            console.error('[handleStartCollection] Critical error:', e);
+            toast.error(`Collection error: ${e?.message || 'Unknown error'}`);
+            dispatch({ type: 'SET_STARTING', payload: false });
+        }
     };
 
     return (
@@ -220,37 +273,29 @@ export function CollectionStatusManager({
                     <h3 className="text-2xl font-medium tracking-tight">{brandData.name}</h3>
                     <p className="text-muted-foreground">Data Collection Status</p>
                 </div>
-                {pollingMessage && <p className="text-sm text-blue-500 mt-1">{pollingMessage}</p>}
+                {state.pollingMessage && <p className="text-sm text-blue-500 mt-1">{state.pollingMessage}</p>}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <StatusCard
                     title="Website Data Gathering"
                     icon={Globe}
-                    status={webBatchStatus}
-                    batchId={currentWebBatchId}
+                    status={state.webStatus}
+                    batchId={state.webBatchId}
                     isRunning={isRunning && !isWebComplete}
+                    error={state.webError}
                 />
                 <StatusCard
                     title="Social Media Data Gathering"
                     icon={Share2}
-                    status={socBatchStatus}
-                    batchId={currentSocialBatchId}
+                    status={state.socialStatus}
+                    batchId={state.socialBatchId}
                     isRunning={isRunning && !isSocialComplete}
+                    error={state.socialError}
                 />
             </div>
 
             <div className="flex gap-4">
-                {/* {!isRunning && !isAllComplete && (
-                    <Button onClick={handleStartCollection} disabled={isStarting}>
-                        {isStarting ? (
-                            <><RotateCw className="w-4 h-4 mr-2 animate-spin" /> Starting...</>
-                        ) : (
-                            <><Play className="w-4 h-4 mr-2" /> Start Collection</>
-                        )}
-                    </Button>
-                )} */}
-
                 {isAllComplete && (
                     <Button asChild>
                         <Link href={`/dashboard/brandos-v2.1/gather/data/${brandId}`}>
@@ -288,45 +333,16 @@ function StatusCard({
     icon: Icon,
     status,
     batchId,
-    isRunning
+    isRunning,
+    error
 }: {
     title: string;
     icon: any;
     status: string | null;
     batchId: string | null;
     isRunning: boolean;
+    error?: string | null;
 }) {
-    const getStatusBadge = () => {
-        if (status === 'Processing' || status === 'processing') {
-            return (
-                <Badge variant="outline" className=" text-blue-700 dark:text-blue-300">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    Processing
-                </Badge>
-            );
-        }
-        if (status === 'Completed' || status === 'CompletedWithErrors') {
-            return (
-                <Badge variant="outline" className=" text-green-700 dark:text-green-300">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    {status}
-                </Badge>
-            );
-        }
-        if (status === 'Failed') {
-            return (
-                <Badge variant="destructive">
-                    <AlertCircle className="w-3 h-3 mr-1" />
-                    Failed
-                </Badge>
-            );
-        }
-        if (status) {
-            return <Badge variant="outline"><Loader2 className="w-3 h-3 animate-spin" />{status}</Badge>;
-        }
-        return <Badge variant="outline" className="text-muted-foreground"><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Pending</Badge>;
-    };
-
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -334,7 +350,13 @@ function StatusCard({
                     <Icon className="w-4 h-4" />
                     {title}
                 </CardTitle>
-                {getStatusBadge()}
+                <ScrapeStatusBadge
+                    label={status || 'Pending'}
+                    status={status}
+                    error={error}
+                    showLabel={true}
+                    size="md"
+                />
             </CardHeader>
             <CardContent>
                 {batchId && (

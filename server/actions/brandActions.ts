@@ -7,8 +7,6 @@ import { z } from "zod";
 import { getCurrentUser } from "@/server/actions/authActions";
 import { getWebsiteBatchIdWithUser } from "@/server/actions/ccba/website/websiteScrapeActions";
 import { getSocialBatchIdWithUser } from "@/server/actions/ccba/social/socialScrapeActions";
-import { getBatchWebsiteScrapeStatusWithUser } from "@/server/actions/ccba/website/websiteStatusAction";
-import { getBatchSocialScrapeStatusWithUser } from "@/server/actions/ccba/social/socialStatusAction";
 
 
 export async function addBrand(values: z.infer<typeof brandSchema>) {
@@ -148,7 +146,7 @@ export async function getBrands() {
 
 
     if (Array.isArray(data)) {
-        data.sort((a: any, b: any) => {
+        return data.toSorted((a: any, b: any) => {
             const dateA = new Date(a.created_at || 0).getTime();
             const dateB = new Date(b.created_at || 0).getTime();
             return dateB - dateA;
@@ -173,7 +171,7 @@ export async function getBrandsWithUser(user: any) {
     if (!success) return null;
 
     if (Array.isArray(data)) {
-        data.sort((a: any, b: any) => {
+        return data.toSorted((a: any, b: any) => {
             const dateA = new Date(a.created_at || 0).getTime();
             const dateB = new Date(b.created_at || 0).getTime();
             return dateB - dateA;
@@ -328,9 +326,43 @@ export async function getClientDetails() {
   }
 }
 
+const BATCH_SIZE = 5;
+
+async function processBrandsInBatches(brands: any[], user: any): Promise<any[]> {
+  const results: any[] = [];
+  
+  for (let i = 0; i < brands.length; i += BATCH_SIZE) {
+    const batch = brands.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.allSettled(
+      batch.map((brand: any) => enrichBrandWithUser(brand, user))
+    );
+    
+    for (let j = 0; j < batchResults.length; j++) {
+      const result = batchResults[j];
+      if (result.status === 'fulfilled') {
+        results.push(result.value);
+      } else {
+        console.error(`[processBrandsInBatches] Failed to enrich brand at index ${i + j}:`, result.reason);
+        results.push({
+          ...batch[j],
+          websiteBatchId: null,
+          socialBatchId: null,
+          competitors: [],
+          webStatus: null,
+          socialStatus: null,
+          webError: 'Failed to fetch',
+          socialError: 'Failed to fetch'
+        });
+      }
+    }
+  }
+  
+  return results;
+}
+
 export async function getEnrichedBrands() {
   const user = await getCurrentUser();
-  if (!user || !user.client_id) {
+  if (!user?.client_id) {
     console.error("[getEnrichedBrands] User not authenticated");
     return [];
   }
@@ -338,46 +370,66 @@ export async function getEnrichedBrands() {
   const brands = await getBrandsWithUser(user);
   if (!brands || brands.length === 0) return [];
 
-  const enrichedBrands: any[] = [];
-  
-  for (const brand of brands) {
-    const enrichedBrand = await enrichBrandWithUser(brand, user);
-    enrichedBrands.push(enrichedBrand);
-  }
+  const enrichedBrands = await processBrandsInBatches(brands, user);
 
   return enrichedBrands;
 }
 
 async function enrichBrandWithUser(brand: any, user: any) {
+  const defaultResult = {
+    ...brand,
+    websiteBatchId: null,
+    socialBatchId: null,
+    competitors: [],
+    webStatus: null,
+    socialStatus: null,
+    webError: null,
+    socialError: null
+  };
+
+  if (!brand?.brand_id) {
+    console.error("[enrichBrandWithUser] Invalid brand data - missing brand_id");
+    return defaultResult;
+  }
+
+  const results = await Promise.allSettled([
+    getWebsiteBatchIdWithUser(brand.brand_id, user),
+    getSocialBatchIdWithUser(brand.brand_id, user),
+    getCompetitorsWithUser(brand.brand_id, user)
+  ]);
+
+  const [webBatchSettled, socialBatchSettled, competitorsSettled] = results;
+
   let websiteBatchId = null;
   let socialBatchId = null;
   let competitors: any[] = [];
   let webStatus = null;
   let socialStatus = null;
+  let webError = null;
+  let socialError = null;
 
-  try {
-    const webBatchResult = await getWebsiteBatchIdWithUser(brand.brand_id, user);
-    websiteBatchId = webBatchResult || null;
+  if (webBatchSettled.status === 'fulfilled' && webBatchSettled.value) {
+    websiteBatchId = webBatchSettled.value.batchId;
+    webStatus = webBatchSettled.value.status;
+    webError = webBatchSettled.value.error;
+  } else if (webBatchSettled.status === 'rejected') {
+    console.error(`[enrichBrandWithUser] Web batch fetch failed for brand ${brand.brand_id}:`, webBatchSettled.reason);
+    webError = 'Failed to fetch web batch data';
+  }
 
-    const socialBatchResult = await getSocialBatchIdWithUser(brand.brand_id, user);
-    socialBatchId = socialBatchResult || null;
+  if (socialBatchSettled.status === 'fulfilled' && socialBatchSettled.value) {
+    socialBatchId = socialBatchSettled.value.batchId;
+    socialStatus = socialBatchSettled.value.status;
+    socialError = socialBatchSettled.value.error;
+  } else if (socialBatchSettled.status === 'rejected') {
+    console.error(`[enrichBrandWithUser] Social batch fetch failed for brand ${brand.brand_id}:`, socialBatchSettled.reason);
+    socialError = 'Failed to fetch social batch data';
+  }
 
-    const competitorsResult = await getCompetitorsWithUser(brand.brand_id, user);
-    if (competitorsResult?.competitors) {
-      competitors = competitorsResult.competitors;
-    }
-
-    if (websiteBatchId) {
-      const webStatusResult = await getBatchWebsiteScrapeStatusWithUser(brand.brand_id, websiteBatchId, user);
-      webStatus = webStatusResult?.status || null;
-    }
-
-    if (socialBatchId) {
-      const socialStatusResult = await getBatchSocialScrapeStatusWithUser(brand.brand_id, socialBatchId, user);
-      socialStatus = socialStatusResult?.status || null;
-    }
-  } catch (e) {
-    console.error(`[enrichBrandWithUser] Error enriching brand ${brand.brand_id}:`, e);
+  if (competitorsSettled.status === 'fulfilled' && competitorsSettled.value?.competitors) {
+    competitors = competitorsSettled.value.competitors;
+  } else if (competitorsSettled.status === 'rejected') {
+    console.error(`[enrichBrandWithUser] Competitors fetch failed for brand ${brand.brand_id}:`, competitorsSettled.reason);
   }
 
   return {
@@ -386,7 +438,9 @@ async function enrichBrandWithUser(brand: any, user: any) {
     socialBatchId,
     competitors,
     webStatus,
-    socialStatus
+    socialStatus,
+    webError,
+    socialError
   };
 }
 

@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Activity, Loader2, Globe, Users } from 'lucide-react';
+import { ArrowRight, Activity } from 'lucide-react';
 import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
+import { ScrapeStatusBadge } from './ScrapeStatusBadge';
+import { isStatusProcessing } from '@/lib/utils';
+import { MdOutlineArrowRight } from "react-icons/md";
 
 type ProcessingBrand = {
     brand: any;
@@ -17,82 +19,119 @@ type ProcessingBrand = {
     socialBatchId: string | null;
     webStatus: string | null;
     socialStatus: string | null;
+    webError?: string | null;
+    socialError?: string | null;
 };
 
 type ActiveTasksBannerProps = {
     initialProcessingBrands: ProcessingBrand[];
 };
 
-function isStatusProcessing(status: string | null): boolean {
-    if (!status) return false;
-    const completedStatuses = ['Completed', 'CompletedWithErrors', 'Failed'];
-    return !completedStatuses.includes(status);
+type BrandState = {
+    brands: ProcessingBrand[];
+    isPolling: boolean;
+};
+
+type BrandAction =
+    | { type: 'UPDATE_BRANDS'; payload: ProcessingBrand[] }
+    | { type: 'STOP_POLLING' };
+
+function brandsReducer(state: BrandState, action: BrandAction): BrandState {
+    switch (action.type) {
+        case 'UPDATE_BRANDS':
+            return { ...state, brands: action.payload };
+        case 'STOP_POLLING':
+            return { ...state, isPolling: false };
+        default:
+            return state;
+    }
 }
 
 export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBannerProps) {
     const router = useRouter();
-    const [processingBrands, setProcessingBrands] = useState<ProcessingBrand[]>(initialProcessingBrands);
-    const [isPolling, setIsPolling] = useState(initialProcessingBrands.length > 0);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const brandsRef = useRef<ProcessingBrand[]>(initialProcessingBrands);
 
-    const checkStatuses = useCallback(async () => {
-        if (processingBrands.length === 0) return [];
+    const [state, dispatch] = useReducer(brandsReducer, {
+        brands: initialProcessingBrands,
+        isPolling: initialProcessingBrands.length > 0
+    });
+
+    brandsRef.current = state.brands;
+
+    const checkStatuses = useCallback(async (): Promise<ProcessingBrand[]> => {
+        const currentBrands = brandsRef.current;
+        if (currentBrands.length === 0) return [];
 
         const updatedBrands = await Promise.all(
-            processingBrands.map(async (item) => {
+            currentBrands.map(async (item) => {
                 let webStatus = item.webStatus;
                 let socialStatus = item.socialStatus;
+                let webError = item.webError;
+                let socialError = item.socialError;
 
                 try {
                     if (item.websiteBatchId && isStatusProcessing(item.webStatus)) {
                         const webRes = await getBatchWebsiteScrapeStatus(item.brand.brand_id, item.websiteBatchId);
-                        if (webRes?.status) webStatus = webRes.status;
+                        if (webRes?.status) {
+                            webStatus = webRes.status;
+                            webError = webRes.error || null;
+                        }
                     }
                     if (item.socialBatchId && isStatusProcessing(item.socialStatus)) {
                         const socialRes = await getBatchSocialScrapeStatus(item.brand.brand_id, item.socialBatchId);
-                        if (socialRes?.status) socialStatus = socialRes.status;
+                        if (socialRes?.status) {
+                            socialStatus = socialRes.status;
+                            socialError = socialRes.error || null;
+                        }
                     }
                 } catch (e) {
                     console.error('[ActiveTasksBanner] Status check error:', e);
                 }
 
-                return {
-                    ...item,
-                    webStatus,
-                    socialStatus
-                };
+                return { ...item, webStatus, socialStatus, webError, socialError };
             })
         );
 
         return updatedBrands;
-    }, [processingBrands]);
+    }, []);
 
     useEffect(() => {
-        if (!isPolling || processingBrands.length === 0) return;
+        if (!state.isPolling || state.brands.length === 0) return;
 
-        const interval = setInterval(async () => {
+        const poll = async () => {
             try {
                 const updatedBrands = await checkStatuses();
-
                 const stillProcessing = updatedBrands.filter(
                     (b) => isStatusProcessing(b.webStatus) || isStatusProcessing(b.socialStatus)
                 );
 
-                setProcessingBrands(stillProcessing);
+                dispatch({ type: 'UPDATE_BRANDS', payload: stillProcessing });
 
                 if (stillProcessing.length === 0) {
-                    setIsPolling(false);
-                    clearInterval(interval);
+                    dispatch({ type: 'STOP_POLLING' });
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                        intervalRef.current = null;
+                    }
                     router.refresh();
                 }
             } catch (e) {
                 console.error('[ActiveTasksBanner] Polling error:', e);
             }
-        }, 15000);
+        };
 
-        return () => clearInterval(interval);
-    }, [isPolling, processingBrands.length, checkStatuses, router]);
+        intervalRef.current = setInterval(poll, 15000);
 
-    if (processingBrands.length === 0) return null;
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [state.isPolling, state.brands.length, checkStatuses, router]);
+
+    if (state.brands.length === 0) return null;
 
     return (
         <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900/50 dark:bg-blue-900/10 md:m-10 m-6">
@@ -109,37 +148,39 @@ export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBanner
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-4">
-                    {processingBrands.map((item) => {
+                    {state.brands.map((item) => {
                         const isWebProcessing = isStatusProcessing(item.webStatus);
                         const isSocialProcessing = isStatusProcessing(item.socialStatus);
 
                         return (
-                            <div key={item.brand.brand_id} className="flex items-center justify-between gap-4 p-3 rounded-lg bg-blue-100/50 dark:bg-blue-900/20">
+                            <div
+                                key={item.brand.brand_id}
+                                className="flex items-center justify-between gap-4 p-3 rounded-lg bg-blue-100/50 dark:bg-blue-900/20"
+                            >
                                 <Link
                                     href={`/dashboard/brandos-v2.1/gather/collecting/${item.brand.brand_id}`}
                                     className="flex items-center gap-2 font-medium text-blue-700 dark:text-blue-300 hover:underline"
                                 >
-                                    {item.brand.name} Collection 
-                                    <ArrowRight className="w-3 h-3" />
+                                    {item.brand.name} Collection
+                                    <MdOutlineArrowRight className="w-3 h-3" />
                                 </Link>
                                 <div className="flex items-center gap-2">
-                                    {isWebProcessing && (
-                                        <Badge variant="outline" className="border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 flex items-center gap-1.5">
-                                            Website
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                        </Badge>
+                                    {(isWebProcessing || item.webError) && (
+                                        <ScrapeStatusBadge
+                                            label="Website"
+                                            status={item.webStatus}
+                                            error={item.webError}
+                                        />
                                     )}
-                                    {isSocialProcessing && (
-                                        <Badge variant="outline" className="border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 flex items-center gap-1.5">
-                                            Social
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                        </Badge>
+                                    {(isSocialProcessing || item.socialError) && (
+                                        <ScrapeStatusBadge
+                                            label="Social"
+                                            status={item.socialStatus}
+                                            error={item.socialError}
+                                        />
                                     )}
-                                    {!isWebProcessing && !isSocialProcessing && (
-                                        <Badge variant="outline" className="border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 flex items-center gap-1.5">
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                            Processing
-                                        </Badge>
+                                    {!isWebProcessing && !isSocialProcessing && !item.webError && !item.socialError && (
+                                        <ScrapeStatusBadge label="Processing" status="processing" />
                                     )}
                                 </div>
                             </div>

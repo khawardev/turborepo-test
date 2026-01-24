@@ -89,7 +89,7 @@ export const extractFilePaths = (files?: File[]) =>
     file.path || file.relativePath || file.name
   );
 
-export function arrangeAgentIds(ids:any) {
+export function arrangeAgentIds(ids: any) {
   const withMeta = ids.map((id: any) => {
     const [num, suffix] = id.split("-");
     return {
@@ -99,35 +99,41 @@ export function arrangeAgentIds(ids:any) {
     };
   });
 
-  withMeta.sort((a:any, b: any) => {
+  withMeta.sort((a: any, b: any) => {
     if (a.num !== b.num) return a.num - b.num;
     if (a.suffix === null && b.suffix !== null) return -1;
     if (a.suffix !== null && b.suffix === null) return 1;
     return (a.suffix || "").localeCompare(b.suffix || "");
   });
 
-  return withMeta.map((x:any) => x.raw);
+  return withMeta.map((x: any) => x.raw);
 }
 
 export const normalizeImageUrl = (url: string | null | undefined): string => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    
-    // Handle s3:// protocol
-    if (url.startsWith('s3://')) {
-        // Format: s3://bucket-name/path/to/key
-        // Example: s3://east1-brandos-backend-dev/images/...
-        const parts = url.replace('s3://', '').split('/');
-        const bucket = parts[0];
-        const key = parts.slice(1).join('/');
-        
-        // Construct standard S3 HTTP URL
-        // Note: This assumes standard AWS S3 naming. 
-        // If the bucket is in a specific region other than us-east-1 and not using CNAME, 
-        // s3.amazonaws.com might redirect or fail. 
-        // Ideally, we'd know the region, but this is a best-effort client-side conversion.
-        return `https://${bucket}.s3.amazonaws.com/${key}`;
-    }
-    
-    return url;
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+
+  // Handle s3:// protocol
+  if (url.startsWith('s3://')) {
+    // Format: s3://bucket-name/path/to/key
+    // Example: s3://east1-brandos-backend-dev/images/...
+    const parts = url.replace('s3://', '').split('/');
+    const bucket = parts[0];
+    const key = parts.slice(1).join('/');
+
+    // Construct standard S3 HTTP URL
+    // Note: This assumes standard AWS S3 naming. 
+    // If the bucket is in a specific region other than us-east-1 and not using CNAME, 
+    // s3.amazonaws.com might redirect or fail. 
+    // Ideally, we'd know the region, but this is a best-effort client-side conversion.
+    return `https://${bucket}.s3.amazonaws.com/${key}`;
+  }
+
+  return url;
 };
+
+export function isStatusProcessing(status: string | null): boolean {
+  if (!status) return false;
+  const completedStatuses = ['Completed', 'CompletedWithErrors', 'Failed'];
+  return !completedStatuses.includes(status);
+}

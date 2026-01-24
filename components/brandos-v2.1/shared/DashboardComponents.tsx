@@ -1,5 +1,8 @@
-
+import { useMemo } from 'react';
 import { Separator } from "@/components/ui/separator";
+import { GateOutputs } from '@/lib/brandos-v2.1/types';
+import { Badge } from '@/components/ui/badge';
+import { AlertCircle, CheckCircle2, FileJson } from 'lucide-react';
 
 export function DashboardInnerLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -21,17 +24,20 @@ export function DashboardLayoutHeading({ title, subtitle }: { title: string, sub
     )
 }
 
-import { GateOutputs } from '@/lib/brandos-v2.1/types';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2, FileJson } from 'lucide-react';
-import { cn } from '@/lib/utils';
+const STATUS_STYLES = {
+    pass: 'bg-green-50 text-green-900 border-green-200 dark:bg-green-900/10 dark:text-green-100 dark:border-green-900',
+    warn: 'bg-yellow-50 text-yellow-900 border-yellow-200 dark:bg-yellow-900/10 dark:text-yellow-100 dark:border-yellow-900',
+    fail: 'bg-red-50 text-red-900 border-red-200 dark:bg-red-900/10 dark:text-red-100 dark:border-red-900'
+} as const;
 
 export function GateResultDisplay({ results }: { results: GateOutputs }) {
     const isPass = results.overall_status === 'pass';
-    const isWarn = results.overall_status === 'warn';
-    const colorClass = isPass ? 'bg-green-50 text-green-900 border-green-200 dark:bg-green-900/10 dark:text-green-100 dark:border-green-900' :
-        isWarn ? 'bg-yellow-50 text-yellow-900 border-yellow-200 dark:bg-yellow-900/10 dark:text-yellow-100 dark:border-yellow-900' :
-            'bg-red-50 text-red-900 border-red-200 dark:bg-red-900/10 dark:text-red-100 dark:border-red-900';
+    
+    const colorClass = useMemo(() => {
+        if (results.overall_status === 'pass') return STATUS_STYLES.pass;
+        if (results.overall_status === 'warn') return STATUS_STYLES.warn;
+        return STATUS_STYLES.fail;
+    }, [results.overall_status]);
 
     return (
         <div className={`p-8 rounded-xl border ${colorClass} space-y-4`}>
@@ -48,7 +54,7 @@ export function GateResultDisplay({ results }: { results: GateOutputs }) {
                             {g.name}
                             {g.status !== 'pass' && <Badge variant="outline" className="text-xs uppercase bg-white/20 border-current">{g.status}</Badge>}
                         </p>
-                        {g.messages && (
+                        {g.messages ? (
                             <ul className="mt-2 space-y-1">
                                 {g.messages.map((m, idx) => (
                                     <li key={idx} className="flex items-start gap-2 text-sm">
@@ -57,7 +63,7 @@ export function GateResultDisplay({ results }: { results: GateOutputs }) {
                                     </li>
                                 ))}
                             </ul>
-                        )}
+                        ) : null}
                     </div>
                 ))}
             </div>
@@ -66,6 +72,8 @@ export function GateResultDisplay({ results }: { results: GateOutputs }) {
 }
 
 export function JsonViewer({ data, title }: { data: any, title: string }) {
+    const formattedJson = useMemo(() => JSON.stringify(data, null, 2), [data]);
+    
     return (
         <div className="relative group">
             <div className="absolute top-3 right-4 flex items-center gap-2 text-xs text-muted-foreground bg-background/80 backdrop-blur px-2 py-1 rounded-md border">
@@ -74,9 +82,10 @@ export function JsonViewer({ data, title }: { data: any, title: string }) {
             </div>
             <div className="bg-muted dark:text-slate-50  p-6 rounded-xl overflow-auto max-h-[600px] border shadow-sm">
                 <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed">
-                    {JSON.stringify(data, null, 2)}
+                    {formattedJson}
                 </pre>
             </div>
         </div>
     )
 }
+

@@ -95,8 +95,8 @@ export async function getWebsiteBatchId(brand_id: string) {
 
         if (!Array.isArray(data) || data.length === 0) return null;
 
-        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-        return latest?.batch_id;
+        const sorted = data.toSorted((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        return sorted[0]?.batch_id ?? null;
     } catch {
         return null;
     }
@@ -108,15 +108,19 @@ export async function getWebsiteBatchIdWithUser(brand_id: string, user: any) {
 
         const { success, data, error } = await brandRequest(
             `/batch/website-scrapes?client_id=${user.client_id}&brand_id=${brand_id}`, 
-            "GET"
+            "GET",
+            undefined,
+            'no-store'
         );
+
 
         if (!success) return null;
 
         if (!Array.isArray(data) || data.length === 0) return null;
 
-        const latest = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-        return latest?.batch_id;
+        const sorted = data.toSorted((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        const latest = sorted[0];
+        return latest ? { batchId: latest.batch_id, status: latest.status, error: latest.error } : null;
     } catch {
         return null;
     }
@@ -144,7 +148,8 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
             created_at: item.created_at,
             status: item.status,
             scraped_pages: item.scraped_pages,
-            batch_id: item.batch_id
+            batch_id: item.batch_id,
+            error: item.error
         }));
 
 

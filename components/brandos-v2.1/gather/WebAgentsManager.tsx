@@ -433,7 +433,7 @@ export function WebAgentsManager({
                                 onClick={loadExtractionTasks}
                                 disabled={isLoadingExtractionTasks}
                             >
-                                <RefreshCw className={cn("h-4 w-4", isLoadingExtractionTasks && "animate-spin")} />
+                                <Loader2 className={cn("h-4 w-4", isLoadingExtractionTasks && "animate-spin")} />
                             </Button>
                         </div>
 
@@ -610,7 +610,7 @@ export function WebAgentsManager({
                                 onClick={loadSynthesisTasks}
                                 disabled={isLoadingSynthesisTasks}
                             >
-                                <RefreshCw className={cn("h-4 w-4", isLoadingSynthesisTasks && "animate-spin")} />
+                                <Loader2 className={cn("h-4 w-4", isLoadingSynthesisTasks && "animate-spin")} />
                             </Button>
                         </div>
 

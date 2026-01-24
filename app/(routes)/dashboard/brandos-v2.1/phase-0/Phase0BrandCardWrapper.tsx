@@ -48,12 +48,12 @@ export async function Phase0BrandCardWrapper({ brand, index }: { brand: any, ind
             }
             webStatusSlot={
                 websiteBatchId ? (
-                    <StatusBadge type="Website" status={webStatus} />
+                    <StatusBadge label="Website" status={webStatus} />
                 ) : null
             }
             socialStatusSlot={
                  socialBatchId ? (
-                    <StatusBadge type="Social" status={socialStatus} />
+                    <StatusBadge label="Social" status={socialStatus} />
                 ) : null
             }
         />

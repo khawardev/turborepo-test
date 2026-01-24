@@ -5,7 +5,7 @@ import { ActiveTasksBannerWrapper } from './ActiveTasksBannerWrapper';
 
 export default async function GatherPage() {
     const brands = await getEnrichedBrands();
- 
+
     if (!brands || brands.length === 0) {
         return (
             <div>

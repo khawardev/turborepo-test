@@ -24,6 +24,8 @@ async function getLatestBatchData(brandId: string) {
     let socialBatchId = null;
     let websiteBatchStatus = null;
     let socialBatchStatus = null;
+    let websiteBatchError = null;
+    let socialBatchError = null;
 
     try {
         const prevWeb = await getpreviousWebsiteScraps(brandId);
@@ -34,6 +36,7 @@ async function getLatestBatchData(brandId: string) {
             const latestWeb = sorted[0];
             websiteBatchId = latestWeb.batch_id;
             websiteBatchStatus = latestWeb.status;
+            websiteBatchError = latestWeb.error;
         }
     } catch (e) {
         console.error("[CollectingPage] Error fetching website scraps:", e);
@@ -48,12 +51,13 @@ async function getLatestBatchData(brandId: string) {
             const latestSocial = sorted[0];
             socialBatchId = latestSocial.batch_id;
             socialBatchStatus = latestSocial.status;
+            socialBatchError = latestSocial.error;
         }
     } catch (e) {
         console.error("[CollectingPage] Error fetching social scraps:", e);
     }
 
-    return { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus };
+    return { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus, websiteBatchError, socialBatchError };
 }
 
 export default async function CollectingPage({ params, searchParams }: PageProps) {
@@ -71,7 +75,7 @@ export default async function CollectingPage({ params, searchParams }: PageProps
     }
 
     const status = await getCcbaTaskStatus(brandId);
-    const { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus } = await getLatestBatchData(brandId);
+    const { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus, websiteBatchError, socialBatchError } = await getLatestBatchData(brandId);
 
     const isWebComplete = websiteBatchStatus === 'Completed' || websiteBatchStatus === 'CompletedWithErrors';
     const isSocialComplete = socialBatchStatus === 'Completed' || socialBatchStatus === 'CompletedWithErrors';
@@ -96,6 +100,8 @@ export default async function CollectingPage({ params, searchParams }: PageProps
                     socialBatchId={socialBatchId}
                     websiteBatchStatus={websiteBatchStatus}
                     socialBatchStatus={socialBatchStatus}
+                    websiteBatchError={websiteBatchError}
+                    socialBatchError={socialBatchError}
                     triggerScrape={queryParams.triggerScrape === 'true'}
                     webLimit={queryParams.webLimit ? parseInt(queryParams.webLimit) : 10}
                     startDate={queryParams.startDate || ''}

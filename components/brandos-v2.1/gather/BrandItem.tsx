@@ -59,9 +59,6 @@ export default function BrandItem({ item, index, competitorsSlot, webStatusSlot,
 
     const getHref = () => {
         if (!websiteBatchId && !socialBatchId) return undefined;
-        // if (isProcessing) {
-        //     return `/dashboard/brandos-v2.1/gather/collecting/${brand.brand_id}`;
-        // }
         return `/dashboard/brandos-v2.1/gather/data/${brand.brand_id}`;
     };
 
