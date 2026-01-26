@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Copy, Terminal, Bot, Database, FileText } from 'lucide-react';
 import { ScrapeStatusBadge } from '../ScrapeStatusBadge';
-import { SimpleWebsiteScrapViewer, SimpleSocialScrapViewer } from '../ResultsViewers';
+import { BatchSelector } from './BatchSelector';
 import BrandProfile from '@/components/stages/ccba/details/profile-tab/BrandProfile';
 import { AuditorAgentCard } from '../AuditorAgentCard';
 import { AuditorResultViewer } from '../AuditorResultViewer';
@@ -22,6 +22,7 @@ import { useSocialAuditor } from './hooks/UseSocialAuditor';
 import { AiOutlinePieChart } from "react-icons/ai";
 import { RecollectDialog } from '../RecollectDialog';
 import { WebAgentsManager } from '../WebAgentsManager';
+import { SocialDataViewer } from './SocialDataViewer';
 import {
     runSocialReportsAgent,
     getSocialReportsOutput,
@@ -30,37 +31,72 @@ import {
     type SocialChannelName,
     type AnalysisScope
 } from '@/server/actions/socialReportsActions';
+import { WebsiteDataViewer } from './WebsiteDataViewer';
+
+type WebsiteBatch = {
+    batch_id: string;
+    created_at: string;
+    status: string;
+    brand_id: string;
+    client_id: string;
+    scraped_pages: any;
+    errors: any;
+    result_keys: any;
+};
+
+type SocialBatch = {
+    batch_id: string;
+    created_at: string;
+    status: string;
+    brand_id: string;
+    client_id: string;
+    start_date: string;
+    end_date: string;
+    error: any;
+};
 
 type DataViewManagerProps = {
     brandId: string;
     brandData: any;
-    websiteBatchId: string | null;
-    socialBatchId: string | null;
-    websiteBatchStatus: string | null;
-    socialBatchStatus: string | null;
-    websiteSlot: React.ReactNode;
-    socialSlot: React.ReactNode;
+    websiteBatches: WebsiteBatch[];
+    socialBatches: SocialBatch[];
+    defaultWebsiteBatchId: string | null;
+    defaultSocialBatchId: string | null;
+    defaultWebsiteStatus: string | null;
+    defaultSocialStatus: string | null;
     availableChannels: string[];
     hasResults: boolean;
+    hasWebsiteData: boolean;
+    hasSocialData: boolean;
     isWebComplete: boolean;
     isSocialComplete: boolean;
 };
 
+function isCompleteStatus(status: string | null): boolean {
+    return status === 'Completed' || status === 'CompletedWithErrors';
+}
+
 export function DataViewManager({
     brandId,
     brandData,
-    websiteBatchId,
-    socialBatchId,
-    websiteBatchStatus,
-    socialBatchStatus,
-    websiteSlot,
-    socialSlot,
+    websiteBatches,
+    socialBatches,
+    defaultWebsiteBatchId,
+    defaultSocialBatchId,
+    defaultWebsiteStatus,
+    defaultSocialStatus,
     availableChannels,
     hasResults,
-    isWebComplete,
-    isSocialComplete
+    hasWebsiteData,
+    hasSocialData,
+    isWebComplete: initialWebComplete,
+    isSocialComplete: initialSocialComplete
 }: DataViewManagerProps) {
     const [activeTab, setActiveTab] = useState('brand_profile');
+    
+    const [selectedWebsiteBatchId, setSelectedWebsiteBatchId] = useState<string | null>(defaultWebsiteBatchId);
+    const [selectedSocialBatchId, setSelectedSocialBatchId] = useState<string | null>(defaultSocialBatchId);
+
     const [websiteAuditScope, setWebsiteAuditScope] = useState<string>('both');
     const [websiteAuditModel, setWebsiteAuditModel] = useState<string>('claude-4.5-sonnet');
     const [socialAuditScope, setSocialAuditScope] = useState<string>('brand');
@@ -79,6 +115,21 @@ export function DataViewManager({
 
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+    const selectedWebsiteBatch = useMemo(() => 
+        websiteBatches.find(b => b.batch_id === selectedWebsiteBatchId),
+        [websiteBatches, selectedWebsiteBatchId]
+    );
+
+    const selectedSocialBatch = useMemo(() => 
+        socialBatches.find(b => b.batch_id === selectedSocialBatchId),
+        [socialBatches, selectedSocialBatchId]
+    );
+
+    const selectedWebsiteStatus = selectedWebsiteBatch?.status || null;
+    const selectedSocialStatus = selectedSocialBatch?.status || null;
+
+    const isWebComplete = isCompleteStatus(selectedWebsiteStatus);
+    const isSocialComplete = isCompleteStatus(selectedSocialStatus);
     const isComplete = useMemo(() => hasResults && isWebComplete && isSocialComplete, [hasResults, isWebComplete, isSocialComplete]);
     
     const competitors = useMemo(() => 
@@ -97,7 +148,7 @@ export function DataViewManager({
     } = useAuditor({
         clientId: brandData.client_id,
         brandId,
-        batchId: websiteBatchId,
+        batchId: selectedWebsiteBatchId,
         scope: websiteAuditScope,
         modelName: websiteAuditModel
     });
@@ -110,7 +161,7 @@ export function DataViewManager({
     } = useSocialAuditor({
         clientId: brandData.client_id,
         brandId,
-        batchId: socialBatchId,
+        batchId: selectedSocialBatchId,
         channel: selectedChannel,
         scope: socialAuditScope
     });
@@ -122,10 +173,10 @@ export function DataViewManager({
     }, [availableChannels, socialReportsChannel]);
 
     useEffect(() => {
-        if (socialBatchId && brandData?.client_id) {
+        if (selectedSocialBatchId && brandData?.client_id) {
             loadSocialReportsTasks();
         }
-    }, [socialBatchId, brandData?.client_id]);
+    }, [selectedSocialBatchId, brandData?.client_id]);
 
     const loadSocialReportsTasks = useCallback(async () => {
         if (!brandData?.client_id) return;
@@ -183,7 +234,7 @@ export function DataViewManager({
     }, [brandData.client_id, brandId, loadSocialReportsTasks]);
 
     const handleRunSocialReports = useCallback(async () => {
-        if (!socialBatchId) {
+        if (!selectedSocialBatchId) {
             toast.error("No social data found. Please run data collection first.");
             return;
         }
@@ -201,7 +252,7 @@ export function DataViewManager({
             const res = await runSocialReportsAgent({
                 client_id: brandData.client_id,
                 brand_id: brandId,
-                batch_id: socialBatchId,
+                batch_id: selectedSocialBatchId,
                 channel_name: socialReportsChannel,
                 analysis_scope: socialReportsScope,
                 competitor_id: socialReportsScope === 'competitors' ? socialReportsCompetitorId : undefined,
@@ -221,7 +272,7 @@ export function DataViewManager({
             toast.error("Error starting Social Reports Agent");
             setIsSocialReportsRunning(false);
         }
-    }, [socialBatchId, socialReportsScope, socialReportsCompetitorId, socialReportsChannel, socialReportsInstruction, brandData.client_id, brandId, pollSocialReportsResult]);
+    }, [selectedSocialBatchId, socialReportsScope, socialReportsCompetitorId, socialReportsChannel, socialReportsInstruction, brandData.client_id, brandId, pollSocialReportsResult]);
 
     useEffect(() => {
         return () => {
@@ -284,6 +335,16 @@ export function DataViewManager({
         }
     };
 
+    const handleWebsiteBatchChange = (batchId: string) => {
+        setSelectedWebsiteBatchId(batchId);
+    };
+
+    const handleSocialBatchChange = (batchId: string) => {
+        setSelectedSocialBatchId(batchId);
+        setSocialReportsResult(null);
+        setSocialReportsTaskId(null);
+    };
+
     return (
         <div className="space-y-8 w-full pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -291,24 +352,43 @@ export function DataViewManager({
                     <h3 className="text-2xl font-medium tracking-tight">{brandData.name}</h3>
                     <p className="text-muted-foreground">Captured Data & Analysis</p>
                 </div>
-                <div className="flex gap-2">
-                    <RecollectDialog
-                        brandId={brandId}
-                        brandName={brandData.name}
-                        variant="button"
-                        trigger={
-                            <Button>
-                                Re Capture
-                            </Button>
-                        }
-                    />
-                    <Button asChild variant={'secondary'}>
-                        <Link href="/dashboard/brandos-v2.1/gather">
-                            <AiOutlinePieChart className="w-4 h-4" />
-                            Data Gathering
-                        </Link>
-                    </Button>
+                <div className="flex flex-wrap items-center gap-3">
+                    {hasWebsiteData && (
+                        <BatchSelector
+                            type="website"
+                            batches={websiteBatches}
+                            selectedBatchId={selectedWebsiteBatchId}
+                            onBatchChange={handleWebsiteBatchChange}
+                        />
+                    )}
+                    {hasSocialData && (
+                        <BatchSelector
+                            type="social"
+                            batches={socialBatches}
+                            selectedBatchId={selectedSocialBatchId}
+                            onBatchChange={handleSocialBatchChange}
+                        />
+                    )}
                 </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+                <RecollectDialog
+                    brandId={brandId}
+                    brandName={brandData.name}
+                    variant="button"
+                    trigger={
+                        <Button>
+                            Re Capture
+                        </Button>
+                    }
+                />
+                <Button asChild variant={'secondary'}>
+                    <Link href="/dashboard/brandos-v2.1/gather">
+                        <AiOutlinePieChart className="w-4 h-4" />
+                        Data Gathering
+                    </Link>
+                </Button>
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -318,15 +398,15 @@ export function DataViewManager({
                         Captured Data
                         {!hasResults && <span className="ml-2 text-xs text-muted-foreground">(pending)</span>}
                     </TabsTrigger>
-                    <TabsTrigger value="ai_audit" disabled={!isComplete}>
+                    <TabsTrigger value="ai_audit" disabled={!hasWebsiteData && !hasSocialData}>
                         <Bot className="w-4 h-4 mr-1" />
                         Outside-in Audit
                     </TabsTrigger>
-                    <TabsTrigger value="social_reports" disabled={!isSocialComplete}>
+                    <TabsTrigger value="social_reports" disabled={!hasSocialData || !isSocialComplete}>
                         <FileText className="w-4 h-4 mr-1" />
                         Social Reports
                     </TabsTrigger>
-                    <TabsTrigger value="web_agents" disabled={!isWebComplete}>
+                    <TabsTrigger value="web_agents" disabled={!hasWebsiteData || !isWebComplete}>
                         <Database className="w-4 h-4 mr-1" />
                         Web Reports
                     </TabsTrigger>
@@ -337,25 +417,25 @@ export function DataViewManager({
                 </TabsContent>
 
                 <TabsContent value="captured_data" className="space-y-6 pt-4">
-                    <Tabs defaultValue="website" className="w-full">
+                    <Tabs defaultValue={hasWebsiteData ? "website" : "social"} className="w-full">
                         <TabsList>
-                            <TabsTrigger value="website" className="gap-2">
+                            <TabsTrigger value="website" className="gap-2" disabled={!hasWebsiteData}>
                                 Website Data
-                                {websiteBatchStatus && websiteBatchStatus !== 'Completed' && (
+                                {selectedWebsiteStatus && (
                                     <ScrapeStatusBadge
                                         label="Website"
-                                        status={websiteBatchStatus}
+                                        status={selectedWebsiteStatus}
                                         showLabel={false}
                                         size="sm"
                                     />
                                 )}
                             </TabsTrigger>
-                            <TabsTrigger value="social" className="gap-2">
+                            <TabsTrigger value="social" className="gap-2" disabled={!hasSocialData}>
                                 Social Media Data
-                                {socialBatchStatus && socialBatchStatus !== 'Completed' && (
+                                {selectedSocialStatus && (
                                     <ScrapeStatusBadge
                                         label="Social"
-                                        status={socialBatchStatus}
+                                        status={selectedSocialStatus}
                                         showLabel={false}
                                         size="sm"
                                     />
@@ -363,10 +443,33 @@ export function DataViewManager({
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="website" className="pt-6">
-                            {websiteSlot}
+                            {selectedWebsiteBatchId ? (
+                                <WebsiteDataViewer
+                                    brandId={brandId}
+                                    batchId={selectedWebsiteBatchId}
+                                    brandName={brandData.name}
+                                    status={selectedWebsiteStatus}
+                                />
+                            ) : (
+                                <div className="text-center py-12 text-muted-foreground">
+                                    No website data available. Please run data collection first.
+                                </div>
+                            )}
                         </TabsContent>
                         <TabsContent value="social" className="pt-6">
-                            {socialSlot}
+                            {selectedSocialBatchId ? (
+                                <SocialDataViewer
+                                    brandId={brandId}
+                                    batchId={selectedSocialBatchId}
+                                    brandName={brandData.name}
+                                    brandData={brandData}
+                                    status={selectedSocialStatus}
+                                />
+                            ) : (
+                                <div className="text-center py-12 text-muted-foreground">
+                                    No social media data available. Please run data collection first.
+                                </div>
+                            )}
                         </TabsContent>
                     </Tabs>
                 </TabsContent>
@@ -384,7 +487,7 @@ export function DataViewManager({
                             taskId={auditorTaskId}
                             result={auditorResult}
                             RenderResult={AuditorResultViewer}
-                            isDisabled={!websiteBatchId}
+                            isDisabled={!selectedWebsiteBatchId || !isWebComplete}
                             buttonLabel="Run Website Audit"
                             controls={
                                 <div className="flex items-center gap-2">
@@ -431,7 +534,7 @@ export function DataViewManager({
                             taskId={socialAuditorTaskId}
                             result={socialAuditorResult}
                             RenderResult={SocialAuditorResultViewer}
-                            isDisabled={!socialBatchId || !availableChannels.length}
+                            isDisabled={!selectedSocialBatchId || !isSocialComplete || !availableChannels.length}
                             buttonLabel="Run Social Analysis"
                             controls={
                                 <div className="flex items-center gap-2">
@@ -489,7 +592,7 @@ export function DataViewManager({
                             taskId={socialReportsTaskId}
                             result={socialReportsResult}
                             RenderResult={SocialReportsResultViewer}
-                            isDisabled={!socialBatchId || !availableChannels.length}
+                            isDisabled={!selectedSocialBatchId || !isSocialComplete || !availableChannels.length}
                             buttonLabel="Generate Report"
                             processingLabels={{
                                 running: "Generating Report...",
@@ -602,7 +705,7 @@ export function DataViewManager({
                     <WebAgentsManager
                         clientId={brandData?.client_id}
                         brandId={brandId}
-                        batchWebsiteTaskId={websiteBatchId}
+                        batchWebsiteTaskId={selectedWebsiteBatchId}
                         brandName={brandData?.name}
                         competitors={competitors}
                     />
@@ -620,8 +723,8 @@ export function DataViewManager({
                     <div className="p-3 pt-0 space-y-2 border-t bg-muted/10">
                         <DebugIdRow label="Client ID" value={brandData?.client_id || 'N/A'} />
                         <DebugIdRow label="Brand ID" value={brandId} />
-                        <DebugIdRow label="Website Batch ID" value={websiteBatchId || 'N/A'} />
-                        <DebugIdRow label="Social Batch ID" value={socialBatchId || 'N/A'} />
+                        <DebugIdRow label="Website Batch ID" value={selectedWebsiteBatchId || 'N/A'} />
+                        <DebugIdRow label="Social Batch ID" value={selectedSocialBatchId || 'N/A'} />
                     </div>
                 </CollapsibleContent>
             </Collapsible>

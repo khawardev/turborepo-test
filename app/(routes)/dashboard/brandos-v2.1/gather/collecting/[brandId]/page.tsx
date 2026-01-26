@@ -30,13 +30,10 @@ async function getLatestBatchData(brandId: string) {
     try {
         const prevWeb = await getpreviousWebsiteScraps(brandId);
         if (Array.isArray(prevWeb) && prevWeb.length > 0) {
-            const sorted = prevWeb.sort((a: any, b: any) =>
-                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-            const latestWeb = sorted[0];
+            const latestWeb = prevWeb[0];
             websiteBatchId = latestWeb.batch_id;
             websiteBatchStatus = latestWeb.status;
-            websiteBatchError = latestWeb.error;
+            websiteBatchError = latestWeb.errors;
         }
     } catch (e) {
         console.error("[CollectingPage] Error fetching website scraps:", e);
@@ -45,10 +42,7 @@ async function getLatestBatchData(brandId: string) {
     try {
         const prevSocial = await getPreviousSocialScrapes(brandId);
         if (Array.isArray(prevSocial) && prevSocial.length > 0) {
-            const sorted = prevSocial.sort((a: any, b: any) =>
-                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-            const latestSocial = sorted[0];
+            const latestSocial = prevSocial[0];
             socialBatchId = latestSocial.batch_id;
             socialBatchStatus = latestSocial.status;
             socialBatchError = latestSocial.error;
@@ -103,7 +97,7 @@ export default async function CollectingPage({ params, searchParams }: PageProps
                     websiteBatchError={websiteBatchError}
                     socialBatchError={socialBatchError}
                     triggerScrape={queryParams.triggerScrape === 'true'}
-                    webLimit={queryParams.webLimit ? parseInt(queryParams.webLimit) : 10}
+                    webLimit={queryParams.webLimit ? parseInt(queryParams.webLimit) : 0}
                     startDate={queryParams.startDate || ''}
                     endDate={queryParams.endDate || ''}
                 />

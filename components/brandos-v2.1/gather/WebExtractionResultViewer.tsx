@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle, FileText, Clock, Terminal, Cpu, Building2, Users, Check } from "lucide-react";
+import { RefreshCw, FileText, Terminal, Cpu, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from 'react-markdown';
+import { ExtractionOutputViewer } from './ExtractionOutputViewer';
 
 type WebExtractionResultViewerProps = {
     data: any;
@@ -68,7 +68,7 @@ export function WebExtractionResultViewer({ data, onReRun, isReRunning = false }
                 )}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader >
                         <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -99,22 +99,20 @@ export function WebExtractionResultViewer({ data, onReRun, isReRunning = false }
                         <div className="font-mono truncate">{metadata.batchId}</div>
                     </CardContent>
                 </Card>
-            </div>
+            </div> */}
 
-            <Card className="overflow-hidden">
+            {/* <Card className="overflow-hidden">
                 <CardHeader className="pb-0">
                     <CardTitle className="font-medium flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         Extraction Output
                     </CardTitle>
                 </CardHeader>
-                <CardContent >
-                    <ScrollArea className="h-[500px] ">
-                            <ReactMarkdown>{extractionOutput}</ReactMarkdown>
-                    </ScrollArea>
+                <CardContent className="pt-4">
+                    <ExtractionOutputViewer output={extractionOutput} />
                 </CardContent>
-            </Card>
-
+            </Card> */}
+            <ExtractionOutputViewer output={extractionOutput} />
             <div className="pt-4 border-t">
                 <details className="group">
                     <summary className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors w-fit p-2 rounded-md hover:bg-muted/50">

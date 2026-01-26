@@ -1,65 +1,95 @@
 import { redirect } from 'next/navigation';
-import { cache, Suspense } from 'react';
+import { cache } from 'react';
 import { getBrandbyIdWithCompetitors } from '@/server/actions/brandActions';
 import { getpreviousWebsiteScraps } from '@/server/actions/ccba/website/websiteScrapeActions';
 import { getPreviousSocialScrapes } from '@/server/actions/ccba/social/socialScrapeActions';
 import { DashboardLayoutHeading, DashboardInnerLayout } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { DataViewManager } from '@/components/brandos-v2.1/gather/data/DataViewManager';
-import { WebsiteResultsWrapper } from './WebsiteResultsWrapper';
-import { SocialResultsWrapper } from './SocialResultsWrapper';
-import { Skeleton } from '@/components/ui/skeleton';
 
 type PageProps = {
     params: Promise<{ brandId: string }>;
 };
 
-type BatchMetaData = {
-    websiteBatchId: string | null;
-    socialBatchId: string | null;
-    websiteBatchStatus: string | null;
-    socialBatchStatus: string | null;
+type WebsiteBatch = {
+    batch_id: string;
+    created_at: string;
+    status: string;
+    brand_id: string;
+    client_id: string;
+    scraped_pages: any;
+    errors: any;
+    result_keys: any;
+};
+
+type SocialBatch = {
+    batch_id: string;
+    created_at: string;
+    status: string;
+    brand_id: string;
+    client_id: string;
+    start_date: string;
+    end_date: string;
+    error: any;
+};
+
+type BatchData = {
+    websiteBatches: WebsiteBatch[];
+    socialBatches: SocialBatch[];
+    defaultWebsiteBatchId: string | null;
+    defaultSocialBatchId: string | null;
+    defaultWebsiteStatus: string | null;
+    defaultSocialStatus: string | null;
 };
 
 const getBrandData = cache(async (brandId: string) => {
     return getBrandbyIdWithCompetitors(brandId);
 });
 
-async function fetchScrapedMetaData(brandId: string): Promise<BatchMetaData> {
+async function fetchAllBatchData(brandId: string): Promise<BatchData> {
     const [prevWeb, prevSocial] = await Promise.all([
         getpreviousWebsiteScraps(brandId).catch(() => null),
         getPreviousSocialScrapes(brandId).catch(() => null)
     ]);
 
-    let websiteBatchId: string | null = null;
-    let socialBatchId: string | null = null;
-    let websiteBatchStatus: string | null = null;
-    let socialBatchStatus: string | null = null;
+    let websiteBatches: WebsiteBatch[] = [];
+    let socialBatches: SocialBatch[] = [];
+    let defaultWebsiteBatchId: string | null = null;
+    let defaultSocialBatchId: string | null = null;
+    let defaultWebsiteStatus: string | null = null;
+    let defaultSocialStatus: string | null = null;
 
     if (Array.isArray(prevWeb) && prevWeb.length > 0) {
-        const sorted = prevWeb.toSorted((a: any, b: any) =>
+        websiteBatches = prevWeb.toSorted((a: any, b: any) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        const completedBatch = sorted.find(
-            (b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors'
+        const completedBatch = websiteBatches.find(
+            (b) => b.status === 'Completed' || b.status === 'CompletedWithErrors'
         );
-        const targetBatch = completedBatch ?? sorted[0];
-        websiteBatchId = targetBatch?.batch_id ?? null;
-        websiteBatchStatus = targetBatch?.status ?? null;
+        const targetBatch = completedBatch ?? websiteBatches[0];
+        defaultWebsiteBatchId = targetBatch?.batch_id ?? null;
+        defaultWebsiteStatus = targetBatch?.status ?? null;
     }
 
     if (Array.isArray(prevSocial) && prevSocial.length > 0) {
-        const sorted = prevSocial.toSorted((a: any, b: any) =>
+        socialBatches = prevSocial.toSorted((a: any, b: any) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        const completedBatch = sorted.find(
-            (b: any) => b.status === 'Completed' || b.status === 'CompletedWithErrors'
+        const completedBatch = socialBatches.find(
+            (b) => b.status === 'Completed' || b.status === 'CompletedWithErrors'
         );
-        const targetBatch = completedBatch ?? sorted[0];
-        socialBatchId = targetBatch?.batch_id ?? null;
-        socialBatchStatus = targetBatch?.status ?? null;
+        const targetBatch = completedBatch ?? socialBatches[0];
+        defaultSocialBatchId = targetBatch?.batch_id ?? null;
+        defaultSocialStatus = targetBatch?.status ?? null;
     }
 
-    return { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus };
+    return {
+        websiteBatches,
+        socialBatches,
+        defaultWebsiteBatchId,
+        defaultSocialBatchId,
+        defaultWebsiteStatus,
+        defaultSocialStatus
+    };
 }
 
 function getDerivedChannels(brandData: any): string[] {
@@ -83,33 +113,6 @@ function isCompleteStatus(status: string | null): boolean {
     return status === 'Completed' || status === 'CompletedWithErrors';
 }
 
-const WebsiteSkeleton = () => (
-    <div className="space-y-4">
-        <Skeleton className="h-10 w-full max-w-sm" />
-        <div className="grid grid-cols-4 gap-6">
-            <div className="space-y-2">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-20 w-full" />
-            </div>
-            <div className="col-span-3">
-                <Skeleton className="h-96 w-full" />
-            </div>
-        </div>
-    </div>
-);
-
-const SocialSkeleton = () => (
-    <div className="space-y-4">
-        <Skeleton className="h-10 w-full max-w-sm" />
-        <div className="grid grid-cols-3 gap-4 mb-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-        </div>
-        <Skeleton className="h-96 w-full" />
-    </div>
-);
-
 export default async function DataPage({ params }: PageProps) {
     const { brandId } = await params;
 
@@ -117,20 +120,30 @@ export default async function DataPage({ params }: PageProps) {
         redirect('/dashboard/brandos-v2.1/gather');
     }
 
-    const [brandData, batchMeta] = await Promise.all([
+    const [brandData, batchData] = await Promise.all([
         getBrandData(brandId),
-        fetchScrapedMetaData(brandId)
+        fetchAllBatchData(brandId)
     ]);
 
     if (!brandData) {
         redirect('/dashboard/brandos-v2.1/gather');
     }
 
-    const { websiteBatchId, socialBatchId, websiteBatchStatus, socialBatchStatus } = batchMeta;
-    const hasResults = Boolean(websiteBatchId || socialBatchId);
+    const {
+        websiteBatches,
+        socialBatches,
+        defaultWebsiteBatchId,
+        defaultSocialBatchId,
+        defaultWebsiteStatus,
+        defaultSocialStatus
+    } = batchData;
+
+    const hasWebsiteData = websiteBatches.length > 0;
+    const hasSocialData = socialBatches.length > 0;
+    const hasResults = hasWebsiteData || hasSocialData;
     const availableChannels = getDerivedChannels(brandData);
-    const isWebComplete = isCompleteStatus(websiteBatchStatus);
-    const isSocialComplete = isCompleteStatus(socialBatchStatus);
+    const isWebComplete = isCompleteStatus(defaultWebsiteStatus);
+    const isSocialComplete = isCompleteStatus(defaultSocialStatus);
 
     return (
         <div className="space-y-6">
@@ -142,38 +155,20 @@ export default async function DataPage({ params }: PageProps) {
                 <DataViewManager
                     brandId={brandId}
                     brandData={brandData}
-                    websiteBatchId={websiteBatchId}
-                    socialBatchId={socialBatchId}
-                    websiteBatchStatus={websiteBatchStatus}
-                    socialBatchStatus={socialBatchStatus}
+                    websiteBatches={websiteBatches}
+                    socialBatches={socialBatches}
+                    defaultWebsiteBatchId={defaultWebsiteBatchId}
+                    defaultSocialBatchId={defaultSocialBatchId}
+                    defaultWebsiteStatus={defaultWebsiteStatus}
+                    defaultSocialStatus={defaultSocialStatus}
                     availableChannels={availableChannels}
                     hasResults={hasResults}
+                    hasWebsiteData={hasWebsiteData}
+                    hasSocialData={hasSocialData}
                     isWebComplete={isWebComplete}
                     isSocialComplete={isSocialComplete}
-                    websiteSlot={
-                        <Suspense fallback={<WebsiteSkeleton />}>
-                            <WebsiteResultsWrapper 
-                                brandId={brandId} 
-                                batchId={websiteBatchId} 
-                                brandName={brandData.name}
-                                status={websiteBatchStatus}
-                            />
-                        </Suspense>
-                    }
-                    socialSlot={
-                        <Suspense fallback={<SocialSkeleton />}>
-                            <SocialResultsWrapper 
-                                brandId={brandId} 
-                                batchId={socialBatchId} 
-                                brandName={brandData.name}
-                                brandData={brandData}
-                                status={socialBatchStatus}
-                            />
-                        </Suspense>
-                    }
                 />
             </DashboardInnerLayout>
         </div>
     );
 }
-

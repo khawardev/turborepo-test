@@ -48,7 +48,7 @@ export function SetupManager() {
         tiktok: { enabled: false, lookbackDays: 365, maxPosts: 200, collectComments: true },
       },
       scrapeSettings: {
-        webLimit: 500
+        webLimit: 10
       }
     }
   });
@@ -202,18 +202,14 @@ export function SetupManager() {
       industry: 'Experiential Marketing'
     });
     form.setValue('competitors', mockCompetitors);
-    
     // Enable all channels
     form.setValue('channels.linkedin.enabled', true);
     form.setValue('channels.instagram.enabled', true);
     form.setValue('channels.facebook.enabled', true);
-    
     // Enable channels present in competitors even if main client doesn't use them heavily, to catch competitor data
     form.setValue('channels.twitter.enabled', true);
     form.setValue('channels.youtube.enabled', true);
-    
     form.setValue('channels.tiktok.enabled', false);
-
     toast.success('Form autofilled with Creative Solutions Group data');
   };
 
@@ -221,7 +217,6 @@ export function SetupManager() {
     setIsSubmitting(true);
     try {
       // 1. Create Brand (and Client implicit context)
-      // Map form schema to addBrand schema
       
       const brandData = {
           name: data.details.clientName,
@@ -234,7 +229,7 @@ export function SetupManager() {
           instagram_url: data.details.clientSocials?.instagram || "",
           tiktok_url: data.details.clientSocials?.tiktok || "",
           // Map competitors
-          competitors: data.competitors.map((comp: any) => ({
+          competitors: data.competitors.map((comp) => ({
               name: comp.name,
               url: comp.website,
               facebook_url: comp.socials?.facebook || "", 
@@ -257,10 +252,14 @@ export function SetupManager() {
       toast.success('Brand created successfully');
 
       // 3. Redirect to Gather Phase with explicit parameters
-      const webLimit = (data as any).scrapeSettings?.webLimit || 500;
+      const webLimit = data.scrapeSettings?.webLimit || 10;
       
-      const startDate = socialDateRange?.from ? format(socialDateRange.from, 'yyyy-MM-dd') : '';
-      const endDate = socialDateRange?.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+      // Ensure we use the latest state directly
+      const currentStartDate = socialDateRange?.from;
+      const currentEndDate = socialDateRange?.to || new Date();
+
+      const startDate = currentStartDate ? format(currentStartDate, 'yyyy-MM-dd') : '';
+      const endDate = currentEndDate ? format(currentEndDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
 
       if (!startDate) {
           toast.error("Please select a start date for social data capture");
@@ -275,6 +274,7 @@ export function SetupManager() {
         webLimit: webLimit.toString()
       });
 
+      // Redirect handled by parent or flow? User code had redirect commented out.
       const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
       window.location.href = redirectUrl;
 

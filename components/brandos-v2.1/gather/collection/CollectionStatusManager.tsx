@@ -223,8 +223,8 @@ export function CollectionStatusManager({
     }, [state.isPolling, state.webBatchId, state.socialBatchId, brandId, router]);
 
     const handleStartCollection = async () => {
-        if (!startDate) {
-            toast.error('Start Date is required.');
+        if (webLimit <= 0 && !startDate) {
+            toast.error('No collection parameters provided.');
             return;
         }
 
@@ -232,29 +232,42 @@ export function CollectionStatusManager({
         toast.info('Initializing Data Collection Swarm...');
 
         try {
-            const webResult = await scrapeBatchWebsite(brandId, webLimit);
-            
-            if (!webResult?.success) {
-                toast.error(`Website capture failed: ${webResult?.message}`);
-                dispatch({ type: 'UPDATE_WEB_STATUS', payload: { status: 'Failed' } });
-            } else {
-                const webBatchId = webResult.data?.task_id || webResult.data?.batch_id;
-                if (webBatchId) dispatch({ type: 'SET_WEB_BATCH', payload: { id: webBatchId, status: 'Processing' } });
+            let webSuccess = false;
+            let socialSuccess = false;
+
+            if (webLimit > 0) {
+                const webResult = await scrapeBatchWebsite(brandId, webLimit);
+                
+                if (!webResult?.success) {
+                    toast.error(`Website capture failed: ${webResult?.message}`);
+                    dispatch({ type: 'UPDATE_WEB_STATUS', payload: { status: 'Failed' } });
+                } else {
+                    const webBatchId = webResult.data?.task_id || webResult.data?.batch_id;
+                    if (webBatchId) {
+                        dispatch({ type: 'SET_WEB_BATCH', payload: { id: webBatchId, status: 'Processing' } });
+                        webSuccess = true;
+                    }
+                }
             }
 
-            const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
+            if (startDate) {
+                const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
 
-            if (!socialResult?.success) {
-                toast.error(`Social capture failed: ${socialResult?.message}`);
-                dispatch({ type: 'UPDATE_SOCIAL_STATUS', payload: { status: 'Failed' } });
-            } else {
-                const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
-                if (sBatchId) dispatch({ type: 'SET_SOCIAL_BATCH', payload: { id: sBatchId, status: 'Processing' } });
+                if (!socialResult?.success) {
+                    toast.error(`Social capture failed: ${socialResult?.message}`);
+                    dispatch({ type: 'UPDATE_SOCIAL_STATUS', payload: { status: 'Failed' } });
+                } else {
+                    const sBatchId = socialResult.data?.task_id || socialResult.data?.batch_id;
+                    if (sBatchId) {
+                        dispatch({ type: 'SET_SOCIAL_BATCH', payload: { id: sBatchId, status: 'Processing' } });
+                        socialSuccess = true;
+                    }
+                }
             }
 
             dispatch({ type: 'SET_STARTING', payload: false });
 
-            if (webResult?.success || socialResult?.success) {
+            if (webSuccess || socialSuccess) {
                 toast.success('Swarm agents deployed.');
                 pollCountRef.current = 0;
                 dispatch({ type: 'SET_POLLING', payload: true });
@@ -277,22 +290,26 @@ export function CollectionStatusManager({
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-                <StatusCard
-                    title="Website Data Gathering"
-                    icon={Globe}
-                    status={state.webStatus}
-                    batchId={state.webBatchId}
-                    isRunning={isRunning && !isWebComplete}
-                    error={state.webError}
-                />
-                <StatusCard
-                    title="Social Media Data Gathering"
-                    icon={Share2}
-                    status={state.socialStatus}
-                    batchId={state.socialBatchId}
-                    isRunning={isRunning && !isSocialComplete}
-                    error={state.socialError}
-                />
+                {(webLimit > 0 || state.webBatchId) && (
+                    <StatusCard
+                        title="Website Data Gathering"
+                        icon={Globe}
+                        status={state.webStatus}
+                        batchId={state.webBatchId}
+                        isRunning={isRunning && !isWebComplete}
+                        error={state.webError}
+                    />
+                )}
+                {(startDate || state.socialBatchId) && (
+                    <StatusCard
+                        title="Social Media Data Gathering"
+                        icon={Share2}
+                        status={state.socialStatus}
+                        batchId={state.socialBatchId}
+                        isRunning={isRunning && !isSocialComplete}
+                        error={state.socialError}
+                    />
+                )}
             </div>
 
             <div className="flex gap-4">

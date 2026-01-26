@@ -174,18 +174,22 @@ export async function getCurrentUser() {
 
       console.log("[getCurrentUser] Token refresh successful, updating cookies...");
 
-      cookieStore.set("access_token", refreshRes.data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-
-      if (refreshRes.data?.refresh_token) {
-        cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
+      try {
+        cookieStore.set("access_token", refreshRes.data.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           path: "/",
         });
+
+        if (refreshRes.data?.refresh_token) {
+          cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+          });
+        }
+      } catch (cookieError) {
+        console.warn("[getCurrentUser] Could not set cookies (likely called from RSC), continuing with new token in memory.", cookieError);
       }
 
       const userRes = await authRequest("/users/me/", "GET", {

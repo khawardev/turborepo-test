@@ -41,10 +41,15 @@ export const engagementDetailsSchema = z.object({
   industry: z.string().optional(),
 });
 
+export const scrapeSettingsSchema = z.object({
+  webLimit: z.number().min(1).default(10),
+});
+
 export const engagementConfigSchema = z.object({
   details: engagementDetailsSchema,
   competitors: z.array(competitorSchema),
   channels: channelScopeSchema,
+  scrapeSettings: scrapeSettingsSchema,
 });
 
 export type EngagementConfigV2 = z.infer<typeof engagementConfigSchema>;

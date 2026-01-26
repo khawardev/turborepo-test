@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { DateRange } from 'react-day-picker';
 import { format, subMonths } from 'date-fns';
@@ -26,8 +25,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/stages/ccba/details/scraps-tab/social/DatePickerwithRange';
 import { ChevronDown, Globe, Share2, RefreshCw, Loader2 } from 'lucide-react';
-import { scrapeBatchWebsite } from '@/server/actions/ccba/website/websiteScrapeActions';
-import { scrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActions';
+
 
 type RecollectDialogProps = {
     brandId: string;
@@ -46,7 +44,6 @@ export function RecollectDialog({
     showWebsite = true,
     showSocial = true
 }: RecollectDialogProps) {
-    const router = useRouter();
     const [openDialog, setOpenDialog] = useState<'website' | 'social' | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -63,26 +60,19 @@ export function RecollectDialog({
         }
     });
 
-    const handleWebsiteScrape = async () => {
+    const handleWebsiteScrape = () => {
         setIsLoading(true);
         try {
             const webLimit = form.getValues('webLimit');
-            const result = await scrapeBatchWebsite(brandId, webLimit);
-            if (result?.success) {
-                toast.success('Website data collection started!');
-                setOpenDialog(null);
-                router.push(`/dashboard/brandos-v2.1/gather/collecting/${brandId}`);
-            } else {
-                toast.error(result?.message || 'Failed to start website collection');
-            }
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}`;
+            window.location.href = redirectUrl;
         } catch (e) {
             toast.error('An error occurred');
-        } finally {
             setIsLoading(false);
         }
     };
 
-    const handleSocialScrape = async () => {
+    const handleSocialScrape = () => {
         if (!socialDateRange?.from) {
             toast.error('Please select a date range');
             return;
@@ -92,22 +82,15 @@ export function RecollectDialog({
             const startDate = format(socialDateRange.from, 'yyyy-MM-dd');
             const endDate = socialDateRange.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
             
-            const result = await scrapeBatchSocial(brandId, startDate, endDate);
-            if (result?.success) {
-                toast.success('Social media data collection started!');
-                setOpenDialog(null);
-                router.push(`/dashboard/brandos-v2.1/gather/collecting/${brandId}`);
-            } else {
-                toast.error(result?.message || 'Failed to start social collection');
-            }
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&startDate=${startDate}&endDate=${endDate}`;
+            window.location.href = redirectUrl;
         } catch (e) {
             toast.error('An error occurred');
-        } finally {
             setIsLoading(false);
         }
     };
 
-    const handleBothScrape = async () => {
+    const handleBothScrape = () => {
         if (!socialDateRange?.from) {
             toast.error('Please select a date range for social media');
             return;
@@ -118,28 +101,10 @@ export function RecollectDialog({
             const startDate = format(socialDateRange.from, 'yyyy-MM-dd');
             const endDate = socialDateRange.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
 
-            const [webResult, socialResult] = await Promise.all([
-                scrapeBatchWebsite(brandId, webLimit),
-                scrapeBatchSocial(brandId, startDate, endDate)
-            ]);
-
-            if (webResult?.success && socialResult?.success) {
-                toast.success('Data collection started for both sources!');
-            } else if (webResult?.success) {
-                toast.success('Website collection started');
-                toast.error(`Social: ${socialResult?.message || 'Failed'}`);
-            } else if (socialResult?.success) {
-                toast.success('Social collection started');
-                toast.error(`Website: ${webResult?.message || 'Failed'}`);
-            } else {
-                toast.error('Failed to start data collection');
-            }
-
-            setOpenDialog(null);
-            router.push(`/dashboard/brandos-v2.1/gather/collecting/${brandId}`);
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
+            window.location.href = redirectUrl;
         } catch (e) {
             toast.error('An error occurred');
-        } finally {
             setIsLoading(false);
         }
     };

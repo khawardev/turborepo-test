@@ -96,16 +96,18 @@ export async function getPreviousSocialScrapes(brand_id: string) {
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
 
-        const filtered = data.map((item: any) => ({
-            brand_id: item.brand_id,
-            client_id: item.client_id,
-            created_at: item.created_at,
-            status: item.status,
-            batch_id: item.batch_id,
-            start_date: item.start_date,
-            end_date: item.end_date,
-            error: item.error
-        }));
+        const filtered = data
+            .map((item: any) => ({
+                brand_id: item.brand_id,
+                client_id: item.client_id,
+                created_at: item.created_at,
+                status: item.status,
+                batch_id: item.batch_id,
+                start_date: item.start_date,
+                end_date: item.end_date,
+                error: item.error
+            }))
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
         return filtered;
     } catch (error) {

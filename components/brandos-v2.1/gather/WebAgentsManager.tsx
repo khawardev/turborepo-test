@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { 
     Play, Trash2, Eye, ChevronDown, Loader2, Clock, Cpu, 
@@ -74,6 +75,7 @@ export function WebAgentsManager({
     const [customInstruction, setCustomInstruction] = useState('');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<{ id: string; type: 'extraction' | 'synthesis' } | null>(null);
+    const [activeResultTab, setActiveResultTab] = useState<'extraction' | 'synthesis'>('extraction');
 
     const loadExtractionTasks = useCallback(async () => {
         setIsLoadingExtractionTasks(true);
@@ -250,7 +252,7 @@ export function WebAgentsManager({
 
             if (res.success && res.data) {
                 setSelectedExtractionResult(res.data);
-                setSelectedSynthesisResult(null);
+                setActiveResultTab('extraction');
             } else {
                 toast.error(`Failed to load result: ${res.error || 'Unknown error'}`);
             }
@@ -273,7 +275,7 @@ export function WebAgentsManager({
 
             if (res.success && res.data) {
                 setSelectedSynthesisResult(res.data);
-                setSelectedExtractionResult(null);
+                setActiveResultTab('synthesis');
             } else {
                 toast.error(`Failed to load result: ${res.error || 'Unknown error'}`);
             }
@@ -413,7 +415,7 @@ export function WebAgentsManager({
                                     !batchWebsiteTaskId ||
                                     (extractionScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
                                 }
-                                className="gap-2"
+                                
                             >
                                 {isRunningExtraction ? (
                                     <>
@@ -590,7 +592,7 @@ export function WebAgentsManager({
                             <Button 
                                 onClick={handleRunSynthesis} 
                                 disabled={isRunningSynthesis || !selectedExtractionForSynthesis}
-                                className="gap-2"
+                                
                             >
                                 {isRunningSynthesis ? (
                                     <>
@@ -737,22 +739,53 @@ export function WebAgentsManager({
             </Collapsible>
 
             {(selectedExtractionResult || selectedSynthesisResult) && (
-                <div className="border rounded-xl p-6 bg-card">
-                    {selectedExtractionResult && (
-                        <WebExtractionResultViewer 
-                            data={selectedExtractionResult}
-                            onReRun={handleRunExtraction}
-                            isReRunning={isRunningExtraction}
-                        />
-                    )}
-                    {selectedSynthesisResult && (
-                        <WebSynthesisResultViewer 
-                            data={selectedSynthesisResult}
-                            onReRun={handleRunSynthesis}
-                            isReRunning={isRunningSynthesis}
-                        />
-                    )}
-                </div>
+                <Tabs 
+                    value={activeResultTab}
+                    onValueChange={(value) => setActiveResultTab(value as 'extraction' | 'synthesis')}
+                >
+                    <TabsList>
+                        <TabsTrigger 
+                            value="extraction" 
+                            
+                            disabled={!selectedExtractionResult}
+                        >
+                            <Database className="w-4 h-4" />
+                            Extraction Result
+                            {!selectedExtractionResult && (
+                                <Badge variant="outline" className="text-[9px] py-0 ml-1">No Data</Badge>
+                            )}
+                        </TabsTrigger>
+                        <TabsTrigger 
+                            value="synthesis" 
+                            
+                            disabled={!selectedSynthesisResult}
+                        >
+                            <Sparkles className="w-4 h-4" />
+                            Synthesis Result
+                            {!selectedSynthesisResult && (
+                                <Badge variant="outline" className="text-[9px] py-0 ml-1">No Data</Badge>
+                            )}
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="extraction" className="border rounded-xl p-6 bg-card">
+                        {selectedExtractionResult && (
+                            <WebExtractionResultViewer 
+                                data={selectedExtractionResult}
+                                onReRun={handleRunExtraction}
+                                isReRunning={isRunningExtraction}
+                            />
+                        )}
+                    </TabsContent>
+                    <TabsContent value="synthesis" className="border rounded-xl p-6 bg-card">
+                        {selectedSynthesisResult && (
+                            <WebSynthesisResultViewer 
+                                data={selectedSynthesisResult}
+                                onReRun={handleRunSynthesis}
+                                isReRunning={isRunningSynthesis}
+                            />
+                        )}
+                    </TabsContent>
+                </Tabs>
             )}
 
             <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>

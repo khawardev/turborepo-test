@@ -8,6 +8,7 @@ export async function setGatherCookies(params: {
     endDate?: string;
     webLimit?: string;
 }) {
+    console.log("[setGatherCookies] params:", params);
     await clearGatherCookies();
     const cookieStore = await cookies();
     

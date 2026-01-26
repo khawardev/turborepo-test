@@ -142,15 +142,18 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
         if (!success) return null;
         if (!Array.isArray(data) || data.length === 0) return [];
 
-        const filtered = data.map((item: any) => ({
-            brand_id: item.brand_id,
-            client_id: item.client_id,
-            created_at: item.created_at,
-            status: item.status,
-            scraped_pages: item.scraped_pages,
-            batch_id: item.batch_id,
-            error: item.error
-        }));
+        const filtered = data
+            .map((item: any) => ({
+                brand_id: item.brand_id,
+                client_id: item.client_id,
+                created_at: item.created_at,
+                status: item.status,
+                scraped_pages: item.scraped_pages,
+                batch_id: item.batch_id,
+                errors: item.errors,
+                result_keys: item.result_keys
+            }))
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
 
         return filtered;
