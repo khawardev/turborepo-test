@@ -1,36 +1,26 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Copy, Terminal, Bot, Database, FileText } from 'lucide-react';
+import { Copy, Terminal, Database, FileText } from 'lucide-react';
 import { ScrapeStatusBadge } from '../ScrapeStatusBadge';
 import { BatchSelector } from './BatchSelector';
 import BrandProfile from '@/components/stages/ccba/details/profile-tab/BrandProfile';
 import { AuditorAgentCard } from '../AuditorAgentCard';
 import { AuditorResultViewer } from '../AuditorResultViewer';
 import { SocialAuditorResultViewer } from '../SocialAuditorResultViewer';
-import { SocialReportsResultViewer, SocialReportsTaskListViewer } from '../SocialReportsResultViewer';
 import { useAuditor } from './hooks/UseAuditor';
 import { useSocialAuditor } from './hooks/UseSocialAuditor';
 import { AiOutlinePieChart } from "react-icons/ai";
 import { RecollectDialog } from '../RecollectDialog';
 import { WebAgentsManager } from '../WebAgentsManager';
+import { SocialAgentsManager } from '../SocialAgentsManager';
 import { SocialDataViewer } from './SocialDataViewer';
-import {
-    runSocialReportsAgent,
-    getSocialReportsOutput,
-    listSocialReportsTasks,
-    deleteSocialReportsTask,
-    type SocialChannelName,
-    type AnalysisScope
-} from '@/server/actions/socialReportsActions';
 import { WebsiteDataViewer } from './WebsiteDataViewer';
 
 type WebsiteBatch = {
@@ -83,14 +73,10 @@ export function DataViewManager({
     socialBatches,
     defaultWebsiteBatchId,
     defaultSocialBatchId,
-    defaultWebsiteStatus,
-    defaultSocialStatus,
     availableChannels,
     hasResults,
     hasWebsiteData,
     hasSocialData,
-    isWebComplete: initialWebComplete,
-    isSocialComplete: initialSocialComplete
 }: DataViewManagerProps) {
     const [activeTab, setActiveTab] = useState('brand_profile');
     
@@ -101,19 +87,6 @@ export function DataViewManager({
     const [websiteAuditModel, setWebsiteAuditModel] = useState<string>('claude-4.5-sonnet');
     const [socialAuditScope, setSocialAuditScope] = useState<string>('brand');
     const [selectedChannel, setSelectedChannel] = useState<string>('linkedin');
-
-    const [socialReportsTaskId, setSocialReportsTaskId] = useState<string | null>(null);
-    const [socialReportsResult, setSocialReportsResult] = useState<any>(null);
-    const [isSocialReportsRunning, setIsSocialReportsRunning] = useState(false);
-    const [socialReportsChannel, setSocialReportsChannel] = useState<SocialChannelName>('linkedin');
-    const [socialReportsScope, setSocialReportsScope] = useState<AnalysisScope>('brand');
-    const [socialReportsInstruction, setSocialReportsInstruction] = useState<string>('');
-    const [socialReportsCompetitorId, setSocialReportsCompetitorId] = useState<string>('');
-    const [socialReportsTasks, setSocialReportsTasks] = useState<any[]>([]);
-    const [isDeletingTask, setIsDeletingTask] = useState(false);
-    const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
-
-    const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const selectedWebsiteBatch = useMemo(() => 
         websiteBatches.find(b => b.batch_id === selectedWebsiteBatchId),
@@ -130,7 +103,6 @@ export function DataViewManager({
 
     const isWebComplete = isCompleteStatus(selectedWebsiteStatus);
     const isSocialComplete = isCompleteStatus(selectedSocialStatus);
-    const isComplete = useMemo(() => hasResults && isWebComplete && isSocialComplete, [hasResults, isWebComplete, isSocialComplete]);
     
     const competitors = useMemo(() => 
         brandData?.competitors?.map((c: any) => ({
@@ -166,183 +138,12 @@ export function DataViewManager({
         scope: socialAuditScope
     });
 
-    useEffect(() => {
-        if (availableChannels.length > 0 && !availableChannels.includes(socialReportsChannel)) {
-            setSocialReportsChannel(availableChannels[0] as SocialChannelName);
-        }
-    }, [availableChannels, socialReportsChannel]);
-
-    useEffect(() => {
-        if (selectedSocialBatchId && brandData?.client_id) {
-            loadSocialReportsTasks();
-        }
-    }, [selectedSocialBatchId, brandData?.client_id]);
-
-    const loadSocialReportsTasks = useCallback(async () => {
-        if (!brandData?.client_id) return;
-        try {
-            const res = await listSocialReportsTasks({
-                client_id: brandData.client_id,
-                brand_id: brandId,
-            });
-            if (res.success && res.data?.tasks) {
-                setSocialReportsTasks(res.data.tasks);
-            }
-        } catch (e) {
-            console.error("Failed to load social reports tasks", e);
-        }
-    }, [brandData?.client_id, brandId]);
-
-    const pollSocialReportsResult = useCallback((taskId: string) => {
-        if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current);
-        }
-        
-        let attempts = 0;
-        const maxAttempts = 120;
-
-        pollIntervalRef.current = setInterval(async () => {
-            attempts++;
-            try {
-                const res = await getSocialReportsOutput({
-                    client_id: brandData.client_id,
-                    brand_id: brandId,
-                    task_id: taskId
-                });
-
-                if (res.success && res.data) {
-                    setSocialReportsResult(res.data);
-                    toast.success("Social report generated successfully!");
-                    setIsSocialReportsRunning(false);
-                    if (pollIntervalRef.current) {
-                        clearInterval(pollIntervalRef.current);
-                        pollIntervalRef.current = null;
-                    }
-                    loadSocialReportsTasks();
-                } else if (attempts >= maxAttempts) {
-                    toast.error("Social report generation timed out.");
-                    setIsSocialReportsRunning(false);
-                    if (pollIntervalRef.current) {
-                        clearInterval(pollIntervalRef.current);
-                        pollIntervalRef.current = null;
-                    }
-                }
-            } catch (e) {
-                console.error("Polling social reports error", e);
-            }
-        }, 3000);
-    }, [brandData.client_id, brandId, loadSocialReportsTasks]);
-
-    const handleRunSocialReports = useCallback(async () => {
-        if (!selectedSocialBatchId) {
-            toast.error("No social data found. Please run data collection first.");
-            return;
-        }
-
-        if (socialReportsScope === 'competitors' && !socialReportsCompetitorId) {
-            toast.error("Please select a competitor for competitor analysis.");
-            return;
-        }
-
-        setIsSocialReportsRunning(true);
-        setSocialReportsResult(null);
-        toast.info(`Starting Social Reports Agent for ${socialReportsChannel} (${socialReportsScope})...`);
-
-        try {
-            const res = await runSocialReportsAgent({
-                client_id: brandData.client_id,
-                brand_id: brandId,
-                batch_id: selectedSocialBatchId,
-                channel_name: socialReportsChannel,
-                analysis_scope: socialReportsScope,
-                competitor_id: socialReportsScope === 'competitors' ? socialReportsCompetitorId : undefined,
-                instruction: socialReportsInstruction || undefined
-            });
-
-            if (res.success && res.data?.task_id) {
-                setSocialReportsTaskId(res.data.task_id);
-                toast.success(`Social Reports Agent started for ${socialReportsChannel}!`);
-                pollSocialReportsResult(res.data.task_id);
-            } else {
-                toast.error(`Social Reports Agent failed: ${res.error || 'Unknown error'}`);
-                setIsSocialReportsRunning(false);
-            }
-        } catch (e) {
-            console.error(e);
-            toast.error("Error starting Social Reports Agent");
-            setIsSocialReportsRunning(false);
-        }
-    }, [selectedSocialBatchId, socialReportsScope, socialReportsCompetitorId, socialReportsChannel, socialReportsInstruction, brandData.client_id, brandId, pollSocialReportsResult]);
-
-    useEffect(() => {
-        return () => {
-            if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-            }
-        };
-    }, []);
-
-    const handleSelectSocialReportTask = async (taskId: string) => {
-        setSocialReportsTaskId(taskId);
-        setIsSocialReportsRunning(true);
-        try {
-            const res = await getSocialReportsOutput({
-                client_id: brandData.client_id,
-                brand_id: brandId,
-                task_id: taskId
-            });
-            if (res.success && res.data) {
-                setSocialReportsResult(res.data);
-            } else {
-                toast.error("Failed to load report");
-            }
-        } catch (e) {
-            console.error(e);
-            toast.error("Error loading report");
-        } finally {
-            setIsSocialReportsRunning(false);
-        }
-    };
-
-    const handleDeleteSocialReportTask = async (taskId: string) => {
-        if (!confirm("Are you sure you want to delete this report? This action cannot be undone.")) {
-            return;
-        }
-        setIsDeletingTask(true);
-        setDeletingTaskId(taskId);
-        try {
-            const res = await deleteSocialReportsTask({
-                client_id: brandData.client_id,
-                brand_id: brandId,
-                task_id: taskId
-            });
-            if (res.success) {
-                toast.success("Report deleted successfully");
-                if (socialReportsTaskId === taskId) {
-                    setSocialReportsTaskId(null);
-                    setSocialReportsResult(null);
-                }
-                loadSocialReportsTasks();
-            } else {
-                toast.error(`Failed to delete report: ${res.error || 'Unknown error'}`);
-            }
-        } catch (e) {
-            console.error(e);
-            toast.error("Error deleting report");
-        } finally {
-            setIsDeletingTask(false);
-            setDeletingTaskId(null);
-        }
-    };
-
     const handleWebsiteBatchChange = (batchId: string) => {
         setSelectedWebsiteBatchId(batchId);
     };
 
     const handleSocialBatchChange = (batchId: string) => {
         setSelectedSocialBatchId(batchId);
-        setSocialReportsResult(null);
-        setSocialReportsTaskId(null);
     };
 
     return (
@@ -398,10 +199,10 @@ export function DataViewManager({
                         Captured Data
                         {!hasResults && <span className="ml-2 text-xs text-muted-foreground">(pending)</span>}
                     </TabsTrigger>
-                    <TabsTrigger value="ai_audit" disabled={!hasWebsiteData && !hasSocialData}>
+                    {/* <TabsTrigger value="ai_audit" disabled={!hasWebsiteData && !hasSocialData}>
                         <Bot className="w-4 h-4 mr-1" />
                         Outside-in Audit
-                    </TabsTrigger>
+                    </TabsTrigger> */}
                     <TabsTrigger value="social_reports" disabled={!hasSocialData || !isSocialComplete}>
                         <FileText className="w-4 h-4 mr-1" />
                         Social Reports
@@ -579,126 +380,15 @@ export function DataViewManager({
                     </div>
                 </TabsContent>
 
-                <TabsContent value="social_reports" className="space-y-8 pt-4">
-                    <div className="flex flex-col gap-8">
-                        <AuditorAgentCard
-                            title="Social Reports Agent"
-                            description="Generate comprehensive reports from social media batch data with AI-powered analysis."
-                            icon={FileText}
-                            agentCode="OI-SOC-REPORTS"
-                            status={isSocialReportsRunning ? 'running' : socialReportsResult ? 'complete' : 'idle'}
-                            isRunning={isSocialReportsRunning}
-                            onRun={handleRunSocialReports}
-                            taskId={socialReportsTaskId}
-                            result={socialReportsResult}
-                            RenderResult={SocialReportsResultViewer}
-                            isDisabled={!selectedSocialBatchId || !isSocialComplete || !availableChannels.length}
-                            buttonLabel="Generate Report"
-                            processingLabels={{
-                                running: "Generating Report...",
-                                processing: "AI agent is analyzing social data and generating report..."
-                            }}
-                            controls={
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <Select
-                                        value={socialReportsChannel}
-                                        onValueChange={(v) => setSocialReportsChannel(v as SocialChannelName)}
-                                        disabled={isSocialReportsRunning || !availableChannels.length}
-                                    >
-                                        <SelectTrigger className="w-[140px] h-9 bg-background capitalize">
-                                            <SelectValue placeholder="Channel" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {availableChannels.length > 0 ? (
-                                                availableChannels.map(channel => (
-                                                    <SelectItem key={channel} value={channel} className="capitalize">
-                                                        {channel}
-                                                    </SelectItem>
-                                                ))
-                                            ) : (
-                                                <SelectItem value="none" disabled>No Data Available</SelectItem>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-
-                                    <Select
-                                        value={socialReportsScope}
-                                        onValueChange={(v) => setSocialReportsScope(v as AnalysisScope)}
-                                        disabled={isSocialReportsRunning}
-                                    >
-                                        <SelectTrigger className="w-[140px] h-9 bg-background">
-                                            <SelectValue placeholder="Scope" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="brand">Brand</SelectItem>
-                                            <SelectItem value="competitors">Competitors</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-
-                                    {socialReportsScope === 'competitors' && competitors.length > 0 && (
-                                        <Select
-                                            value={socialReportsCompetitorId}
-                                            onValueChange={setSocialReportsCompetitorId}
-                                            disabled={isSocialReportsRunning}
-                                        >
-                                            <SelectTrigger className="w-[180px] h-9 bg-background">
-                                                <SelectValue placeholder="Select Competitor" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {competitors.map((comp: any) => (
-                                                    <SelectItem key={comp.id} value={comp.id}>
-                                                        {comp.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                </div>
-                            }
-                        />
-
-                        <Card className="border-dashed">
-                            <CardHeader>
-                                <CardTitle className="text-sm font-medium">Custom Instructions (Optional)</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Provide specific guidance for the AI analysis, e.g., &quot;Focus on visual trends&quot; or &quot;Analyze competitor positioning&quot;
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Input
-                                    placeholder="Enter custom instructions for the analysis..."
-                                    value={socialReportsInstruction}
-                                    onChange={(e) => setSocialReportsInstruction(e.target.value)}
-                                    disabled={isSocialReportsRunning}
-                                    className="max-w-xl"
-                                />
-                            </CardContent>
-                        </Card>
-
-                        {socialReportsTasks.length > 0 && (
-                            <Card>
-                                <CardHeader >
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                        <FileText className="w-4 h-4" />
-                                        Report History
-                                    </CardTitle>
-                                    <CardDescription className="text-xs">
-                                        View and manage previously generated social reports
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <SocialReportsTaskListViewer
-                                        tasks={socialReportsTasks}
-                                        onSelectTask={handleSelectSocialReportTask}
-                                        onDeleteTask={handleDeleteSocialReportTask}
-                                        selectedTaskId={socialReportsTaskId}
-                                        isDeleting={isDeletingTask}
-                                        deletingTaskId={deletingTaskId}
-                                    />
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
+                <TabsContent value="social_reports" className="space-y-6 pt-4">
+                    <SocialAgentsManager
+                        clientId={brandData?.client_id}
+                        brandId={brandId}
+                        batchSocialTaskId={selectedSocialBatchId}
+                        brandName={brandData?.name}
+                        availableChannels={availableChannels}
+                        competitors={competitors}
+                    />
                 </TabsContent>
 
                 <TabsContent value="web_agents" className="space-y-6 pt-4">

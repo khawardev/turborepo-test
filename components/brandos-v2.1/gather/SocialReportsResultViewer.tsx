@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { 
-    Terminal, Clock, Users, FileText, Calendar, Bot, 
+import {
+    Terminal, Clock, Users, FileText, Calendar, Bot,
     Copy, CheckCircle2, Loader2, Trash2, RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ interface SocialReportsResultViewerProps {
 export function SocialReportsResultViewer({ data, onReRun, isReRunning }: SocialReportsResultViewerProps) {
     if (!data) return null;
 
-    const { 
+    const {
         social_report,
         entity_name,
         analysis_scope,
@@ -70,48 +70,50 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                                 {analysis_scope || 'brand'}
                             </Badge>
                         </div>
-                        
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
-                            <span className="flex items-center gap-1.5">
-                                <Bot className="w-3.5 h-3.5" />
-                                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                    {model_used || 'Claude 4.5 Sonnet'}
-                                </span>
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5" />
-                                {formatExecutionTime(execution_time_seconds)}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5" />
-                                {timestamp ? new Date(timestamp).toLocaleDateString() : 'N/A'}
-                            </span>
-                            {batch_id && (
+
+                        <div className="flex flex-wrap  justify-between items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
+                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
                                 <span className="flex items-center gap-1.5">
-                                    <code className="font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border">
-                                        Batch: {batch_id.substring(0, 8)}...
-                                    </code>
+                                    <Bot className="w-3.5 h-3.5" />
+                                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        {model_used || 'Claude 4.5 Sonnet'}
+                                    </span>
                                 </span>
-                            )}
+                                <span className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    {formatExecutionTime(execution_time_seconds)}
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    {timestamp ? new Date(timestamp).toLocaleDateString() : 'N/A'}
+                                </span>
+                                {batch_id && (
+                                    <span className="flex items-center gap-1.5">
+                                        <code className="font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border">
+                                            Batch: {batch_id.substring(0, 8)}...
+                                        </code>
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
+                                <Button variant="outline" size="sm" onClick={handleCopyReport}>
+                                    <Copy className="w-3.5 h-3.5" />
+                                    Copy Report
+                                </Button>
+                                {onReRun && (
+                                    <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
+                                        {isReRunning ? (
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        ) : (
+                                            <RefreshCw className="w-3.5 h-3.5" />
+                                        )}
+                                        Re-run Analysis
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleCopyReport}>
-                        <Copy className="w-3.5 h-3.5" />
-                        Copy Report
-                    </Button>
-                    {onReRun && (
-                        <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
-                            {isReRunning ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                                <RefreshCw className="w-3.5 h-3.5" />
-                            )}
-                            Re-run Analysis
-                        </Button>
-                    )}
-                </CardContent>
             </Card>
 
             <Card className="overflow-hidden">
@@ -123,11 +125,11 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                 </CardHeader>
                 <CardContent >
                     <ScrollArea className="h-[500px] w-full">
-                            {social_report ? (
-                                <MarkdownViewer content={social_report} />
-                            ) : (
-                                <p className="text-muted-foreground">No report content available.</p>
-                            )}
+                        {social_report ? (
+                            <MarkdownViewer content={social_report} />
+                        ) : (
+                            <p className="text-muted-foreground">No report content available.</p>
+                        )}
                     </ScrollArea>
                 </CardContent>
             </Card>
@@ -162,9 +164,9 @@ interface SocialReportsTaskListViewerProps {
     deletingTaskId?: string | null;
 }
 
-export function SocialReportsTaskListViewer({ 
-    tasks, 
-    onSelectTask, 
+export function SocialReportsTaskListViewer({
+    tasks,
+    onSelectTask,
     onDeleteTask,
     selectedTaskId,
     isDeleting,

@@ -10,16 +10,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { 
-    Play, Trash2, Eye, ChevronDown, Loader2, Clock, Cpu, 
-    FileText, RefreshCw, Search, Database, Sparkles, AlertCircle, Building2, Users
+import {
+    Play, Trash2, Eye, ChevronDown, Loader2, Clock, Cpu,
+    FileText, RefreshCw, Search, Database, Sparkles, AlertCircle, Building2, Users, Edit
 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { MdOutlineArrowRight } from 'react-icons/md';
-import { 
-    runWebExtractionAgent, 
-    getWebExtractionOutput, 
-    listWebExtractionTasks, 
+import {
+    runWebExtractionAgent,
+    getWebExtractionOutput,
+    listWebExtractionTasks,
     deleteWebExtractionTask,
     runWebSynthesisAgent,
     getWebSynthesisOutput,
@@ -30,7 +32,7 @@ import {
 } from '@/server/actions/webAuditorActions';
 import { WebExtractionResultViewer } from './WebExtractionResultViewer';
 import { WebSynthesisResultViewer } from './WebSynthesisResultViewer';
-import { Spinner } from '@/components/shared/SpinnerLoader';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -50,9 +52,13 @@ type WebAgentsManagerProps = {
     competitors?: Array<{ id: string; name: string }>;
 }
 
-export function WebAgentsManager({ 
-    clientId, 
-    brandId, 
+// Cache to store tasks by brandId to prevent reloading on tab switch
+const EXTRACTION_TASKS_CACHE: Record<string, WebExtractionTask[]> = {};
+const SYNTHESIS_TASKS_CACHE: Record<string, WebSynthesisTask[]> = {};
+
+export function WebAgentsManager({
+    clientId,
+    brandId,
     batchWebsiteTaskId,
     brandName = 'Brand',
     competitors = []
@@ -72,17 +78,27 @@ export function WebAgentsManager({
     const [extractionScope, setExtractionScope] = useState<'brand' | 'competitors'>('brand');
     const [selectedCompetitorId, setSelectedCompetitorId] = useState<string | null>(null);
     const [selectedExtractionForSynthesis, setSelectedExtractionForSynthesis] = useState<string | null>(null);
-    const [customInstruction, setCustomInstruction] = useState('');
+    const [extractionInstruction, setExtractionInstruction] = useState('');
+    const [synthesisInstruction, setSynthesisInstruction] = useState('');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<{ id: string; type: 'extraction' | 'synthesis' } | null>(null);
     const [activeResultTab, setActiveResultTab] = useState<'extraction' | 'synthesis'>('extraction');
 
     const loadExtractionTasks = useCallback(async () => {
-        setIsLoadingExtractionTasks(true);
+        // Check cache first
+        if (EXTRACTION_TASKS_CACHE[brandId]) {
+            setExtractionTasks(EXTRACTION_TASKS_CACHE[brandId]);
+            setIsLoadingExtractionTasks(false);
+        } else {
+            setIsLoadingExtractionTasks(true);
+        }
+
         try {
             const res = await listWebExtractionTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
                 setExtractionTasks(res.data.tasks);
+                // Update cache
+                EXTRACTION_TASKS_CACHE[brandId] = res.data.tasks;
             }
         } catch (e) {
             console.error('Failed to load extraction tasks:', e);
@@ -92,11 +108,20 @@ export function WebAgentsManager({
     }, [clientId, brandId]);
 
     const loadSynthesisTasks = useCallback(async () => {
-        setIsLoadingSynthesisTasks(true);
+        // Check cache first
+        if (SYNTHESIS_TASKS_CACHE[brandId]) {
+            setSynthesisTasks(SYNTHESIS_TASKS_CACHE[brandId]);
+            setIsLoadingSynthesisTasks(false);
+        } else {
+            setIsLoadingSynthesisTasks(true);
+        }
+
         try {
             const res = await listWebSynthesisTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
                 setSynthesisTasks(res.data.tasks);
+                // Update cache
+                SYNTHESIS_TASKS_CACHE[brandId] = res.data.tasks;
             }
         } catch (e) {
             console.error('Failed to load synthesis tasks:', e);
@@ -131,7 +156,7 @@ export function WebAgentsManager({
                 batch_website_task_id: batchWebsiteTaskId,
                 analysis_scope: extractionScope,
                 competitor_id: extractionScope === 'competitors' ? (selectedCompetitorId || undefined) : undefined,
-                instruction: customInstruction || undefined,
+                instruction: extractionInstruction || undefined,
             });
 
             if (res.success && res.data?.task_id) {
@@ -152,7 +177,7 @@ export function WebAgentsManager({
     const pollExtractionResult = async (taskId: string) => {
         let attempts = 0;
         const maxAttempts = 120;
-        
+
         const interval = setInterval(async () => {
             attempts++;
             try {
@@ -193,7 +218,7 @@ export function WebAgentsManager({
                 client_id: clientId,
                 brand_id: brandId,
                 extraction_task_id: selectedExtractionForSynthesis,
-                instruction: customInstruction || undefined,
+                instruction: synthesisInstruction || undefined,
             });
 
             if (res.success && res.data?.task_id) {
@@ -214,7 +239,7 @@ export function WebAgentsManager({
     const pollSynthesisResult = async (taskId: string) => {
         let attempts = 0;
         const maxAttempts = 120;
-        
+
         const interval = setInterval(async () => {
             attempts++;
             try {
@@ -306,6 +331,10 @@ export function WebAgentsManager({
                 });
                 if (res.success) {
                     toast.success('Extraction task deleted');
+                    // Update cache immediately
+                    if (EXTRACTION_TASKS_CACHE[brandId]) {
+                        EXTRACTION_TASKS_CACHE[brandId] = EXTRACTION_TASKS_CACHE[brandId].filter(t => t.task_id !== taskToDelete.id);
+                    }
                     loadExtractionTasks();
                     if (selectedExtractionResult?.task_id === taskToDelete.id) {
                         setSelectedExtractionResult(null);
@@ -319,6 +348,10 @@ export function WebAgentsManager({
                 });
                 if (res.success) {
                     toast.success('Synthesis task deleted');
+                    // Update cache immediately
+                    if (SYNTHESIS_TASKS_CACHE[brandId]) {
+                        SYNTHESIS_TASKS_CACHE[brandId] = SYNTHESIS_TASKS_CACHE[brandId].filter(t => t.task_id !== taskToDelete.id);
+                    }
                     loadSynthesisTasks();
                     if (selectedSynthesisResult?.task_id === taskToDelete.id) {
                         setSelectedSynthesisResult(null);
@@ -370,73 +403,98 @@ export function WebAgentsManager({
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4 space-y-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild disabled={isRunningExtraction}>
-                                    <Button variant="outline" className="h-9 justify-between capitalize">
-                                        {extractionScope}
-                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => { setExtractionScope('brand'); setSelectedCompetitorId(null); }}>Brand</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setExtractionScope('competitors')}>Competitors</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            
-                            {extractionScope === 'competitors' && competitors.length > 0 && (
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild disabled={isRunningExtraction}>
-                                        <Button variant="outline" className="h-9 justify-between min-w-[140px]">
-                                            {selectedCompetitorId 
-                                                ? competitors.find(c => c.id === selectedCompetitorId)?.name || 'Selected'
-                                                : <span className="text-muted-foreground">Select Competitor</span>
-                                            }
+                                        <Button variant="outline" className="h-9 justify-between capitalize">
+                                            {extractionScope}
                                             <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-[180px]">
-                                        {competitors.map((competitor) => (
-                                            <DropdownMenuItem 
-                                                key={competitor.id}
-                                                onClick={() => setSelectedCompetitorId(competitor.id)}
-                                            >
-                                                {competitor.name}
-                                            </DropdownMenuItem>
-                                        ))}
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onClick={() => { setExtractionScope('brand'); setSelectedCompetitorId(null); }}>Brand</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setExtractionScope('competitors')}>Competitors</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
-                            )}
-                            
-                            <Button 
-                                onClick={handleRunExtraction} 
-                                disabled={
-                                    isRunningExtraction || 
-                                    !batchWebsiteTaskId ||
-                                    (extractionScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
-                                }
-                                
-                            >
-                                {isRunningExtraction ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Extracting...
-                                    </>
-                                ) : (
-                                    <>
-                                        Run Extraction
-                                        <MdOutlineArrowRight className="h-4 w-4" />
-                                    </>
+
+                                {extractionScope === 'competitors' && competitors.length > 0 && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild disabled={isRunningExtraction}>
+                                            <Button variant="outline" className="h-9 justify-between min-w-[140px]">
+                                                {selectedCompetitorId
+                                                    ? competitors.find(c => c.id === selectedCompetitorId)?.name || 'Selected'
+                                                    : <span className="text-muted-foreground">Select Competitor</span>
+                                                }
+                                                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="w-[180px]">
+                                            {competitors.map((competitor) => (
+                                                <DropdownMenuItem
+                                                    key={competitor.id}
+                                                    onClick={() => setSelectedCompetitorId(competitor.id)}
+                                                >
+                                                    {competitor.name}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 )}
-                            </Button>
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={loadExtractionTasks}
-                                disabled={isLoadingExtractionTasks}
-                            >
-                                <Loader2 className={cn("h-4 w-4", isLoadingExtractionTasks && "animate-spin")} />
-                            </Button>
+
+
+
+                                <Button
+                                    onClick={handleRunExtraction}
+                                    disabled={
+                                        isRunningExtraction ||
+                                        !batchWebsiteTaskId ||
+                                        (extractionScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
+                                    }
+
+                                >
+                                    {isRunningExtraction ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Extracting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Run Extraction
+                                            <MdOutlineArrowRight className="h-4 w-4" />
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={loadExtractionTasks}
+                                    disabled={isLoadingExtractionTasks}
+                                >
+                                    <Loader2 className={cn("h-4 w-4", isLoadingExtractionTasks && "animate-spin")} />Refresh
+                                </Button>
+                            </div>
+
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" title="Custom Instructions">
+                                        <Edit className="h-4 w-4" /> Add Instructions
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                        <h4 className="font-medium leading-none">Extraction Instructions</h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Add guidelines for the scraper.
+                                        </p>
+                                        <Textarea
+                                            placeholder="e.g., Focus on pricing tables..."
+                                            value={extractionInstruction}
+                                            onChange={(e) => setExtractionInstruction(e.target.value)}
+                                            className="h-24 resize-none"
+                                        />
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         </div>
 
                         {!batchWebsiteTaskId && (
@@ -451,78 +509,121 @@ export function WebAgentsManager({
                                 <span className="text-muted-foreground font-medium">Extraction Tasks</span>
                                 <Badge variant="secondary">{extractionTasks.length}</Badge>
                             </div>
-                            <ScrollArea className="h-[200px] border rounded-lg">
+                            <ScrollArea className="h-[320px] pt-4">
                                 {isLoadingExtractionTasks ? (
-                                    <div className="flex items-center justify-center h-full py-24">
-                                        <Spinner />
+                                    <div className="space-y-3">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-2 bg-card">
+                                                <div className="shrink-0">
+                                                    <Skeleton className="w-10 h-10 rounded-lg" />
+                                                </div>
+                                                <div className="flex-1 min-w-0 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Skeleton className="h-5 w-28" />
+                                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <Skeleton className="h-4 w-36" />
+                                                        <Skeleton className="h-4 w-16 rounded-full" />
+                                                    </div>
+                                                    <Skeleton className="h-3 w-24" />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton className="h-9 w-20 rounded-md" />
+                                                    <Skeleton className="h-9 w-9 rounded-md" />
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : extractionTasks.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm p-14">
-                                        <Database className="h-8 w-8 mb-2 opacity-50" />
-                                        <span>No extraction tasks yet</span>
+                                        <Database className="h-10 w-10 mb-3 opacity-40" />
+                                        <span className="font-medium">No extraction tasks yet</span>
+                                        <span className="text-xs mt-1 opacity-70">Run an extraction to see it here</span>
                                     </div>
                                 ) : (
-                                    <div className="p-2 space-y-2">
+                                    <div className="space-y-3">
                                         {extractionTasks.map((task) => (
-                                            <div 
-                                                key={task.task_id} 
+                                            <div
+                                                key={task.task_id}
                                                 className={cn(
-                                                    "flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors",
-                                                    selectedExtractionResult?.task_id === task.task_id && "ring-2 ring-primary"
+                                                    "group relative flex items-center gap-4 p-4 rounded-xl border-2 bg-card hover:bg-accent/50  hover:border-primary/30 transition-all duration-200 cursor-pointer ",
+                                                    selectedExtractionResult?.task_id === task.task_id && "border-primary/50 bg-primary/5"
                                                 )}
+                                                onClick={() => handleViewExtractionResult(task.task_id)}
                                             >
-                                                <div className="flex-1 min-w-0">
+                                                <div className="shrink-0">
+                                                    <div className={cn(
+                                                        "w-10 h-10 rounded-lg flex items-center justify-center",
+                                                        task.analysis_scope === 'brand'
+                                                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                                            : "bg-secondary text-secondary-foreground"
+                                                    )}>
+                                                        <Database className="h-5 w-5" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 min-w-0 space-y-1.5">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        {task.entity_name && (
-                                                            <Badge 
-                                                                variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
-                                                                className="text-[9px] py-0 gap-1"
-                                                            >
-                                                                {task.entity_name}
-                                                            </Badge>
-                                                        )}
-                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[80px]">
-                                                            {task.task_id.slice(0, 8)}...
-                                                        </code>
-                                                        <Badge variant="outline" className="text-[9px] py-0">
-                                                            {formatExecutionTime(task.execution_time_seconds)}
+                                                        <span className="font-semibold text-sm truncate">
+                                                            {task.entity_name || 'Extraction'}
+                                                        </span>
+                                                        <Badge
+                                                            variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
+                                                            className="text-[10px] px-2 py-0.5 font-medium capitalize"
+                                                        >
+                                                            {task.analysis_scope || 'brand'}
                                                         </Badge>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
-                                                        <Clock className="h-3 w-3" />
-                                                        {formatDate(task.timestamp)}
+                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Clock className="h-3.5 w-3.5" />
+                                                            {formatDate(task.timestamp)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
+                                                            ⏱️ {formatExecutionTime(task.execution_time_seconds)}
+                                                        </span>
                                                         {task.model_used && (
-                                                            <span className="text-[8px] opacity-70">
-                                                                • {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
+                                                            <span className="opacity-70 hidden sm:inline">
+                                                                {task.model_used.includes('claude') ? '🤖 Claude' : task.model_used.slice(0, 10)}
                                                             </span>
                                                         )}
                                                     </div>
+
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-7 w-7"
-                                                        onClick={() => handleViewExtractionResult(task.task_id)}
+                                                <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-9 px-3 gap-1.5"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleViewExtractionResult(task.task_id);
+                                                        }}
                                                         disabled={loadingResultId === task.task_id}
                                                     >
                                                         {loadingResultId === task.task_id ? (
-                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
                                                         ) : (
-                                                            <Eye className="h-3.5 w-3.5" />
+                                                            <>
+                                                                <Eye className="h-4 w-4" />
+                                                                <span className="hidden sm:inline">View</span>
+                                                            </>
                                                         )}
                                                     </Button>
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-7 w-7 text-destructive hover:text-destructive"
-                                                        onClick={() => confirmDelete(task.task_id, 'extraction')}
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            confirmDelete(task.task_id, 'extraction');
+                                                        }}
                                                         disabled={deletingTaskId === task.task_id}
                                                     >
                                                         {deletingTaskId === task.task_id ? (
-                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
                                                         ) : (
-                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                            <Trash2 className="h-4 w-4" />
                                                         )}
                                                     </Button>
                                                 </div>
@@ -551,69 +652,89 @@ export function WebAgentsManager({
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4 space-y-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild disabled={isRunningSynthesis || extractionTasks.length === 0}>
-                                    <Button variant="outline" className="h-9 justify-between min-w-[180px]">
-                                        {selectedExtractionForSynthesis ? (
-                                            <span className="truncate text-xs font-mono">
-                                                {selectedExtractionForSynthesis.slice(0, 12)}...
-                                            </span>
-                                        ) : (
-                                            <span className="text-muted-foreground">Select Extraction</span>
-                                        )}
-                                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[220px]">
-                                    {extractionTasks.map((task) => (
-                                        <DropdownMenuItem 
-                                            key={task.task_id}
-                                            onClick={() => setSelectedExtractionForSynthesis(task.task_id)}
-                                        >
-                                            <div className="flex flex-col gap-0.5">
-                                                <div className="flex items-center gap-1.5">
-                                                    {task.entity_name && (
-                                                        <Badge 
-                                                            variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
-                                                            className="text-[8px] py-0 h-4"
-                                                        >
-                                                            {task.entity_name}
-                                                        </Badge>
-                                                    )}
-                                                    <span className="font-mono text-[10px] text-muted-foreground">{task.task_id.slice(0, 8)}...</span>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild disabled={isRunningSynthesis || extractionTasks.length === 0}>
+                                        <Button variant="outline" className="h-9 justify-between min-w-[180px]">
+                                            {selectedExtractionForSynthesis ? (
+                                                <span className="truncate text-xs font-mono">
+                                                    {selectedExtractionForSynthesis.slice(0, 12)}...
+                                                </span>
+                                            ) : (
+                                                <span className="text-muted-foreground">Select Extraction</span>
+                                            )}
+                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-[220px]">
+                                        {extractionTasks.map((task) => (
+                                            <DropdownMenuItem
+                                                key={task.task_id}
+                                                onClick={() => setSelectedExtractionForSynthesis(task.task_id)}
+                                            >
+                                                <div className="flex flex-col gap-0.5">
+                                                    <div className="flex items-center gap-1.5">
+                                                        {task.entity_name}
+                                                    </div>
+                                                    <span className="text-[10px] text-muted-foreground">{formatDate(task.timestamp)}</span>
                                                 </div>
-                                                <span className="text-[10px] text-muted-foreground">{formatDate(task.timestamp)}</span>
-                                            </div>
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <Button 
-                                onClick={handleRunSynthesis} 
-                                disabled={isRunningSynthesis || !selectedExtractionForSynthesis}
-                                
-                            >
-                                {isRunningSynthesis ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Synthesizing...
-                                    </>
-                                ) : (
-                                    <>
-                                        Run Synthesis
-                                        <MdOutlineArrowRight className="h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
-                            <Button 
-                                variant="ghost"
-                                size="icon"
-                                onClick={loadSynthesisTasks}
-                                disabled={isLoadingSynthesisTasks}
-                            >
-                                <Loader2 className={cn("h-4 w-4", isLoadingSynthesisTasks && "animate-spin")} />
-                            </Button>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+
+                                <Button
+                                    onClick={handleRunSynthesis}
+                                    disabled={isRunningSynthesis || !selectedExtractionForSynthesis}
+
+                                >
+                                    {isRunningSynthesis ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Synthesizing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Run Synthesis
+                                            <MdOutlineArrowRight className="h-4 w-4" />
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={loadSynthesisTasks}
+                                    disabled={isLoadingSynthesisTasks}
+                                >
+                                    <Loader2 className={cn("h-4 w-4", isLoadingSynthesisTasks && "animate-spin")} />Refresh
+                                </Button>
+
+                            </div>
+
+
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" title="Custom Instructions">
+                                        <Edit className="h-4 w-4" /> Add Instructions
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                        <h4 className="font-medium leading-none">Synthesis Instructions</h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Add guidelines for the analysis.
+                                        </p>
+                                        <Textarea
+                                            placeholder="e.g., Summarize key findings..."
+                                            value={synthesisInstruction}
+                                            onChange={(e) => setSynthesisInstruction(e.target.value)}
+                                            className="h-24 resize-none"
+                                        />
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+
                         </div>
 
                         {extractionTasks.length === 0 && (
@@ -628,78 +749,121 @@ export function WebAgentsManager({
                                 <span className="text-muted-foreground font-medium">Synthesis Tasks</span>
                                 <Badge variant="secondary">{synthesisTasks.length}</Badge>
                             </div>
-                            <ScrollArea className="h-[200px] border rounded-lg">
+                            <ScrollArea className="h-[320px] pt-4">
                                 {isLoadingSynthesisTasks ? (
-                                    <div className="flex items-center justify-center h-full p-24">
-                                        <Spinner />
+                                    <div className="space-y-3">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-2 bg-card">
+                                                <div className="shrink-0">
+                                                    <Skeleton className="w-10 h-10 rounded-lg" />
+                                                </div>
+                                                <div className="flex-1 min-w-0 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Skeleton className="h-5 w-28" />
+                                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <Skeleton className="h-4 w-36" />
+                                                        <Skeleton className="h-4 w-16 rounded-full" />
+                                                    </div>
+                                                    <Skeleton className="h-3 w-24" />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton className="h-9 w-20 rounded-md" />
+                                                    <Skeleton className="h-9 w-9 rounded-md" />
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : synthesisTasks.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm p-14">
-                                        <Sparkles className="h-8 w-8 mb-2 opacity-50" />
-                                        <span>No synthesis tasks yet</span>
+                                        <Sparkles className="h-10 w-10 mb-3 opacity-40" />
+                                        <span className="font-medium">No synthesis tasks yet</span>
+                                        <span className="text-xs mt-1 opacity-70">Run a synthesis to see it here</span>
                                     </div>
                                 ) : (
-                                    <div className="p-2 space-y-2">
+                                    <div className="space-y-3">
                                         {synthesisTasks.map((task) => (
-                                            <div 
-                                                key={task.task_id} 
+                                            <div
+                                                key={task.task_id}
                                                 className={cn(
-                                                    "flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors",
-                                                    selectedSynthesisResult?.task_id === task.task_id && "ring-2 ring-primary"
+                                                    "group relative flex items-center gap-4 p-4 rounded-xl border-2 bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 cursor-pointer ",
+                                                    selectedSynthesisResult?.task_id === task.task_id && " border-primary/50 bg-primary/5"
                                                 )}
+                                                onClick={() => handleViewSynthesisResult(task.task_id)}
                                             >
-                                                <div className="flex-1 min-w-0">
+                                                <div className="shrink-0">
+                                                    <div className={cn(
+                                                        "w-10 h-10 rounded-lg flex items-center justify-center",
+                                                        task.analysis_scope === 'brand'
+                                                            ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                                            : "bg-secondary text-secondary-foreground"
+                                                    )}>
+                                                        <Sparkles className="h-5 w-5" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 min-w-0 space-y-1.5">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        {task.entity_name && (
-                                                            <Badge 
-                                                                variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
-                                                                className="text-[9px] py-0 gap-1"
-                                                            >
-                                                                {task.entity_name}
-                                                            </Badge>
-                                                        )}
-                                                        <code className="text-[10px] font-mono text-muted-foreground truncate max-w-[80px]">
-                                                            {task.task_id.slice(0, 8)}...
-                                                        </code>
-                                                        <Badge variant="outline" className="text-[9px] py-0">
-                                                            {formatExecutionTime(task.execution_time_seconds)}
+                                                        <span className="font-semibold text-sm truncate">
+                                                            {task.entity_name || 'Synthesis'}
+                                                        </span>
+                                                        <Badge
+                                                            variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
+                                                            className="text-[10px] px-2 py-0.5 font-medium capitalize"
+                                                        >
+                                                            {task.analysis_scope || 'brand'}
                                                         </Badge>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
-                                                        <Clock className="h-3 w-3" />
-                                                        {formatDate(task.timestamp)}
+                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Clock className="h-3.5 w-3.5" />
+                                                            {formatDate(task.timestamp)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
+                                                            ⏱️ {formatExecutionTime(task.execution_time_seconds)}
+                                                        </span>
                                                         {task.model_used && (
-                                                            <span className="text-[8px] opacity-70">
-                                                                • {task.model_used.includes('claude') ? 'Claude' : task.model_used.slice(0, 12)}
+                                                            <span className="opacity-70 hidden sm:inline">
+                                                                {task.model_used.includes('claude') ? '🤖 Claude' : task.model_used.slice(0, 10)}
                                                             </span>
                                                         )}
                                                     </div>
+
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-7 w-7"
-                                                        onClick={() => handleViewSynthesisResult(task.task_id)}
+                                                <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-9 px-3 gap-1.5"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleViewSynthesisResult(task.task_id);
+                                                        }}
                                                         disabled={loadingResultId === task.task_id}
                                                     >
                                                         {loadingResultId === task.task_id ? (
-                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
                                                         ) : (
-                                                            <Eye className="h-3.5 w-3.5" />
+                                                            <>
+                                                                <Eye className="h-4 w-4" />
+                                                                <span className="hidden sm:inline">View</span>
+                                                            </>
                                                         )}
                                                     </Button>
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-7 w-7 text-destructive hover:text-destructive"
-                                                        onClick={() => confirmDelete(task.task_id, 'synthesis')}
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            confirmDelete(task.task_id, 'synthesis');
+                                                        }}
                                                         disabled={deletingTaskId === task.task_id}
                                                     >
                                                         {deletingTaskId === task.task_id ? (
-                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
                                                         ) : (
-                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                            <Trash2 className="h-4 w-4" />
                                                         )}
                                                     </Button>
                                                 </div>
@@ -713,40 +877,17 @@ export function WebAgentsManager({
                 </Card>
             </div>
 
-            <Collapsible>
-                <CollapsibleTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between">
-                        <span className="flex items-center gap-2">
-                            <Search className="h-4 w-4" />
-                            Custom Instructions (Optional)
-                        </span>
-                        <ChevronDown className="h-4 w-4" />
-                    </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-4">
-                    <div className="space-y-2">
-                        <Input 
-                            placeholder="e.g., Focus on product features and pricing information..."
-                            value={customInstruction}
-                            onChange={(e) => setCustomInstruction(e.target.value)}
-                            className="w-full"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Add custom instructions to guide the extraction or synthesis agent's analysis.
-                        </p>
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
+
 
             {(selectedExtractionResult || selectedSynthesisResult) && (
-                <Tabs 
+                <Tabs
                     value={activeResultTab}
                     onValueChange={(value) => setActiveResultTab(value as 'extraction' | 'synthesis')}
                 >
                     <TabsList>
-                        <TabsTrigger 
-                            value="extraction" 
-                            
+                        <TabsTrigger
+                            value="extraction"
+
                             disabled={!selectedExtractionResult}
                         >
                             <Database className="w-4 h-4" />
@@ -755,9 +896,9 @@ export function WebAgentsManager({
                                 <Badge variant="outline" className="text-[9px] py-0 ml-1">No Data</Badge>
                             )}
                         </TabsTrigger>
-                        <TabsTrigger 
-                            value="synthesis" 
-                            
+                        <TabsTrigger
+                            value="synthesis"
+
                             disabled={!selectedSynthesisResult}
                         >
                             <Sparkles className="w-4 h-4" />
@@ -769,7 +910,7 @@ export function WebAgentsManager({
                     </TabsList>
                     <TabsContent value="extraction" className="border rounded-xl p-6 bg-card">
                         {selectedExtractionResult && (
-                            <WebExtractionResultViewer 
+                            <WebExtractionResultViewer
                                 data={selectedExtractionResult}
                                 onReRun={handleRunExtraction}
                                 isReRunning={isRunningExtraction}
@@ -778,7 +919,7 @@ export function WebAgentsManager({
                     </TabsContent>
                     <TabsContent value="synthesis" className="border rounded-xl p-6 bg-card">
                         {selectedSynthesisResult && (
-                            <WebSynthesisResultViewer 
+                            <WebSynthesisResultViewer
                                 data={selectedSynthesisResult}
                                 onReRun={handleRunSynthesis}
                                 isReRunning={isRunningSynthesis}

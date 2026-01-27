@@ -100,7 +100,7 @@ function MetricCard({ label, value, icon: Icon }: { label: string; value: any; i
 function SectionHeader({ title, icon: Icon, count }: { title: string; icon?: any; count?: number }) {
     return (
         <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-medium flex items-center gap-2">
+            <h4 className=" font-medium flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
                 {title}
             </h4>
@@ -117,7 +117,7 @@ function QuoteItem({ quote, url, verb }: { quote: string; url?: string; verb?: s
 
     return (
         <div className="border-l-2 border-muted-foreground/20 pl-3 py-2 hover:border-primary/50 transition-colors">
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className=" text-muted-foreground leading-relaxed">
                 {isLong && !isExpanded ? `${quote.slice(0, 150)}...` : quote}
             </p>
             <div className="flex items-center gap-2 mt-1">
@@ -170,7 +170,7 @@ function VerbCard({ verb, count, quotes }: { verb: string; count: number; quotes
             </CollapsibleTrigger>
             {hasQuotes && (
                 <CollapsibleContent>
-                    <div className="pl-10 pr-3 py-3 space-y-3 max-h-[300px] overflow-y-auto">
+                    <div className="pr-3 py-3 space-y-3 max-h-[300px] overflow-y-auto">
                         {quotes.slice(0, 10).map((quote, idx) => (
                             <QuoteItem key={idx} quote={quote} />
                         ))}
@@ -190,7 +190,7 @@ function FrequencyBar({ label, count, maxCount }: { label: string; count: number
     const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
     return (
         <div className="flex items-center gap-3 py-1.5">
-            <span className="text-sm font-medium w-28 truncate capitalize" title={label}>{label}</span>
+            <span className=" font-medium w-28 truncate capitalize" title={label}>{label}</span>
             <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
                     className="h-full bg-primary/70 rounded-full transition-all"
@@ -261,19 +261,19 @@ function AuditMetadataSection({ data }: { data: any }) {
     const persona = safeGet(data, 'persona', null);
 
     return (
-        <div className="flex flex-wrap gap-4 p-4 bg-muted/30 rounded-lg border">
+        <div className="flex flex-wrap gap-4 p-4 bg-muted/30 rounded-xl border">
             <div className="flex items-center gap-2">
                 <Badge variant="outline">Audit Date</Badge>
-                <span className="text-sm">{date}</span>
+                <span className="">{date}</span>
             </div>
             <div className="flex items-center gap-2">
                 <Badge variant="outline">Agent</Badge>
-                <span className="text-sm">{agentName}</span>
+                <span className="">{agentName}</span>
             </div>
             {persona && (
                 <div className="flex items-center gap-2">
                     <Badge variant="outline">Persona</Badge>
-                    <span className="text-sm italic">{persona}</span>
+                    <span className=" ">{persona}</span>
                 </div>
             )}
         </div>
@@ -607,13 +607,13 @@ export function ExtractionOutputViewer({ output }: ExtractionOutputViewerProps) 
     if (!parsedData) {
         return (
             <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2  text-muted-foreground">
                     <FileText className="w-4 h-4" />
                     <span>Raw Output (could not parse as structured data)</span>
                 </div>
                 <ScrollArea className="h-[500px] border rounded-lg">
                     <div className="p-4">
-                        <pre className="text-sm whitespace-pre-wrap break-all">
+                        <pre className=" whitespace-pre-wrap break-all">
                             {typeof output === 'string' ? output : JSON.stringify(output, null, 2)}
                         </pre>
                     </div>
@@ -735,13 +735,13 @@ export function ExtractionOutputViewer({ output }: ExtractionOutputViewerProps) 
                 </Tabs>
             ) : (
                 <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2  text-muted-foreground">
                         <FileText className="w-4 h-4" />
                         <span>Parsed Data (no recognized sections found)</span>
                     </div>
                     <ScrollArea className="h-[400px] border rounded-lg">
                         <div className="p-4">
-                            <pre className="text-sm whitespace-pre-wrap break-all">
+                            <pre className=" whitespace-pre-wrap break-all">
                                 {JSON.stringify(parsedData, null, 2)}
                             </pre>
                         </div>

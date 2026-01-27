@@ -39,7 +39,6 @@ export function WebExtractionResultViewer({ data, onReRun, isReRunning = false }
             <div className="flex justify-between items-center pb-2 border-b">
                 <div>
                     <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Check className="w-5 h-5 text-green-500" />
                         Web Extraction Complete
                         {metadata.entityName && (
                             <Badge
