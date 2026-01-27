@@ -22,6 +22,7 @@ import { WebAgentsManager } from '../WebAgentsManager';
 import { SocialAgentsManager } from '../SocialAgentsManager';
 import { SocialDataViewer } from './SocialDataViewer';
 import { WebsiteDataViewer } from './WebsiteDataViewer';
+import { MdOutlineArrowLeft } from 'react-icons/md';
 
 type WebsiteBatch = {
     batch_id: string;
@@ -107,7 +108,13 @@ export function DataViewManager({
     const competitors = useMemo(() => 
         brandData?.competitors?.map((c: any) => ({
             id: c.competitor_id,
-            name: c.name
+            name: c.name,
+            linkedin_url: c.linkedin_url,
+            facebook_url: c.facebook_url,
+            instagram_url: c.instagram_url,
+            x_url: c.x_url,
+            youtube_url: c.youtube_url,
+            tiktok_url: c.tiktok_url
         })) ?? [], 
         [brandData?.competitors]
     );
@@ -148,12 +155,28 @@ export function DataViewManager({
 
     return (
         <div className="space-y-8 w-full pb-12">
+            <Button asChild className="rounded-full" variant={'secondary'}>
+                <Link href="/dashboard/brandos-v2.1/gather">
+                    <MdOutlineArrowLeft/>
+                    Back
+                </Link>
+            </Button>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h3 className="text-2xl font-medium tracking-tight">{brandData.name}</h3>
                     <p className="text-muted-foreground">Captured Data & Analysis</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
+                    <RecollectDialog
+                        brandId={brandId}
+                        brandName={brandData.name}
+                        variant="button"
+                        trigger={
+                            <Button>
+                                Re Capture
+                            </Button>
+                        }
+                    />
                     {hasWebsiteData && (
                         <BatchSelector
                             type="website"
@@ -172,26 +195,6 @@ export function DataViewManager({
                     )}
                 </div>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-                <RecollectDialog
-                    brandId={brandId}
-                    brandName={brandData.name}
-                    variant="button"
-                    trigger={
-                        <Button>
-                            Re Capture
-                        </Button>
-                    }
-                />
-                <Button asChild variant={'secondary'}>
-                    <Link href="/dashboard/brandos-v2.1/gather">
-                        <AiOutlinePieChart className="w-4 h-4" />
-                        Data Gathering
-                    </Link>
-                </Button>
-            </div>
-
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList>
                     <TabsTrigger value="brand_profile">Brand Profile</TabsTrigger>

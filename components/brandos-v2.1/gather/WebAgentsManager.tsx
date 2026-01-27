@@ -526,7 +526,6 @@ export function WebAgentsManager({
                                                         <Skeleton className="h-4 w-36" />
                                                         <Skeleton className="h-4 w-16 rounded-full" />
                                                     </div>
-                                                    <Skeleton className="h-3 w-24" />
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Skeleton className="h-9 w-20 rounded-md" />
@@ -766,7 +765,6 @@ export function WebAgentsManager({
                                                         <Skeleton className="h-4 w-36" />
                                                         <Skeleton className="h-4 w-16 rounded-full" />
                                                     </div>
-                                                    <Skeleton className="h-3 w-24" />
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Skeleton className="h-9 w-20 rounded-md" />

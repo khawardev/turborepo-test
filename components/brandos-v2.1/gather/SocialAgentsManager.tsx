@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -46,17 +46,17 @@ type SocialAgentsManagerProps = {
     batchSocialTaskId: string | null;
     brandName?: string;
     availableChannels: string[];
-    competitors?: Array<{ id: string; name: string }>;
+    competitors?: Array<{
+        id: string;
+        name: string;
+        linkedin_url?: string;
+        facebook_url?: string;
+        instagram_url?: string;
+        x_url?: string;
+        youtube_url?: string;
+        tiktok_url?: string;
+    }>;
 }
-
-const CHANNEL_ICONS: Record<string, string> = {
-    linkedin: '💼',
-    instagram: '📸',
-    facebook: '👤',
-    x: '𝕏',
-    youtube: '▶️',
-    tiktok: '🎵'
-};
 
 // Cache to store tasks by brandId to prevent reloading on tab switch
 const TASKS_CACHE: Record<string, SocialReportsTaskListItem[]> = {};
@@ -78,13 +78,37 @@ export function SocialAgentsManager({
     const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
     const [analysisScope, setAnalysisScope] = useState<AnalysisScope>('brand');
     const [selectedChannel, setSelectedChannel] = useState<SocialChannelName>(
-        availableChannels[0] as SocialChannelName || 'linkedin'
+        (availableChannels[0] as SocialChannelName) || 'linkedin'
     );
     const [selectedCompetitorId, setSelectedCompetitorId] = useState<string | null>(null);
     const [customInstruction, setCustomInstruction] = useState('');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const getCompetitorChannels = (competitorId: string): string[] => {
+        const competitor = competitors.find(c => c.id === competitorId);
+        if (!competitor) return [];
+        
+        const channels: string[] = [];
+        if (competitor.linkedin_url) channels.push('linkedin');
+        if (competitor.facebook_url) channels.push('facebook');
+        if (competitor.instagram_url) channels.push('instagram');
+        if (competitor.x_url) channels.push('x');
+        if (competitor.youtube_url) channels.push('youtube');
+        if (competitor.tiktok_url) channels.push('tiktok');
+        
+        return channels;
+    };
+
+    const currentAvailableChannels = useMemo(() => {
+        if (analysisScope === 'brand') {
+            return availableChannels;
+        } else if (analysisScope === 'competitors') {
+            return selectedCompetitorId ? getCompetitorChannels(selectedCompetitorId) : [];
+        }
+        return [];
+    }, [analysisScope, selectedCompetitorId, availableChannels, competitors]);
 
     const loadReportsTasks = useCallback(async () => {
         // Check cache first
@@ -114,10 +138,14 @@ export function SocialAgentsManager({
     }, [loadReportsTasks]);
 
     useEffect(() => {
-        if (availableChannels.length > 0 && !availableChannels.includes(selectedChannel)) {
-            setSelectedChannel(availableChannels[0] as SocialChannelName);
+        // When scope or competitor changes, we need to validate if selected channel is still valid
+        // or default to the first available one
+        if (currentAvailableChannels.length > 0) {
+            if (!currentAvailableChannels.includes(selectedChannel)) {
+                setSelectedChannel(currentAvailableChannels[0] as SocialChannelName);
+            }
         }
-    }, [availableChannels, selectedChannel]);
+    }, [currentAvailableChannels, selectedChannel]);
 
     useEffect(() => {
         return () => {
@@ -136,6 +164,11 @@ export function SocialAgentsManager({
         if (analysisScope === 'competitors' && !selectedCompetitorId && competitors.length > 0) {
             toast.error('Please select a competitor for competitor analysis.');
             return;
+        }
+
+        if (currentAvailableChannels.length === 0) {
+             toast.error('No social channels available for the selected entity.');
+             return;
         }
 
         setIsRunningReports(true);
@@ -304,30 +337,6 @@ export function SocialAgentsManager({
                         <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger asChild disabled={isRunningReports || availableChannels.length === 0}>
-                                        <Button variant="outline" className="h-9 justify-between min-w-[140px] capitalize">
-                                            <span className="flex items-center gap-2">
-                                                {/* <span>{CHANNEL_ICONS[selectedChannel] || '📱'}</span> */}
-                                                {selectedChannel}
-                                            </span>
-                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        {availableChannels.map((channel) => (
-                                            <DropdownMenuItem
-                                                key={channel}
-                                                onClick={() => setSelectedChannel(channel as SocialChannelName)}
-                                                className="capitalize"
-                                            >
-                                                {/* <span className="mr-2">{CHANNEL_ICONS[channel] || '📱'}</span> */}
-                                                {channel}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <DropdownMenu>
                                     <DropdownMenuTrigger asChild disabled={isRunningReports}>
                                         <Button variant="outline" className="h-9 justify-between capitalize">
                                             {analysisScope}
@@ -363,12 +372,35 @@ export function SocialAgentsManager({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 )}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild disabled={isRunningReports || currentAvailableChannels.length === 0}>
+                                        <Button variant="outline" className="h-9 justify-between min-w-[140px] capitalize">
+                                            <span className="flex items-center gap-2">
+                                                {/* <span>{CHANNEL_ICONS[selectedChannel] || '📱'}</span> */}
+                                                {selectedChannel}
+                                            </span>
+                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        {currentAvailableChannels.map((channel) => (
+                                            <DropdownMenuItem
+                                                key={channel}
+                                                onClick={() => setSelectedChannel(channel as SocialChannelName)}
+                                                className="capitalize"
+                                            >
+                                                {/* <span className="mr-2">{CHANNEL_ICONS[channel] || '📱'}</span> */}
+                                                {channel}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                                 <Button
                                     onClick={handleRunReports}
                                     disabled={
                                         isRunningReports ||
                                         !batchSocialTaskId ||
-                                        availableChannels.length === 0 ||
+                                        currentAvailableChannels.length === 0 ||
                                         (analysisScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
                                     }
 
@@ -423,10 +455,10 @@ export function SocialAgentsManager({
                             </div>
                         )}
 
-                        {availableChannels.length === 0 && batchSocialTaskId && (
-                            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
+                        {currentAvailableChannels.length === 0 && batchSocialTaskId && (
+                             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
                                 <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span>No social channels with data available.</span>
+                                <span>No social channels with data available for the selected {analysisScope === 'brand' ? 'brand' : 'competitor'}.</span>
                             </div>
                         )}
 
@@ -452,7 +484,6 @@ export function SocialAgentsManager({
                                                         <Skeleton className="h-4 w-36" />
                                                         <Skeleton className="h-4 w-16 rounded-full" />
                                                     </div>
-                                                    <Skeleton className="h-3 w-24" />
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Skeleton className="h-9 w-20 rounded-md" />

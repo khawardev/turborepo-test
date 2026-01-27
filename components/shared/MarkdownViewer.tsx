@@ -5,7 +5,7 @@ import { cleanAndFlattenBullets } from "@/lib/static/cleanMarkdown";
 
 export const MarkdownViewer = ({ content }: { content: string }) => {
     return (
-        <div className="prose prose-neutral max-w-none markdown-body space-y-4  dark:prose-invert">
+        <div className="markdown-body">
             <ReactMarkdown components={{
                 img: ({ node, ...props }) => {
                     if (!props.src) return null
@@ -17,7 +17,7 @@ export const MarkdownViewer = ({ content }: { content: string }) => {
                     </div>
                 ),
             }}  remarkPlugins={[remarkGfm]}>
-                {cleanAndFlattenBullets(content)} 
+                {content} 
             </ReactMarkdown>
         </div>
     );

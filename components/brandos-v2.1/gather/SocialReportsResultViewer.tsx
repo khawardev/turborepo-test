@@ -116,7 +116,7 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                 </CardHeader>
             </Card>
 
-            <Card className="overflow-hidden">
+            <Card >
                 <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
                         <FileText className="w-4 h-4 text-primary" />
@@ -124,7 +124,7 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                     </CardTitle>
                 </CardHeader>
                 <CardContent >
-                    <ScrollArea className="h-[500px] w-full">
+                    <ScrollArea className="h-[600px] w-full">
                         {social_report ? (
                             <MarkdownViewer content={social_report} />
                         ) : (
@@ -133,7 +133,7 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                     </ScrollArea>
                 </CardContent>
             </Card>
-
+         
             <div className="mt-8 pt-4 border-t">
                 <details className="group">
                     <summary className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors w-fit p-2 rounded-md hover:bg-muted/50">

@@ -3,13 +3,17 @@
 import { useMemo } from 'react';
 import { format, parseISO } from 'date-fns';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Globe, Share2, CheckCircle2, AlertCircle, Loader2, Clock } from 'lucide-react';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { Globe, Share2, CheckCircle2, AlertCircle, Loader2, Clock, ChevronDown, Check } from 'lucide-react';
 
 type BatchItem = {
     batch_id: string;
@@ -37,24 +41,24 @@ function formatBatchTime(createdAt: string): string {
 function getStatusIcon(status: string) {
     const normalized = status?.toLowerCase() || '';
     if (normalized === 'completed') {
-        return <CheckCircle2 className="w-3 h-3 text-green-500" />;
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
     }
     if (normalized === 'completedwitherrors') {
-        return <AlertCircle className="w-3 h-3 text-yellow-500" />;
+        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
     }
     if (normalized === 'failed') {
-        return <AlertCircle className="w-3 h-3 text-destructive" />;
+        return <AlertCircle className="w-4 h-4 text-destructive" />;
     }
     if (normalized === 'processing' || normalized === 'initializing') {
-        return <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />;
+        return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
     }
-    return <Clock className="w-3 h-3 text-muted-foreground" />;
+    return <Clock className="w-4 h-4 text-muted-foreground" />;
 }
 
 function getStatusText(status: string): string {
     const normalized = status?.toLowerCase() || '';
     if (normalized === 'completed') return 'Completed';
-    if (normalized === 'completedwitherrors') return 'Completed with Errors';
+    if (normalized === 'completedwitherrors') return 'Completed w/ Errors';
     if (normalized === 'failed') return 'Failed';
     if (normalized === 'processing') return 'Processing';
     if (normalized === 'initializing') return 'Initializing';
@@ -82,45 +86,86 @@ export function BatchSelector({
         [batches, selectedBatchId]
     );
 
+    const normalizedType = type === 'website' ? 'Website' : 'Social';
+
     if (sortedBatches.length === 0) {
         return null;
     }
 
     return (
-        <div className="flex items-center gap-2">
-            <Icon className="w-4 h-4 text-muted-foreground" />
-            <Select
-                value={selectedBatchId || ''}
-                onValueChange={onBatchChange}
-                disabled={disabled}
-            >
-                <SelectTrigger className="w-[260px]">
-                    <SelectValue placeholder={`Select ${label}`}>
-                        {selectedBatch && (
-                            <div className="flex items-center gap-2">
-                                {getStatusIcon(selectedBatch.status)}
-                                <span className="truncate">{formatBatchTime(selectedBatch.created_at)}</span>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    disabled={disabled}
+                    className={cn(
+                        "rounded-xl h-auto py-2",
+                        !selectedBatch && "text-muted-foreground"
+                    )}
+                >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <Badge variant={'secondary'} className="shrink-0">
+                            {normalizedType}
+                        </Badge>
+                        {selectedBatch ? (
+                            <div className="flex items-center gap-2 truncate text-foreground">
+                                {/* {getStatusIcon(selectedBatch.status)} */}
+                                <div className="flex flex-col gap-0.5 truncate text-left">
+                                    <span className="truncate font-medium text-sm leading-none">
+                                        {formatBatchTime(selectedBatch.created_at)}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground leading-none">
+                                        {getStatusText(selectedBatch.status)}
+                                    </span>
+                                </div>
                             </div>
+                        ) : (
+                            <span>Select {label}</span>
                         )}
-                    </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                    {sortedBatches.map((batch, index) => (
-                        <SelectItem key={batch.batch_id} value={batch.batch_id}>
-                            <div className="flex items-center gap-2">
-                                {getStatusIcon(batch.status)}
-                                <span>{formatBatchTime(batch.created_at)}</span>
-                                <span className="text-xs text-muted-foreground">
-                                    ({getStatusText(batch.status)})
-                                </span>
-                                {index === 0 && (
-                                    <span className="text-xs font-medium text-primary">(Latest)</span>
-                                )}
+                    </div>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[300px]" align="start">
+                <DropdownMenuLabel label={`${normalizedType} Batches`} />
+                <DropdownMenuSeparator />
+                {sortedBatches.map((batch, index) => {
+                    const isSelected = selectedBatchId === batch.batch_id;
+                    return (
+                        <DropdownMenuItem 
+                            key={batch.batch_id} 
+                            onSelect={() => onBatchChange(batch.batch_id)}
+                            className="cursor-pointer py-2.5 items-start px-3"
+                        >
+                            <div className={cn(
+                                "mr-2 flex h-4 w-4 shrink-0 items-center justify-center mt-0.5 transition-opacity",
+                                isSelected ? "opacity-100" : "opacity-0"
+                            )}>
+                                <Check className="h-4 w-4" />
                             </div>
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        </div>
+                            <div className="flex flex-1 flex-col gap-1 w-full min-w-0">
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="font-medium text-sm truncate">
+                                        {formatBatchTime(batch.created_at)}
+                                    </span>
+                                    {index === 0 && (
+                                        <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary ml-2 shrink-0">
+                                            Latest
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1.5 text-muted-foreground">
+                                    {/* {getStatusIcon(batch.status)} */}
+                                    <span className="text-xs truncate">
+                                        {getStatusText(batch.status)}
+                                    </span>
+                                </div>
+                            </div>
+                        </DropdownMenuItem>
+                    );
+                })}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }
