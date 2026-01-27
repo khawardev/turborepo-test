@@ -3,6 +3,9 @@ import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/brand
 import { GatherBrandList } from '@/components/brandos-v2.1/gather/GatherBrandList';
 import { ActiveTasksBannerWrapper } from './ActiveTasksBannerWrapper';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function GatherPage() {
     const brands = await getEnrichedBrands();
 
@@ -33,4 +36,3 @@ export default async function GatherPage() {
         </div>
     );
 }
-

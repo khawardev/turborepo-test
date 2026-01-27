@@ -4,6 +4,7 @@ import { brandRequest } from "@/server/api/brandRequest";
 import { revalidatePath } from "next/cache";
 import { SCRAPING } from "@/lib/constants";
 import { getCurrentUser } from "@/server/actions/authActions";
+import { cache } from "react";
 
 export async function scrapeBatchWebsite(brand_id: any, limit: any) {
     try {
@@ -126,7 +127,7 @@ export async function getWebsiteBatchIdWithUser(brand_id: string, user: any) {
     }
 }
 
-export async function getpreviousWebsiteScraps(brand_id: string) {
+async function fetchPreviousWebsiteScrapsInternal(brand_id: string) {
     try {
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
@@ -162,3 +163,5 @@ export async function getpreviousWebsiteScraps(brand_id: string) {
         return null;
     }
 }
+
+export const getpreviousWebsiteScraps = cache(fetchPreviousWebsiteScrapsInternal);

@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export async function login(values: z.infer<typeof loginSchema>) {
   try {
@@ -129,13 +130,44 @@ export async function logout() {
   return { success: true, message: "Logged out successfully" };
 }
 
-export async function getCurrentUser() {
+let refreshPromise: Promise<any> | null = null;
+
+async function refreshTokenWithLock(refreshToken: string) {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const refreshRes = await authRequest("/refresh-token", "POST", {
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!refreshRes.success) {
+        return null;
+      }
+
+      if (!refreshRes.data?.access_token) {
+        return null;
+      }
+
+      return refreshRes.data;
+    } finally {
+      setTimeout(() => {
+        refreshPromise = null;
+      }, 1000);
+    }
+  })();
+
+  return refreshPromise;
+}
+
+async function fetchUserInternal(): Promise<any> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
   if (!accessToken && !refreshToken) {
-    console.log("[getCurrentUser] No tokens available");
     return null;
   }
 
@@ -148,8 +180,6 @@ export async function getCurrentUser() {
       if (success) {
         return data;
       }
-
-      console.log("[getCurrentUser] Access token invalid, will attempt refresh:", error);
     } catch (error) {
       console.error("[getCurrentUser] Access token validation error:", error);
     }
@@ -157,59 +187,46 @@ export async function getCurrentUser() {
 
   if (refreshToken) {
     try {
-      console.log("[getCurrentUser] Attempting token refresh...");
-      const refreshRes = await authRequest("/refresh-token", "POST", {
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
+      const refreshData = await refreshTokenWithLock(refreshToken);
 
-      if (!refreshRes.success) {
-        console.error("[getCurrentUser] Token refresh failed:", refreshRes.error);
+      if (!refreshData) {
         return null;
       }
-
-      if (!refreshRes.data?.access_token) {
-        console.error("[getCurrentUser] Refresh response missing access_token");
-        return null;
-      }
-
-      console.log("[getCurrentUser] Token refresh successful, updating cookies...");
 
       try {
-        cookieStore.set("access_token", refreshRes.data.access_token, {
+        cookieStore.set("access_token", refreshData.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           path: "/",
         });
 
-        if (refreshRes.data?.refresh_token) {
-          cookieStore.set("refresh_token", refreshRes.data.refresh_token, {
+        if (refreshData.refresh_token) {
+          cookieStore.set("refresh_token", refreshData.refresh_token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             path: "/",
           });
         }
       } catch (cookieError) {
-        console.warn("[getCurrentUser] Could not set cookies (likely called from RSC), continuing with new token in memory.", cookieError);
+        console.warn("[getCurrentUser] Could not set cookies (likely called from RSC)");
       }
 
       const userRes = await authRequest("/users/me/", "GET", {
-        headers: { Authorization: `Bearer ${refreshRes.data.access_token}` },
+        headers: { Authorization: `Bearer ${refreshData.access_token}` },
       });
 
       if (userRes.success) {
-        console.log("[getCurrentUser] User fetched successfully after refresh");
         return userRes.data;
       }
-
-      console.error("[getCurrentUser] Failed to fetch user after refresh:", userRes.error);
     } catch (error) {
       console.error("[getCurrentUser] Token refresh error:", error);
     }
   }
 
-  console.log("[getCurrentUser] All authentication attempts failed");
   return null;
 }
+
+export const getCurrentUser = cache(fetchUserInternal);
 
 export async function googleLogin() {
   redirect(`${process.env.API_URL}/login/google`);

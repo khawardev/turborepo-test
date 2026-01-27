@@ -4,6 +4,7 @@ import { brandRequest } from "@/server/api/brandRequest";
 import { revalidatePath } from "next/cache";
 import { SCRAPE, SCRAPING } from "@/lib/constants";
 import { getCurrentUser } from "@/server/actions/authActions";
+import { cache } from "react";
 
 export async function scrapeBatchSocial(
     brand_id: any,
@@ -81,7 +82,7 @@ export async function getScrapeBatchSocial(brand_id: string, batch_id: any) {
     }
 }
 
-export async function getPreviousSocialScrapes(brand_id: string) {
+async function fetchPreviousSocialScrapesInternal(brand_id: string) {
     try {
         const user = await getCurrentUser();
         if (!user || !user.client_id) return null;
@@ -115,6 +116,8 @@ export async function getPreviousSocialScrapes(brand_id: string) {
         return null;
     }
 }
+
+export const getPreviousSocialScrapes = cache(fetchPreviousSocialScrapesInternal);
 
 export async function getSocialBatchId(brand_id: string) {
     try {
