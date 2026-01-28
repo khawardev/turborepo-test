@@ -2,6 +2,7 @@
 
 import { prepareGoogleSlidesExportData } from '@/lib/brandos-v2.1/markdownToSlides';
 import { parseWebSynthesisMarkdown } from '@/lib/brandos-v2.1/markdownToWebSynthesisSlides';
+import { generateWebSynthesisPPTX } from '@/lib/brandos-v2.1/pptx/webSynthesisGenerator';
 
 type ExportToPPTXParams = {
     social_report: string;
@@ -100,34 +101,10 @@ export async function exportWebSynthesisToSlides(params: ExportWebSynthesisToPPT
     try {
         const exportData = parseWebSynthesisMarkdown(synthesis_report);
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-            (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-        
-        const response = await fetch(`${baseUrl}/api/pptx/web-synthesis`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                entity_name,
-                export_data: exportData
-            }),
-        });
-
-        if (!response.ok) {
-             const errorData = await response.json().catch(() => ({}));
-            return {
-                success: false,
-                error: errorData.error || `Export failed with status ${response.status}`
-            };
-        }
-
-        const contentDisposition = response.headers.get('Content-Disposition');
-        const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-        const filename = filenameMatch ? filenameMatch[1] : `${entity_name}_Web_Synthesis.pptx`;
-
-        const arrayBuffer = await response.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        // DIRECT GENERATION (Authentication Safe)
+        const buffer = await generateWebSynthesisPPTX(exportData);
+        const base64 = buffer.toString('base64');
+        const filename = `${entity_name}_Web_Synthesis_Report.pptx`;
 
         return {
             success: true,
