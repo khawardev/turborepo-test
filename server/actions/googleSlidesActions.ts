@@ -25,6 +25,8 @@ type ExportResult = {
     error?: string;
 };
 
+import { generateSocialReportPPTX } from '@/lib/brandos-v2.1/pptx/socialReportGenerator';
+
 export async function exportToGoogleSlides(params: ExportToPPTXParams): Promise<ExportResult> {
     const {
         social_report,
@@ -41,36 +43,13 @@ export async function exportToGoogleSlides(params: ExportToPPTXParams): Promise<
 
     try {
         const exportData = prepareGoogleSlidesExportData(social_report);
-
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-            (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         
-        const response = await fetch(`${baseUrl}/api/pptx/export`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                entity_name,
-                channel_name,
-                export_data: exportData
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            return {
-                success: false,
-                error: errorData.error || `Export failed with status ${response.status}`
-            };
-        }
-
-        const contentDisposition = response.headers.get('Content-Disposition');
-        const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-        const filename = filenameMatch ? filenameMatch[1] : `${entity_name}_Report.pptx`;
-
-        const arrayBuffer = await response.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        // Ensure exportData matches the expected interface for generateSocialReportPPTX
+        // We might need to map or cast if interfaces slightly differ, but they should be compatible
+        // based on previous analysis.
+        const buffer = await generateSocialReportPPTX(exportData as any, entity_name);
+        const base64 = buffer.toString('base64');
+        const filename = `${entity_name}_Report.pptx`;
 
         return {
             success: true,
