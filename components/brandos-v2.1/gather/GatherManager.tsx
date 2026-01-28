@@ -859,6 +859,11 @@ export function GatherManager({
                                     taskId={socialReportsTaskId}
                                     result={socialReportsResult}
                                     RenderResult={SocialReportsResultViewer}
+                                    resultProps={{
+                                        clientId: brandData?.client_id,
+                                        brandId: brandId,
+                                        channelName: socialReportsChannel
+                                    }}
                                     isDisabled={!currentSocialBatchId || !availableChannels.length}
                                     buttonLabel="Generate Report"
                                     processingLabels={{

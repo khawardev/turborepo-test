@@ -19,7 +19,8 @@ interface AuditorAgentCardProps {
     onRun: () => void;
     taskId?: string | null;
     result?: any;
-    RenderResult?: React.ComponentType<{ data: any, onReRun?: () => void, isReRunning?: boolean }>;
+    RenderResult?: React.ComponentType<{ data: any, onReRun?: () => void, isReRunning?: boolean, [key: string]: any }>;
+    resultProps?: Record<string, any>; // Additional props to pass to RenderResult
     controls?: ReactNode; // Extra controls like Select
     isDisabled?: boolean;
     buttonLabel?: string;
@@ -40,6 +41,7 @@ export function AuditorAgentCard({
     taskId,
     result,
     RenderResult,
+    resultProps = {},
     controls,
     isDisabled,
     buttonLabel = "Run Analysis",
@@ -162,7 +164,8 @@ export function AuditorAgentCard({
                             <RenderResult 
                                 data={result} 
                                 onReRun={onRun}
-                                isReRunning={isRunning} 
+                                isReRunning={isRunning}
+                                {...resultProps}
                             />
                          </div>
                     </CollapsibleContent>

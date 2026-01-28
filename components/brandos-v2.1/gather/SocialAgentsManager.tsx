@@ -596,11 +596,14 @@ export function SocialAgentsManager({
 
 
             {selectedReportsResult && (
-                <Card className="border rounded-xl p-6 bg-card">
+                <Card className="border rounded-2xl p-6 bg-card">
                     <SocialReportsResultViewer
                         data={selectedReportsResult}
                         onReRun={handleRunReports}
                         isReRunning={isRunningReports}
+                        clientId={clientId}
+                        brandId={brandId}
+                        channelName={selectedChannel}
                     />
                 </Card>
             )}

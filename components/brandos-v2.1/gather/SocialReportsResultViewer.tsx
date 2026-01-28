@@ -1,24 +1,39 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
-    Terminal, Clock, Users, FileText, Calendar, Bot,
-    Copy, CheckCircle2, Loader2, Trash2, RefreshCw
+    Terminal, Clock, FileText, Calendar, Bot,
+    Copy, CheckCircle2, Loader2, Trash2, RefreshCw, 
+    Presentation
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from "sonner";
+import { exportToGoogleSlides } from "@/server/actions/googleSlidesActions";
 
 interface SocialReportsResultViewerProps {
     data: any;
     onReRun?: () => void;
     isReRunning?: boolean;
+    clientId?: string;
+    brandId?: string;
+    channelName?: string;
 }
 
-export function SocialReportsResultViewer({ data, onReRun, isReRunning }: SocialReportsResultViewerProps) {
+export function SocialReportsResultViewer({ 
+    data, 
+    onReRun, 
+    isReRunning,
+    clientId,
+    brandId,
+    channelName = 'linkedin'
+}: SocialReportsResultViewerProps) {
+    const [isExporting, setIsExporting] = useState(false);
+
     if (!data) return null;
 
     const {
@@ -36,6 +51,40 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
         if (social_report) {
             navigator.clipboard.writeText(social_report);
             toast.success("Report copied to clipboard");
+        }
+    };
+
+    const handleExportToSlides = async () => {
+        if (!social_report) {
+            toast.error("No report content to export");
+            return;
+        }
+
+        setIsExporting(true);
+        try {
+            const result = await exportToGoogleSlides({
+                social_report: social_report,
+                entity_name: entity_name || 'Social Report',
+                channel_name: channelName
+            });
+
+            if (result.success && result.data?.download_url) {
+                const link = document.createElement('a');
+                link.href = result.data.download_url;
+                link.download = result.data.filename || 'Social_Report.pptx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                toast.success("PowerPoint presentation downloaded successfully!");
+            } else {
+                toast.error(result.error || "Failed to export presentation");
+            }
+        } catch (error: any) {
+            console.error('Export error:', error);
+            toast.error(error?.message || "An error occurred while exporting");
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -71,8 +120,8 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                             </Badge>
                         </div>
 
-                        <div className="flex flex-wrap  justify-between items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
-                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
+                        <div className="flex flex-wrap  justify-between items-center gap-3 text-xs text-muted-foreground pt-2">
+                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2">
                                 <span className="flex items-center gap-1.5">
                                     <Bot className="w-3.5 h-3.5" />
                                     <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
@@ -95,10 +144,22 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                                     </span>
                                 )}
                             </div>
-                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2 border-t">
+                            <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2">
                                 <Button variant="outline" size="sm" onClick={handleCopyReport}>
                                     <Copy className="w-3.5 h-3.5" />
                                     Copy Report
+                                </Button>
+                                <Button 
+                                    size="sm" 
+                                    onClick={handleExportToSlides}
+                                    disabled={isExporting}
+                                >
+                                    {isExporting ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <Presentation className="w-3.5 h-3.5" />
+                                    )}
+                                    Download PPTX
                                 </Button>
                                 {onReRun && (
                                     <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
@@ -134,7 +195,7 @@ export function SocialReportsResultViewer({ data, onReRun, isReRunning }: Social
                 </CardContent>
             </Card>
          
-            <div className="mt-8 pt-4 border-t">
+            <div className="mt-8 pt-4">
                 <details className="group">
                     <summary className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors w-fit p-2 rounded-md hover:bg-muted/50">
                         <Terminal className="h-4 w-4" />
