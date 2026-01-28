@@ -1,14 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle, FileText, Clock, Terminal, Cpu, Sparkles, Copy, Building2, Users } from "lucide-react";
+import { RefreshCw, Sparkles, Copy, Download, FileText, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from 'react-markdown';
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from 'sonner';
+import { exportWebSynthesisToSlides } from "@/server/actions/googleSlidesActions";
+import { Separator } from "@/components/ui/separator";
 
 type WebSynthesisResultViewerProps = {
     data: any;
@@ -17,121 +19,161 @@ type WebSynthesisResultViewerProps = {
 }
 
 export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }: WebSynthesisResultViewerProps) {
+    const [isExporting, setIsExporting] = useState(false);
+
     if (!data) return null;
 
     const synthesisReport = data.synthesis_report || '';
     const executionTimeValue = typeof data.execution_time_seconds === 'number' && !isNaN(data.execution_time_seconds)
         ? data.execution_time_seconds.toFixed(2)
         : 'N/A';
+        
     const metadata = {
         taskId: data.task_id || 'N/A',
-        clientId: data.client_id || 'N/A',
-        brandId: data.brand_id || 'N/A',
-        batchId: data.batch_id || 'N/A',
-        entityName: data.entity_name || null,
-        analysisScope: data.analysis_scope || null,
-        modelUsed: data.model_used || 'Claude 4.5 Sonnet',
+        entityName: data.entity_name || 'Brand',
+        analysisScope: data.analysis_scope || 'N/A',
         timestamp: data.timestamp ? new Date(data.timestamp).toLocaleString() : 'N/A',
         executionTime: executionTimeValue !== 'N/A' ? `${executionTimeValue}s` : 'N/A',
     };
 
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            const result = await exportWebSynthesisToSlides({
+                synthesis_report: synthesisReport,
+                entity_name: metadata.entityName
+            });
+
+            if (result.success && result.data?.download_url) {
+                const link = document.createElement('a');
+                link.href = result.data.download_url;
+                link.download = result.data.filename || `${metadata.entityName}_Web_Synthesis.pptx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                toast.success('PPTX Exported Successfully!');
+            } else {
+                toast.error(result.error || 'Failed to export presentation');
+            }
+        } catch (e) {
+            toast.error('An unexpected error occurred during export');
+            console.error(e);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(synthesisReport);
+        toast.success('Report copied to clipboard');
+    };
+
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden animate-in fade-in duration-500">
-            <div className="flex justify-between items-center pb-2 border-b">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
                 <div>
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-purple-500" />
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                        <Sparkles className="w-5 h-5 text-purple-600" />
                         Web Synthesis Report
-                        {metadata.entityName && (
-                            <Badge
-                                variant={metadata.analysisScope === 'brand' ? 'default' : 'secondary'}
-                                className="ml-2 gap-1"
-                            >
-                                {metadata.entityName}
-                            </Badge>
-                        )}
+                        <Badge variant="outline" className="ml-2 font-mono text-xs">
+                            {metadata.entityName.toUpperCase()}
+                        </Badge>
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Comprehensive analysis completed • {metadata.timestamp}
-                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                        <ClockIcon className="w-3 h-3" />
+                        <span>Generated on {metadata.timestamp}</span>
+                        <span>•</span>
+                        <span>Time: {metadata.executionTime}</span>
+                    </div>
                 </div>
-                {onReRun && (
-                    <Button
-                        variant="outline"
-                        onClick={onReRun}
-                        disabled={isReRunning}
+                
+                <div className="flex items-center gap-2">
+                    {onReRun && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onReRun}
+                            disabled={isReRunning}
+                            className="bg-background"
+                        >
+                            <RefreshCw className={cn("w-3.5 h-3.5 mr-2", isReRunning && "animate-spin")} />
+                            {isReRunning ? "Synthesizing..." : "Re-Run Analysis"}
+                        </Button>
+                    )}
+                    
+                    <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={handleExport} 
+                        disabled={isExporting}
+                        className="bg-green-600 hover:bg-green-700 text-white"
                     >
-                        <RefreshCw className={cn("w-4 h-4", isReRunning && "animate-spin")} />
-                        {isReRunning ? "Running..." : "Re Synthesis"}
+                        <Download className={cn("w-3.5 h-3.5 mr-2", isExporting && "animate-pulse")} />
+                        {isExporting ? 'Exporting...' : 'Export PPTX'}
                     </Button>
-                )}
-            </div>
-
-            {/* <div className="grid grid-cols-2  gap-4">
-                <Card>
-                    <CardHeader >
-                        <CardTitle className="font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                            <Cpu className="size-4" /> Model
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent >
-                        <div className="font-mono  font-medium truncate">{metadata.modelUsed}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader >
-                        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                            <FileText className="size-4" /> Batch ID
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent >
-                        <div className="font-mono truncate">{metadata.batchId}</div>
-                    </CardContent>
-                </Card>
-            </div> */}
-
-            <Card className="overflow-hidden">
-                <CardHeader className="pb-0 flex flex-row items-center justify-between">
-                    <CardTitle className="font-medium flex items-center gap-2">
-                        <Sparkles className="h-4 w-4  text-purple-500" />
-                        Synthesis Report
-                    </CardTitle>
                     <Button
                         variant="ghost"
-                        className="h-8 gap-2 text-xs"
-                        onClick={() => {
-                            navigator.clipboard.writeText(synthesisReport);
-                            toast.success('Synthesis report copied to clipboard!');
-                        }}
+                        onClick={handleCopy}
+                        className="h-8 text-xs hover:bg-background"
                     >
-                        <Copy  />
-                        Copy
+                        <Copy/>
+                        Copy 
                     </Button>
-                </CardHeader>
+                </div>
+            </div>
+
+            {/* Main Content Card */}
+            <Card>
                 <CardContent>
-                    <ScrollArea className="h-[600px] ">
-                        <MarkdownViewer content={synthesisReport} />
+                    <ScrollArea className="h-[700px] w-full">
+                        <div className="p-4">
+                            <MarkdownViewer content={synthesisReport} />
+                        </div>
                     </ScrollArea>
                 </CardContent>
             </Card>
 
-            <div className="pt-4 border-t">
+            {/* Debug/Ref Details */}
+            <div className="rounded-lg border bg-muted/20">
                 <details className="group">
-                    <summary className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors w-fit p-2 rounded-md hover:bg-muted/50">
-                        <Terminal className="h-4 w-4" />
-                        <span className="font-medium">View Raw JSON</span>
+                    <summary className="flex items-center justify-between cursor-pointer p-3 text-xs font-medium text-muted-foreground hover:bg-muted/40 transition-colors">
+                        <div className="flex items-center gap-2">
+                            <Terminal className="h-4 w-4" />
+                            <span>Raw Data Object</span>
+                        </div>
+                        <span className="text-[10px] bg-muted px-2 py-0.5 rounded">JSON</span>
                     </summary>
-                    <div className="mt-2 bg-muted/50 rounded-lg overflow-hidden border">
-                        <ScrollArea className="h-[300px] w-full">
-                            <div className="p-4">
-                                <pre className="text-[10px] font-mono whitespace-pre-wrap break-all text-muted-foreground">
-                                    {JSON.stringify(data, null, 2)}
-                                </pre>
-                            </div>
+                    <Separator />
+                    <div className="bg-card p-4">
+                        <ScrollArea className="h-[200px]">
+                            <pre className="text-[10px] font-mono whitespace-pre-wrap break-all text-muted-foreground">
+                                {JSON.stringify(data, null, 2)}
+                            </pre>
                         </ScrollArea>
                     </div>
                 </details>
             </div>
         </div>
     );
+}
+
+function ClockIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+        </svg>
+    )
 }
