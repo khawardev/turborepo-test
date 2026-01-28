@@ -67,7 +67,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                 )}
             </div>
 
-            <div className="grid grid-cols-2  gap-4">
+            {/* <div className="grid grid-cols-2  gap-4">
                 <Card>
                     <CardHeader >
                         <CardTitle className="font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -88,7 +88,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                         <div className="font-mono truncate">{metadata.batchId}</div>
                     </CardContent>
                 </Card>
-            </div>
+            </div> */}
 
             <Card className="overflow-hidden">
                 <CardHeader className="pb-0 flex flex-row items-center justify-between">

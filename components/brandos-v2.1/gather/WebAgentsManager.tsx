@@ -83,6 +83,7 @@ export function WebAgentsManager({
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<{ id: string; type: 'extraction' | 'synthesis' } | null>(null);
     const [activeResultTab, setActiveResultTab] = useState<'extraction' | 'synthesis'>('extraction');
+console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
     const loadExtractionTasks = useCallback(async () => {
         // Check cache first

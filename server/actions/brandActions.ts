@@ -441,6 +441,7 @@ async function getBrandsWithUser(user: any) {
     const { success, data, error } = await brandRequest(
       `/brands/?client_id=${user.client_id}`,
       "GET"
+      
     );
 
     if (!success) return [];
