@@ -599,48 +599,39 @@ async function getBrandsWithUser(user: any) {
   }
 }
 
-const BATCH_SIZE = 2;
-const BATCH_DELAY_MS = 100;
+const BATCH_SIZE = 1;
+const BATCH_DELAY_MS = 50;
 
-async function processBrandsInBatches(
+async function processBrandsSequentially(
   brands: any[], 
   clientId: string, 
   accessToken: string
 ): Promise<any[]> {
   const allResults: any[] = [];
   
-  for (let i = 0; i < brands.length; i += BATCH_SIZE) {
-    const batch = brands.slice(i, i + BATCH_SIZE);
-    const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(brands.length / BATCH_SIZE);
+  for (let i = 0; i < brands.length; i++) {
+    const brand = brands[i];
+    console.log(`[processBrandsSequentially] Processing brand ${i + 1}/${brands.length}: ${brand?.name}`);
     
-    console.log(`[processBrandsInBatches] Processing batch ${batchNumber}/${totalBatches} (${batch.length} brands)`);
+    try {
+      const enrichedBrand = await enrichBrandWithData(brand, clientId, accessToken);
+      allResults.push(enrichedBrand);
+      console.log(`[processBrandsSequentially] Brand ${brand?.name}: competitors=${enrichedBrand.competitors?.length || 0}, webStatus=${enrichedBrand.webStatus}, socialStatus=${enrichedBrand.socialStatus}`);
+    } catch (error) {
+      console.error(`[processBrandsSequentially] Brand ${brand?.name} failed:`, error);
+      allResults.push({
+        ...brand,
+        websiteBatchId: null,
+        socialBatchId: null,
+        competitors: [],
+        webStatus: null,
+        socialStatus: null,
+        webError: 'Failed to enrich',
+        socialError: 'Failed to enrich'
+      });
+    }
     
-    const batchPromises = batch.map((brand: any) => 
-      enrichBrandWithData(brand, clientId, accessToken)
-    );
-    
-    const batchResults = await Promise.allSettled(batchPromises);
-    
-    batchResults.forEach((result, j) => {
-      if (result.status === 'fulfilled') {
-        allResults.push(result.value);
-      } else {
-        console.log(`[processBrandsInBatches] Brand ${batch[j]?.name} enrichment failed:`, result.reason);
-        allResults.push({
-          ...batch[j],
-          websiteBatchId: null,
-          socialBatchId: null,
-          competitors: [],
-          webStatus: null,
-          socialStatus: null,
-          webError: 'Failed to enrich',
-          socialError: 'Failed to enrich'
-        });
-      }
-    });
-    
-    if (i + BATCH_SIZE < brands.length) {
+    if (i < brands.length - 1) {
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS));
     }
   }
@@ -672,11 +663,11 @@ export async function getEnrichedBrands() {
     return [];
   }
 
-  console.log(`[getEnrichedBrands] Found ${brands.length} brands, starting batched enrichment (batch size: ${BATCH_SIZE})...`);
+  console.log(`[getEnrichedBrands] Found ${brands.length} brands, starting SEQUENTIAL enrichment...`);
 
   const startTime = Date.now();
   
-  const enrichedBrands = await processBrandsInBatches(brands, user.client_id, accessToken);
+  const enrichedBrands = await processBrandsSequentially(brands, user.client_id, accessToken);
   
   const duration = Date.now() - startTime;
 
@@ -691,5 +682,6 @@ export async function getEnrichedBrands() {
 }
 
 export { getBrandsWithUser };
+
 
 
