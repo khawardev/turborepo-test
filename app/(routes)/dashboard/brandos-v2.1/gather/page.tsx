@@ -8,6 +8,7 @@ export const revalidate = 0;
 
 export default async function GatherPage() {
     const brands = await getEnrichedBrands();
+console.log(brands, `<-> brands <->`);
 
     if (!brands || brands.length === 0) {
         return (
