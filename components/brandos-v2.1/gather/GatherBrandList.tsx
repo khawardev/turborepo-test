@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { EmptyStateCard } from '@/components/shared/CardsUI';
 import { Badge } from '@/components/ui/badge';
 import { DashboardInnerLayout } from '@/components/stages/ccba/dashboard/shared/DashboardComponents';
@@ -26,9 +25,27 @@ export function GatherBrandList({ brands }: GatherBrandListProps) {
             </DashboardInnerLayout>
 
             {brands.map((brand, index) => (
-                <Suspense key={brand.brand_id} fallback={<div className="p-6"><BrandItemSkeleton /></div>}>
-                    <BrandCardWrapper brand={brand} index={index} />
-                </Suspense>
+                <BrandCardWrapper 
+                    key={brand.brand_id || index} 
+                    brand={brand} 
+                    index={index} 
+                />
+            ))}
+        </div>
+    );
+}
+
+export function GatherBrandListSkeleton() {
+    return (
+        <div>
+            <DashboardInnerLayout className="space-y-4">
+                <Badge className='mb-2'>Loading...</Badge>
+                <h3 className="text-2xl ">Your Brands</h3>
+            </DashboardInnerLayout>
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="p-6">
+                    <BrandItemSkeleton />
+                </div>
             ))}
         </div>
     );

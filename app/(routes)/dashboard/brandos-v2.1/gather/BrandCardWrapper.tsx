@@ -1,12 +1,21 @@
+"use client";
+
 import { 
     CompetitorsTable,
+    CompetitorsSkeleton
 } from "@/components/brandos-v2.1/gather/BrandItemParts";
 import BrandItem from "@/components/brandos-v2.1/gather/BrandItem";
-import { ScrapeStatusBadge } from "@/components/brandos-v2.1/gather/ScrapeStatusBadge";
+import { ScrapeStatusBadge, ScrapeStatusBadgeSkeleton } from "@/components/brandos-v2.1/gather/ScrapeStatusBadge";
 import { PollingStatusBadge } from "@/components/brandos-v2.1/gather/PollingStatusBadge";
 import { isStatusProcessing } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export async function BrandCardWrapper({ brand, index }: { brand: any, index: number }) {
+type BrandCardWrapperProps = {
+    brand: any;
+    index: number;
+}
+
+export function BrandCardWrapper({ brand, index }: BrandCardWrapperProps) {
     const { 
         websiteBatchId, 
         socialBatchId, 
@@ -15,15 +24,15 @@ export async function BrandCardWrapper({ brand, index }: { brand: any, index: nu
         competitors,
         webError,
         socialError 
-    } = brand;
+    } = brand || {};
 
     const isWebProcessing = isStatusProcessing(webStatus);
     const isSocialProcessing = isStatusProcessing(socialStatus);
 
     const itemProps = {
         brand,
-        websiteBatchId,
-        socialBatchId,
+        websiteBatchId: websiteBatchId || null,
+        socialBatchId: socialBatchId || null,
         hasData: false, 
         isProcessing: isWebProcessing || isSocialProcessing,
     };
@@ -76,11 +85,18 @@ export async function BrandCardWrapper({ brand, index }: { brand: any, index: nu
         );
     };
 
+    const renderCompetitorsSlot = () => {
+        if (competitors === undefined) {
+            return <CompetitorsSkeleton />;
+        }
+        return <CompetitorsTable competitors={competitors || []} />;
+    };
+
     return (
         <BrandItem 
             item={itemProps} 
             index={index}
-            competitorsSlot={<CompetitorsTable competitors={competitors || []} />}
+            competitorsSlot={renderCompetitorsSlot()}
             webStatusSlot={renderWebStatusSlot()}
             socialStatusSlot={renderSocialStatusSlot()}
         />

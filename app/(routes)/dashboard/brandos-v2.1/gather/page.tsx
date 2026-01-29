@@ -1,5 +1,5 @@
 import { getEnrichedBrands } from "@/server/actions/brandActions";
-import { DashboardInnerLayout, DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
+import { DashboardLayoutHeading } from '@/components/brandos-v2.1/shared/DashboardComponents';
 import { GatherBrandList } from '@/components/brandos-v2.1/gather/GatherBrandList';
 import { ActiveTasksBannerWrapper } from './ActiveTasksBannerWrapper';
 
@@ -7,8 +7,17 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function GatherPage() {
+    console.log(`[GatherPage] Starting page render...`);
+    
     const brands = await getEnrichedBrands();
-console.log(brands, `<-> brands <->`);
+    
+    console.log(`[GatherPage] Received ${brands?.length || 0} brands`);
+    
+    if (brands && brands.length > 0) {
+        brands.forEach((brand, i) => {
+            console.log(`[GatherPage] Brand[${i}]: name=${brand.name}, brand_id=${brand.brand_id}, competitors=${brand.competitors?.length || 0}, webBatchId=${brand.websiteBatchId}, socialBatchId=${brand.socialBatchId}, webStatus=${brand.webStatus}, socialStatus=${brand.socialStatus}`);
+        });
+    }
 
     if (!brands || brands.length === 0) {
         return (

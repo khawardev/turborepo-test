@@ -10,14 +10,22 @@ async function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function brandRequest(
+export async function getAccessToken(): Promise<string | null> {
+    try {
+        const accessToken = (await cookies()).get("access_token")?.value;
+        return accessToken || null;
+    } catch {
+        return null;
+    }
+}
+
+export async function brandRequestWithToken(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
+    accessToken: string,
     body?: any,
     cache: RequestCache = "no-store"
 ) {
-    const accessToken = (await cookies()).get("access_token")?.value;
-    
     if (!accessToken) {
         return { success: false, error: "Unauthorized - No access token" };
     }
@@ -68,10 +76,26 @@ export async function brandRequest(
                 continue;
             }
             
-            console.error("[brandRequest] Fetch error:", e);
+            console.error("[brandRequestWithToken] Fetch error:", e);
             return { success: false, error: "Network error" };
         }
     }
 
     return { success: false, error: lastError || "Request failed after retries" };
 }
+
+export async function brandRequest(
+    endpoint: string,
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    body?: any,
+    cache: RequestCache = "no-store"
+) {
+    const accessToken = (await cookies()).get("access_token")?.value;
+    
+    if (!accessToken) {
+        return { success: false, error: "Unauthorized - No access token" };
+    }
+
+    return brandRequestWithToken(endpoint, method, accessToken, body, cache);
+}
+
