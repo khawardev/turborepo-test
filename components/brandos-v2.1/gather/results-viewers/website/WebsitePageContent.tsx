@@ -37,8 +37,7 @@ export function WebsitePageContent({ page }: WebsitePageContentProps) {
                 </NextLink>
                 <div className="flex items-center gap-2">
                     {page.image_urls && page.image_urls.length > 0 && (
-                        <Badge variant="outline" className="text-xs">
-                            <ImageIcon className="w-3 h-3 mr-1" />
+                        <Badge variant="outline">
                             {page.image_urls.length} images
                         </Badge>
                     )}

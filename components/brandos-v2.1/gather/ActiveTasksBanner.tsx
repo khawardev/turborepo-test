@@ -4,11 +4,11 @@ import { useEffect, useRef, useCallback, useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { ScrapeStatusBadge } from './ScrapeStatusBadge';
-import { isStatusProcessing } from '@/lib/utils';
+import { isStatusProcessing, isWithinOneDay } from '@/lib/utils';
 import { MdOutlineArrowRight } from "react-icons/md";
 
 type ProcessingBrand = {
@@ -21,6 +21,8 @@ type ProcessingBrand = {
     socialStatus: string | null;
     webError?: string | null;
     socialError?: string | null;
+    webCreatedAt?: string | null;
+    socialCreatedAt?: string | null;
 };
 
 type ActiveTasksBannerProps = {
@@ -70,15 +72,18 @@ export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBanner
                 let webError = item.webError;
                 let socialError = item.socialError;
 
+                const isWebWithinOneDay = isWithinOneDay(item.webCreatedAt);
+                const isSocialWithinOneDay = isWithinOneDay(item.socialCreatedAt);
+
                 try {
-                    if (item.websiteBatchId && isStatusProcessing(item.webStatus)) {
+                    if (item.websiteBatchId && isStatusProcessing(item.webStatus) && isWebWithinOneDay) {
                         const webRes = await getBatchWebsiteScrapeStatus(item.brand.brand_id, item.websiteBatchId);
                         if (webRes?.status) {
                             webStatus = webRes.status;
                             webError = webRes.error || null;
                         }
                     }
-                    if (item.socialBatchId && isStatusProcessing(item.socialStatus)) {
+                    if (item.socialBatchId && isStatusProcessing(item.socialStatus) && isSocialWithinOneDay) {
                         const socialRes = await getBatchSocialScrapeStatus(item.brand.brand_id, item.socialBatchId);
                         if (socialRes?.status) {
                             socialStatus = socialRes.status;
@@ -102,9 +107,18 @@ export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBanner
         const poll = async () => {
             try {
                 const updatedBrands = await checkStatuses();
-                const stillProcessing = updatedBrands.filter(
-                    (b) => isStatusProcessing(b.webStatus) || isStatusProcessing(b.socialStatus)
-                );
+                
+                const stillProcessing = updatedBrands.filter((b) => {
+                    const isWebProcessing = isStatusProcessing(b.webStatus);
+                    const isSocialProcessing = isStatusProcessing(b.socialStatus);
+                    const isWebWithinOneDay = isWithinOneDay(b.webCreatedAt);
+                    const isSocialWithinOneDay = isWithinOneDay(b.socialCreatedAt);
+                    
+                    const shouldContinueWebPolling = isWebProcessing && isWebWithinOneDay;
+                    const shouldContinueSocialPolling = isSocialProcessing && isSocialWithinOneDay;
+                    
+                    return shouldContinueWebPolling || shouldContinueSocialPolling;
+                });
 
                 dispatch({ type: 'UPDATE_BRANDS', payload: stillProcessing });
 
@@ -151,6 +165,11 @@ export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBanner
                     {state.brands.map((item) => {
                         const isWebProcessing = isStatusProcessing(item.webStatus);
                         const isSocialProcessing = isStatusProcessing(item.socialStatus);
+                        const isWebWithinOneDay = isWithinOneDay(item.webCreatedAt);
+                        const isSocialWithinOneDay = isWithinOneDay(item.socialCreatedAt);
+
+                        const showWebStatus = isWebProcessing && isWebWithinOneDay;
+                        const showSocialStatus = isSocialProcessing && isSocialWithinOneDay;
 
                         return (
                             <div
@@ -162,24 +181,24 @@ export function ActiveTasksBanner({ initialProcessingBrands }: ActiveTasksBanner
                                     className="flex items-center gap-2 font-medium text-blue-700 dark:text-blue-300 hover:underline"
                                 >
                                     {item.brand.name} Collection
-                                    <MdOutlineArrowRight className="w-3 h-3" />
+                                    <MdOutlineArrowRight  />
                                 </Link>
                                 <div className="flex items-center gap-2">
-                                    {(isWebProcessing || item.webError) && (
+                                    {(showWebStatus || item.webError) && (
                                         <ScrapeStatusBadge
                                             label="Website"
                                             status={item.webStatus}
                                             error={item.webError}
                                         />
                                     )}
-                                    {(isSocialProcessing || item.socialError) && (
+                                    {(showSocialStatus || item.socialError) && (
                                         <ScrapeStatusBadge
                                             label="Social"
                                             status={item.socialStatus}
                                             error={item.socialError}
                                         />
                                     )}
-                                    {!isWebProcessing && !isSocialProcessing && !item.webError && !item.socialError && (
+                                    {!showWebStatus && !showSocialStatus && !item.webError && !item.socialError && (
                                         <ScrapeStatusBadge label="Processing" status="processing" />
                                     )}
                                 </div>

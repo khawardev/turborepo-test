@@ -1,5 +1,5 @@
 import { ActiveTasksBanner } from "@/components/brandos-v2.1/gather/ActiveTasksBanner";
-import { isStatusProcessing } from "@/lib/utils";
+import { isStatusProcessing, isWithinOneDay } from "@/lib/utils";
 
 
 export async function ActiveTasksBannerWrapper({ brands }: { brands: any[] }) {
@@ -7,7 +7,13 @@ export async function ActiveTasksBannerWrapper({ brands }: { brands: any[] }) {
     const processingBrands = brands.filter((brand) => {
         const isWebProcessing = isStatusProcessing(brand.webStatus);
         const isSocialProcessing = isStatusProcessing(brand.socialStatus);
-        return isWebProcessing || isSocialProcessing;
+        const isWebWithinOneDay = isWithinOneDay(brand.webCreatedAt);
+        const isSocialWithinOneDay = isWithinOneDay(brand.socialCreatedAt);
+        
+        const shouldShowWeb = isWebProcessing && isWebWithinOneDay;
+        const shouldShowSocial = isSocialProcessing && isSocialWithinOneDay;
+        
+        return shouldShowWeb || shouldShowSocial;
     }).map((brand) => ({
         brand,
         hasData: false,
@@ -17,7 +23,9 @@ export async function ActiveTasksBannerWrapper({ brands }: { brands: any[] }) {
         webStatus: brand.webStatus,
         socialStatus: brand.socialStatus,
         webError: brand.webError,
-        socialError: brand.socialError
+        socialError: brand.socialError,
+        webCreatedAt: brand.webCreatedAt,
+        socialCreatedAt: brand.socialCreatedAt
     }));
 
     return <ActiveTasksBanner initialProcessingBrands={processingBrands} />;

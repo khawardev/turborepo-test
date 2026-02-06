@@ -155,7 +155,7 @@ export function DataViewManager({
 
     return (
         <div className="space-y-8 w-full pb-12">
-            <Button asChild className="rounded-full" variant={'secondary'}>
+            <Button asChild className="rounded-full" variant={'outline'}>
                 <Link href="/dashboard/brandos-v2.1/gather">
                     <MdOutlineArrowLeft/>
                     Back

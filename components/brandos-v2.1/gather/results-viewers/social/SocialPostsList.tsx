@@ -37,7 +37,7 @@ export function SocialPostsList({ posts, selectedPost, onSelect }: SocialPostsLi
     const visiblePosts = posts.slice(0, visibleCount);
 
     return (
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 ">
             <div className="sticky top-4">
                 <h4 className="mb-3 flex items-center gap-2">
                     Posts ({posts.length})

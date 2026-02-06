@@ -477,8 +477,8 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" title="Custom Instructions">
-                                        <Edit className="h-4 w-4" /> Add Instructions
+                                    <Button variant="ghost" title="Custom Instructions">
+                                        <Edit className="h-4 w-4" />  Instructions
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">
@@ -715,8 +715,8 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" title="Custom Instructions">
-                                        <Edit className="h-4 w-4" /> Add Instructions
+                                    <Button variant="ghost" title="Custom Instructions">
+                                        <Edit className="h-4 w-4" />  Instructions
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80">

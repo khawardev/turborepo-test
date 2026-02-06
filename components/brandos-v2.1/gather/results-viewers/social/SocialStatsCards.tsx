@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function SocialStatCard({ icon: Icon, value, label, className, iconContainerClassName, iconClassName }: any) {
     return (
-        <Card className={cn("border", className)}>
+        <Card className={cn("border-2  rounded-2xl", className)}>
             <CardContent >
                 <div className="flex items-center gap-3">
                     <div className={cn("p-2 rounded-lg", iconContainerClassName)}>

@@ -137,3 +137,13 @@ export function isStatusProcessing(status: string | null): boolean {
   const completedStatuses = ['Completed', 'CompletedWithErrors', 'Failed'];
   return !completedStatuses.includes(status);
 }
+
+export function isWithinOneDay(dateString: string | null | undefined): boolean {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return false;
+  const now = new Date();
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+  const diff = now.getTime() - date.getTime();
+  return diff >= 0 && diff <= oneDayInMs;
+}

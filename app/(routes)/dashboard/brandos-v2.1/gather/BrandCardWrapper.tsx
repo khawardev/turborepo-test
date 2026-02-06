@@ -5,10 +5,9 @@ import {
     CompetitorsSkeleton
 } from "@/components/brandos-v2.1/gather/BrandItemParts";
 import BrandItem from "@/components/brandos-v2.1/gather/BrandItem";
-import { ScrapeStatusBadge, ScrapeStatusBadgeSkeleton } from "@/components/brandos-v2.1/gather/ScrapeStatusBadge";
+import { ScrapeStatusBadge } from "@/components/brandos-v2.1/gather/ScrapeStatusBadge";
 import { PollingStatusBadge } from "@/components/brandos-v2.1/gather/PollingStatusBadge";
-import { isStatusProcessing } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
+import { isStatusProcessing, isWithinOneDay } from "@/lib/utils";
 
 type BrandCardWrapperProps = {
     brand: any;
@@ -23,24 +22,31 @@ export function BrandCardWrapper({ brand, index }: BrandCardWrapperProps) {
         socialStatus, 
         competitors,
         webError,
-        socialError 
+        socialError,
+        webCreatedAt,
+        socialCreatedAt
     } = brand || {};
 
     const isWebProcessing = isStatusProcessing(webStatus);
     const isSocialProcessing = isStatusProcessing(socialStatus);
+    const isWebWithinOneDay = isWithinOneDay(webCreatedAt);
+    const isSocialWithinOneDay = isWithinOneDay(socialCreatedAt);
+
+    const shouldPollWeb = isWebProcessing && isWebWithinOneDay;
+    const shouldPollSocial = isSocialProcessing && isSocialWithinOneDay;
 
     const itemProps = {
         brand,
         websiteBatchId: websiteBatchId || null,
         socialBatchId: socialBatchId || null,
         hasData: false, 
-        isProcessing: isWebProcessing || isSocialProcessing,
+        isProcessing: shouldPollWeb || shouldPollSocial,
     };
 
     const renderWebStatusSlot = () => {
         if (!websiteBatchId) return null;
         
-        if (isWebProcessing) {
+        if (shouldPollWeb) {
             return (
                 <PollingStatusBadge 
                     type="Website" 
@@ -48,6 +54,7 @@ export function BrandCardWrapper({ brand, index }: BrandCardWrapperProps) {
                     initialError={webError}
                     brandId={brand.brand_id}
                     batchId={websiteBatchId}
+                    createdAt={webCreatedAt}
                 />
             );
         }
@@ -64,7 +71,7 @@ export function BrandCardWrapper({ brand, index }: BrandCardWrapperProps) {
     const renderSocialStatusSlot = () => {
         if (!socialBatchId) return null;
         
-        if (isSocialProcessing) {
+        if (shouldPollSocial) {
             return (
                 <PollingStatusBadge 
                     type="Social" 
@@ -72,6 +79,7 @@ export function BrandCardWrapper({ brand, index }: BrandCardWrapperProps) {
                     initialError={socialError}
                     brandId={brand.brand_id}
                     batchId={socialBatchId}
+                    createdAt={socialCreatedAt}
                 />
             );
         }

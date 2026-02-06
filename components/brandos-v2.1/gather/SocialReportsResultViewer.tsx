@@ -5,17 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
     Terminal, Clock, FileText, Calendar, Bot,
     Copy, CheckCircle2, Loader2, Trash2, RefreshCw, 
-    Presentation
+    Presentation, Globe, Settings2, MapPin, ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from "sonner";
 import { exportToGoogleSlides } from "@/server/actions/googleSlidesActions";
+import type { UniversalConfig } from "@/server/actions/socialReportsActions";
 
-interface SocialReportsResultViewerProps {
+type SocialReportsResultViewerProps = {
     data: any;
     onReRun?: () => void;
     isReRunning?: boolean;
@@ -23,6 +25,15 @@ interface SocialReportsResultViewerProps {
     brandId?: string;
     channelName?: string;
 }
+
+const CHANNEL_DISPLAY_NAMES: Record<string, string> = {
+    facebook: 'Facebook',
+    instagram: 'Instagram',
+    linkedin: 'LinkedIn',
+    x: 'X (Twitter)',
+    youtube: 'YouTube',
+    tiktok: 'TikTok'
+};
 
 export function SocialReportsResultViewer({ 
     data, 
@@ -33,6 +44,7 @@ export function SocialReportsResultViewer({
     channelName = 'linkedin'
 }: SocialReportsResultViewerProps) {
     const [isExporting, setIsExporting] = useState(false);
+    const [showUniversalConfig, setShowUniversalConfig] = useState(false);
 
     if (!data) return null;
 
@@ -40,12 +52,16 @@ export function SocialReportsResultViewer({
         social_report,
         entity_name,
         analysis_scope,
+        channel_name: responseChannelName,
+        universal_config,
         batch_id,
         model_used,
         timestamp,
         execution_time_seconds,
         task_id
     } = data;
+
+    const displayChannelName = responseChannelName || channelName;
 
     const handleCopyReport = () => {
         if (social_report) {
@@ -65,7 +81,7 @@ export function SocialReportsResultViewer({
             const result = await exportToGoogleSlides({
                 social_report: social_report,
                 entity_name: entity_name || 'Social Report',
-                channel_name: channelName
+                channel_name: displayChannelName
             });
 
             if (result.success && result.data?.download_url) {
@@ -97,6 +113,77 @@ export function SocialReportsResultViewer({
         return `${minutes}m ${remainingSeconds.toFixed(0)}s`;
     };
 
+    const renderUniversalConfig = (config: UniversalConfig) => {
+        if (!config) return null;
+
+        return (
+            <div className="space-y-3 text-sm">
+                {config.client_name && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground min-w-[120px]">Client:</span>
+                        <span className="font-medium">{config.client_name}</span>
+                    </div>
+                )}
+                {config.channel_account_name && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground min-w-[120px]">Account:</span>
+                        <span className="font-medium">{config.channel_account_name}</span>
+                    </div>
+                )}
+                {config.analysis_window && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground min-w-[120px]">Analysis Window:</span>
+                        <span className="font-medium">{config.analysis_window}</span>
+                    </div>
+                )}
+                {config.priority_regions && config.priority_regions.length > 0 && (
+                    <div className="flex items-start gap-2">
+                        <span className="text-muted-foreground min-w-[120px]">Priority Regions:</span>
+                        <div className="flex flex-wrap gap-1">
+                            {config.priority_regions.map((region, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                    <MapPin className="w-3 h-3 mr-1" />
+                                    {region}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {config.mandated_drivers && config.mandated_drivers.length > 0 && (
+                    <div className="space-y-2">
+                        <span className="text-muted-foreground">Mandated Drivers:</span>
+                        <div className="grid gap-2 ml-4">
+                            {config.mandated_drivers.map((driver, idx) => (
+                                <div key={idx} className="bg-muted/50 p-2 rounded-md">
+                                    <div className="font-medium text-xs">{driver.driver_name}</div>
+                                    <div className="text-xs text-muted-foreground">{driver.definition}</div>
+                                    {driver.include_keywords && driver.include_keywords.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {driver.include_keywords.map((kw, i) => (
+                                                <Badge key={i} variant="outline" className="text-[10px] text-green-600">
+                                                    +{kw}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {driver.exclude_keywords && driver.exclude_keywords.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {driver.exclude_keywords.map((kw, i) => (
+                                                <Badge key={i} variant="outline" className="text-[10px] text-red-600">
+                                                    -{kw}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500 w-full max-w-full overflow-x-hidden">
             <Card className="border-l-4 border-l-primary">
@@ -115,9 +202,17 @@ export function SocialReportsResultViewer({
                                     </Badge>
                                 </CardDescription>
                             </div>
-                            <Badge>
-                                {analysis_scope || 'brand'}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                                {displayChannelName && (
+                                    <Badge variant="secondary" className="capitalize">
+                                        <Globe className="w-3 h-3 mr-1" />
+                                        {CHANNEL_DISPLAY_NAMES[displayChannelName] || displayChannelName}
+                                    </Badge>
+                                )}
+                                <Badge>
+                                    {analysis_scope || 'brand'}
+                                </Badge>
+                            </div>
                         </div>
 
                         <div className="flex flex-wrap  justify-between items-center gap-3 text-xs text-muted-foreground pt-2">
@@ -177,10 +272,28 @@ export function SocialReportsResultViewer({
                 </CardHeader>
             </Card>
 
+            {universal_config && (
+                <Collapsible open={showUniversalConfig} onOpenChange={setShowUniversalConfig}>
+                    <Card className="border-dashed">
+                            <CardHeader >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <CardTitle className="font-medium">Universal Module Configuration</CardTitle>
+                                        <Badge variant="outline" >v3</Badge>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-0">
+                                {renderUniversalConfig(universal_config)}
+                            </CardContent>
+                    </Card>
+                </Collapsible>
+            )}
+
             <Card >
                 <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-primary" />
+                    <CardTitle className=" flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
                         Generated Social Report
                     </CardTitle>
                 </CardHeader>
@@ -216,7 +329,7 @@ export function SocialReportsResultViewer({
     );
 }
 
-interface SocialReportsTaskListViewerProps {
+type SocialReportsTaskListViewerProps = {
     tasks: any[];
     onSelectTask: (taskId: string) => void;
     onDeleteTask: (taskId: string) => void;
@@ -274,6 +387,11 @@ export function SocialReportsTaskListViewer({
                                     <Badge variant="outline" className="text-[10px] h-5 capitalize">
                                         {task.analysis_scope || 'brand'}
                                     </Badge>
+                                    {task.channel_name && (
+                                        <Badge variant="secondary" className="text-[10px] h-5 capitalize">
+                                            {CHANNEL_DISPLAY_NAMES[task.channel_name] || task.channel_name}
+                                        </Badge>
+                                    )}
                                 </div>
                                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-0.5">
                                     <span className="flex items-center gap-1">

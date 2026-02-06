@@ -42,14 +42,14 @@ export function ScrapeStatusBadge({
         switch (variant) {
             case 'completed':
                 return (
-                    <Badge variant="outline" className={cn('text-green-700 dark:text-green-400 flex items-center gap-1', sizeClasses, className)}>
+                    <Badge variant='secondary' className={cn(' dark:text-green-400 flex items-center gap-1', sizeClasses, className)}>
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
                         {showLabel ? label : 'Completed'}
                     </Badge>
                 );
             case 'completedWithErrors':
                 return (
-                    <Badge variant="outline" className={cn('text-yellow-700 dark:text-yellow-400 flex items-center gap-1', sizeClasses, className)}>
+                    <Badge variant="secondary" className={cn('text-yellow-700 dark:text-yellow-400 flex items-center gap-1', sizeClasses, className)}>
                         <CheckCircle2 className="w-3 h-3 shrink-0" />
                         {showLabel ? label : 'Completed with Errors'}
                     </Badge>
@@ -64,7 +64,7 @@ export function ScrapeStatusBadge({
             case 'initializing':
             case 'processing':
                 return (
-                    <Badge variant="outline" className={cn('text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 flex items-center gap-1', sizeClasses, className)}>
+                    <Badge variant="secondary" className={cn('text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 flex items-center gap-1', sizeClasses, className)}>
                         <Loader2 className="w-3 h-3 animate-spin shrink-0" />
                         {showLabel ? label : 'Processing'}
                     </Badge>

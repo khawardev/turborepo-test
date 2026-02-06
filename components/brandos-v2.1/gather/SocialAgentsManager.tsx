@@ -6,13 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import {
     Trash2, Eye, ChevronDown, Loader2, Clock,
-    FileText, Search, Sparkles, AlertCircle, MessageSquare, Edit
+    FileText, AlertCircle, MessageSquare, Edit, Settings2
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,8 +23,10 @@ import {
     deleteSocialReportsTask,
     type SocialChannelName,
     type AnalysisScope,
+    type AnalysisPriority,
     type SocialReportsTaskListItem
 } from '@/server/actions/socialReportsActions';
+import { getScrapeBatchSocial } from '@/server/actions/ccba/social/socialScrapeActions';
 import { SocialReportsResultViewer } from './SocialReportsResultViewer';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -39,6 +39,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type SocialAgentsManagerProps = {
     clientId: string;
@@ -58,7 +60,24 @@ type SocialAgentsManagerProps = {
     }>;
 }
 
-// Cache to store tasks by brandId to prevent reloading on tab switch
+const ANALYSIS_PRIORITY_OPTIONS: { value: AnalysisPriority; label: string }[] = [
+    { value: 'balanced', label: 'Balanced' },
+    { value: 'employer_brand', label: 'Employer Brand' },
+    { value: 'product_marketing', label: 'Product Marketing' },
+    { value: 'thought_leadership', label: 'Thought Leadership' },
+    { value: 'community', label: 'Community' },
+];
+
+const REGION_OPTIONS = [
+    'North America',
+    'Europe',
+    'Asia',
+    'South America',
+    'Africa',
+    'Middle East',
+    'Oceania',
+];
+
 const TASKS_CACHE: Record<string, SocialReportsTaskListItem[]> = {};
 
 export function SocialAgentsManager({
@@ -84,6 +103,13 @@ export function SocialAgentsManager({
     const [customInstruction, setCustomInstruction] = useState('');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
+    const [analysisPriority, setAnalysisPriority] = useState<AnalysisPriority>('balanced');
+    const [priorityRegions, setPriorityRegions] = useState<string[]>([]);
+    const [mandatedDriversInput, setMandatedDriversInput] = useState('');
+    const [channelsWithPosts, setChannelsWithPosts] = useState<Record<string, boolean>>({});
+    const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const getCompetitorChannels = (competitorId: string): string[] => {
@@ -111,7 +137,6 @@ export function SocialAgentsManager({
     }, [analysisScope, selectedCompetitorId, availableChannels, competitors]);
 
     const loadReportsTasks = useCallback(async () => {
-        // Check cache first
         if (TASKS_CACHE[brandId]) {
             setReportsTasks(TASKS_CACHE[brandId]);
             setIsLoadingTasks(false);
@@ -123,7 +148,6 @@ export function SocialAgentsManager({
             const res = await listSocialReportsTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
                 setReportsTasks(res.data.tasks);
-                // Update cache
                 TASKS_CACHE[brandId] = res.data.tasks;
             }
         } catch (e) {
@@ -138,8 +162,33 @@ export function SocialAgentsManager({
     }, [loadReportsTasks]);
 
     useEffect(() => {
-        // When scope or competitor changes, we need to validate if selected channel is still valid
-        // or default to the first available one
+        if (!batchSocialTaskId || !brandId) return;
+
+        const fetchChannelsWithPosts = async () => {
+            try {
+                const socialData = await getScrapeBatchSocial(brandId, batchSocialTaskId);
+                if (socialData) {
+                    const brandPlatforms = socialData.brand?.social_platforms || socialData.social_platforms || [];
+                    const postsMap: Record<string, boolean> = {};
+                    
+                    brandPlatforms.forEach((platform: any) => {
+                        const platformName = platform.platform?.toLowerCase();
+                        if (platformName) {
+                            postsMap[platformName] = platform.posts && Array.isArray(platform.posts) && platform.posts.length > 0;
+                        }
+                    });
+                    
+                    setChannelsWithPosts(postsMap);
+                }
+            } catch (e) {
+                console.error('Failed to fetch social data for channels:', e);
+            }
+        };
+
+        fetchChannelsWithPosts();
+    }, [brandId, batchSocialTaskId]);
+
+    useEffect(() => {
         if (currentAvailableChannels.length > 0) {
             if (!currentAvailableChannels.includes(selectedChannel)) {
                 setSelectedChannel(currentAvailableChannels[0] as SocialChannelName);
@@ -154,6 +203,14 @@ export function SocialAgentsManager({
             }
         };
     }, []);
+
+    const toggleRegion = (region: string) => {
+        setPriorityRegions(prev => 
+            prev.includes(region) 
+                ? prev.filter(r => r !== region)
+                : [...prev, region]
+        );
+    };
 
     const handleRunReports = async () => {
         if (!batchSocialTaskId) {
@@ -183,6 +240,9 @@ export function SocialAgentsManager({
                 channel_name: selectedChannel,
                 analysis_scope: analysisScope,
                 competitor_id: analysisScope === 'competitors' ? (selectedCompetitorId || undefined) : undefined,
+                priority_regions: priorityRegions.length > 0 ? priorityRegions : undefined,
+                analysis_priority: analysisPriority !== 'balanced' ? analysisPriority : undefined,
+                mandated_drivers: mandatedDriversInput.trim() || undefined,
                 instruction: customInstruction || undefined,
             });
 
@@ -282,7 +342,6 @@ export function SocialAgentsManager({
 
             if (res.success) {
                 toast.success('Report task deleted');
-                // Update cache immediately
                 if (TASKS_CACHE[brandId]) {
                     TASKS_CACHE[brandId] = TASKS_CACHE[brandId].filter(t => t.task_id !== taskToDelete);
                 }
@@ -315,6 +374,18 @@ export function SocialAgentsManager({
         return `${(numSeconds / 60).toFixed(1)}m`;
     };
 
+    const getChannelDisplayName = (channel: string) => {
+        const channelNames: Record<string, string> = {
+            facebook: 'Facebook',
+            instagram: 'Instagram',
+            linkedin: 'LinkedIn',
+            x: 'X (Twitter)',
+            youtube: 'YouTube',
+            tiktok: 'TikTok'
+        };
+        return channelNames[channel] || channel;
+    };
+
     return (
         <div className="space-y-8">
             <div className="grid lg:grid-cols-1 gap-6">
@@ -330,7 +401,7 @@ export function SocialAgentsManager({
                                     <CardDescription>Generate comprehensive reports from social media data</CardDescription>
                                 </div>
                             </div>
-                            <Badge variant="outline" className="font-mono text-[10px]">SOC-REPORTS</Badge>
+                            <Badge variant="outline" className="font-mono text-[10px]">SOC-REPORTS v3</Badge>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4 space-y-4">
@@ -372,29 +443,53 @@ export function SocialAgentsManager({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 )}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild disabled={isRunningReports || currentAvailableChannels.length === 0}>
-                                        <Button variant="outline" className="h-9 justify-between min-w-[140px] capitalize">
-                                            <span className="flex items-center gap-2">
-                                                {/* <span>{CHANNEL_ICONS[selectedChannel] || '📱'}</span> */}
-                                                {selectedChannel}
-                                            </span>
-                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        {currentAvailableChannels.map((channel) => (
-                                            <DropdownMenuItem
-                                                key={channel}
-                                                onClick={() => setSelectedChannel(channel as SocialChannelName)}
-                                                className="capitalize"
-                                            >
-                                                {/* <span className="mr-2">{CHANNEL_ICONS[channel] || '📱'}</span> */}
-                                                {channel}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <TooltipProvider>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild disabled={isRunningReports || currentAvailableChannels.length === 0}>
+                                            <Button variant="outline" className="h-9 justify-between min-w-[140px] capitalize">
+                                                <span className="flex items-center gap-2">
+                                                    {getChannelDisplayName(selectedChannel)}
+                                                </span>
+                                                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            {currentAvailableChannels.map((channel) => {
+                                                const hasNoPosts = channelsWithPosts[channel] === false;
+                                                
+                                                if (hasNoPosts) {
+                                                    return (
+                                                        <Tooltip key={channel}>
+                                                            <TooltipTrigger asChild>
+                                                                <div>
+                                                                    <DropdownMenuItem
+                                                                        disabled
+                                                                        className="capitalize opacity-50 cursor-not-allowed"
+                                                                    >
+                                                                        {getChannelDisplayName(channel)}
+                                                                    </DropdownMenuItem>
+                                                                </div>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent side="right">
+                                                                <p>No posts available for {getChannelDisplayName(channel)}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <DropdownMenuItem
+                                                        key={channel}
+                                                        onClick={() => setSelectedChannel(channel as SocialChannelName)}
+                                                        className="capitalize"
+                                                    >
+                                                        {getChannelDisplayName(channel)}
+                                                    </DropdownMenuItem>
+                                                );
+                                            })}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TooltipProvider>
                                 <Button
                                     onClick={handleRunReports}
                                     disabled={
@@ -425,27 +520,113 @@ export function SocialAgentsManager({
                                     <Loader2 className={cn("h-4 w-4", isLoadingTasks && "animate-spin")} />Refresh
                                 </Button>
                             </div>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant="outline" title="Custom Instructions">
-                                        <Edit className="h-4 w-4" /> Add Instructions
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                        <h4 className="font-medium leading-none">Custom Instructions</h4>
-                                        <p className="text-sm text-muted-foreground">
-                                            Add specific guidelines for the agent.
-                                        </p>
-                                        <Textarea
-                                            placeholder="e.g., Focus on engagement metrics..."
-                                            value={customInstruction}
-                                            onChange={(e) => setCustomInstruction(e.target.value)}
-                                            className="h-24 resize-none"
-                                        />
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
+                            <div className="flex items-center gap-2">
+                                <Popover open={showAdvancedSettings} onOpenChange={setShowAdvancedSettings}>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" title="Advanced Settings">
+                                            <Settings2 className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Advanced</span>
+                                            {(priorityRegions.length > 0 || analysisPriority !== 'balanced' || mandatedDriversInput) && (
+                                                <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
+                                                    !
+                                                </Badge>
+                                            )}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-96" align="end">
+                                        <div className="space-y-4">
+                                            <div>
+                                                <h4 className="font-medium leading-none mb-3">Advanced Configuration</h4>
+                                                <p className="text-sm text-muted-foreground mb-4">
+                                                    Configure Universal Module v3 parameters for enhanced analysis.
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium">Analysis Priority</Label>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="outline" className="w-full justify-between">
+                                                            {ANALYSIS_PRIORITY_OPTIONS.find(o => o.value === analysisPriority)?.label || 'Balanced'}
+                                                            <ChevronDown className="h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent className="w-full">
+                                                        {ANALYSIS_PRIORITY_OPTIONS.map(option => (
+                                                            <DropdownMenuItem
+                                                                key={option.value}
+                                                                onClick={() => setAnalysisPriority(option.value)}
+                                                            >
+                                                                {option.label}
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium">Priority Regions</Label>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {REGION_OPTIONS.map(region => (
+                                                        <Badge
+                                                            key={region}
+                                                            variant={priorityRegions.includes(region) ? "default" : "outline"}
+                                                            className="cursor-pointer transition-colors"
+                                                            onClick={() => toggleRegion(region)}
+                                                        >
+                                                            {region}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                                {priorityRegions.length > 0 && (
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="sm" 
+                                                        className="h-7 text-xs"
+                                                        onClick={() => setPriorityRegions([])}
+                                                    >
+                                                        Clear All
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium">Mandated Drivers (JSON)</Label>
+                                                <Textarea
+                                                    placeholder='[{"driver_name":"Sustainability","definition":"Environmental responsibility"}]'
+                                                    value={mandatedDriversInput}
+                                                    onChange={(e) => setMandatedDriversInput(e.target.value)}
+                                                    className="h-20 resize-none font-mono text-xs"
+                                                />
+                                                <p className="text-[11px] text-muted-foreground">
+                                                    Optional JSON array of mandated drivers for customized analysis.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" title="Custom Instructions">
+                                            <Edit className="h-4 w-4" /> Add Instructions
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80">
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium leading-none">Custom Instructions</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Add specific guidelines for the agent.
+                                            </p>
+                                            <Textarea
+                                                placeholder="e.g., Focus on engagement metrics..."
+                                                value={customInstruction}
+                                                onChange={(e) => setCustomInstruction(e.target.value)}
+                                                className="h-24 resize-none"
+                                            />
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
                         </div>
 
                         {!batchSocialTaskId && (
@@ -530,6 +711,14 @@ export function SocialAgentsManager({
                                                         >
                                                             {task.analysis_scope || 'brand'}
                                                         </Badge>
+                                                        {task.channel_name && (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-[10px] px-2 py-0.5 font-medium capitalize"
+                                                            >
+                                                                {getChannelDisplayName(task.channel_name)}
+                                                            </Badge>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                         <span className="flex items-center gap-1.5">
@@ -603,7 +792,7 @@ export function SocialAgentsManager({
                         isReRunning={isRunningReports}
                         clientId={clientId}
                         brandId={brandId}
-                        channelName={selectedChannel}
+                        channelName={selectedReportsResult.channel_name || selectedChannel}
                     />
                 </Card>
             )}

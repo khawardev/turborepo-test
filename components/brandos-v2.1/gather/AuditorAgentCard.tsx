@@ -116,7 +116,7 @@ export function AuditorAgentCard({
     };
 
     return (
-        <Collapsible defaultOpen={true} className="group bg-muted/20 p-4 rounded-xl border transition-all hover:bg-muted/30">
+        <Collapsible defaultOpen={true} className="group bg-muted/20 p-4 rounded-2xl border transition-all hover:bg-muted/30">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                     <div className="flex items-center gap-3">

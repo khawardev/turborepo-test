@@ -65,19 +65,18 @@ export default function SidebarUser({ user }: any ) {
           </div>
           <div className="ml-auto size-2 rounded-full bg-primary" />
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        {/* <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href='/dashboard/profile'><RiUserSmileLine /> Profile</Link>
           </DropdownMenuItem>
-          {/* <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild>
             <Link href='/dashboard/blog'><Book /> Blog</Link>
-          </DropdownMenuItem> */}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+          </DropdownMenuItem> 
+        </DropdownMenuGroup> */}
+        {/* <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href='/dashboard/settings'><Settings />  Settings</Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         {/* <DropdownMenuSeparator />
 
         <DropdownMenuGroup>

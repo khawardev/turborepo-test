@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getBatchWebsiteScrapeStatus } from '@/server/actions/ccba/website/websiteStatusAction';
 import { getBatchSocialScrapeStatus } from '@/server/actions/ccba/social/socialStatusAction';
 import { ScrapeStatusBadge } from './ScrapeStatusBadge';
-import { isStatusProcessing } from '@/lib/utils';
+import { isStatusProcessing, isWithinOneDay } from '@/lib/utils';
 
 type PollingStatusBadgeProps = {
     type: 'Website' | 'Social';
@@ -13,6 +13,7 @@ type PollingStatusBadgeProps = {
     initialError?: string | null;
     brandId: string;
     batchId: string;
+    createdAt?: string | null;
     pollInterval?: number;
 };
 
@@ -22,16 +23,28 @@ export function PollingStatusBadge({
     initialError,
     brandId,
     batchId,
+    createdAt,
     pollInterval = 15000
 }: PollingStatusBadgeProps) {
     const router = useRouter();
     const [status, setStatus] = useState<string | null>(initialStatus);
     const [error, setError] = useState<string | null>(initialError || null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const isPollingRef = useRef(isStatusProcessing(initialStatus));
+    
+    const shouldPoll = isStatusProcessing(initialStatus) && isWithinOneDay(createdAt);
+    const isPollingRef = useRef(shouldPoll);
 
     const checkStatus = useCallback(async () => {
         if (!isPollingRef.current) return;
+
+        if (!isWithinOneDay(createdAt)) {
+            isPollingRef.current = false;
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+            return;
+        }
 
         try {
             const fetchStatus = type === 'Website' 
@@ -56,10 +69,10 @@ export function PollingStatusBadge({
         } catch (e) {
             console.error(`[PollingStatusBadge] ${type} status check error:`, e);
         }
-    }, [type, brandId, batchId, router]);
+    }, [type, brandId, batchId, createdAt, router]);
 
     useEffect(() => {
-        if (!isStatusProcessing(initialStatus)) {
+        if (!isStatusProcessing(initialStatus) || !isWithinOneDay(createdAt)) {
             isPollingRef.current = false;
             return;
         }
@@ -73,7 +86,7 @@ export function PollingStatusBadge({
                 intervalRef.current = null;
             }
         };
-    }, [initialStatus, checkStatus, pollInterval]);
+    }, [initialStatus, createdAt, checkStatus, pollInterval]);
 
     return (
         <ScrapeStatusBadge

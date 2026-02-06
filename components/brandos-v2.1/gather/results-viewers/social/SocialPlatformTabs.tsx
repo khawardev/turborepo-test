@@ -1,11 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { getPlatformIcon } from '../shared/PlatformIcon';
 import { SocialPlatformProfile } from './SocialPlatformProfile';
 import { SocialPostsList } from './SocialPostsList';
 import { SocialPostDetail } from './SocialPostDetail';
+import { EmptyStateCard } from '@/components/shared/CardsUI';
 
 interface SocialPlatformTabsProps {
     platforms: any[];
@@ -15,6 +15,10 @@ interface SocialPlatformTabsProps {
     onPostSelect: (post: any) => void;
     rawData?: any;
 }
+
+const hasPosts = (platform: any): boolean => {
+    return platform?.posts && Array.isArray(platform.posts) && platform.posts.length > 0;
+};
 
 export function SocialPlatformTabs({
     platforms,
@@ -58,23 +62,30 @@ export function SocialPlatformTabs({
 
             {platforms.map((platform: any) => (
                 <TabsContent key={platform.platform} value={platform.platform} className="mt-6 space-y-6">
-                    <SocialPlatformProfile platform={platform} />
+                    {hasPosts(platform) ? (
+                        <>
+                            <SocialPlatformProfile platform={platform} />
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+                                <SocialPostsList 
+                                    posts={platform.posts} 
+                                    selectedPost={selectedPost} 
+                                    onSelect={onPostSelect} 
+                                />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <SocialPostsList 
-                            posts={platform.posts} 
-                            selectedPost={selectedPost} 
-                            onSelect={onPostSelect} 
+                                <div className="lg:col-span-2">
+                                    <SocialPostDetail 
+                                        post={selectedPost} 
+                                        platformName={platform.platform}
+                                        pageUsername={platform.page_info?.username}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <EmptyStateCard 
+                            message={`No posts available for ${platform.platform}.`} 
                         />
-
-                        <div className="lg:col-span-2">
-                            <SocialPostDetail 
-                                post={selectedPost} 
-                                platformName={platform.platform}
-                                pageUsername={platform.page_info?.username}
-                            />
-                        </div>
-                    </div>
+                    )}
                 </TabsContent>
             ))}
         </Tabs>

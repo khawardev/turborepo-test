@@ -303,13 +303,14 @@ export async function getClientDetails() {
 
 function extractLatestBatchInfo(scrapes: any[] | null) {
   if (!scrapes || !Array.isArray(scrapes) || scrapes.length === 0) {
-    return { batchId: null, status: null, error: null };
+    return { batchId: null, status: null, error: null, createdAt: null };
   }
   const latest = scrapes[0];
   return {
     batchId: latest.batch_id || null,
     status: latest.status || null,
-    error: latest.error || latest.errors || null
+    error: latest.error || latest.errors || null,
+    createdAt: latest.created_at || null
   };
 }
 
@@ -445,7 +446,9 @@ async function enrichBrandWithData(
     webStatus: null,
     socialStatus: null,
     webError: null,
-    socialError: null
+    socialError: null,
+    webCreatedAt: null,
+    socialCreatedAt: null
   };
 
   if (!brandId) {
@@ -473,13 +476,16 @@ async function enrichBrandWithData(
   let socialStatus = null;
   let webError = null;
   let socialError = null;
+  let webCreatedAt = null;
+  let socialCreatedAt = null;
 
   if (webResult.status === 'fulfilled' && webResult.value !== null) {
     const webInfo = extractLatestBatchInfo(webResult.value);
     websiteBatchId = webInfo.batchId;
     webStatus = webInfo.status;
     webError = webInfo.error;
-    console.log(`[enrichBrandWithData] brandId=${brandId} - Web: batchId=${websiteBatchId}, status=${webStatus}`);
+    webCreatedAt = webInfo.createdAt;
+    console.log(`[enrichBrandWithData] brandId=${brandId} - Web: batchId=${websiteBatchId}, status=${webStatus}, createdAt=${webCreatedAt}`);
   } else if (webResult.status === 'rejected') {
     webError = 'Failed to fetch web data';
     console.log(`[enrichBrandWithData] brandId=${brandId} - Web fetch rejected:`, (webResult as PromiseRejectedResult).reason);
@@ -492,7 +498,8 @@ async function enrichBrandWithData(
     socialBatchId = socialInfo.batchId;
     socialStatus = socialInfo.status;
     socialError = socialInfo.error;
-    console.log(`[enrichBrandWithData] brandId=${brandId} - Social: batchId=${socialBatchId}, status=${socialStatus}`);
+    socialCreatedAt = socialInfo.createdAt;
+    console.log(`[enrichBrandWithData] brandId=${brandId} - Social: batchId=${socialBatchId}, status=${socialStatus}, createdAt=${socialCreatedAt}`);
   } else if (socialResult.status === 'rejected') {
     socialError = 'Failed to fetch social data';
     console.log(`[enrichBrandWithData] brandId=${brandId} - Social fetch rejected:`, (socialResult as PromiseRejectedResult).reason);
@@ -517,7 +524,9 @@ async function enrichBrandWithData(
     webStatus,
     socialStatus,
     webError,
-    socialError
+    socialError,
+    webCreatedAt,
+    socialCreatedAt
   };
 
   console.log(`[enrichBrandWithData] brandId=${brandId} - Final enriched brand:`, {

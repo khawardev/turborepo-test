@@ -11,13 +11,13 @@ export default function GatherPageLoading() {
                 subtitle="Manage data collection and view captured content for your brands."
             />
             <div className="w-full">
-                <DashboardInnerLayout className="space-y-4">
+                <DashboardInnerLayout >
                     <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-8 mt-4 w-48" />
                 </DashboardInnerLayout>
 
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-6 mt-4">
+                    <div key={i} >
                         <BrandItemSkeleton />
                     </div>
                 ))}
@@ -28,7 +28,7 @@ export default function GatherPageLoading() {
 
 function BrandItemSkeleton() {
     return (
-        <div className="border rounded-lg p-6 space-y-4">
+        <div className="border-b md:px-10 px-4 py-8 space-y-4">
             <div className="flex justify-between items-start">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ function BrandItemSkeleton() {
                     <Skeleton className="h-8 w-8 rounded" />
                 </div>
             </div>
-            
+
             <div>
                 <Skeleton className="h-5 w-24 mb-2" />
                 <div className="flex gap-2">
@@ -71,3 +71,4 @@ function BrandItemSkeleton() {
         </div>
     );
 }
+
