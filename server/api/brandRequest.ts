@@ -36,8 +36,10 @@ export async function brandRequestWithToken(
     if (!isFormData) headers["Content-Type"] = "application/json";
 
     let lastError: any = null;
+    const RETRY_BASE_DELAY = 500;
+    const MAX_RETRIES_EXTENDED = 3;
 
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 0; attempt <= MAX_RETRIES_EXTENDED; attempt++) {
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
                 method, 
@@ -50,7 +52,7 @@ export async function brandRequestWithToken(
             try { 
                 data = await res.json(); 
             } catch { 
-                data = null;
+                data = null; 
             }
 
             if (res.ok) {
@@ -58,21 +60,30 @@ export async function brandRequestWithToken(
             }
 
             if (res.status === 401) {
-                return { success: false, error: "Unauthorized - Token expired", authError: true };
+                const errorDetail = data?.message || data?.detail;
+                // If it's a token expiry, we might want to return authError: true immediately
+                // But some 401s might be transient (unlikely). 
+                // We'll trust 401 is hard failure.
+                return { success: false, error: errorDetail || "Unauthorized - Token expired", authError: true };
             }
 
-            if (res.status >= 500 && attempt < MAX_RETRIES) {
-                lastError = data?.message || data?.detail || "Server error";
-                await delay(RETRY_DELAY_MS * (attempt + 1));
+            // Retry on Server Errors (5xx) or Rate Limits (429)
+            if ((res.status >= 500 || res.status === 429) && attempt < MAX_RETRIES_EXTENDED) {
+                lastError = data?.message || data?.detail || `Server error ${res.status}`;
+                const waitTime = RETRY_BASE_DELAY * Math.pow(2, attempt);
+                await delay(waitTime);
                 continue;
             }
 
+            // Other client errors (400, 403, 404) - Return immediately
             return { success: false, error: data?.message || data?.detail || "Request failed" };
+
         } catch (e: any) {
             lastError = e?.message || "Network error";
             
-            if (attempt < MAX_RETRIES) {
-                await delay(RETRY_DELAY_MS * (attempt + 1));
+            if (attempt < MAX_RETRIES_EXTENDED) {
+                const waitTime = RETRY_BASE_DELAY * Math.pow(2, attempt);
+                await delay(waitTime);
                 continue;
             }
             
