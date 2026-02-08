@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Copy, Terminal, Database, FileText } from 'lucide-react';
 import { ScrapeStatusBadge } from '../ScrapeStatusBadge';
+import { PollingStatusBadge } from '../PollingStatusBadge';
+import { isStatusProcessing, isWithinOneDay } from '@/lib/utils';
 import { BatchSelector } from './BatchSelector';
 import BrandProfile from '@/components/stages/ccba/details/profile-tab/BrandProfile';
 import { AuditorAgentCard } from '../AuditorAgentCard';
@@ -101,9 +103,14 @@ export function DataViewManager({
 
     const selectedWebsiteStatus = selectedWebsiteBatch?.status || null;
     const selectedSocialStatus = selectedSocialBatch?.status || null;
+    const selectedWebsiteCreatedAt = selectedWebsiteBatch?.created_at || null;
+    const selectedSocialCreatedAt = selectedSocialBatch?.created_at || null;
 
     const isWebComplete = isCompleteStatus(selectedWebsiteStatus);
     const isSocialComplete = isCompleteStatus(selectedSocialStatus);
+
+    const shouldPollWebsite = isStatusProcessing(selectedWebsiteStatus) && isWithinOneDay(selectedWebsiteCreatedAt);
+    const shouldPollSocial = isStatusProcessing(selectedSocialStatus) && isWithinOneDay(selectedSocialCreatedAt);
     
     const competitors = useMemo(() => 
         brandData?.competitors?.map((c: any) => ({
@@ -226,23 +233,43 @@ export function DataViewManager({
                             <TabsTrigger value="website" className="gap-2" disabled={!hasWebsiteData}>
                                 Website Data
                                 {selectedWebsiteStatus && (
-                                    <ScrapeStatusBadge
-                                        label="Website"
-                                        status={selectedWebsiteStatus}
-                                        showLabel={false}
-                                        size="sm"
-                                    />
+                                    shouldPollWebsite && selectedWebsiteBatchId ? (
+                                        <PollingStatusBadge
+                                            type="Website"
+                                            initialStatus={selectedWebsiteStatus}
+                                            brandId={brandId}
+                                            batchId={selectedWebsiteBatchId}
+                                            createdAt={selectedWebsiteCreatedAt}
+                                        />
+                                    ) : (
+                                        <ScrapeStatusBadge
+                                            label="Website"
+                                            status={selectedWebsiteStatus}
+                                            showLabel={false}
+                                            size="sm"
+                                        />
+                                    )
                                 )}
                             </TabsTrigger>
                             <TabsTrigger value="social" className="gap-2" disabled={!hasSocialData}>
                                 Social Media Data
                                 {selectedSocialStatus && (
-                                    <ScrapeStatusBadge
-                                        label="Social"
-                                        status={selectedSocialStatus}
-                                        showLabel={false}
-                                        size="sm"
-                                    />
+                                    shouldPollSocial && selectedSocialBatchId ? (
+                                        <PollingStatusBadge
+                                            type="Processing"
+                                            initialStatus={selectedSocialStatus}
+                                            brandId={brandId}
+                                            batchId={selectedSocialBatchId}
+                                            createdAt={selectedSocialCreatedAt}
+                                        />
+                                    ) : (
+                                        <ScrapeStatusBadge
+                                            label="Social"
+                                            status={selectedSocialStatus}
+                                            showLabel={false}
+                                            size="sm"
+                                        />
+                                    )
                                 )}
                             </TabsTrigger>
                         </TabsList>

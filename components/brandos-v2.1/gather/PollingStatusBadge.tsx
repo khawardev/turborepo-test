@@ -8,7 +8,7 @@ import { ScrapeStatusBadge } from './ScrapeStatusBadge';
 import { isStatusProcessing, isWithinOneDay } from '@/lib/utils';
 
 type PollingStatusBadgeProps = {
-    type: 'Website' | 'Social';
+    type: 'Website' | 'Social' | 'Processing';
     initialStatus: string | null;
     initialError?: string | null;
     brandId: string;

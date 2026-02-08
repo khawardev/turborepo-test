@@ -110,7 +110,7 @@ export function BatchSelector({
                         </Badge>
                         {selectedBatch ? (
                             <div className="flex items-center gap-2 truncate text-foreground">
-                                {/* {getStatusIcon(selectedBatch.status)} */}
+                                {getStatusIcon(selectedBatch.status)}
                                 <div className="flex flex-col gap-0.5 truncate text-left">
                                     <span className="truncate font-medium text-sm leading-none">
                                         {formatBatchTime(selectedBatch.created_at)}
@@ -156,7 +156,7 @@ export function BatchSelector({
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1.5 text-muted-foreground">
-                                    {/* {getStatusIcon(batch.status)} */}
+                                    {getStatusIcon(batch.status)}
                                     <span className="text-xs truncate">
                                         {getStatusText(batch.status)}
                                     </span>
