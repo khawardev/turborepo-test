@@ -261,15 +261,27 @@ export function SocialAgentsManager({
         }
     };
 
+    const resultRef = useRef<HTMLDivElement>(null);
+    const isPollingRef = useRef(false);
+
+    // ... (existing code)
+
     const pollReportsResult = (taskId: string) => {
         if (pollIntervalRef.current) {
             clearInterval(pollIntervalRef.current);
         }
-
+        
+        isPollingRef.current = true;
         let attempts = 0;
         const maxAttempts = 120;
 
         pollIntervalRef.current = setInterval(async () => {
+             // Safety check if polling was stopped externally
+             if (!isPollingRef.current) {
+                 if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+                 return;
+             }
+
             attempts++;
             try {
                 const res = await getSocialReportsOutput({
@@ -279,21 +291,30 @@ export function SocialAgentsManager({
                 });
 
                 if (res.success && res.data) {
+                    isPollingRef.current = false;
+                    if (pollIntervalRef.current) {
+                        clearInterval(pollIntervalRef.current);
+                        pollIntervalRef.current = null;
+                    }
+                    
                     setSelectedReportsResult(res.data);
                     toast.success('Social Reports complete!');
                     setIsRunningReports(false);
-                    if (pollIntervalRef.current) {
+                    loadReportsTasks();
+                    
+                    // Scroll to results
+                    setTimeout(() => {
+                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                } else if (attempts >= maxAttempts) {
+                    isPollingRef.current = false;
+                     if (pollIntervalRef.current) {
                         clearInterval(pollIntervalRef.current);
                         pollIntervalRef.current = null;
                     }
-                    loadReportsTasks();
-                } else if (attempts >= maxAttempts) {
+                    
                     toast.error('Report generation timed out. Please check back later.');
                     setIsRunningReports(false);
-                    if (pollIntervalRef.current) {
-                        clearInterval(pollIntervalRef.current);
-                        pollIntervalRef.current = null;
-                    }
                 }
             } catch (e) {
                 console.error('Polling reports error:', e);
@@ -313,6 +334,14 @@ export function SocialAgentsManager({
             if (res.success && res.data) {
                 setSelectedReportsResult(res.data);
                 setReportsTaskId(taskId);
+                toast.success('Report has been shown below !!', {
+                    description: 'Scroll down to view.'
+                });
+                
+                // Scroll to results
+                setTimeout(() => {
+                    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             } else {
                 toast.error(`Failed to load result: ${res.error || 'Unknown error'}`);
             }
@@ -785,6 +814,7 @@ export function SocialAgentsManager({
 
 
             {selectedReportsResult && (
+                <div ref={resultRef}>
                 <Card className="border rounded-2xl p-6 bg-card">
                     <SocialReportsResultViewer
                         data={selectedReportsResult}
@@ -795,6 +825,7 @@ export function SocialAgentsManager({
                         channelName={selectedReportsResult.channel_name || selectedChannel}
                     />
                 </Card>
+                </div>
             )}
 
             <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>

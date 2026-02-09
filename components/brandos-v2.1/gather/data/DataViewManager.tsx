@@ -409,28 +409,31 @@ export function DataViewManager({
                         />
                     </div>
                 </TabsContent>
-
-                <TabsContent value="social_reports" className="space-y-6 pt-4">
-                    <SocialAgentsManager
-                        clientId={brandData?.client_id}
-                        brandId={brandId}
-                        batchSocialTaskId={selectedSocialBatchId}
-                        brandName={brandData?.name}
-                        availableChannels={availableChannels}
-                        competitors={competitors}
-                    />
-                </TabsContent>
-
-                <TabsContent value="web_agents" className="space-y-6 pt-4">
-                    <WebAgentsManager
-                        clientId={brandData?.client_id}
-                        brandId={brandId}
-                        batchWebsiteTaskId={selectedWebsiteBatchId}
-                        brandName={brandData?.name}
-                        competitors={competitors}
-                    />
-                </TabsContent>
             </Tabs>
+
+            {/* Social Reports Manager - Kept mounted to preserve state */}
+            <div className={activeTab === "social_reports" ? "block space-y-6 pt-4" : "hidden"}>
+                 <SocialAgentsManager
+                    clientId={brandData?.client_id}
+                    brandId={brandId}
+                    batchSocialTaskId={selectedSocialBatchId}
+                    brandName={brandData?.name}
+                    availableChannels={availableChannels}
+                    competitors={competitors}
+                />
+            </div>
+
+            {/* Web Agents Manager - Kept mounted to preserve state */}
+            <div className={activeTab === "web_agents" ? "block space-y-6 pt-4" : "hidden"}>
+                <WebAgentsManager
+                    clientId={brandData?.client_id}
+                    brandId={brandId}
+                    batchWebsiteTaskId={selectedWebsiteBatchId}
+                    brandName={brandData?.name}
+                    competitors={competitors}
+                />
+            </div>
+
 
             <Collapsible className="group border rounded-lg bg-muted/20">
                 <CollapsibleTrigger asChild>

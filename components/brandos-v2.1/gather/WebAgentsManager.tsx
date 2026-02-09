@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -175,11 +175,36 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
         }
     };
 
+    const resultRef = useRef<HTMLDivElement>(null);
+    const isPollingExtractionRef = useRef(false);
+    const isPollingSynthesisRef = useRef(false);
+    const extractionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const synthesisIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (extractionIntervalRef.current) clearInterval(extractionIntervalRef.current);
+            if (synthesisIntervalRef.current) clearInterval(synthesisIntervalRef.current);
+        };
+    }, []);
+
+    // ... (existing code not shown)
+
     const pollExtractionResult = async (taskId: string) => {
+        // Clear any existing interval
+        if (extractionIntervalRef.current) clearInterval(extractionIntervalRef.current);
+        
+        isPollingExtractionRef.current = true;
         let attempts = 0;
         const maxAttempts = 120;
 
-        const interval = setInterval(async () => {
+        extractionIntervalRef.current = setInterval(async () => {
+            if (!isPollingExtractionRef.current) {
+                if (extractionIntervalRef.current) clearInterval(extractionIntervalRef.current);
+                return;
+            }
+            
             attempts++;
             try {
                 const res = await getWebExtractionOutput({
@@ -188,16 +213,28 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                     task_id: taskId
                 });
 
+                // Check again if polling was stopped while awaiting
+                if (!isPollingExtractionRef.current) return;
+
                 if (res.success && res.data) {
+                    isPollingExtractionRef.current = false;
+                    if (extractionIntervalRef.current) clearInterval(extractionIntervalRef.current);
+
                     setSelectedExtractionResult(res.data);
                     toast.success('Web Extraction complete!');
                     setIsRunningExtraction(false);
-                    clearInterval(interval);
                     loadExtractionTasks();
+                    
+                     // Scroll
+                    setTimeout(() => {
+                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
                 } else if (attempts >= maxAttempts) {
+                    isPollingExtractionRef.current = false;
+                    if (extractionIntervalRef.current) clearInterval(extractionIntervalRef.current);
+                    
                     toast.error('Extraction timed out. Please check back later.');
                     setIsRunningExtraction(false);
-                    clearInterval(interval);
                 }
             } catch (e) {
                 console.error('Polling extraction error:', e);
@@ -238,10 +275,18 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
     };
 
     const pollSynthesisResult = async (taskId: string) => {
+        // Clear any existing interval
+        if (synthesisIntervalRef.current) clearInterval(synthesisIntervalRef.current);
+
+        isPollingSynthesisRef.current = true;
         let attempts = 0;
         const maxAttempts = 120;
 
-        const interval = setInterval(async () => {
+        synthesisIntervalRef.current = setInterval(async () => {
+             if (!isPollingSynthesisRef.current) {
+                if (synthesisIntervalRef.current) clearInterval(synthesisIntervalRef.current);
+                return;
+            }
             attempts++;
             try {
                 const res = await getWebSynthesisOutput({
@@ -250,16 +295,28 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                     task_id: taskId
                 });
 
+                // Check again if polling was stopped while awaiting
+                if (!isPollingSynthesisRef.current) return;
+
                 if (res.success && res.data) {
+                    isPollingSynthesisRef.current = false;
+                    if (synthesisIntervalRef.current) clearInterval(synthesisIntervalRef.current);
+
                     setSelectedSynthesisResult(res.data);
                     toast.success('Web Synthesis complete!');
                     setIsRunningSynthesis(false);
-                    clearInterval(interval);
                     loadSynthesisTasks();
+                    
+                    // Scroll
+                    setTimeout(() => {
+                         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
                 } else if (attempts >= maxAttempts) {
+                    isPollingSynthesisRef.current = false;
+                    if (synthesisIntervalRef.current) clearInterval(synthesisIntervalRef.current);
+
                     toast.error('Synthesis timed out. Please check back later.');
                     setIsRunningSynthesis(false);
-                    clearInterval(interval);
                 }
             } catch (e) {
                 console.error('Polling synthesis error:', e);
@@ -279,6 +336,11 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
             if (res.success && res.data) {
                 setSelectedExtractionResult(res.data);
                 setActiveResultTab('extraction');
+                toast.success('Report has been shown below !!', { description: 'Scroll down to view.' });
+                 // Scroll
+                setTimeout(() => {
+                    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             } else {
                 toast.error(`Failed to load result: ${res.error || 'Unknown error'}`);
             }
@@ -302,6 +364,11 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
             if (res.success && res.data) {
                 setSelectedSynthesisResult(res.data);
                 setActiveResultTab('synthesis');
+                toast.success('Report has been shown below !!', { description: 'Scroll down to view.' });
+                 // Scroll
+                setTimeout(() => {
+                    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             } else {
                 toast.error(`Failed to load result: ${res.error || 'Unknown error'}`);
             }

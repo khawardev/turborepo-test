@@ -192,7 +192,12 @@ export function CollectionStatusManager({
                     dispatch({ type: 'SET_POLLING_MESSAGE', payload: '' });
                     dispatch({ type: 'SET_POLLING', payload: false });
                     if (intervalRef.current) clearInterval(intervalRef.current);
-                    router.push(`/dashboard/brandos-v2.1/gather/data/${brandId}`);
+                    
+                    // Refresh to ensure layout status is updated, then redirect
+                    router.refresh();
+                    setTimeout(() => {
+                        router.push(`/dashboard/brandos-v2.1/gather/data/${brandId}`);
+                    }, 500); 
                     return;
                 }
 
