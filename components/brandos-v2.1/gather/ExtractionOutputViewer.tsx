@@ -99,7 +99,7 @@ function MetricCard({ label, value, icon: Icon }: { label: string; value: any; i
 
 function SectionHeader({ title, icon: Icon, count }: { title: string; icon?: any; count?: number }) {
     return (
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between my-4">
             <h4 className=" font-medium flex items-center gap-2">
                 {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
                 {title}

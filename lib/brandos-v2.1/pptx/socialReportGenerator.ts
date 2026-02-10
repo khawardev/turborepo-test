@@ -53,7 +53,7 @@ const COLORS = {
 };
 
 const FONTS = {
-    main: 'Arial',
+    main: 'Inter',
 };
 
 const SLIDE = {
@@ -63,7 +63,7 @@ const SLIDE = {
     marginRight: 0.5,
     marginTop: 0.7,
     contentWidth: 9,
-    headerY: 0.15,
+    headerY: 0.25,
     headerHeight: 0.4,
     footerY: 5.3,
     titleY: 0.9,
@@ -86,43 +86,36 @@ function cleanText(text: string): string {
 }
 
 function addSlideHeader(slide: any, isDark: boolean = false) {
-    const logoColor = isDark ? COLORS.textLight : COLORS.black;
+    // Logo URLs from components/shared/Logo.tsx
+    // Light Mode (Dark Text): https://i.postimg.cc/yY06gqFK/HB-logo-name-mark-side-black-1.png
+    // Dark Mode (Green/White Text): https://i.postimg.cc/c1jwNRnH/HB-logo-name-mark-side-green-1.png
     
-    slide.addText('⬡', {
+    const logoUrl = isDark 
+        ? 'https://i.postimg.cc/c1jwNRnH/HB-logo-name-mark-side-green-1.png'
+        : 'https://i.postimg.cc/yY06gqFK/HB-logo-name-mark-side-black-1.png';
+
+    slide.addImage({
+        path: logoUrl,
         x: 0.3,
-        y: 0.12,
-        w: 0.3,
-        h: 0.35,
-        fontSize: 20,
-        color: logoColor,
-        fontFace: FONTS.main,
-    });
-    
-    slide.addText('Humanbrand AI', {
-        x: 0.55,
-        y: 0.18,
-        w: 1.5,
-        h: 0.25,
-        fontSize: 12,
-        bold: true,
-        color: logoColor,
-        fontFace: FONTS.main,
+        y: 0.15,
+        w: 1.8,
+        h: 0.45,
     });
 
     if (!isDark) {
         slide.addShape('line' as any, {
             x: 0.25,
-            y: 0.5,
+            y: 0.7,
             w: 0,
-            h: 4.8,
+            h: 4.6,
             line: { color: COLORS.headerLine, width: 0.5 },
         });
 
         slide.addShape('line' as any, {
             x: 9.75,
-            y: 0.5,
+            y: 0.7,
             w: 0,
-            h: 4.8,
+            h: 4.6,
             line: { color: COLORS.headerLine, width: 0.5 },
         });
     }
@@ -259,7 +252,7 @@ function createContentSlideWithSections(
 
         slide.addText(pageTitle, {
             x: SLIDE.marginLeft + 0.2,
-            y: 0.75,
+            y: 0.9,
             w: 8.6,
             h: 0.6,
             fontSize: 32,
@@ -269,7 +262,7 @@ function createContentSlideWithSections(
             align: 'center',
         });
 
-        let yPos = 1.5;
+        let yPos = 1.6;
         const pageSections = contentSections.slice(page * sectionsPerPage, (page + 1) * sectionsPerPage);
 
         for (const section of pageSections) {
@@ -342,7 +335,7 @@ function createFindingsSlide(
     
     slide.addText(title.toUpperCase(), {
         x: SLIDE.marginLeft + 0.2,
-        y: 0.75,
+        y: 0.9,
         w: 8.6,
         h: 0.55,
         fontSize: 32,
@@ -351,7 +344,7 @@ function createFindingsSlide(
         fontFace: FONTS.main,
     });
 
-    let yPos = 1.45;
+    let yPos = 1.6;
 
     slide.addText(mainHeading, {
         x: SLIDE.marginLeft + 0.2,
@@ -368,22 +361,23 @@ function createFindingsSlide(
     if (content) {
          // Auto-calculate height roughly
          const lines = Math.ceil(content.length / 90);
-         const height = Math.min(1.5, Math.max(0.5, lines * 0.25));
+         const height = Math.min(1.5, Math.ceil(content.length / 90) * 0.25 + 0.1);
 
         slide.addText(cleanText(content), {
             x: SLIDE.marginLeft + 0.2,
             y: yPos,
             w: 8.6,
             h: height,
-            fontSize: 11,
-            color: COLORS.textMain,
+            fontSize: 14,
+            bold: true,
+            color: COLORS.black,
             fontFace: FONTS.main,
-            breakLine: true,
+            autoFit: true // Ensure text fits
         });
         yPos += height + 0.1;
     }
 
-    if (bullets.length > 0) {
+    if (bullets && bullets.length > 0) {
         let remainingBullets = [...bullets];
         while(remainingBullets.length > 0) {
              // If we filled the first slide, create a continuation
@@ -393,7 +387,7 @@ function createFindingsSlide(
                   addSlideHeader(nextSlide, false);
                   nextSlide.addText(`${title.toUpperCase()} (Cont.)`, {
                         x: SLIDE.marginLeft + 0.2,
-                        y: 0.75,
+                        y: 0.9,
                         w: 8.6,
                         h: 0.55,
                         fontSize: 32,
@@ -401,7 +395,7 @@ function createFindingsSlide(
                         color: COLORS.black,
                         fontFace: FONTS.main,
                   });
-                  yPos = 1.5;
+                  yPos = 1.6;
                   
                   for (const bullet of remainingBullets) {
                        if (yPos > SLIDE.footerY - 0.4) break; 
@@ -464,7 +458,7 @@ function createTableSlide(pptx: PptxGenJS, section: SlideSection, entityName: st
 
         slide.addText(titleText, {
             x: SLIDE.marginLeft + 0.2,
-            y: 0.75,
+            y: 0.9,
             w: 8.6,
             h: 0.5,
             fontSize: 26,
@@ -509,7 +503,7 @@ function createTableSlide(pptx: PptxGenJS, section: SlideSection, entityName: st
 
         slide.addTable(tableData, {
             x: SLIDE.marginLeft + 0.2,
-            y: 1.35,
+            y: 1.6,
             w: tableWidth,
             colW: colW,
             border: { type: 'solid', pt: 0.75, color: COLORS.tableBorder },
@@ -538,7 +532,7 @@ function createRecommendationsSlide(pptx: PptxGenJS, section: SlideSection) {
 
         slide.addText(titleText, {
             x: SLIDE.marginLeft + 0.2,
-            y: 0.75,
+            y: 0.9,
             w: 8.6,
             h: 0.5,
             fontSize: 28,
@@ -548,7 +542,7 @@ function createRecommendationsSlide(pptx: PptxGenJS, section: SlideSection) {
         });
 
         const pageItems = items.slice(page * maxItemsPerSlide, (page + 1) * maxItemsPerSlide);
-        let yPos = 1.4;
+        let yPos = 1.6;
         const cardHeight = 0.85; // slightly taller to fit content
         const gap = 0.15;
 
@@ -628,7 +622,7 @@ function createMetricsSlide(pptx: PptxGenJS, section: SlideSection) {
 
         slide.addText(titleText, {
             x: SLIDE.marginLeft + 0.2,
-            y: 0.75,
+            y: 0.9,
             w: 8.6,
             h: 0.5,
             fontSize: 26,
@@ -643,7 +637,7 @@ function createMetricsSlide(pptx: PptxGenJS, section: SlideSection) {
         const cardHeight = 0.85;
         const gap = 0.15;
         
-        let yPos = 1.4;
+        let yPos = 1.6;
         
         for (let i = 0; i < pageMetrics.length; i++) {
             const metric = pageMetrics[i];

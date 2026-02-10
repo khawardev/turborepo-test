@@ -98,7 +98,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                             className="bg-background"
                         >
                             <RefreshCw className={cn("w-3.5 h-3.5 mr-2", isReRunning && "animate-spin")} />
-                            {isReRunning ? "Synthesizing..." : "Re-Run Analysis"}
+                            {isReRunning ? "Synthesizing..." : "Re Run "}
                         </Button>
                     )}
                     
@@ -107,7 +107,6 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                         size="sm" 
                         onClick={handleExport} 
                         disabled={isExporting}
-                        className="bg-green-600 hover:bg-green-700 text-white"
                     >
                         <Download className={cn("w-3.5 h-3.5 mr-2", isExporting && "animate-pulse")} />
                         {isExporting ? 'Exporting...' : 'Export PPTX'}

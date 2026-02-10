@@ -20,7 +20,7 @@ const COLORS = {
 };
 
 const FONTS = {
-    main: 'Arial',
+    main: 'Inter',
 };
 
 const SLIDE = {
@@ -39,9 +39,35 @@ function cleanText(text: string): string {
 }
 
 function addSlideHeader(slide: any, isDark: boolean = false) {
-    const logoColor = isDark ? COLORS.textLight : COLORS.black;
-    slide.addText('⬡', { x: 0.3, y: 0.12, w: 0.3, h: 0.35, fontSize: 20, color: logoColor, fontFace: FONTS.main });
-    slide.addText('Humanbrand AI', { x: 0.55, y: 0.18, w: 1.5, h: 0.25, fontSize: 12, bold: true, color: logoColor, fontFace: FONTS.main });
+    const logoUrl = isDark 
+        ? 'https://i.postimg.cc/c1jwNRnH/HB-logo-name-mark-side-green-1.png'
+        : 'https://i.postimg.cc/yY06gqFK/HB-logo-name-mark-side-black-1.png';
+
+    slide.addImage({
+        path: logoUrl,
+        x: 0.3,
+        y: 0.15,
+        w: 1.8,
+        h: 0.45,
+    });
+
+    if (!isDark) {
+        slide.addShape('line' as any, {
+            x: 0.25,
+            y: 0.7,
+            w: 0,
+            h: 4.6,
+            line: { color: COLORS.headerLine, width: 0.5 },
+        });
+
+        slide.addShape('line' as any, {
+            x: 9.75,
+            y: 0.7,
+            w: 0,
+            h: 4.6,
+            line: { color: COLORS.headerLine, width: 0.5 },
+        });
+    }
 }
 
 function addSlideFooter(slide: any) {
@@ -91,18 +117,22 @@ function createTextSlide(pptx: PptxGenJS, title: string, content: string, bullet
     addSlideHeader(slide, false);
 
     slide.addText(title.toUpperCase(), {
-        x: SLIDE.marginLeft, y: 0.6, w: 9, h: 0.6,
+        x: SLIDE.marginLeft, y: 0.9, w: 9, h: 0.6,
         fontSize: 32, bold: true, color: COLORS.brandDark, fontFace: FONTS.main
     });
 
-    let yPos = 1.4;
+    let yPos = 1.6;
+
+    const maxY = SLIDE.footerY - 0.5;
 
     if (content) {
+        // Use autoFit to ensure text stays within bounds
         slide.addText(cleanText(content), {
-            x: SLIDE.marginLeft, y: yPos, w: 9, h: 3.5,
-            fontSize: 14, color: COLORS.textMain, fontFace: FONTS.main, valign: 'top'
+            x: SLIDE.marginLeft, y: yPos, w: 9, h: maxY - yPos,
+            fontSize: 14, color: COLORS.textMain, fontFace: FONTS.main, valign: 'top',
+            autoFit: true
         });
-        yPos += 3.5; 
+        yPos = maxY; 
     }
 
     if (bullets && bullets.length > 0) {
@@ -126,13 +156,13 @@ function createArchetypeSlide(pptx: PptxGenJS, section: WebSlideSection) {
     addSlideHeader(slide, false);
 
     slide.addText(section.title.toUpperCase(), {
-        x: SLIDE.marginLeft, y: 0.6, w: 9, h: 0.6,
+        x: SLIDE.marginLeft, y: 0.9, w: 9, h: 0.6,
         fontSize: 32, bold: true, color: COLORS.brandDark, fontFace: FONTS.main
     });
     
     if (section.content) {
          slide.addText(cleanText(section.content), {
-            x: SLIDE.marginLeft, y: 1.3, w: 9, h: 1.0,
+            x: SLIDE.marginLeft, y: 1.6, w: 9, h: 1.0,
             fontSize: 12, italic: true, color: COLORS.textMain, fontFace: FONTS.main
         });
     }
@@ -173,121 +203,177 @@ function createArchetypeSlide(pptx: PptxGenJS, section: WebSlideSection) {
 }
 
 function createDetailedFindingSlide(pptx: PptxGenJS, section: WebSlideSection) {
-    const slide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' });
-    addSlideHeader(slide, false);
+    const blocks: { type: 'finding' | 'rationale' | 'implication', title: string, content: string }[] = [];
+    if (section.finding) blocks.push({ type: 'finding', title: 'Synthesized Finding:', content: section.finding });
+    if (section.rationale) blocks.push({ type: 'rationale', title: 'Deep Rationale:', content: section.rationale });
+    if (section.implication) blocks.push({ type: 'implication', title: 'Strategic Implication:', content: section.implication });
 
-    slide.addText(section.title.toUpperCase(), {
-        x: SLIDE.marginLeft, y: 0.6, w: 8, h: 0.5,
+    if (blocks.length === 0) return;
+
+    let slide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' });
+    addSlideHeader(slide, false);
+    
+    let currentTitle = section.title.toUpperCase();
+    slide.addText(currentTitle, {
+        x: SLIDE.marginLeft, y: 0.9, w: 8, h: 0.5,
         fontSize: 24, bold: true, color: COLORS.brandDark, fontFace: FONTS.main
     });
-    
+
     if (section.subtitle) {
         slide.addText(section.subtitle, {
-            x: SLIDE.marginLeft, y: 1.0, w: 8, h: 0.3,
+            x: SLIDE.marginLeft, y: 1.3, w: 8, h: 0.3,
             fontSize: 12, italic: true, color: COLORS.textMuted, fontFace: FONTS.main
         });
     }
 
-    let yPos = section.subtitle ? 1.4 : 1.2;
+    let yPos = section.subtitle ? 1.7 : 1.6;
+    const maxY = SLIDE.footerY - 0.5;
 
-    if (section.finding) {
-        slide.addText('Synthesized Finding:', {
-            x: SLIDE.marginLeft, y: yPos, w: 3, h: 0.3,
-            fontSize: 11, bold: true, color: COLORS.brandBlue, fontFace: FONTS.main
-        });
-        const height = Math.min(1.2, Math.ceil(section.finding.length / 90) * 0.25 + 0.1);
-        slide.addText(cleanText(section.finding), {
-            x: SLIDE.marginLeft, y: yPos + 0.25, w: 9, h: height,
-            fontSize: 14, bold: true, color: COLORS.black, fontFace: FONTS.main
-        });
-        yPos += height + 0.3;
-    }
-
-    if (section.rationale) {
-        slide.addText('Deep Rationale:', {
-            x: SLIDE.marginLeft, y: yPos, w: 3, h: 0.3,
-            fontSize: 11, bold: true, color: COLORS.brandBlue, fontFace: FONTS.main
-        });
-        const height = Math.min(2.0, Math.ceil(section.rationale.length / 100) * 0.2 + 0.1);
-        slide.addText(cleanText(section.rationale), {
-            x: SLIDE.marginLeft, y: yPos + 0.25, w: 9, h: height,
-            fontSize: 11, color: COLORS.textMain, fontFace: FONTS.main
-        });
-        yPos += height + 0.3;
-    }
-
-    if (section.implication) {
-        const height = 1.2; 
+    for (const block of blocks) {
+        // Estimate height
+        const charCount = block.content.length;
+        const lines = Math.ceil(charCount / 95); // Slightly wider estimate
+        let contentHeight = Math.max(0.3, lines * 0.25) + 0.1;
         
-        slide.addShape(pptx.ShapeType.rect, {
-            x: SLIDE.marginLeft, y: yPos, w: 9, h: height,
-            fill: { color: COLORS.greyBox },
-        });
+        let blockTotalHeight = 0.3 + contentHeight + 0.2; // title + content + gap
+        if (block.type === 'implication') blockTotalHeight += 0.2; // padding for box
 
-        slide.addText('Strategic Implication:', {
-            x: SLIDE.marginLeft + 0.2, y: yPos + 0.1, w: 3, h: 0.2,
-            fontSize: 10, bold: true, color: COLORS.brandBlue, fontFace: FONTS.main
-        });
-        
-        slide.addText(cleanText(section.implication), {
-            x: SLIDE.marginLeft + 0.2, y: yPos + 0.35, w: 8.6, h: height - 0.4,
-            fontSize: 11, color: COLORS.brandDark, fontFace: FONTS.main
-        });
+        // If it doesn't fit, new slide
+        if (yPos + blockTotalHeight > maxY && yPos > 2.0) { // Ensure we don't split if it's the first item
+            addSlideFooter(slide);
+            slide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' });
+            addSlideHeader(slide, false);
+            slide.addText(`${currentTitle} (Cont.)`, {
+                x: SLIDE.marginLeft, y: 0.9, w: 8, h: 0.5,
+                fontSize: 24, bold: true, color: COLORS.brandDark, fontFace: FONTS.main
+            });
+            yPos = 1.6;
+        }
+
+        // Render Block
+        if (block.type === 'implication') {
+             slide.addShape(pptx.ShapeType.rect, {
+                x: SLIDE.marginLeft, y: yPos, w: 9, h: contentHeight + 0.4, 
+                fill: { color: COLORS.greyBox },
+            });
+
+            slide.addText(block.title, {
+                x: SLIDE.marginLeft + 0.2, y: yPos + 0.1, w: 4, h: 0.2,
+                fontSize: 10, bold: true, color: COLORS.brandBlue, fontFace: FONTS.main
+            });
+            
+            slide.addText(cleanText(block.content), {
+                x: SLIDE.marginLeft + 0.2, y: yPos + 0.35, w: 8.6, h: contentHeight,
+                fontSize: 11, color: COLORS.brandDark, fontFace: FONTS.main,
+                autoFit: true,
+            });
+            yPos += contentHeight + 0.6;
+
+        } else {
+            slide.addText(block.title, {
+                x: SLIDE.marginLeft, y: yPos, w: 4, h: 0.3,
+                fontSize: 11, bold: true, color: COLORS.brandBlue, fontFace: FONTS.main
+            });
+            
+            slide.addText(cleanText(block.content), {
+                x: SLIDE.marginLeft, y: yPos + 0.25, w: 9, h: contentHeight,
+                fontSize: (block.type === 'finding' ? 14 : 11), 
+                bold: (block.type === 'finding'),
+                color: (block.type === 'finding' ? COLORS.black : COLORS.textMain), 
+                fontFace: FONTS.main,
+                autoFit: true,
+            });
+            yPos += contentHeight + 0.4;
+        }
     }
-    
+
     addSlideFooter(slide);
 }
 
 function createTableSlide(pptx: PptxGenJS, section: WebSlideSection) {
     if (!section.table) return;
 
-    const slide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' });
-    addSlideHeader(slide, false);
-
-    slide.addText(section.title.toUpperCase(), {
-        x: SLIDE.marginLeft, y: 0.6, w: 9, h: 0.6,
-        fontSize: 26, bold: true, color: COLORS.black, fontFace: FONTS.main
-    });
-
     const { headers, rows } = section.table;
-    const tableData: any[][] = [];
+    const maxCols = 6;
+    const maxRowsPerSlide = 7;
+    
+    // Fit columns logic - naive slice for now, similar to social report
+    // A better approach would be to distribute or wrap, but slice is safe for basic tables
+    const fitHeaders = headers.length > maxCols ? headers.slice(0, maxCols) : headers;
+    const totalPages = Math.ceil(rows.length / maxRowsPerSlide);
+    const tableWidth = 9;
+    const colW = tableWidth / fitHeaders.length;
 
-    tableData.push(headers.map(h => ({
-        text: h,
-        options: { 
-            fill: { color: COLORS.brandLime }, 
-            color: COLORS.black, 
+    for (let page = 0; page < totalPages; page++) {
+        const slide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' });
+        addSlideHeader(slide, false);
+
+        const titleText = totalPages > 1 
+            ? `${section.title.toUpperCase()} (${page + 1}/${totalPages})`
+            : section.title.toUpperCase();
+
+        slide.addText(titleText, {
+            x: SLIDE.marginLeft, 
+            y: 0.9, 
+            w: 9, 
+            h: 0.6,
+            fontSize: 26, 
             bold: true, 
-            fontSize: 12, 
-            align: 'left',
-            border: { type: 'solid', color: COLORS.black, pt: 1 }
-        }
-    })));
+            color: COLORS.black, 
+            fontFace: FONTS.main 
+        });
 
-    const MAX_ROWS = 7; 
-    const rowsToRender = rows.slice(0, MAX_ROWS);
+        const pageRows = rows.slice(page * maxRowsPerSlide, (page + 1) * maxRowsPerSlide);
+        const tableData: any[][] = [];
 
-    rowsToRender.forEach(row => {
-        tableData.push(row.map((cell, i) => ({
-            text: cleanText(cell),
+        // Header
+        tableData.push(fitHeaders.map(h => ({
+            text: h,
             options: { 
-                fill: { color: COLORS.white }, 
-                color: COLORS.black,
-                fontSize: 11,
-                bold: i === 0, 
+                fill: { color: COLORS.brandLime }, 
+                color: COLORS.black, 
+                bold: true, 
+                fontSize: 12, 
+                fontFace: FONTS.main,
+                align: 'left',
                 border: { type: 'solid', color: COLORS.black, pt: 1 },
                 valign: 'middle'
             }
         })));
-    });
 
-    slide.addTable(tableData, {
-        x: SLIDE.marginLeft, y: 1.4, w: 9,
-        border: { type: 'solid', pt: 1, color: COLORS.black },
-        fontFace: FONTS.main
-    });
+        // Rows
+        pageRows.forEach(row => {
+            // Slice row to match header count
+            const slicedRow = row.slice(0, fitHeaders.length);
+            // Fill if shorter
+            while (slicedRow.length < fitHeaders.length) slicedRow.push('');
 
-    addSlideFooter(slide);
+            tableData.push(slicedRow.map((cell, i) => ({
+                text: cleanText(cell),
+                options: { 
+                    fill: { color: COLORS.white }, 
+                    color: COLORS.black, 
+                    fontSize: 11,
+                    fontFace: FONTS.main,
+                    bold: i === 0, 
+                    border: { type: 'solid', color: COLORS.black, pt: 1 },
+                    valign: 'top' // align top for multi-line content
+                }
+            })));
+        });
+
+        slide.addTable(tableData, {
+            x: SLIDE.marginLeft, 
+            y: 1.6, 
+            w: tableWidth,
+            colW: colW, 
+            border: { type: 'solid', pt: 1, color: COLORS.black },
+            fontFace: FONTS.main,
+            autoPage: false
+        });
+
+        addSlideFooter(slide);
+    }
 }
 
 export function createWebSynthesisPresentation(exportData: WebSynthesisExportData): PptxGenJS {

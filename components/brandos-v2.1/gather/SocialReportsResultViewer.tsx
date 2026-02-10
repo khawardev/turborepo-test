@@ -254,7 +254,7 @@ export function SocialReportsResultViewer({
                                     ) : (
                                         <Presentation className="w-3.5 h-3.5" />
                                     )}
-                                    Download PPTX
+                                    Export PPTX
                                 </Button>
                                 {onReRun && (
                                     <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
@@ -263,7 +263,7 @@ export function SocialReportsResultViewer({
                                         ) : (
                                             <RefreshCw className="w-3.5 h-3.5" />
                                         )}
-                                        Re-run Analysis
+                                        Re Run 
                                     </Button>
                                 )}
                             </div>

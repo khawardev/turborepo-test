@@ -53,6 +53,9 @@ export async function proxy(request: NextRequest) {
                 // 500s or network errors are just logged
                 if (userRes.status === 401 || userRes.status === 403) {
                      console.warn(`[Middleware] Token invalid (${userRes.status}) for ${pathname}`);
+                     if (!refreshToken) {
+                         authFailedExplicitly = true;
+                     }
                 } else {
                      console.error(`[Middleware] Backend error (${userRes.status}) for ${pathname}:`, userRes.error);
                 }
@@ -124,14 +127,18 @@ export async function proxy(request: NextRequest) {
     }
 
     // 5. The Safety Net logic (User is NULL)
+    if (authFailedExplicitly) {
+        const response = isDashboardPath 
+            ? NextResponse.redirect(new URL("/login", request.url))
+            : NextResponse.next();
+        
+        response.cookies.delete("access_token");
+        response.cookies.delete("refresh_token");
+        return response;
+    }
+
     if (isDashboardPath) {
-        // If auth failed explicitly (401/403), kill the session.
-        if (authFailedExplicitly) {
-            const res = NextResponse.redirect(new URL("/login", request.url));
-            res.cookies.delete("access_token");
-            res.cookies.delete("refresh_token");
-            return res;
-        }
+        // If auth didn't "fail" but user is null (e.g. Backend Timeout/500 Error),
 
         // If auth didn't "fail" but user is null (e.g. Backend Timeout/500 Error),
         // we allow request to proceed but MUST try to help downstream by passing tokens.
