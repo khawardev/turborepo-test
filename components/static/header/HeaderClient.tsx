@@ -12,6 +12,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export function HeaderClient({user}:any) {
   const pathname = usePathname()
+  
+  // If we are on the login page, forcedly treat user as null to avoid stale layout state showing "logged in" headers
+  // right after a middleware redirect (which deletes cookies but might leave the layout cache active).
+  const effectiveUser = pathname === '/login' ? null : user;
+
   if (pathname.startsWith("/dashboard")) return null
 
   return (
@@ -21,7 +26,7 @@ export function HeaderClient({user}:any) {
           <FullLogo />
         </Link>
         <ul className={`flex px-2 h-11  items-center justify-end gap-2 rounded-full backdrop-blur-2xl`}>
-          {user &&
+          {effectiveUser &&
             BrandOSConfig.mainNav.map((item: any, index: number) => (
               <TooltipProvider key={index}>
                 <Tooltip>
@@ -42,13 +47,13 @@ export function HeaderClient({user}:any) {
                 </Tooltip>
               </TooltipProvider>
             ))}
-          <div className={`${user && 'md:border-l pl-4'}  flex items-center gap-2`}>
-            {!user ? (
+          <div className={`${effectiveUser && 'md:border-l pl-4'}  flex items-center gap-2`}>
+            {!effectiveUser ? (
               <Button asChild>
                 <Link href="/login">Login</Link>
               </Button>
             ) : (
-              <UserNav user={user} />
+              <UserNav user={effectiveUser} />
             )}
             <ThemeSwitcher />
           </div>

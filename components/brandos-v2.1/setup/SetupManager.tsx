@@ -404,7 +404,7 @@ export function SetupManager() {
                 webLimit: webLimit.toString()
             });
 
-            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&scrapeType=both&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
             window.location.href = redirectUrl;
 
         } catch (error) {

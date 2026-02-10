@@ -13,6 +13,7 @@ type PageProps = {
     params: Promise<{ brandId: string }>;
     searchParams: Promise<{
         triggerScrape?: string;
+        scrapeType?: string;
         webLimit?: string;
         startDate?: string;
         endDate?: string;
@@ -97,6 +98,7 @@ export default async function CollectingPage({ params, searchParams }: PageProps
                     websiteBatchError={websiteBatchError}
                     socialBatchError={socialBatchError}
                     triggerScrape={queryParams.triggerScrape === 'true'}
+                    scrapeType={queryParams.scrapeType as 'web' | 'social' | 'both' | undefined}
                     webLimit={queryParams.webLimit ? parseInt(queryParams.webLimit) : 0}
                     startDate={queryParams.startDate || ''}
                     endDate={queryParams.endDate || ''}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { DateRange } from 'react-day-picker';
 import { format, subMonths } from 'date-fns';
@@ -46,6 +47,7 @@ export function RecollectDialog({
 }: RecollectDialogProps) {
     const [openDialog, setOpenDialog] = useState<'website' | 'social' | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const today = new Date();
     const defaultStartDate = subMonths(today, 3);
@@ -64,8 +66,8 @@ export function RecollectDialog({
         setIsLoading(true);
         try {
             const webLimit = form.getValues('webLimit');
-            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}`;
-            window.location.href = redirectUrl;
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&scrapeType=web&webLimit=${webLimit}`;
+            router.push(redirectUrl);
         } catch (e) {
             toast.error('An error occurred');
             setIsLoading(false);
@@ -82,8 +84,8 @@ export function RecollectDialog({
             const startDate = format(socialDateRange.from, 'yyyy-MM-dd');
             const endDate = socialDateRange.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
             
-            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&startDate=${startDate}&endDate=${endDate}`;
-            window.location.href = redirectUrl;
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&scrapeType=social&startDate=${startDate}&endDate=${endDate}`;
+            router.push(redirectUrl);
         } catch (e) {
             toast.error('An error occurred');
             setIsLoading(false);
@@ -101,8 +103,8 @@ export function RecollectDialog({
             const startDate = format(socialDateRange.from, 'yyyy-MM-dd');
             const endDate = socialDateRange.to ? format(socialDateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
 
-            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
-            window.location.href = redirectUrl;
+            const redirectUrl = `/dashboard/brandos-v2.1/gather/collecting/${brandId}?triggerScrape=true&scrapeType=both&webLimit=${webLimit}&startDate=${startDate}&endDate=${endDate}`;
+            router.push(redirectUrl);
         } catch (e) {
             toast.error('An error occurred');
             setIsLoading(false);

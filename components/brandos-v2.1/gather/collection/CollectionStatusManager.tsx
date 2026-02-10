@@ -30,6 +30,7 @@ type CollectionStatusManagerProps = {
     websiteBatchStatus: string | null;
     socialBatchStatus: string | null;
     triggerScrape: boolean;
+    scrapeType?: 'web' | 'social' | 'both';
     webLimit: number;
     startDate: string;
     endDate: string;
@@ -44,6 +45,8 @@ type CollectionState = {
     socialStatus: string | null; 
     webError: string | null;
     socialError: string | null;
+    webProgress: number;
+    socialProgress: number;
     isPolling: boolean;
     pollingMessage: string;
     isStarting: boolean;
@@ -54,8 +57,8 @@ type CollectionState = {
 type CollectionAction =
     | { type: 'SET_WEB_BATCH'; payload: { id: string; status?: string } }
     | { type: 'SET_SOCIAL_BATCH'; payload: { id: string; status?: string } }
-    | { type: 'UPDATE_WEB_STATUS'; payload: { status: string; error?: string } }
-    | { type: 'UPDATE_SOCIAL_STATUS'; payload: { status: string; error?: string } }
+    | { type: 'UPDATE_WEB_STATUS'; payload: { status: string; error?: string; progress?: number } }
+    | { type: 'UPDATE_SOCIAL_STATUS'; payload: { status: string; error?: string; progress?: number } }
     | { type: 'SET_POLLING'; payload: boolean }
     | { type: 'SET_POLLING_MESSAGE'; payload: string }
     | { type: 'SET_STARTING'; payload: boolean }
@@ -70,9 +73,19 @@ function collectionReducer(state: CollectionState, action: CollectionAction): Co
         case 'SET_SOCIAL_BATCH':
             return { ...state, socialBatchId: action.payload.id, socialStatus: action.payload.status || state.socialStatus };
         case 'UPDATE_WEB_STATUS':
-            return { ...state, webStatus: action.payload.status, webError: action.payload.error || state.webError };
+            return { 
+                ...state, 
+                webStatus: action.payload.status, 
+                webError: action.payload.error || state.webError,
+                webProgress: action.payload.progress ?? state.webProgress 
+            };
         case 'UPDATE_SOCIAL_STATUS':
-            return { ...state, socialStatus: action.payload.status, socialError: action.payload.error || state.socialError };
+            return { 
+                ...state, 
+                socialStatus: action.payload.status, 
+                socialError: action.payload.error || state.socialError,
+                socialProgress: action.payload.progress ?? state.socialProgress
+            };
         case 'SET_POLLING':
             return { ...state, isPolling: action.payload };
         case 'SET_POLLING_MESSAGE':
@@ -84,7 +97,14 @@ function collectionReducer(state: CollectionState, action: CollectionAction): Co
         case 'SET_TASK_STATUS':
             return { ...state, taskStatus: action.payload };
         case 'INIT_COLLECTION':
-            return { ...state, webStatus: 'Initializing', socialStatus: 'Initializing', isStarting: true };
+            return { 
+                ...state, 
+                webStatus: 'Initializing', 
+                socialStatus: 'Initializing', 
+                isStarting: true,
+                webProgress: 0,
+                socialProgress: 0
+            };
         default:
             return state;
     }
@@ -103,6 +123,7 @@ export function CollectionStatusManager({
     websiteBatchStatus: initialWebStatus,
     socialBatchStatus: initialSocialStatus,
     triggerScrape,
+    scrapeType,
     webLimit,
     startDate,
     endDate,
@@ -121,6 +142,8 @@ export function CollectionStatusManager({
         socialStatus: initialSocialStatus,
         webError: websiteBatchError || null,
         socialError: socialBatchError || null,
+        webProgress: 0,
+        socialProgress: 0,
         isPolling: false,
         pollingMessage: '',
         isStarting: false,
@@ -144,8 +167,11 @@ export function CollectionStatusManager({
         }
     }, [brandId, startDate, endDate, webLimit]);
 
+    const ignoreTriggerRef = useRef(false);
+
     useEffect(() => {
-        if (triggerScrape && !state.hasAutoTriggered && !state.isStarting && !state.isPolling) {
+        if (triggerScrape && !state.hasAutoTriggered && !state.isStarting && !state.isPolling && !ignoreTriggerRef.current) {
+            ignoreTriggerRef.current = true;
             dispatch({ type: 'SET_AUTO_TRIGGERED' });
             if (state.taskStatus?.total_running > 0) {
                 dispatch({ type: 'SET_POLLING', payload: true });
@@ -159,8 +185,7 @@ export function CollectionStatusManager({
         if (!state.isPolling) return;
 
         const poll = async () => {
-            pollCountRef.current++;
-            dispatch({ type: 'SET_POLLING_MESSAGE', payload: `Checking status... (${pollCountRef.current})` });
+            dispatch({ type: 'SET_POLLING_MESSAGE', payload: `Checking status...` });
 
             try {
                 let webRes = null;
@@ -169,14 +194,37 @@ export function CollectionStatusManager({
                 if (state.webBatchId) {
                     webRes = await getBatchWebsiteScrapeStatus(brandId, state.webBatchId);
                     if (webRes?.status) {
-                        dispatch({ type: 'UPDATE_WEB_STATUS', payload: { status: webRes.status, error: webRes.error } });
+                        let progress = 0;
+                        if (webRes.progress?.total_urls > 0) {
+                            progress = Math.round((webRes.progress.completed / webRes.progress.total_urls) * 100);
+                        }
+                        dispatch({ 
+                            type: 'UPDATE_WEB_STATUS', 
+                            payload: { 
+                                status: webRes.status, 
+                                error: webRes.error,
+                                progress 
+                            } 
+                        });
                     }
                 }
 
                 if (state.socialBatchId) {
                     socialRes = await getBatchSocialScrapeStatus(brandId, state.socialBatchId);
                     if (socialRes?.status) {
-                        dispatch({ type: 'UPDATE_SOCIAL_STATUS', payload: { status: socialRes.status, error: socialRes.error } });
+                        let progress = 0;
+                        if (socialRes.progress?.total > 0) {
+                             progress = Math.round((socialRes.progress.completed / socialRes.progress.total) * 100);
+                        }
+
+                        dispatch({ 
+                            type: 'UPDATE_SOCIAL_STATUS', 
+                            payload: { 
+                                status: socialRes.status, 
+                                error: socialRes.error,
+                                progress
+                            } 
+                        });
                     }
                 }
 
@@ -209,12 +257,6 @@ export function CollectionStatusManager({
             } catch (e: any) {
                 console.error('[CollectionStatusManager] Polling error:', e);
             }
-
-            if (pollCountRef.current >= maxPolls) {
-                dispatch({ type: 'SET_POLLING', payload: false });
-                dispatch({ type: 'SET_POLLING_MESSAGE', payload: '' });
-                if (intervalRef.current) clearInterval(intervalRef.current);
-            }
         };
 
         intervalRef.current = setInterval(poll, 10000);
@@ -240,7 +282,11 @@ export function CollectionStatusManager({
             let webSuccess = false;
             let socialSuccess = false;
 
-            if (webLimit > 0) {
+            // Determine what to scrape based on scrapeType if provided, otherwise fallback to existing logic
+            const shouldScrapeWeb = scrapeType ? (scrapeType === 'web' || scrapeType === 'both') : (webLimit > 0);
+            const shouldScrapeSocial = scrapeType ? (scrapeType === 'social' || scrapeType === 'both') : (!!startDate);
+
+            if (shouldScrapeWeb && webLimit > 0) {
                 const webResult = await scrapeBatchWebsite(brandId, webLimit);
                 
                 if (!webResult?.success) {
@@ -255,7 +301,7 @@ export function CollectionStatusManager({
                 }
             }
 
-            if (startDate) {
+            if (shouldScrapeSocial && startDate) {
                 const socialResult = await scrapeBatchSocial(brandId, startDate, endDate);
 
                 if (!socialResult?.success) {
@@ -276,6 +322,11 @@ export function CollectionStatusManager({
                 toast.success('Swarm agents deployed.');
                 pollCountRef.current = 0;
                 dispatch({ type: 'SET_POLLING', payload: true });
+            } else {
+                // If nothing started (e.g. only web requested but limit 0, or errors), stop loading
+                if (!webSuccess && !socialSuccess) {
+                     toast.warning("No agents were deployed. Please check configuration.");
+                }
             }
         } catch (e: any) {
             console.error('[handleStartCollection] Critical error:', e);
@@ -303,6 +354,7 @@ export function CollectionStatusManager({
                         batchId={state.webBatchId}
                         isRunning={isRunning && !isWebComplete}
                         error={state.webError}
+                        progress={state.webProgress}
                     />
                 )}
                 {(startDate || state.socialBatchId) && (
@@ -313,6 +365,7 @@ export function CollectionStatusManager({
                         batchId={state.socialBatchId}
                         isRunning={isRunning && !isSocialComplete}
                         error={state.socialError}
+                        progress={state.socialProgress}
                     />
                 )}
             </div>
@@ -342,7 +395,15 @@ export function CollectionStatusManager({
                                 </p>
                             </div>
                         </div>
-                        <Progress value={undefined} className="h-2 w-full mt-4 animate-pulse" />
+                        <Progress 
+                            value={
+                                (state.webProgress > 0 || state.socialProgress > 0)
+                                    ? Math.max(state.webProgress, state.socialProgress)
+                                    : 5
+                            } 
+                            max={100}
+                            className="h-2 w-full mt-4 animate-pulse" 
+                        />
                     </CardContent>
                 </Card>
             )}
@@ -356,7 +417,8 @@ function StatusCard({
     status,
     batchId,
     isRunning,
-    error
+    error,
+    progress
 }: {
     title: string;
     icon: any;
@@ -364,6 +426,7 @@ function StatusCard({
     batchId: string | null;
     isRunning: boolean;
     error?: string | null;
+    progress?: number;
 }) {
     return (
         <Card>
@@ -386,7 +449,21 @@ function StatusCard({
                         Batch: {batchId}
                     </p>
                 )}
-                {isRunning && <Progress value={undefined} className="h-1 mt-2 animate-pulse" />}
+                {isRunning && (
+                    <div className="mt-2 space-y-1">
+                        <Progress 
+                            value={progress && progress > 0 ? progress : 5} 
+                            max={100}
+                            className={`h-1 ${(progress === undefined || progress === 0) ? "animate-pulse" : ""}`} 
+                        />
+                        {progress !== undefined && progress > 0 && (
+                             <p className="text-xs text-right text-muted-foreground">{progress}%</p>
+                        )}
+                        {(progress === undefined || progress === 0) && (
+                             <p className="text-xs text-right text-muted-foreground">Initializing...</p>
+                        )}
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
