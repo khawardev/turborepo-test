@@ -16,6 +16,8 @@ import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from "sonner";
 import { exportToGoogleSlides } from "@/server/actions/googleSlidesActions";
 import type { UniversalConfig } from "@/server/actions/socialReportsActions";
+import { exportToPDF, exportToDocx } from '@/lib/brandos-v2.1/exportUtils';
+import { FileDown, FileType } from 'lucide-react';
 
 type SocialReportsResultViewerProps = {
     data: any;
@@ -44,6 +46,8 @@ export function SocialReportsResultViewer({
     channelName = 'linkedin'
 }: SocialReportsResultViewerProps) {
     const [isExporting, setIsExporting] = useState(false);
+    const [isExportingPDF, setIsExportingPDF] = useState(false);
+    const [isExportingDocx, setIsExportingDocx] = useState(false);
     const [showUniversalConfig, setShowUniversalConfig] = useState(false);
 
     if (!data) return null;
@@ -101,6 +105,32 @@ export function SocialReportsResultViewer({
             toast.error(error?.message || "An error occurred while exporting");
         } finally {
             setIsExporting(false);
+        }
+    };
+
+    const handleExportPDF = async () => {
+        if (!social_report) return;
+        setIsExportingPDF(true);
+        try {
+            await exportToPDF(social_report, `${entity_name || 'Social'}_Report`, `Social Media Report - ${entity_name}`);
+            toast.success("PDF exported successfully!");
+        } catch (error) {
+            toast.error("Failed to export PDF");
+        } finally {
+            setIsExportingPDF(false);
+        }
+    };
+
+    const handleExportDocx = async () => {
+        if (!social_report) return;
+        setIsExportingDocx(true);
+        try {
+            await exportToDocx(social_report, `${entity_name || 'Social'}_Report`, `Social Media Report - ${entity_name}`);
+            toast.success("DOCX exported successfully!");
+        } catch (error) {
+            toast.error("Failed to export DOCX");
+        } finally {
+            setIsExportingDocx(false);
         }
     };
 
@@ -256,6 +286,32 @@ export function SocialReportsResultViewer({
                                     )}
                                     Export PPTX
                                 </Button>
+                                <Button 
+                                    variant="outline"
+                                    size="sm" 
+                                    onClick={handleExportPDF}
+                                    disabled={isExportingPDF}
+                                >
+                                    {isExportingPDF ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <FileDown className="w-3.5 h-3.5" />
+                                    )}
+                                    Download PDF
+                                </Button>
+                                <Button 
+                                    variant="outline"
+                                    size="sm" 
+                                    onClick={handleExportDocx}
+                                    disabled={isExportingDocx}
+                                >
+                                    {isExportingDocx ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <FileType className="w-3.5 h-3.5" />
+                                    )}
+                                    Download DOCX
+                                </Button>
                                 {onReRun && (
                                     <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
                                         {isReRunning ? (
@@ -300,7 +356,9 @@ export function SocialReportsResultViewer({
                 <CardContent >
                     <ScrollArea className="h-[600px] w-full">
                         {social_report ? (
-                            <MarkdownViewer content={social_report} />
+                            <div id={`social-report-content-${task_id || 'preview'}`} className="p-4 bg-white text-black">
+                                <MarkdownViewer content={social_report} />
+                            </div>
                         ) : (
                             <p className="text-muted-foreground">No report content available.</p>
                         )}

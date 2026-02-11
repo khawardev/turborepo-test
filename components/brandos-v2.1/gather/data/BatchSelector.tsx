@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, isStatusProcessing, isWithinOneDay } from '@/lib/utils';
 import { Globe, Share2, CheckCircle2, AlertCircle, Loader2, Clock, ChevronDown, Check } from 'lucide-react';
+import { PollingStatusBadge } from '../PollingStatusBadge';
 
 type BatchItem = {
     batch_id: string;
@@ -22,6 +23,7 @@ type BatchItem = {
 };
 
 type BatchSelectorProps = {
+    brandId: string;
     type: 'website' | 'social';
     batches: BatchItem[];
     selectedBatchId: string | null;
@@ -66,6 +68,7 @@ function getStatusText(status: string): string {
 }
 
 export function BatchSelector({
+    brandId,
     type,
     batches,
     selectedBatchId,
@@ -105,20 +108,32 @@ export function BatchSelector({
                     )}
                 >
                     <div className="flex items-center gap-2 overflow-hidden">
-                        <Badge variant={'secondary'} className="shrink-0">
+                        <Badge variant={'secondary'} className="shrink-0 font-normal">
                             {normalizedType}
                         </Badge>
                         {selectedBatch ? (
                             <div className="flex items-center gap-2 truncate text-foreground">
-                                {getStatusIcon(selectedBatch.status)}
-                                <div className="flex flex-col gap-0.5 truncate text-left">
-                                    <span className="truncate font-medium text-sm leading-none">
-                                        {formatBatchTime(selectedBatch.created_at)}
-                                    </span>
-                                    <span className="text-[10px] text-muted-foreground leading-none">
-                                        {getStatusText(selectedBatch.status)}
-                                    </span>
-                                </div>
+                                {isStatusProcessing(selectedBatch.status) && isWithinOneDay(selectedBatch.created_at) ? (
+                                    <PollingStatusBadge
+                                        type={type === 'website' ? 'Website' : 'Social'}
+                                        initialStatus={selectedBatch.status}
+                                        brandId={brandId}
+                                        batchId={selectedBatch.batch_id}
+                                        createdAt={selectedBatch.created_at}
+                                    />
+                                ) : (
+                                    <>
+                                        {getStatusIcon(selectedBatch.status)}
+                                        <div className="flex flex-col gap-0.5 truncate text-left">
+                                            <span className="truncate font-medium text-sm leading-none">
+                                                {formatBatchTime(selectedBatch.created_at)}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground leading-none">
+                                                {getStatusText(selectedBatch.status)}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <span>Select {label}</span>
@@ -132,6 +147,8 @@ export function BatchSelector({
                 <DropdownMenuSeparator />
                 {sortedBatches.map((batch, index) => {
                     const isSelected = selectedBatchId === batch.batch_id;
+                    const isProcessing = isStatusProcessing(batch.status) && isWithinOneDay(batch.created_at);
+                    
                     return (
                         <DropdownMenuItem 
                             key={batch.batch_id} 
@@ -156,10 +173,22 @@ export function BatchSelector({
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1.5 text-muted-foreground">
-                                    {getStatusIcon(batch.status)}
-                                    <span className="text-xs truncate">
-                                        {getStatusText(batch.status)}
-                                    </span>
+                                    {isProcessing ? (
+                                        <PollingStatusBadge
+                                            type={type === 'website' ? 'Website' : 'Social'}
+                                            initialStatus={batch.status}
+                                            brandId={brandId}
+                                            batchId={batch.batch_id}
+                                            createdAt={batch.created_at}
+                                        />
+                                    ) : (
+                                        <>
+                                            {getStatusIcon(batch.status)}
+                                            <span className="text-xs truncate">
+                                                {getStatusText(batch.status)}
+                                            </span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </DropdownMenuItem>

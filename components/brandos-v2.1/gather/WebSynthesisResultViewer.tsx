@@ -11,6 +11,8 @@ import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from 'sonner';
 import { exportWebSynthesisToSlides } from "@/server/actions/googleSlidesActions";
 import { Separator } from "@/components/ui/separator";
+import { exportToPDF, exportToDocx } from '@/lib/brandos-v2.1/exportUtils';
+import { FileDown, FileType, Loader2 } from 'lucide-react';
 
 type WebSynthesisResultViewerProps = {
     data: any;
@@ -20,6 +22,8 @@ type WebSynthesisResultViewerProps = {
 
 export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }: WebSynthesisResultViewerProps) {
     const [isExporting, setIsExporting] = useState(false);
+    const [isExportingPDF, setIsExportingPDF] = useState(false);
+    const [isExportingDocx, setIsExportingDocx] = useState(false);
 
     if (!data) return null;
 
@@ -60,6 +64,32 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
             console.error(e);
         } finally {
             setIsExporting(false);
+        }
+    };
+
+    const handleExportPDF = async () => {
+        if (!synthesisReport) return;
+        setIsExportingPDF(true);
+        try {
+            await exportToPDF(synthesisReport, `${metadata.entityName}_Web_Synthesis`, `Web Synthesis Report - ${metadata.entityName}`);
+            toast.success("PDF exported successfully!");
+        } catch (error) {
+            toast.error("Failed to export PDF");
+        } finally {
+            setIsExportingPDF(false);
+        }
+    };
+
+    const handleExportDocx = async () => {
+        if (!synthesisReport) return;
+        setIsExportingDocx(true);
+        try {
+            await exportToDocx(synthesisReport, `${metadata.entityName}_Web_Synthesis`, `Web Synthesis Report - ${metadata.entityName}`);
+            toast.success("DOCX exported successfully!");
+        } catch (error) {
+            toast.error("Failed to export DOCX");
+        } finally {
+            setIsExportingDocx(false);
         }
     };
 
@@ -111,6 +141,32 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                         <Download className={cn("w-3.5 h-3.5 mr-2", isExporting && "animate-pulse")} />
                         {isExporting ? 'Exporting...' : 'Export PPTX'}
                     </Button>
+                    <Button 
+                        variant="outline"
+                        size="sm" 
+                        onClick={handleExportPDF}
+                        disabled={isExportingPDF}
+                    >
+                        {isExportingPDF ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
+                        ) : (
+                            <FileDown className="w-3.5 h-3.5 mr-2" />
+                        )}
+                        {isExportingPDF ? 'Processing...' : 'Download PDF'}
+                    </Button>
+                    <Button 
+                        variant="outline"
+                        size="sm" 
+                        onClick={handleExportDocx}
+                        disabled={isExportingDocx}
+                    >
+                        {isExportingDocx ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
+                        ) : (
+                            <FileType className="w-3.5 h-3.5 mr-2" />
+                        )}
+                        {isExportingDocx ? 'Processing...' : 'Download DOCX'}
+                    </Button>
                     <Button
                         variant="ghost"
                         onClick={handleCopy}
@@ -126,7 +182,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
             <Card>
                 <CardContent>
                     <ScrollArea className="h-[700px] w-full">
-                        <div className="p-4">
+                        <div id={`web-synthesis-content-${metadata.taskId || 'preview'}`} className="p-4 bg-white text-black">
                             <MarkdownViewer content={synthesisReport} />
                         </div>
                     </ScrollArea>

@@ -15,6 +15,8 @@ type PollingStatusBadgeProps = {
     batchId: string;
     createdAt?: string | null;
     pollInterval?: number;
+    showLabel?: boolean;
+    size?: 'sm' | 'md';
 };
 
 export function PollingStatusBadge({
@@ -24,7 +26,9 @@ export function PollingStatusBadge({
     brandId,
     batchId,
     createdAt,
-    pollInterval = 15000
+    pollInterval = 15000,
+    showLabel = true,
+    size = 'sm'
 }: PollingStatusBadgeProps) {
     const router = useRouter();
     const [status, setStatus] = useState<string | null>(initialStatus);
@@ -93,6 +97,8 @@ export function PollingStatusBadge({
             label={type}
             status={status}
             error={error}
+            showLabel={showLabel}
+            size={size}
         />
     );
 }
