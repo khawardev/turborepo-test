@@ -70,7 +70,7 @@ export function BrandCompCrudButtons({ brand, side }: any) {
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 {/* Competitors Sub Menu */}
-                <DropdownMenuSub>
+                {/* <DropdownMenuSub>
                     <DropdownMenuSubTrigger >
                         <span>Competitors</span>
                     </DropdownMenuSubTrigger>
@@ -88,7 +88,7 @@ export function BrandCompCrudButtons({ brand, side }: any) {
                             </DropdownMenuItem>
                         </UpdateCompetitorsDialog>
                     </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                </DropdownMenuSub> */}
             </DropdownMenuContent>
         </DropdownMenu>
     )
