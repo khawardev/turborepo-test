@@ -182,7 +182,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
             <Card>
                 <CardContent>
                     <ScrollArea className="h-[700px] w-full">
-                        <div id={`web-synthesis-content-${metadata.taskId || 'preview'}`} className="p-4 bg-white text-black">
+                        <div id={`web-synthesis-content-${metadata.taskId || 'preview'}`} className="p-4 ">
                             <MarkdownViewer content={synthesisReport} />
                         </div>
                     </ScrollArea>

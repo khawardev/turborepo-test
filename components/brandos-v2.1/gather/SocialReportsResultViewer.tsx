@@ -356,7 +356,7 @@ export function SocialReportsResultViewer({
                 <CardContent >
                     <ScrollArea className="h-[600px] w-full">
                         {social_report ? (
-                            <div id={`social-report-content-${task_id || 'preview'}`} className="p-4 bg-white text-black">
+                            <div id={`social-report-content-${task_id || 'preview'}`} className="p-4">
                                 <MarkdownViewer content={social_report} />
                             </div>
                         ) : (
