@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Sparkles, Copy, Download, FileText, Terminal } from "lucide-react";
+import { RefreshCw, Sparkles, Copy, Download, FileText, Terminal, Maximize2, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ import { exportWebSynthesisToSlides } from "@/server/actions/googleSlidesActions
 import { Separator } from "@/components/ui/separator";
 import { exportToPDF, exportToDocx } from '@/lib/brandos-v2.1/exportUtils';
 import { FileDown, FileType, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type WebSynthesisResultViewerProps = {
     data: any;
@@ -24,6 +25,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
     const [isExporting, setIsExporting] = useState(false);
     const [isExportingPDF, setIsExportingPDF] = useState(false);
     const [isExportingDocx, setIsExportingDocx] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     if (!data) return null;
 
@@ -154,7 +156,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                         )}
                         {isExportingPDF ? 'Processing...' : 'Download PDF'}
                     </Button>
-                    <Button 
+                     {/* <Button 
                         variant="outline"
                         size="sm" 
                         onClick={handleExportDocx}
@@ -166,7 +168,7 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                             <FileType className="w-3.5 h-3.5 mr-2" />
                         )}
                         {isExportingDocx ? 'Processing...' : 'Download DOCX'}
-                    </Button>
+                    </Button>  */}
                     <Button
                         variant="ghost"
                         onClick={handleCopy}
@@ -174,6 +176,15 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                     >
                         <Copy/>
                         Copy 
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsFullScreen(true)}
+                        className="h-8 w-8 hover:bg-background"
+                        title="View Full Screen"
+                    >
+                        <Maximize2 className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
@@ -209,6 +220,28 @@ export function WebSynthesisResultViewer({ data, onReRun, isReRunning = false }:
                     </div>
                 </details>
             </div>
+
+            {/* Full Screen Dialog */}
+            <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
+                <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] sm:max-w-[95vw] flex flex-col p-0">
+                    <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
+                        <div className="flex items-center justify-between w-full">
+                            <DialogTitle className="flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-purple-600" />
+                                Web Synthesis Report
+                                <Badge variant="outline" className="ml-2 font-mono text-xs">
+                                    {metadata.entityName.toUpperCase()} 
+                                </Badge>
+                            </DialogTitle>
+                        </div>
+                    </DialogHeader>
+                    <ScrollArea className="h-full w-full">
+                        <div className="max-w-7xl mx-auto min-h-full  p-8 pb-20">
+                            <MarkdownViewer content={synthesisReport} />
+                        </div>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

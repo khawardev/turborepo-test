@@ -101,24 +101,6 @@ function addSlideHeader(slide: any, isDark: boolean = false) {
         w: 1.8,
         h: 0.45,
     });
-
-    if (!isDark) {
-        slide.addShape('line' as any, {
-            x: 0.25,
-            y: 0.7,
-            w: 0,
-            h: 4.6,
-            line: { color: COLORS.headerLine, width: 0.5 },
-        });
-
-        slide.addShape('line' as any, {
-            x: 9.75,
-            y: 0.7,
-            w: 0,
-            h: 4.6,
-            line: { color: COLORS.headerLine, width: 0.5 },
-        });
-    }
 }
 
 function addSlideFooter(slide: any) {
@@ -440,7 +422,7 @@ function createTableSlide(pptx: PptxGenJS, section: SlideSection, entityName: st
     
     const { headers, rows } = section.table_data;
     const maxCols = 6; // Limit cols per slide to ensure readability
-    const maxRowsPerSlide = 7; // As requested, maybe 7-8 rows fits well.
+    const maxRowsPerSlide = 5; 
     
     const totalPages = Math.ceil(rows.length / maxRowsPerSlide);
     const tableWidth = 8.6;
@@ -798,36 +780,18 @@ function createPresentation(exportData: ExportData, entityName: string): PptxGen
                         section.title,
                         'Key Insights',
                         section.content || '',
-                        section.bullet_points,
+                        section.bullet_points
                     );
                 } else if (section.content) {
-                    createContentSlideWithSections(pptx, section.title, [
-                        { heading: 'Overview', content: section.content }
-                    ], entityName);
+                     createFindingsSlide(
+                        pptx,
+                        section.title,
+                        'Key Insights',
+                        section.content || '',
+                        []
+                    );
                 }
                 break;
-            default:
-                if (section.table_data) {
-                    createTableSlide(pptx, section, entityName);
-                } else if (section.metrics) {
-                    createMetricsSlide(pptx, section);
-                } else if (section.contentSections) {
-                    createContentSlideWithSections(pptx, section.title, section.contentSections, entityName);
-                } else if (section.content || section.bullet_points) {
-                     if (section.bullet_points && section.bullet_points.length > 0) {
-                        createFindingsSlide(
-                            pptx,
-                            section.title,
-                            'Key Insights',
-                            section.content || '',
-                            section.bullet_points,
-                        );
-                    } else if (section.content) {
-                        createContentSlideWithSections(pptx, section.title, [
-                            { heading: 'Overview', content: section.content }
-                        ], entityName);
-                    }
-                }
         }
     }
 

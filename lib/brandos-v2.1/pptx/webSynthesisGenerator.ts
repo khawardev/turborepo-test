@@ -50,24 +50,6 @@ function addSlideHeader(slide: any, isDark: boolean = false) {
         w: 1.8,
         h: 0.45,
     });
-
-    if (!isDark) {
-        slide.addShape('line' as any, {
-            x: 0.25,
-            y: 0.7,
-            w: 0,
-            h: 4.6,
-            line: { color: COLORS.headerLine, width: 0.5 },
-        });
-
-        slide.addShape('line' as any, {
-            x: 9.75,
-            y: 0.7,
-            w: 0,
-            h: 4.6,
-            line: { color: COLORS.headerLine, width: 0.5 },
-        });
-    }
 }
 
 function addSlideFooter(slide: any) {
@@ -295,7 +277,7 @@ function createTableSlide(pptx: PptxGenJS, section: WebSlideSection) {
 
     const { headers, rows } = section.table;
     const maxCols = 6;
-    const maxRowsPerSlide = 7;
+    const maxRowsPerSlide = 5;
     
     // Fit columns logic - naive slice for now, similar to social report
     // A better approach would be to distribute or wrap, but slice is safe for basic tables
@@ -334,7 +316,7 @@ function createTableSlide(pptx: PptxGenJS, section: WebSlideSection) {
                 color: COLORS.black, 
                 bold: true, 
                 fontSize: 12, 
-                fontFace: FONTS.main,
+                fontFace: FONTS.main, 
                 align: 'left',
                 border: { type: 'solid', color: COLORS.black, pt: 1 },
                 valign: 'middle'

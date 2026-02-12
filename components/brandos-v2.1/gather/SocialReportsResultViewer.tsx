@@ -9,7 +9,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
     Terminal, Clock, FileText, Calendar, Bot,
     Copy, CheckCircle2, Loader2, Trash2, RefreshCw, 
-    Presentation, Globe, Settings2, MapPin, ChevronDown
+    Presentation, Globe, Settings2, MapPin, ChevronDown,
+    Maximize2, Minimize2 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MarkdownViewer } from "@/components/shared/MarkdownViewer";
@@ -18,6 +19,7 @@ import { exportToGoogleSlides } from "@/server/actions/googleSlidesActions";
 import type { UniversalConfig } from "@/server/actions/socialReportsActions";
 import { exportToPDF, exportToDocx } from '@/lib/brandos-v2.1/exportUtils';
 import { FileDown, FileType } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type SocialReportsResultViewerProps = {
     data: any;
@@ -49,6 +51,7 @@ export function SocialReportsResultViewer({
     const [isExportingPDF, setIsExportingPDF] = useState(false);
     const [isExportingDocx, setIsExportingDocx] = useState(false);
     const [showUniversalConfig, setShowUniversalConfig] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     if (!data) return null;
 
@@ -242,6 +245,15 @@ export function SocialReportsResultViewer({
                                 <Badge>
                                     {analysis_scope || 'brand'}
                                 </Badge>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsFullScreen(true)}
+                                    className="h-8 w-8 hover:bg-muted ml-2"
+                                    title="View Full Screen"
+                                >
+                                    <Maximize2 className="h-4 w-4" />
+                                </Button>
                             </div>
                         </div>
 
@@ -270,10 +282,18 @@ export function SocialReportsResultViewer({
                                 )}
                             </div>
                             <div className="flex flex-wrap  items-center gap-3 text-xs text-muted-foreground pt-2">
-                                <Button variant="outline" size="sm" onClick={handleCopyReport}>
-                                    <Copy className="w-3.5 h-3.5" />
-                                    Copy Report
-                                </Button>
+                          
+                                {onReRun && (
+                                    <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
+                                        {isReRunning ? (
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        ) : (
+                                            <RefreshCw className="w-3.5 h-3.5" />
+                                        )}
+                                        Re Run
+                                    </Button>
+                                )}
+                               
                                 <Button 
                                     size="sm" 
                                     onClick={handleExportToSlides}
@@ -299,7 +319,7 @@ export function SocialReportsResultViewer({
                                     )}
                                     Download PDF
                                 </Button>
-                                <Button 
+                                 {/* <Button 
                                     variant="outline"
                                     size="sm" 
                                     onClick={handleExportDocx}
@@ -311,17 +331,11 @@ export function SocialReportsResultViewer({
                                         <FileType className="w-3.5 h-3.5" />
                                     )}
                                     Download DOCX
+                                </Button>  */}
+                                <Button variant="outline" size="sm" onClick={handleCopyReport}>
+                                    <Copy className="w-3.5 h-3.5" />
+                                    Copy Report
                                 </Button>
-                                {onReRun && (
-                                    <Button variant="outline" size="sm" onClick={onReRun} disabled={isReRunning}>
-                                        {isReRunning ? (
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                        ) : (
-                                            <RefreshCw className="w-3.5 h-3.5" />
-                                        )}
-                                        Re Run 
-                                    </Button>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -383,6 +397,33 @@ export function SocialReportsResultViewer({
                     </div>
                 </details>
             </div>
+
+            {/* Full Screen Dialog */}
+            <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
+                <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] sm:max-w-[95vw] flex flex-col p-0">
+                    <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
+                        <div className="flex items-center justify-between w-full">
+                            <DialogTitle className="flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-primary" />
+                                Social Report
+                                <Badge variant="outline" className="ml-2 font-mono text-xs">
+                                    {entity_name ? entity_name.toUpperCase() : 'UNKNOWN'} 
+                                </Badge>
+                            </DialogTitle>
+                           
+                        </div>
+                    </DialogHeader>
+                        <ScrollArea className="h-full w-full">
+                            <div className="max-w-7xl mx-auto min-h-full  p-8 pb-20">
+                                {social_report ? (
+                                    <MarkdownViewer content={social_report} />
+                                ) : (
+                                    <p className="text-muted-foreground">No report content available.</p>
+                                )}
+                            </div>
+                        </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

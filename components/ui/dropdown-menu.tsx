@@ -1,30 +1,48 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle, X } from "lucide-react"
-
-import { cn } from "@/lib/utils"
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import { motion } from 'framer-motion'
+import { Check, ChevronRight, Circle, X } from 'lucide-react'
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 // --- Hover Tracker Logic & Context ---
 
+// --- Hover Tracker Logic & Context ---
+
+type HoverVariant = 'default' | 'destructive'
+
 interface HoverTrackerContextType {
-  onHover: (element: HTMLElement) => void
+  onHover: (element: HTMLElement, variant?: HoverVariant) => void
   onLeave: () => void
 }
 
 const HoverTrackerContext = React.createContext<HoverTrackerContextType | null>(null)
 
 function useHoverTracker() {
-  const [hoverStyle, setHoverStyle] = React.useState({ top: 0, left: 0, height: 0, width: 0, opacity: 0 })
+  const [hoverStyle, setHoverStyle] = React.useState({
+    top: 0,
+    left: 0,
+    height: 0,
+    width: 0,
+    opacity: 0,
+    variant: 'default' as HoverVariant,
+  })
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
-  const onHover = React.useCallback((element: HTMLElement) => {
+  const onHover = React.useCallback((element: HTMLElement, variant: HoverVariant = 'default') => {
+    if (!containerRef.current) return
+
+    const containerRect = containerRef.current.getBoundingClientRect()
+    const elementRect = element.getBoundingClientRect()
+
     setHoverStyle({
-      top: element.offsetTop,
-      left: element.offsetLeft,
-      height: element.offsetHeight,
-      width: element.offsetWidth,
+      top: elementRect.top - containerRect.top,
+      left: elementRect.left - containerRect.left,
+      height: elementRect.height,
+      width: elementRect.width,
       opacity: 1,
+      variant,
     })
   }, [])
 
@@ -32,13 +50,18 @@ function useHoverTracker() {
     setHoverStyle((prev) => ({ ...prev, opacity: 0 }))
   }, [])
 
-  return { hoverStyle, onHover, onLeave }
+  return { hoverStyle, onHover, onLeave, containerRef }
 }
 
 function HoverTrackerBackground({ hoverStyle }: { hoverStyle: any }) {
   return (
     <div
-      className="absolute rounded-lg dark:bg-border bg-accent z-0 transition-all duration-300 ease-out pointer-events-none"
+      className={cn(
+        'pointer-events-none absolute z-0 rounded-lg transition-all duration-300 ease-out',
+        hoverStyle.variant === 'destructive'
+          ? 'bg-destructive/10'
+          : 'bg-accent dark:bg-border'
+      )}
       style={{
         top: hoverStyle.top,
         left: hoverStyle.left,
@@ -52,31 +75,32 @@ function HoverTrackerBackground({ hoverStyle }: { hoverStyle: any }) {
 
 // --- Components ---
 
-function DropdownMenu({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
 }
 
 function DropdownMenuPortal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
-  return (
-    <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
-  )
+  return <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
 }
+
+const MotionTrigger = motion.create(DropdownMenuPrimitive.Trigger)
 
 function DropdownMenuTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
   return (
-    <DropdownMenuPrimitive.Trigger
+    <MotionTrigger
+      className={cn(
+        "outline-none focus-visible:ring-0 active:scale-[0.98]",
+        className,
+      )}
       data-slot="dropdown-menu-trigger"
-      className={cn("outline-none focus-visible:ring-0 ", className)}
-      {...props}
+      {...(props as any)}
     />
-  )
+  );
 }
 
 function DropdownMenuContent({
@@ -85,19 +109,20 @@ function DropdownMenuContent({
   children,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
-  const { hoverStyle, onHover, onLeave } = useHoverTracker()
+  const { hoverStyle, onHover, onLeave, containerRef } = useHoverTracker()
 
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
-        data-slot="dropdown-menu-content"
-        sideOffset={sideOffset}
-        onMouseLeave={onLeave}
         className={cn(
-          "relative z-50 min-w-[8rem] overflow-hidden rounded-2xl border  dark:bg-accent  bg-popover p-2 text-popover-foreground shadow-xl shadow-black/5",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          'relative z-50 min-w-[8rem] overflow-hidden rounded-2xl border bg-popover p-2 text-popover-foreground shadow-black/5 shadow-xl dark:bg-accent',
+          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=open]:animate-in',
           className
         )}
+        data-slot="dropdown-menu-content"
+        onMouseLeave={onLeave}
+        ref={containerRef}
+        sideOffset={sideOffset}
         {...props}
       >
         <HoverTrackerBackground hoverStyle={hoverStyle} />
@@ -109,58 +134,53 @@ function DropdownMenuContent({
   )
 }
 
-function DropdownMenuGroup({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
-  return (
-    <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
-  )
+function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
+  return <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
+
+const MotionItem = motion.create(DropdownMenuPrimitive.Item)
 
 function DropdownMenuItem({
   className,
   inset,
-  variant = "default",
+  variant = 'default',
   onMouseEnter,
   onFocus,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean
-  variant?: "default" | "destructive"
+  variant?: 'default' | 'destructive'
 }) {
   const context = React.useContext(HoverTrackerContext)
 
   const handleInteraction = (e: any) => {
-    context?.onHover(e.currentTarget)
+    context?.onHover(e.currentTarget, variant)
   }
 
   return (
-    <DropdownMenuPrimitive.Item
-      data-slot="dropdown-menu-item"
+    <MotionItem
+      className={cn(
+        'relative z-10 flex cursor-pointer select-none items-center gap-3 rounded-lg px-2 py-2 outline-none transition-colors active:scale-[0.98]',
+        'focus:bg-transparent focus:text-accent-foreground',
+        'data-disabled:pointer-events-none data-disabled:opacity-50',
+        'data-inset:pl-8',
+        '[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground',
+        variant === 'destructive' &&
+        'text-destructive focus:text-destructive [&>svg]:text-destructive',
+        className
+      )}
       data-inset={inset}
+      data-slot="dropdown-menu-item"
       data-variant={variant}
-      onMouseEnter={(e) => {
-        onMouseEnter?.(e)
-        handleInteraction(e)
-      }}
       onFocus={(e) => {
         onFocus?.(e)
         handleInteraction(e)
       }}
-      className={cn(
-        "relative z-10 flex cursor-pointer select-none items-center gap-3 rounded-lg px-2 py-2 text-sm outline-none transition-colors",
-        // Disabled default focus background to let HoverTracker handle it
-        "focus:bg-transparent focus:text-accent-foreground",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        "data-inset:pl-8",
-        // Default Icon Styling
-        "[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground",
-        // Destructive Variant Styling
-        variant === "destructive" &&
-        "text-destructive focus:bg-destructive/10 focus:text-destructive [&>svg]:text-destructive",
-        className
-      )}
-      {...props}
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e)
+        handleInteraction(e)
+      }}
+      {...(props as any)}
     />
   )
 }
@@ -181,18 +201,18 @@ function DropdownMenuCheckboxItem({
 
   return (
     <DropdownMenuPrimitive.CheckboxItem
-      data-slot="dropdown-menu-checkbox-item"
+      checked={checked}
       className={cn(
-        "relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg py-2.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-transparent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        'relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg py-2.5 pr-2 pl-8 text-sm outline-none transition-colors focus:bg-transparent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
-      checked={checked}
-      onMouseEnter={(e) => {
-        onMouseEnter?.(e)
-        handleInteraction(e)
-      }}
+      data-slot="dropdown-menu-checkbox-item"
       onFocus={(e) => {
         onFocus?.(e)
+        handleInteraction(e)
+      }}
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e)
         handleInteraction(e)
       }}
       {...props}
@@ -210,12 +230,7 @@ function DropdownMenuCheckboxItem({
 function DropdownMenuRadioGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
-  return (
-    <DropdownMenuPrimitive.RadioGroup
-      data-slot="dropdown-menu-radio-group"
-      {...props}
-    />
-  )
+  return <DropdownMenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />
 }
 
 function DropdownMenuRadioItem({
@@ -233,17 +248,17 @@ function DropdownMenuRadioItem({
 
   return (
     <DropdownMenuPrimitive.RadioItem
-      data-slot="dropdown-menu-radio-item"
       className={cn(
-        "relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg py-2.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-transparent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        'relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg py-2.5 pr-2 pl-8 text-sm outline-none transition-colors focus:bg-transparent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
-      onMouseEnter={(e) => {
-        onMouseEnter?.(e)
-        handleInteraction(e)
-      }}
+      data-slot="dropdown-menu-radio-item"
       onFocus={(e) => {
         onFocus?.(e)
+        handleInteraction(e)
+      }}
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e)
         handleInteraction(e)
       }}
       {...props}
@@ -271,12 +286,12 @@ function DropdownMenuLabel({
 }) {
   return (
     <DropdownMenuPrimitive.Label
-      data-slot="dropdown-menu-label"
-      data-inset={inset}
       className={cn(
-        "px-2 py-2 text-sm font-normal text-muted-foreground data-[inset]:pl-8 flex items-center justify-between",
+        'flex items-center justify-between px-2 py-2 font-normal text-muted-foreground text-sm data-[inset]:pl-8',
         className
       )}
+      data-inset={inset}
+      data-slot="dropdown-menu-label"
       {...props}
     >
       <span>{label}</span>
@@ -294,32 +309,24 @@ function DropdownMenuSeparator({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
   return (
     <DropdownMenuPrimitive.Separator
+      className={cn('-mx-2 my-1 h-px bg-border/50', className)}
       data-slot="dropdown-menu-separator"
-      className={cn("-mx-2 my-1 h-px bg-border/50", className)}
       {...props}
     />
   )
 }
 
-function DropdownMenuShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
+      className={cn('ml-auto text-muted-foreground text-xs tracking-widest', className)}
       data-slot="dropdown-menu-shortcut"
-      className={cn(
-        "ml-auto text-xs tracking-widest text-muted-foreground",
-        className
-      )}
       {...props}
     />
   )
 }
 
-function DropdownMenuSub({
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+function DropdownMenuSub({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />
 }
 
@@ -341,21 +348,21 @@ function DropdownMenuSubTrigger({
 
   return (
     <DropdownMenuPrimitive.SubTrigger
-      data-slot="dropdown-menu-sub-trigger"
+      className={cn(
+        'relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg px-2 py-2.5 text-sm outline-none focus:bg-transparent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground',
+        'data-[inset]:pl-8',
+        className
+      )}
       data-inset={inset}
-      onMouseEnter={(e) => {
-        onMouseEnter?.(e)
-        handleInteraction(e)
-      }}
+      data-slot="dropdown-menu-sub-trigger"
       onFocus={(e) => {
         onFocus?.(e)
         handleInteraction(e)
       }}
-      className={cn(
-        "relative z-10 flex cursor-default select-none items-center gap-3 rounded-lg px-2 py-2.5 text-sm outline-none focus:bg-transparent  [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground",
-        "data-[inset]:pl-8",
-        className
-      )}
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e)
+        handleInteraction(e)
+      }}
       {...props}
     >
       {children}
@@ -369,16 +376,17 @@ function DropdownMenuSubContent({
   children,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
-  const { hoverStyle, onHover, onLeave } = useHoverTracker()
+  const { hoverStyle, onHover, onLeave, containerRef } = useHoverTracker()
 
   return (
     <DropdownMenuPrimitive.SubContent
-      data-slot="dropdown-menu-sub-content"
-      onMouseLeave={onLeave}
       className={cn(
-        "relative z-50 min-w-[8rem] mx-2 overflow-hidden rounded-2xl border dark:border-border border-zinc-200 dark:bg-accent bg-popover p-2 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 mx-2 min-w-[8rem] overflow-hidden rounded-2xl border border-zinc-200 bg-popover p-2 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=open]:animate-in dark:border-border dark:bg-accent',
         className
       )}
+      data-slot="dropdown-menu-sub-content"
+      onMouseLeave={onLeave}
+      ref={containerRef}
       {...props}
     >
       <HoverTrackerBackground hoverStyle={hoverStyle} />
