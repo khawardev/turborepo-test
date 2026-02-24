@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { MdOutlineArrowRight } from 'react-icons/md';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     runSocialReportsAgent,
     getSocialReportsOutput,
@@ -113,9 +114,9 @@ export function SocialAgentsManager({
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const getCompetitorChannels = (competitorId: string): string[] => {
-        const competitor = competitors.find(c => c.id === competitorId);
+        const competitor = competitors.find(c => String(c.id) === competitorId);
         if (!competitor) return [];
-        
+
         const channels: string[] = [];
         if (competitor.linkedin_url) channels.push('linkedin');
         if (competitor.facebook_url) channels.push('facebook');
@@ -123,7 +124,7 @@ export function SocialAgentsManager({
         if (competitor.x_url) channels.push('x');
         if (competitor.youtube_url) channels.push('youtube');
         if (competitor.tiktok_url) channels.push('tiktok');
-        
+
         return channels;
     };
 
@@ -137,18 +138,17 @@ export function SocialAgentsManager({
     }, [analysisScope, selectedCompetitorId, availableChannels, competitors]);
 
     const loadReportsTasks = useCallback(async () => {
-        if (TASKS_CACHE[brandId]) {
-            setReportsTasks(TASKS_CACHE[brandId]);
-            setIsLoadingTasks(false);
-        } else {
-            setIsLoadingTasks(true);
-        }
+        setIsLoadingTasks(true);
 
         try {
             const res = await listSocialReportsTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
-                setReportsTasks(res.data.tasks);
-                TASKS_CACHE[brandId] = res.data.tasks;
+                // Sort by timestamp descending
+                const sortedTasks = res.data.tasks.sort((a: SocialReportsTaskListItem, b: SocialReportsTaskListItem) =>
+                    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                );
+                setReportsTasks(sortedTasks);
+                TASKS_CACHE[brandId] = sortedTasks;
             }
         } catch (e) {
             console.error('Failed to load social reports tasks:', e);
@@ -170,14 +170,14 @@ export function SocialAgentsManager({
                 if (socialData) {
                     const brandPlatforms = socialData.brand?.social_platforms || socialData.social_platforms || [];
                     const postsMap: Record<string, boolean> = {};
-                    
+
                     brandPlatforms.forEach((platform: any) => {
                         const platformName = platform.platform?.toLowerCase();
                         if (platformName) {
                             postsMap[platformName] = platform.posts && Array.isArray(platform.posts) && platform.posts.length > 0;
                         }
                     });
-                    
+
                     setChannelsWithPosts(postsMap);
                 }
             } catch (e) {
@@ -205,8 +205,8 @@ export function SocialAgentsManager({
     }, []);
 
     const toggleRegion = (region: string) => {
-        setPriorityRegions(prev => 
-            prev.includes(region) 
+        setPriorityRegions(prev =>
+            prev.includes(region)
                 ? prev.filter(r => r !== region)
                 : [...prev, region]
         );
@@ -224,13 +224,19 @@ export function SocialAgentsManager({
         }
 
         if (currentAvailableChannels.length === 0) {
-             toast.error('No social channels available for the selected entity.');
-             return;
+            toast.error('No social channels available for the selected entity.');
+            return;
         }
 
         setIsRunningReports(true);
-        setSelectedReportsResult(null);
-        toast.info(`Starting Social Reports Agent for ${selectedChannel}...`);
+        // Do not clear the current result so the user can still view other reports
+        // setSelectedReportsResult(null); 
+
+        const entityName = analysisScope === 'brand'
+            ? brandName
+            : competitors.find(c => String(c.id) === selectedCompetitorId)?.name || 'Competitor';
+
+        toast.info(`Starting Social Reports Agent for ${entityName} on ${selectedChannel}...`);
 
         try {
             const res = await runSocialReportsAgent({
@@ -238,7 +244,7 @@ export function SocialAgentsManager({
                 brand_id: brandId,
                 batch_id: batchSocialTaskId,
                 channel_name: selectedChannel,
-                analysis_scope: analysisScope,
+                analysis_scope: analysisScope === 'competitors' ? undefined : analysisScope,
                 competitor_id: analysisScope === 'competitors' ? (selectedCompetitorId || undefined) : undefined,
                 priority_regions: priorityRegions.length > 0 ? priorityRegions : undefined,
                 analysis_priority: analysisPriority !== 'balanced' ? analysisPriority : undefined,
@@ -248,7 +254,7 @@ export function SocialAgentsManager({
 
             if (res.success && res.data?.task_id) {
                 setReportsTaskId(res.data.task_id);
-                toast.success('Social Reports Agent started! Polling for results...');
+                toast.success('Social Reports Agent completed! Polling for results...');
                 pollReportsResult(res.data.task_id);
             } else {
                 toast.error(`Social Reports Agent failed: ${res.error || 'Unknown error'}`);
@@ -270,17 +276,17 @@ export function SocialAgentsManager({
         if (pollIntervalRef.current) {
             clearInterval(pollIntervalRef.current);
         }
-        
+
         isPollingRef.current = true;
         let attempts = 0;
         const maxAttempts = 120;
 
         pollIntervalRef.current = setInterval(async () => {
-             // Safety check if polling was stopped externally
-             if (!isPollingRef.current) {
-                 if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-                 return;
-             }
+            // Safety check if polling was stopped externally
+            if (!isPollingRef.current) {
+                if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+                return;
+            }
 
             attempts++;
             try {
@@ -296,23 +302,23 @@ export function SocialAgentsManager({
                         clearInterval(pollIntervalRef.current);
                         pollIntervalRef.current = null;
                     }
-                    
+
                     setSelectedReportsResult(res.data);
                     toast.success('Social Reports complete!');
                     setIsRunningReports(false);
                     loadReportsTasks();
-                    
+
                     // Scroll to results
                     setTimeout(() => {
                         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
                 } else if (attempts >= maxAttempts) {
                     isPollingRef.current = false;
-                     if (pollIntervalRef.current) {
+                    if (pollIntervalRef.current) {
                         clearInterval(pollIntervalRef.current);
                         pollIntervalRef.current = null;
                     }
-                    
+
                     toast.error('Report generation timed out. Please check back later.');
                     setIsRunningReports(false);
                 }
@@ -337,7 +343,7 @@ export function SocialAgentsManager({
                 toast.success('Report has been shown below !!', {
                     description: 'Scroll down to view.'
                 });
-                
+
                 // Scroll to results
                 setTimeout(() => {
                     resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -434,379 +440,354 @@ export function SocialAgentsManager({
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild disabled={isRunningReports}>
-                                        <Button variant="outline" className="h-9 justify-between capitalize">
-                                            {analysisScope}
-                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={() => { setAnalysisScope('brand'); setSelectedCompetitorId(null); }}>Brand</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setAnalysisScope('competitors')}>Competitors</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <Select
+                                        value={analysisScope}
+                                        onValueChange={(value: AnalysisScope) => {
+                                            setAnalysisScope(value);
+                                            if (value === 'brand') setSelectedCompetitorId(null);
+                                        }}
+                                        disabled={isRunningReports}
+                                    >
+                                        <SelectTrigger className="w-[140px] h-9 bg-background capitalize">
+                                            <SelectValue placeholder="Scope" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="brand">Brand</SelectItem>
+                                            <SelectItem value="competitors">Competitors</SelectItem>
+                                        </SelectContent>
+                                    </Select>
 
-                                {analysisScope === 'competitors' && competitors.length > 0 && (
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild disabled={isRunningReports}>
-                                            <Button variant="outline" className="h-9 justify-between min-w-[140px]">
-                                                {selectedCompetitorId
-                                                    ? competitors.find(c => c.id === selectedCompetitorId)?.name || 'Selected'
-                                                    : <span className="text-muted-foreground">Select Competitor</span>
-                                                }
-                                                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-[180px]">
-                                            {competitors.map((competitor) => (
-                                                <DropdownMenuItem
-                                                    key={competitor.id}
-                                                    onClick={() => setSelectedCompetitorId(competitor.id)}
-                                                >
-                                                    {competitor.name}
-                                                </DropdownMenuItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                )}
-                                <TooltipProvider>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild disabled={isRunningReports || currentAvailableChannels.length === 0}>
-                                            <Button variant="outline" className="h-9 justify-between min-w-[140px] capitalize">
-                                                <span className="flex items-center gap-2">
-                                                    {getChannelDisplayName(selectedChannel)}
-                                                </span>
-                                                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            {currentAvailableChannels.map((channel) => {
-                                                const hasNoPosts = channelsWithPosts[channel] === false;
-                                                
-                                                if (hasNoPosts) {
-                                                    return (
-                                                        <Tooltip key={channel}>
-                                                            <TooltipTrigger asChild>
-                                                                <div>
-                                                                    <DropdownMenuItem
-                                                                        disabled
-                                                                        className="capitalize opacity-50 cursor-not-allowed"
-                                                                    >
-                                                                        {getChannelDisplayName(channel)}
-                                                                    </DropdownMenuItem>
-                                                                </div>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent side="right">
-                                                                <p>No posts available for {getChannelDisplayName(channel)}</p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    );
-                                                }
-
-                                                return (
-                                                    <DropdownMenuItem
-                                                        key={channel}
-                                                        onClick={() => setSelectedChannel(channel as SocialChannelName)}
-                                                        className="capitalize"
-                                                    >
-                                                        {getChannelDisplayName(channel)}
-                                                    </DropdownMenuItem>
-                                                );
-                                            })}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TooltipProvider>
-                                <Button
-                                    onClick={handleRunReports}
-                                    disabled={
-                                        isRunningReports ||
-                                        !batchSocialTaskId ||
-                                        currentAvailableChannels.length === 0 ||
-                                        (analysisScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
-                                    }
-
-                                >
-                                    {isRunningReports ? (
-                                        <>
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            Generating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Generate Report
-                                            <MdOutlineArrowRight className="h-4 w-4" />
-                                        </>
+                                    {analysisScope === 'competitors' && competitors.length > 0 && (
+                                        <Select
+                                            value={selectedCompetitorId || ''}
+                                            onValueChange={(value) => setSelectedCompetitorId(value)}
+                                            disabled={isRunningReports}
+                                        >
+                                            <SelectTrigger className="w-[180px] h-9 bg-background">
+                                                <SelectValue placeholder="Select Competitor" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {competitors.map((competitor) => (
+                                                    <SelectItem key={competitor.id} value={String(competitor.id)}>
+                                                        {competitor.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     )}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    onClick={loadReportsTasks}
-                                    disabled={isLoadingTasks}
-                                >
-                                    <Loader2 className={cn("h-4 w-4", isLoadingTasks && "animate-spin")} />Refresh
-                                </Button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Popover open={showAdvancedSettings} onOpenChange={setShowAdvancedSettings}>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" title="Advanced Settings">
-                                            <Settings2 className="h-4 w-4" />
-                                            <span className="hidden sm:inline">Advanced</span>
-                                            {(priorityRegions.length > 0 || analysisPriority !== 'balanced' || mandatedDriversInput) && (
-                                                <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
-                                                    !
-                                                </Badge>
-                                            )}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-96" align="end">
-                                        <div className="space-y-4">
-                                            <div>
-                                                <h4 className="font-medium leading-none mb-3">Advanced Configuration</h4>
-                                                <p className="text-sm text-muted-foreground mb-4">
-                                                    Configure Universal Module v3 parameters for enhanced analysis.
-                                                </p>
-                                            </div>
 
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Analysis Priority</Label>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" className="w-full justify-between">
-                                                            {ANALYSIS_PRIORITY_OPTIONS.find(o => o.value === analysisPriority)?.label || 'Balanced'}
-                                                            <ChevronDown className="h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent className="w-full">
-                                                        {ANALYSIS_PRIORITY_OPTIONS.map(option => (
-                                                            <DropdownMenuItem
-                                                                key={option.value}
-                                                                onClick={() => setAnalysisPriority(option.value)}
-                                                            >
-                                                                {option.label}
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Priority Regions</Label>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {REGION_OPTIONS.map(region => (
-                                                        <Badge
-                                                            key={region}
-                                                            variant={priorityRegions.includes(region) ? "default" : "outline"}
-                                                            className="cursor-pointer transition-colors"
-                                                            onClick={() => toggleRegion(region)}
-                                                        >
-                                                            {region}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                                {priorityRegions.length > 0 && (
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="sm" 
-                                                        className="h-7 text-xs"
-                                                        onClick={() => setPriorityRegions([])}
-                                                    >
-                                                        Clear All
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Mandated Drivers (JSON)</Label>
-                                                <Textarea
-                                                    placeholder='[{"driver_name":"Sustainability","definition":"Environmental responsibility"}]'
-                                                    value={mandatedDriversInput}
-                                                    onChange={(e) => setMandatedDriversInput(e.target.value)}
-                                                    className="h-20 resize-none font-mono text-xs"
-                                                />
-                                                <p className="text-[11px] text-muted-foreground">
-                                                    Optional JSON array of mandated drivers for customized analysis.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" title="Custom Instructions">
-                                            <Edit className="h-4 w-4" /> Add Instructions
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-80">
-                                        <div className="space-y-2">
-                                            <h4 className="font-medium leading-none">Custom Instructions</h4>
-                                            <p className="text-sm text-muted-foreground">
-                                                Add specific guidelines for the agent.
-                                            </p>
-                                            <Textarea
-                                                placeholder="e.g., Focus on engagement metrics..."
-                                                value={customInstruction}
-                                                onChange={(e) => setCustomInstruction(e.target.value)}
-                                                className="h-24 resize-none"
-                                            />
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                        </div>
-
-                        {!batchSocialTaskId && (
-                            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span>No social batch data available. Run data collection first.</span>
-                            </div>
-                        )}
-
-                        {currentAvailableChannels.length === 0 && batchSocialTaskId && (
-                             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span>No social channels with data available for the selected {analysisScope === 'brand' ? 'brand' : 'competitor'}.</span>
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground font-medium">Report Tasks</span>
-                                <Badge variant="secondary">{reportsTasks.length}</Badge>
-                            </div>
-                            <ScrollArea className="h-[320px] pt-4">
-                                {isLoadingTasks ? (
-                                    <div className="space-y-3">
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-2 bg-card">
-                                                <div className="shrink-0">
-                                                    <Skeleton className="w-10 h-10 rounded-lg" />
-                                                </div>
-                                                <div className="flex-1 min-w-0 space-y-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <Skeleton className="h-5 w-28" />
-                                                        <Skeleton className="h-5 w-16 rounded-full" />
-                                                    </div>
-                                                    <div className="flex items-center gap-3">
-                                                        <Skeleton className="h-4 w-36" />
-                                                        <Skeleton className="h-4 w-16 rounded-full" />
-                                                    </div>
-                                                </div>
+                                    <TooltipProvider>
+                                        <Select
+                                            value={selectedChannel}
+                                            onValueChange={(value: SocialChannelName) => setSelectedChannel(value)}
+                                            disabled={isRunningReports || currentAvailableChannels.length === 0}
+                                        >
+                                            <SelectTrigger className="w-[140px] h-9 bg-background capitalize">
                                                 <div className="flex items-center gap-2">
-                                                    <Skeleton className="h-9 w-20 rounded-md" />
-                                                    <Skeleton className="h-9 w-9 rounded-md" />
+                                                    {/* <ChannelIcon channel={selectedChannel} /> */}
+                                                    <SelectValue placeholder="Channel" />
+                                                </div>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {currentAvailableChannels.map((channel) => {
+                                                    const hasNoPosts = channelsWithPosts[channel] === false;
+                                                    return (
+                                                        <SelectItem
+                                                            key={channel}
+                                                            value={channel}
+                                                            disabled={hasNoPosts}
+                                                            className="capitalize"
+                                                        >
+                                                            {getChannelDisplayName(channel)} {hasNoPosts && '(No Data)'}
+                                                        </SelectItem>
+                                                    );
+                                                })}
+                                            </SelectContent>
+                                        </Select>
+                                    </TooltipProvider>
+                                    <Button
+                                        onClick={handleRunReports}
+                                        disabled={
+                                            isRunningReports ||
+                                            !batchSocialTaskId ||
+                                            currentAvailableChannels.length === 0 ||
+                                            (analysisScope === 'competitors' && competitors.length > 0 && !selectedCompetitorId)
+                                        }
+
+                                    >
+                                        {isRunningReports ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Generate Report
+                                                <MdOutlineArrowRight className="h-4 w-4" />
+                                            </>
+                                        )}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={loadReportsTasks}
+                                        disabled={isLoadingTasks}
+                                    >
+                                        <Loader2 className={cn("h-4 w-4", isLoadingTasks && "animate-spin")} />Refresh
+                                    </Button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Popover open={showAdvancedSettings} onOpenChange={setShowAdvancedSettings}>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" title="Advanced Settings">
+                                                <Settings2 className="h-4 w-4" />
+                                                <span className="hidden sm:inline">Advanced</span>
+                                                {(priorityRegions.length > 0 || analysisPriority !== 'balanced' || mandatedDriversInput) && (
+                                                    <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
+                                                        !
+                                                    </Badge>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-96" align="end">
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <h4 className="font-medium leading-none mb-3">Advanced Configuration</h4>
+                                                    <p className="text-sm text-muted-foreground mb-4">
+                                                        Configure Universal Module v3 parameters for enhanced analysis.
+                                                    </p>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium">Analysis Priority</Label>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="outline" className="w-full justify-between">
+                                                                {ANALYSIS_PRIORITY_OPTIONS.find(o => o.value === analysisPriority)?.label || 'Balanced'}
+                                                                <ChevronDown className="h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent className="w-full">
+                                                            {ANALYSIS_PRIORITY_OPTIONS.map(option => (
+                                                                <DropdownMenuItem
+                                                                    key={option.value}
+                                                                    onClick={() => setAnalysisPriority(option.value)}
+                                                                >
+                                                                    {option.label}
+                                                                </DropdownMenuItem>
+                                                            ))}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium">Priority Regions</Label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {REGION_OPTIONS.map(region => (
+                                                            <Badge
+                                                                key={region}
+                                                                variant={priorityRegions.includes(region) ? "default" : "outline"}
+                                                                className="cursor-pointer transition-colors"
+                                                                onClick={() => toggleRegion(region)}
+                                                            >
+                                                                {region}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                    {priorityRegions.length > 0 && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 text-xs"
+                                                            onClick={() => setPriorityRegions([])}
+                                                        >
+                                                            Clear All
+                                                        </Button>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium">Mandated Drivers (JSON)</Label>
+                                                    <Textarea
+                                                        placeholder='[{"driver_name":"Sustainability","definition":"Environmental responsibility"}]'
+                                                        value={mandatedDriversInput}
+                                                        onChange={(e) => setMandatedDriversInput(e.target.value)}
+                                                        className="h-20 resize-none font-mono text-xs"
+                                                    />
+                                                    <p className="text-[11px] text-muted-foreground">
+                                                        Optional JSON array of mandated drivers for customized analysis.
+                                                    </p>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : reportsTasks.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm p-14">
-                                        <FileText className="h-10 w-10 mb-3 opacity-40" />
-                                        <span className="font-medium">No report tasks yet</span>
-                                        <span className="text-xs mt-1 opacity-70">Generate a report to see it here</span>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3">
-                                        {reportsTasks.map((task) => (
-                                            <div
-                                                key={task.task_id}
-                                                className={cn(
-                                                    "group relative flex items-center gap-4 p-4 rounded-xl border-2 bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 cursor-pointer ",
-                                                    selectedReportsResult?.task_id === task.task_id && "border-primary/50 bg-primary/5"
-                                                )}
-                                                onClick={() => handleViewReportsResult(task.task_id)}
-                                            >
-                                                <div className="shrink-0">
-                                                    <div className={cn(
-                                                        "w-10 h-10 rounded-lg flex items-center justify-center",
-                                                        task.analysis_scope === 'brand'
-                                                            ? "bg-primary/10 text-primary"
-                                                            : "bg-secondary text-secondary-foreground"
-                                                    )}>
-                                                        <FileText className="h-5 w-5" />
+                                        </PopoverContent>
+                                    </Popover>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" title="Custom Instructions">
+                                                <Edit className="h-4 w-4" /> Add Instructions
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80">
+                                            <div className="space-y-2">
+                                                <h4 className="font-medium leading-none">Custom Instructions</h4>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Add specific guidelines for the agent.
+                                                </p>
+                                                <Textarea
+                                                    placeholder="e.g., Focus on engagement metrics..."
+                                                    value={customInstruction}
+                                                    onChange={(e) => setCustomInstruction(e.target.value)}
+                                                    className="h-24 resize-none"
+                                                />
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                            </div>
+
+                            {!batchSocialTaskId && (
+                                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
+                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                    <span>No social batch data available. Run data collection first.</span>
+                                </div>
+                            )}
+
+                            {currentAvailableChannels.length === 0 && batchSocialTaskId && (
+                                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/30">
+                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                    <span>No social channels with data available for the selected {analysisScope === 'brand' ? 'brand' : 'competitor'}.</span>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground font-medium">Report Tasks</span>
+                                    <Badge variant="secondary">{reportsTasks.length}</Badge>
+                                </div>
+                                <ScrollArea className="h-[320px] pt-4">
+                                    {isLoadingTasks ? (
+                                        <div className="space-y-3">
+                                            {[1, 2, 3].map((i) => (
+                                                <div key={i} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
+                                                    <div className="shrink-0">
+                                                        <Skeleton className="w-10 h-10 rounded-lg" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0 space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Skeleton className="h-5 w-28" />
+                                                            <Skeleton className="h-5 w-16 rounded-full" />
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <Skeleton className="h-4 w-36" />
+                                                            <Skeleton className="h-4 w-16 rounded-full" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Skeleton className="h-9 w-20 rounded-md" />
+                                                        <Skeleton className="h-9 w-9 rounded-md" />
                                                     </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0 space-y-1.5">
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className="font-semibold text-sm truncate">
-                                                            {task.entity_name || 'Report'}
-                                                        </span>
-                                                        <Badge
-                                                            variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
-                                                            className="text-[10px] px-2 py-0.5 font-medium capitalize"
-                                                        >
-                                                            {task.analysis_scope || 'brand'}
-                                                        </Badge>
-                                                        {task.channel_name && (
+                                            ))}
+                                        </div>
+                                    ) : reportsTasks.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm p-14">
+                                            <FileText className="h-10 w-10 mb-3 opacity-40" />
+                                            <span className="font-medium">No report tasks yet</span>
+                                            <span className="text-xs mt-1 opacity-70">Generate a report to see it here</span>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {reportsTasks.map((task) => (
+                                                <div
+                                                    key={task.task_id}
+                                                    className={cn(
+                                                        "group relative flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 cursor-pointer ",
+                                                        selectedReportsResult?.task_id === task.task_id && "border-primary/50 bg-primary/5"
+                                                    )}
+                                                    onClick={() => handleViewReportsResult(task.task_id)}
+                                                >
+                                                    <div className="shrink-0">
+                                                        <div className={cn(
+                                                            "w-10 h-10 rounded-lg flex items-center justify-center",
+                                                            task.analysis_scope === 'brand'
+                                                                ? "bg-primary/10 text-primary"
+                                                                : "bg-secondary text-secondary-foreground"
+                                                        )}>
+                                                            <FileText className="h-5 w-5" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0 space-y-1.5">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="font-semibold text-sm truncate">
+                                                                {task.entity_name || 'Report'}
+                                                            </span>
                                                             <Badge
-                                                                variant="outline"
+                                                                variant={task.analysis_scope === 'brand' ? 'default' : 'secondary'}
                                                                 className="text-[10px] px-2 py-0.5 font-medium capitalize"
                                                             >
-                                                                {getChannelDisplayName(task.channel_name)}
+                                                                {task.analysis_scope || 'brand'}
                                                             </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                                        <span className="flex items-center gap-1.5">
-                                                            <Clock className="h-3.5 w-3.5" />
-                                                            {formatDate(task.timestamp)}
-                                                        </span>
-                                                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
-                                                            ⏱️ {formatExecutionTime(task.execution_time_seconds)}
-                                                        </span>
-                                                        {task.model_used && (
-                                                            <span className="opacity-70 hidden sm:inline">
-                                                                {task.model_used.includes('claude') ? '🤖 Claude' : task.model_used.slice(0, 10)}
+                                                            {task.channel_name && (
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    className="text-[10px] px-2 py-0.5 font-medium capitalize"
+                                                                >
+                                                                    {getChannelDisplayName(task.channel_name)}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                            <span className="flex items-center gap-1.5">
+                                                                <Clock className="h-3.5 w-3.5" />
+                                                                {formatDate(task.timestamp)}
                                                             </span>
-                                                        )}
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-9 px-3 gap-1.5"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleViewReportsResult(task.task_id);
+                                                            }}
+                                                            disabled={loadingResultId === task.task_id}
+                                                        >
+                                                            {loadingResultId === task.task_id ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <>
+                                                                    <Eye className="h-4 w-4" />
+                                                                    <span className="hidden sm:inline">View</span>
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                confirmDelete(task.task_id);
+                                                            }}
+                                                            disabled={deletingTaskId === task.task_id}
+                                                        >
+                                                            {deletingTaskId === task.task_id ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-9 px-3 gap-1.5"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleViewReportsResult(task.task_id);
-                                                        }}
-                                                        disabled={loadingResultId === task.task_id}
-                                                    >
-                                                        {loadingResultId === task.task_id ? (
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        ) : (
-                                                            <>
-                                                                <Eye className="h-4 w-4" />
-                                                                <span className="hidden sm:inline">View</span>
-                                                            </>
-                                                        )}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            confirmDelete(task.task_id);
-                                                        }}
-                                                        disabled={deletingTaskId === task.task_id}
-                                                    >
-                                                        {deletingTaskId === task.task_id ? (
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        ) : (
-                                                            <Trash2 className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </ScrollArea>
-                        </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </ScrollArea>
+                            </div>
                     </CardContent>
                 </Card>
             </div>
@@ -815,16 +796,16 @@ export function SocialAgentsManager({
 
             {selectedReportsResult && (
                 <div ref={resultRef}>
-                <Card className="border rounded-2xl p-6 bg-card">
-                    <SocialReportsResultViewer
-                        data={selectedReportsResult}
-                        onReRun={handleRunReports}
-                        isReRunning={isRunningReports}
-                        clientId={clientId}
-                        brandId={brandId}
-                        channelName={selectedReportsResult.channel_name || selectedChannel}
-                    />
-                </Card>
+                    <Card className="border rounded-2xl p-6 bg-card">
+                        <SocialReportsResultViewer
+                            data={selectedReportsResult}
+                            onReRun={handleRunReports}
+                            isReRunning={isRunningReports}
+                            clientId={clientId}
+                            brandId={brandId}
+                            channelName={selectedReportsResult.channel_name || selectedChannel}
+                        />
+                    </Card>
                 </div>
             )}
 

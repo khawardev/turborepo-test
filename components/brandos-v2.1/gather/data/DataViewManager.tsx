@@ -114,7 +114,7 @@ export function DataViewManager({
     
     const competitors = useMemo(() => 
         brandData?.competitors?.map((c: any) => ({
-            id: c.competitor_id,
+            id: String(c.competitor_id),
             name: c.name,
             linkedin_url: c.linkedin_url,
             facebook_url: c.facebook_url,
@@ -122,7 +122,7 @@ export function DataViewManager({
             x_url: c.x_url,
             youtube_url: c.youtube_url,
             tiktok_url: c.tiktok_url
-        })) ?? [], 
+        })) ?? [],  
         [brandData?.competitors]
     );
 

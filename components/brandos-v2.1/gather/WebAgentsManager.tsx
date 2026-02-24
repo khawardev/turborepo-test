@@ -83,23 +83,19 @@ export function WebAgentsManager({
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<{ id: string; type: 'extraction' | 'synthesis' } | null>(null);
     const [activeResultTab, setActiveResultTab] = useState<'extraction' | 'synthesis'>('extraction');
-console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
     const loadExtractionTasks = useCallback(async () => {
-        // Check cache first
-        if (EXTRACTION_TASKS_CACHE[brandId]) {
-            setExtractionTasks(EXTRACTION_TASKS_CACHE[brandId]);
-            setIsLoadingExtractionTasks(false);
-        } else {
-            setIsLoadingExtractionTasks(true);
-        }
-
+        setIsLoadingExtractionTasks(true);
         try {
             const res = await listWebExtractionTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
-                setExtractionTasks(res.data.tasks);
+                // Sort by timestamp descending
+                const sortedTasks = res.data.tasks.sort((a: WebExtractionTask, b: WebExtractionTask) => 
+                    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                );
+                setExtractionTasks(sortedTasks);
                 // Update cache
-                EXTRACTION_TASKS_CACHE[brandId] = res.data.tasks;
+                EXTRACTION_TASKS_CACHE[brandId] = sortedTasks;
             }
         } catch (e) {
             console.error('Failed to load extraction tasks:', e);
@@ -109,20 +105,17 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
     }, [clientId, brandId]);
 
     const loadSynthesisTasks = useCallback(async () => {
-        // Check cache first
-        if (SYNTHESIS_TASKS_CACHE[brandId]) {
-            setSynthesisTasks(SYNTHESIS_TASKS_CACHE[brandId]);
-            setIsLoadingSynthesisTasks(false);
-        } else {
-            setIsLoadingSynthesisTasks(true);
-        }
-
+        setIsLoadingSynthesisTasks(true);
         try {
             const res = await listWebSynthesisTasks({ client_id: clientId, brand_id: brandId });
             if (res.success && res.data?.tasks) {
-                setSynthesisTasks(res.data.tasks);
+                 // Sort by timestamp descending
+                 const sortedTasks = res.data.tasks.sort((a: WebSynthesisTask, b: WebSynthesisTask) => 
+                    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                );
+                setSynthesisTasks(sortedTasks);
                 // Update cache
-                SYNTHESIS_TASKS_CACHE[brandId] = res.data.tasks;
+                SYNTHESIS_TASKS_CACHE[brandId] = sortedTasks;
             }
         } catch (e) {
             console.error('Failed to load synthesis tasks:', e);
@@ -148,6 +141,8 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
         }
 
         setIsRunningExtraction(true);
+        // Do not clear the current result so the user can still view other reports
+        // setSelectedExtractionResult(null); 
         toast.info(`Starting Web Extraction for ${extractionScope}...`);
 
         try {
@@ -162,7 +157,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
             if (res.success && res.data?.task_id) {
                 setExtractionTaskId(res.data.task_id);
-                toast.success('Web Extraction started! Polling for results...');
+                toast.success('Web Extraction completed! Polling for results...');
                 pollExtractionResult(res.data.task_id);
             } else {
                 toast.error(`Extraction failed: ${res.error || 'Unknown error'}`);
@@ -225,6 +220,10 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                     setIsRunningExtraction(false);
                     loadExtractionTasks();
                     
+                    // Auto-select for synthesis and switch tab
+                    setSelectedExtractionForSynthesis(taskId);
+                    setActiveResultTab('extraction');
+
                      // Scroll
                     setTimeout(() => {
                         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -249,7 +248,13 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
         }
 
         setIsRunningSynthesis(true);
-        toast.info('Starting Web Synthesis...');
+        // Do not clear the current result so the user can still view other reports
+        // setSelectedSynthesisResult(null); 
+        
+        const selectedTask = extractionTasks.find(t => t.task_id === selectedExtractionForSynthesis);
+        const entityName = selectedTask?.entity_name || 'Selected Entity';
+
+        toast.info(`Starting Web Synthesis for ${entityName}...`);
 
         try {
             const res = await runWebSynthesisAgent({
@@ -261,7 +266,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
 
             if (res.success && res.data?.task_id) {
                 setSynthesisTaskId(res.data.task_id);
-                toast.success('Web Synthesis started! Polling for results...');
+                toast.success('Web Synthesis completed! Polling for results...');
                 pollSynthesisResult(res.data.task_id);
             } else {
                 toast.error(`Synthesis failed: ${res.error || 'Unknown error'}`);
@@ -481,8 +486,8 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={() => { setExtractionScope('brand'); setSelectedCompetitorId(null); }}>Brand</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setExtractionScope('competitors')}>Competitors</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => { setExtractionScope('brand'); setSelectedCompetitorId(null); }}>Brand</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => setExtractionScope('competitors')}>Competitors</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -491,7 +496,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                         <DropdownMenuTrigger asChild disabled={isRunningExtraction}>
                                             <Button variant="outline" className="h-9 justify-between min-w-[140px]">
                                                 {selectedCompetitorId
-                                                    ? competitors.find(c => c.id === selectedCompetitorId)?.name || 'Selected'
+                                                    ? competitors.find(c => String(c.id) === selectedCompetitorId)?.name || 'Selected'
                                                     : <span className="text-muted-foreground">Select Competitor</span>
                                                 }
                                                 <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -501,7 +506,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                             {competitors.map((competitor) => (
                                                 <DropdownMenuItem
                                                     key={competitor.id}
-                                                    onClick={() => setSelectedCompetitorId(competitor.id)}
+                                                    onSelect={() => setSelectedCompetitorId(String(competitor.id))}
                                                 >
                                                     {competitor.name}
                                                 </DropdownMenuItem>
@@ -581,7 +586,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                 {isLoadingExtractionTasks ? (
                                     <div className="space-y-3">
                                         {[1, 2, 3].map((i) => (
-                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-2 bg-card">
+                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
                                                 <div className="shrink-0">
                                                     <Skeleton className="w-10 h-10 rounded-lg" />
                                                 </div>
@@ -614,7 +619,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                             <div
                                                 key={task.task_id}
                                                 className={cn(
-                                                    "group relative flex items-center gap-4 p-4 rounded-xl border-2 bg-card hover:bg-accent/50  hover:border-primary/30 transition-all duration-200 cursor-pointer ",
+                                                    "group relative flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-accent/50  hover:border-primary/30 transition-all duration-200 cursor-pointer ",
                                                     selectedExtractionResult?.task_id === task.task_id && "border-primary/50 bg-primary/5"
                                                 )}
                                                 onClick={() => handleViewExtractionResult(task.task_id)}
@@ -646,14 +651,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                                             <Clock className="h-3.5 w-3.5" />
                                                             {formatDate(task.timestamp)}
                                                         </span>
-                                                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
-                                                            ⏱️ {formatExecutionTime(task.execution_time_seconds)}
-                                                        </span>
-                                                        {task.model_used && (
-                                                            <span className="opacity-70 hidden sm:inline">
-                                                                {task.model_used.includes('claude') ? '🤖 Claude' : task.model_used.slice(0, 10)}
-                                                            </span>
-                                                        )}
+                                                       
                                                     </div>
 
                                                 </div>
@@ -723,31 +721,40 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                             <div className="flex flex-wrap items-center gap-2">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild disabled={isRunningSynthesis || extractionTasks.length === 0}>
-                                        <Button variant="outline" className="h-9 justify-between min-w-[180px]">
+                                        <Button variant="outline" className="h-9 justify-between min-w-[200px]">
                                             {selectedExtractionForSynthesis ? (
-                                                <span className="truncate text-xs font-mono">
-                                                    {selectedExtractionForSynthesis.slice(0, 12)}...
-                                                </span>
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="truncate text-xs font-medium">
+                                                        {extractionTasks.find(t => t.task_id === selectedExtractionForSynthesis)?.entity_name || 'Selected Task'}
+                                                    </span>
+                                                </div>
                                             ) : (
-                                                <span className="text-muted-foreground">Select Extraction</span>
+                                                <span className="text-muted-foreground">Select Extraction Task</span>
                                             )}
-                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50 shrink-0" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-[220px]">
-                                        {extractionTasks.map((task) => (
-                                            <DropdownMenuItem
-                                                key={task.task_id}
-                                                onClick={() => setSelectedExtractionForSynthesis(task.task_id)}
-                                            >
-                                                <div className="flex flex-col gap-0.5">
-                                                    <div className="flex items-center gap-1.5">
-                                                        {task.entity_name}
+                                    <DropdownMenuContent className="w-[250px]">
+                                        {extractionTasks.length === 0 ? (
+                                            <div className="p-2 text-xs text-muted-foreground text-center">
+                                                No extraction tasks available
+                                            </div>
+                                        ) : (
+                                            extractionTasks.map((task) => (
+                                                <DropdownMenuItem
+                                                    key={task.task_id}
+                                                    onSelect={() => setSelectedExtractionForSynthesis(task.task_id)}
+                                                >
+                                                    <div className="flex flex-col gap-0.5 w-full">
+                                                        <div className="flex items-center justify-between gap-2 w-full">
+                                                            <span className="truncate font-medium">{task.entity_name}</span>
+                                                            <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">{task.analysis_scope}</Badge>
+                                                        </div>
+                                                        <span className="text-[10px] text-muted-foreground">{formatDate(task.timestamp)}</span>
                                                     </div>
-                                                    <span className="text-[10px] text-muted-foreground">{formatDate(task.timestamp)}</span>
-                                                </div>
-                                            </DropdownMenuItem>
-                                        ))}
+                                                </DropdownMenuItem>
+                                            ))
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -820,7 +827,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                 {isLoadingSynthesisTasks ? (
                                     <div className="space-y-3">
                                         {[1, 2, 3].map((i) => (
-                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-2 bg-card">
+                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
                                                 <div className="shrink-0">
                                                     <Skeleton className="w-10 h-10 rounded-lg" />
                                                 </div>
@@ -853,7 +860,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                             <div
                                                 key={task.task_id}
                                                 className={cn(
-                                                    "group relative flex items-center gap-4 p-4 rounded-xl border-2 bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 cursor-pointer ",
+                                                    "group relative flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 cursor-pointer ",
                                                     selectedSynthesisResult?.task_id === task.task_id && " border-primary/50 bg-primary/5"
                                                 )}
                                                 onClick={() => handleViewSynthesisResult(task.task_id)}
@@ -885,14 +892,7 @@ console.log(synthesisTasks, `<-> synthesisTasks <->`);
                                                             <Clock className="h-3.5 w-3.5" />
                                                             {formatDate(task.timestamp)}
                                                         </span>
-                                                        <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
-                                                            ⏱️ {formatExecutionTime(task.execution_time_seconds)}
-                                                        </span>
-                                                        {task.model_used && (
-                                                            <span className="opacity-70 hidden sm:inline">
-                                                                {task.model_used.includes('claude') ? '🤖 Claude' : task.model_used.slice(0, 10)}
-                                                            </span>
-                                                        )}
+                                                       
                                                     </div>
 
                                                 </div>

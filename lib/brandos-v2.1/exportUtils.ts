@@ -62,6 +62,21 @@ const PDF_CONFIG = {
     }
 };
 
+const LOGO_URL = 'https://i.postimg.cc/yY06gqFK/HB-logo-name-mark-side-black-1.png';
+
+// --- Helper: Image Loading ---
+async function loadImage(url: string): Promise<string | null> {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch image: ${url}`);
+        const buffer = await response.arrayBuffer();
+        return arrayBufferToBase64(buffer);
+    } catch (error) {
+        console.warn('Image loading failed:', error);
+        return null;
+    }
+}
+
 // --- Helper: Font Loading ---
 async function loadFonts(doc: jsPDF) {
     try {
@@ -123,8 +138,11 @@ export async function exportToPDF(markdown: string, filename: string, title: str
         format: 'a4'
     });
 
-    // 2. Load Fonts
-    const fontsLoaded = await loadFonts(doc);
+    // 2. Load Resources (Fonts & Images)
+    const [fontsLoaded, logoBase64] = await Promise.all([
+        loadFonts(doc),
+        loadImage(LOGO_URL)
+    ]);
     const fontName = fontsLoaded ? 'Inter' : 'helvetica';
 
     // 3. Document State
@@ -159,13 +177,26 @@ export async function exportToPDF(markdown: string, filename: string, title: str
     };
 
     // 4. Create Cover Page
+    // Add Logo if available
+    if (logoBase64) {
+        try {
+            const imgProps = doc.getImageProperties(logoBase64);
+            const imgWidth = 60; // mm
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            const x = (pageWidth - imgWidth) / 2;
+            doc.addImage(logoBase64, 'PNG', x, 30, imgWidth, imgHeight);
+        } catch (e) {
+            console.warn('Failed to add logo to PDF:', e);
+        }
+    }
+
     doc.setFont(fontName, 'bold');
     doc.setFontSize(PDF_CONFIG.fontSize.title);
     doc.setTextColor(COLORS.primary);
     
     // Centered Title
     const titleLines = doc.splitTextToSize(title, contentWidth);
-    let titleY = pageHeight / 3;
+    let titleY = pageHeight / 2.3; // Adjust title position slightly lower
     doc.text(titleLines, pageWidth / 2, titleY, { align: 'center' });
     
     // Metadata / Date
@@ -176,12 +207,11 @@ export async function exportToPDF(markdown: string, filename: string, title: str
         year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
     });
-    doc.text(`Generated on: ${dateStr}`, pageWidth / 2, titleY + (titleLines.length * 12) + 10, { align: 'center' });
+    doc.text(`${dateStr}`, pageWidth / 2, titleY + (titleLines.length * 12) + 10, { align: 'center' });
 
     // Brand Marker
     doc.setFontSize(10);
     doc.setTextColor(COLORS.accent);
-    doc.text("CONFIDENTIAL REPORT", pageWidth / 2, pageHeight - 30, { align: 'center' });
 
     // Start Content on New Page
     addNewPage();
